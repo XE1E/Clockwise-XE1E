@@ -830,7 +830,35 @@ npx serve .
 4. Los elementos apareceran en el canvas
 5. Editar y exportar nuevamente
 
-#### 8. Tips y Mejores Practicas
+#### 8. Usar Imagen de Referencia
+
+El editor permite cargar una imagen como guia para calcar o diseñar encima.
+
+**Cargar imagen de referencia:**
+1. Click en "Imagen Referencia"
+2. Seleccionar cualquier imagen (foto, dibujo, captura, etc.)
+3. La imagen aparece sobre/debajo del canvas
+
+**Controles disponibles:**
+- **Opacidad:** Ajustar transparencia de 10% a 90%
+- **Detras:** Marcar para poner la imagen debajo del diseño (ideal para calcar)
+- **X:** Quitar la imagen de referencia
+- **Usar como Fondo:** Convertir la imagen a 64x64 pixeles y agregarla como elemento
+
+**Convertir a elemento:**
+1. Cargar la imagen de referencia
+2. Click en "Usar como Fondo"
+3. La imagen se escala automaticamente a 64x64
+4. Se agrega como primer elemento (fondo)
+5. Puedes ajustar su posicion despues
+
+**Casos de uso:**
+- Calcar un logo o dibujo pixel art
+- Usar una foto como base para pixelar
+- Importar un diseño de Photoshop/Figma
+- Referenciar otra clockface mientras diseñas
+
+#### 9. Tips y Mejores Practicas
 
 **Rendimiento:**
 - Usar formas geometricas en lugar de imagenes cuando sea posible
