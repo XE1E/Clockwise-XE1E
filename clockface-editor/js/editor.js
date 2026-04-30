@@ -139,6 +139,155 @@ class ClockfaceEditor {
         this.referenceImage.classList.add(behind ? 'behind' : 'above');
     }
 
+    bindImageTool() {
+        this.imageToolData = { originalImage: null, processedBase64: null };
+
+        document.getElementById('btn-image-tool').addEventListener('click', () => {
+            document.getElementById('image-modal').classList.add('active');
+            document.getElementById('image-preview-section').style.display = 'none';
+            document.getElementById('btn-add-image').style.display = 'none';
+        });
+
+        document.getElementById('image-tool-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    this.imageToolData.originalImage = img;
+                    document.getElementById('image-preview-section').style.display = 'block';
+                    document.getElementById('btn-add-image').style.display = 'inline-block';
+                    document.getElementById('original-info').textContent = `${img.width}x${img.height} px`;
+
+                    const origCanvas = document.getElementById('preview-original');
+                    const origCtx = origCanvas.getContext('2d');
+                    origCtx.imageSmoothingEnabled = false;
+                    origCtx.fillStyle = '#000';
+                    origCtx.fillRect(0, 0, 128, 128);
+
+                    const scale = Math.min(128 / img.width, 128 / img.height);
+                    const w = img.width * scale;
+                    const h = img.height * scale;
+                    origCtx.drawImage(img, (128 - w) / 2, (128 - h) / 2, w, h);
+
+                    this.updateImagePreview();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btn-preview-update').addEventListener('click', () => {
+            this.updateImagePreview();
+        });
+
+        ['contrast-adjust', 'brightness-adjust', 'saturation-adjust'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', () => {
+                document.getElementById(id.replace('-adjust', '-value')).textContent = el.value + '%';
+            });
+        });
+
+        document.getElementById('btn-add-image').addEventListener('click', async () => {
+            if (!this.imageToolData.processedBase64) return;
+
+            const element = new ImageElement(0, 0);
+            element.image = this.imageToolData.processedBase64;
+            await element.loadImage(this.imageToolData.processedBase64);
+
+            this.clockface.elements.unshift(element);
+            this.selectedId = element.id;
+
+            document.getElementById('image-modal').classList.remove('active');
+            document.getElementById('image-tool-file').value = '';
+
+            this.updatePropertiesPanel();
+            this.updateLayersList();
+            this.render();
+        });
+    }
+
+    updateImagePreview() {
+        if (!this.imageToolData.originalImage) return;
+
+        const img = this.imageToolData.originalImage;
+        const canvas = document.getElementById('preview-64');
+        const ctx = canvas.getContext('2d');
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 64;
+        tempCanvas.height = 64;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.imageSmoothingEnabled = false;
+
+        tempCtx.fillStyle = '#000';
+        tempCtx.fillRect(0, 0, 64, 64);
+
+        const scaleMode = document.getElementById('scale-mode').value;
+        let sx = 0, sy = 0, sw = img.width, sh = img.height;
+        let dx = 0, dy = 0, dw = 64, dh = 64;
+
+        if (scaleMode === 'contain') {
+            const scale = Math.min(64 / img.width, 64 / img.height);
+            dw = Math.floor(img.width * scale);
+            dh = Math.floor(img.height * scale);
+            dx = Math.floor((64 - dw) / 2);
+            dy = Math.floor((64 - dh) / 2);
+        } else if (scaleMode === 'cover') {
+            const scale = Math.max(64 / img.width, 64 / img.height);
+            sw = 64 / scale;
+            sh = 64 / scale;
+            sx = (img.width - sw) / 2;
+            sy = (img.height - sh) / 2;
+        }
+
+        tempCtx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+
+        const contrast = parseInt(document.getElementById('contrast-adjust').value) / 100;
+        const brightness = parseInt(document.getElementById('brightness-adjust').value) / 100;
+        const saturation = parseInt(document.getElementById('saturation-adjust').value) / 100;
+
+        const imageData = tempCtx.getImageData(0, 0, 64, 64);
+        const data = imageData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+            let r = data[i], g = data[i + 1], b = data[i + 2];
+
+            r = ((r / 255 - 0.5) * contrast + 0.5) * 255 * brightness;
+            g = ((g / 255 - 0.5) * contrast + 0.5) * 255 * brightness;
+            b = ((b / 255 - 0.5) * contrast + 0.5) * 255 * brightness;
+
+            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+            r = gray + (r - gray) * saturation;
+            g = gray + (g - gray) * saturation;
+            b = gray + (b - gray) * saturation;
+
+            data[i] = Math.max(0, Math.min(255, r));
+            data[i + 1] = Math.max(0, Math.min(255, g));
+            data[i + 2] = Math.max(0, Math.min(255, b));
+        }
+
+        const colorMode = document.getElementById('color-mode').value;
+        if (colorMode !== 'full') {
+            const levels = parseInt(colorMode);
+            const step = 256 / levels;
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = Math.floor(data[i] / step) * step;
+                data[i + 1] = Math.floor(data[i + 1] / step) * step;
+                data[i + 2] = Math.floor(data[i + 2] / step) * step;
+            }
+        }
+
+        tempCtx.putImageData(imageData, 0, 0);
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(tempCanvas, 0, 0, 128, 128);
+
+        this.imageToolData.processedBase64 = tempCanvas.toDataURL('image/png').split(',')[1];
+    }
+
     bindEvents() {
         this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
         this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
@@ -277,6 +426,8 @@ class ClockfaceEditor {
             a.click();
             URL.revokeObjectURL(url);
         });
+
+        this.bindImageTool();
 
         document.querySelectorAll('.modal-close').forEach(btn => {
             btn.addEventListener('click', () => {

@@ -527,6 +527,91 @@ body {
     border-top: 1px solid var(--border-color);
 }
 
+/* Image Tool Modal */
+.modal-large {
+    max-width: 800px;
+}
+
+.image-tool-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.image-tool-input {
+    text-align: center;
+    padding: 30px;
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+}
+
+.image-tool-input label.btn {
+    cursor: pointer;
+}
+
+.help-text {
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    margin-top: 10px;
+}
+
+.image-tool-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.preview-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.preview-box {
+    text-align: center;
+}
+
+.preview-box h4 {
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+    font-weight: normal;
+}
+
+.preview-box canvas {
+    border: 1px solid var(--border-color);
+    background: #000;
+    image-rendering: pixelated;
+}
+
+.preview-box span {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+}
+
+.image-tool-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-dark);
+    border-radius: 8px;
+}
+
+.image-tool-options .form-group {
+    margin-bottom: 0;
+}
+
+.image-tool-options input[type="range"] {
+    width: 100%;
+}
+
+#btn-preview-update {
+    align-self: center;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;

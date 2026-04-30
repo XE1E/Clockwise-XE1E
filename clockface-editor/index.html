@@ -17,6 +17,7 @@
             <div class="header-actions">
                 <button id="btn-new" class="btn btn-secondary" title="Nuevo">Nuevo</button>
                 <button id="btn-import" class="btn btn-secondary" title="Importar JSON">Importar</button>
+                <button id="btn-image-tool" class="btn btn-secondary" title="Optimizar imagen para 64x64">Preparar Imagen</button>
                 <button id="btn-export" class="btn btn-primary" title="Exportar JSON">Exportar JSON</button>
             </div>
         </header>
@@ -292,6 +293,83 @@
                 <button class="btn btn-secondary modal-close">Cerrar</button>
                 <button class="btn btn-primary" id="btn-copy-json">Copiar</button>
                 <button class="btn btn-primary" id="btn-download-json">Descargar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preparation Modal -->
+    <div id="image-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Preparar Imagen para 64x64</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="image-tool-container">
+                    <div class="image-tool-input">
+                        <label class="btn btn-primary">
+                            <input type="file" id="image-tool-file" accept="image/*" hidden>
+                            Cargar Imagen
+                        </label>
+                        <p class="help-text">Sube cualquier imagen (foto, logo, dibujo)</p>
+                    </div>
+
+                    <div class="image-tool-preview" id="image-preview-section" style="display:none;">
+                        <div class="preview-row">
+                            <div class="preview-box">
+                                <h4>Original</h4>
+                                <canvas id="preview-original" width="128" height="128"></canvas>
+                                <span id="original-info"></span>
+                            </div>
+                            <div class="preview-box">
+                                <h4>64x64 Preview</h4>
+                                <canvas id="preview-64" width="128" height="128"></canvas>
+                                <span>64x64 px</span>
+                            </div>
+                        </div>
+
+                        <div class="image-tool-options">
+                            <div class="form-group">
+                                <label>Modo de escala:</label>
+                                <select id="scale-mode">
+                                    <option value="contain">Ajustar (mantener proporcion)</option>
+                                    <option value="cover">Recortar (llenar todo)</option>
+                                    <option value="stretch">Estirar (deformar)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Colores:</label>
+                                <select id="color-mode">
+                                    <option value="full">Todos (RGB565)</option>
+                                    <option value="16">16 colores</option>
+                                    <option value="8">8 colores</option>
+                                    <option value="4">4 colores</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Contraste:</label>
+                                <input type="range" id="contrast-adjust" min="50" max="200" value="100">
+                                <span id="contrast-value">100%</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Brillo:</label>
+                                <input type="range" id="brightness-adjust" min="50" max="150" value="100">
+                                <span id="brightness-value">100%</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Saturacion:</label>
+                                <input type="range" id="saturation-adjust" min="0" max="200" value="100">
+                                <span id="saturation-value">100%</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary" id="btn-preview-update">Actualizar Preview</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cancelar</button>
+                <button class="btn btn-primary" id="btn-add-image" style="display:none;">Agregar al Canvas</button>
             </div>
         </div>
     </div>
