@@ -86,10 +86,45 @@ https://github.com/jnthas/clockwise/wiki/Connecting-the-LDR) about that.
 - *LDR Pin*: The ESP32 GPIO pin where the LDR is connected to. The default is 35. There is a link there where you can read the current value of LDR and test if it's working.
 - *Posix Timezone String*: To avoid remote lookups of ezTime, provide a Posix string that corresponds to your timezone ([explanation](https://github.com/ropg/ezTime#timezones-1)). Leave empty to obtain this automatically from the server. 
 - *Display Rotation*: Allows you to rotate the display. This is useful if you need to adjust the direction in which cables protrude relative to the displayed image.
+- *Language (Spanish/English)*: Toggle between Spanish and English for day and month names. When Spanish is enabled, dates will show "Lunes", "Martes", "Enero", etc. instead of "Monday", "Tuesday", "January".
 
 ## How to change the clockface (PlatformIO)
 
-Clockwise uses PlatformIO as IDE, so the configuration is already done if you use the same. The Clockwise structure consists mainly of three folders
+Clockwise uses PlatformIO as IDE, so the configuration is already done if you use the same.
+
+### Prerequisites
+
+1. **Install VS Code**: Download from https://code.visualstudio.com/
+2. **Install PlatformIO Extension**: 
+   - Open VS Code
+   - Go to Extensions (Ctrl+Shift+X)
+   - Search for "PlatformIO IDE"
+   - Click Install
+
+### Compiling and Uploading
+
+```bash
+# Navigate to the firmware folder
+cd firmware
+
+# Compile (build) the firmware
+pio run
+
+# Compile and upload to ESP32 (connect USB first)
+pio run -t upload
+
+# Monitor serial output (for debugging)
+pio device monitor
+```
+
+**Using VS Code GUI:**
+- Click the checkmark icon (✓) in the bottom bar to **Build**
+- Click the arrow icon (→) to **Upload**
+- Click the plug icon to open **Serial Monitor**
+
+### Project Structure
+
+The Clockwise structure consists mainly of three folders
 - clockfaces: contains the collection of available clockfaces. This folder is not included when compiling
 - lib: contains the basic code for Clockwise to work and in addition a symbolic link to the current clockface
 - src: contains the entry point for the clock code

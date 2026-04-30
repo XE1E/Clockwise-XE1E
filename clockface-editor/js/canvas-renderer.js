@@ -6,12 +6,12 @@ class CanvasRenderer {
         this.width = 64;
         this.height = 64;
 
-        this.fonts = {
-            'picopixel': { size: 3, lineHeight: 5 },
-            'square': { size: 5, lineHeight: 7 },
-            'medium': { size: 6, lineHeight: 8 },
-            'big': { size: 8, lineHeight: 10 },
-            '': { size: 5, lineHeight: 7 }
+        this.fontMap = {
+            'picopixel': 'picopixel',
+            'square': 'square',
+            'medium': 'medium',
+            'big': 'big',
+            '': 'picopixel'
         };
     }
 
@@ -69,32 +69,30 @@ class CanvasRenderer {
     }
 
     drawText(text, x, y, fontName, fgColor, bgColor) {
-        const font = this.fonts[fontName] || this.fonts[''];
+        const mappedFont = this.fontMap[fontName] || 'picopixel';
         const fgRgb = ColorUtils.rgb565ToRgb(fgColor);
         const bgRgb = ColorUtils.rgb565ToRgb(bgColor);
 
-        this.ctx.font = `${font.size}px monospace`;
+        const fgColorStr = `rgb(${fgRgb.r}, ${fgRgb.g}, ${fgRgb.b})`;
+        const bgColorStr = bgColor !== 0 ? `rgb(${bgRgb.r}, ${bgRgb.g}, ${bgRgb.b})` : null;
 
-        if (bgColor !== 0) {
-            const metrics = this.ctx.measureText(text);
-            this.ctx.fillStyle = `rgb(${bgRgb.r}, ${bgRgb.g}, ${bgRgb.b})`;
-            this.ctx.fillRect(x, y, metrics.width, font.lineHeight);
-        }
-
-        this.ctx.fillStyle = `rgb(${fgRgb.r}, ${fgRgb.g}, ${fgRgb.b})`;
-        this.ctx.fillText(text, x, y + font.size);
+        PixelFonts.drawText(this.ctx, mappedFont, text, x, y, fgColorStr, bgColorStr);
     }
 
     renderImage(element) {
         if (element.imageData) {
             this.ctx.drawImage(element.imageData, element.x, element.y);
-        } else if (element.image) {
+        } else if (element.image && !element._loading) {
+            element._loading = true;
             const img = new Image();
             img.onload = () => {
                 element.imageData = img;
                 element.width = img.width;
                 element.height = img.height;
-                this.ctx.drawImage(img, element.x, element.y);
+                element._loading = false;
+            };
+            img.onerror = () => {
+                element._loading = false;
             };
             img.src = element.image.startsWith('data:') ?
                 element.image : `data:image/png;base64,${element.image}`;
@@ -140,14 +138,13 @@ class CanvasRenderer {
             case 'datetime':
             case 'text': {
                 const text = element.type === 'datetime' ? element.getDisplayText() : element.content;
-                const font = this.fonts[element.font] || this.fonts[''];
-                this.ctx.font = `${font.size}px monospace`;
-                const metrics = this.ctx.measureText(text);
+                const mappedFont = this.fontMap[element.font] || 'picopixel';
+                const metrics = PixelFonts.measureText(mappedFont, text);
                 return {
                     x: element.x,
                     y: element.y,
-                    width: Math.ceil(metrics.width),
-                    height: font.lineHeight
+                    width: metrics.width,
+                    height: metrics.height
                 };
             }
             case 'image':

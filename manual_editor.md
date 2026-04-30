@@ -505,6 +505,130 @@ Verde: 64 niveles
 
 ---
 
+## Firmware - Compilacion y Configuracion
+
+### Requisitos
+
+1. **VS Code**: Descargar de https://code.visualstudio.com/
+2. **Extension PlatformIO**:
+   - Abrir VS Code
+   - Ir a Extensions (Ctrl+Shift+X)
+   - Buscar "PlatformIO IDE"
+   - Click en Install
+   - Reiniciar VS Code
+
+### Compilar y Subir Firmware
+
+#### Desde Terminal (bash)
+
+```bash
+# Navegar a la carpeta del firmware
+cd firmware
+
+# Solo compilar (verificar errores)
+pio run
+
+# Compilar y subir al ESP32 (conectar USB primero)
+pio run -t upload
+
+# Ver mensajes de debug en tiempo real
+pio device monitor
+
+# Compilar, subir y monitorear en un solo comando
+pio run -t upload && pio device monitor
+```
+
+#### Desde VS Code (GUI)
+
+| Icono | Accion | Ubicacion |
+|-------|--------|-----------|
+| ✓ (checkmark) | Build - Compilar | Barra inferior |
+| → (flecha) | Upload - Subir | Barra inferior |
+| 🔌 (plug) | Monitor - Serial | Barra inferior |
+| 🏠 (casa) | PIO Home | Barra lateral |
+
+### Configuracion de Idioma
+
+El firmware soporta **Español** e **Ingles** para nombres de dias y meses.
+
+#### Como cambiar el idioma
+
+1. Conectar el reloj a tu red WiFi
+2. Abrir navegador y visitar la IP del reloj
+3. En la pagina de Settings, buscar "Spanish"
+4. Activar o desactivar segun preferencia
+5. El cambio se guarda automaticamente
+
+#### Ejemplos de traduccion
+
+| Ingles | Español |
+|--------|---------|
+| Monday | Lunes |
+| Tuesday | Martes |
+| Wednesday | Miercoles |
+| January | Enero |
+| February | Febrero |
+| December | Diciembre |
+
+#### Uso en clockfaces
+
+En el formato de fecha/hora, los nombres se traducen automaticamente:
+
+```
+Formato: "l, d F"
+Ingles:  "Monday, 30 April"
+Español: "Lunes, 30 Abril"
+```
+
+### Configuracion via Web
+
+Despues de flashear, el reloj crea una red WiFi temporal o se conecta a la configurada. Visitar su IP para acceder a:
+
+| Opcion | Descripcion |
+|--------|-------------|
+| Timezone | Zona horaria (America/Mexico_City, Europe/Madrid, etc.) |
+| NTP Server | Servidor de tiempo (time.google.com por defecto) |
+| Display Bright | Brillo del display (0-255) |
+| 24h Format | Formato de hora 24h o 12h |
+| Spanish | Idioma español para fechas |
+| Swap Blue/Green | Para paneles con orden RBG |
+| Display Rotation | Rotar display 0, 90, 180, 270 grados |
+| LDR Pin | Pin del sensor de luz (35 por defecto) |
+| Auto Bright | Brillo automatico con LDR |
+
+### Estructura del Proyecto
+
+```
+firmware/
+├── src/
+│   └── main.cpp              # Punto de entrada
+├── lib/
+│   ├── cw-commons/           # Librerias comunes
+│   │   ├── CWDateTime.cpp    # Manejo de fecha/hora
+│   │   ├── CWPreferences.h   # Configuracion persistente
+│   │   ├── CWWebServer.h     # Servidor web de config
+│   │   └── WiFiController.h  # Control de WiFi
+│   ├── cw-gfx-engine/        # Motor grafico
+│   └── [clockface]/          # Clockface seleccionado
+├── clockfaces/               # Coleccion de clockfaces
+│   ├── cw-cf-0x01/           # Mario Bros
+│   ├── cw-cf-0x02/           # Time in Words
+│   └── cw-cf-0x07/           # Canvas (JSON)
+└── platformio.ini            # Configuracion PlatformIO
+```
+
+### Solucionar Problemas Comunes
+
+| Problema | Solucion |
+|----------|----------|
+| "No se encuentra el puerto" | Instalar driver CP2102 o CH340 |
+| "Upload failed" | Presionar BOOT en el ESP32 durante upload |
+| "No WiFi" | Solo funciona con redes 2.4GHz |
+| "Hora incorrecta" | Verificar timezone y conexion a internet |
+| "Colores invertidos" | Activar "Swap Blue/Green" |
+
+---
+
 ## Soporte
 
 - **Repositorio:** https://github.com/XE1E/Clockwise

@@ -159,6 +159,38 @@
                         <input type="text" id="el-content" value="">
                     </div>
 
+                    <!-- DateTime format presets -->
+                    <div class="form-group" id="fg-format-presets" style="display:none;">
+                        <label>Formatos rapidos</label>
+                        <div class="format-presets">
+                            <div class="preset-group">
+                                <span class="preset-label">24H:</span>
+                                <button type="button" class="btn-preset" data-format="H:i">14:30</button>
+                                <button type="button" class="btn-preset" data-format="H:i:s">14:30:45</button>
+                            </div>
+                            <div class="preset-group">
+                                <span class="preset-label">12H:</span>
+                                <button type="button" class="btn-preset" data-format="h:i">2:30</button>
+                                <button type="button" class="btn-preset" data-format="h:i:s">2:30:45</button>
+                                <button type="button" class="btn-preset" data-format="h:i A">2:30 PM</button>
+                                <button type="button" class="btn-preset" data-format="h:i:s A">2:30:45 PM</button>
+                            </div>
+                            <div class="preset-group">
+                                <span class="preset-label">Fecha:</span>
+                                <button type="button" class="btn-preset" data-format="d/m">30/04</button>
+                                <button type="button" class="btn-preset" data-format="d/m/y">30/04/26</button>
+                                <button type="button" class="btn-preset" data-format="d-m-Y">30-04-2026</button>
+                            </div>
+                            <div class="preset-group">
+                                <span class="preset-label">Dia:</span>
+                                <button type="button" class="btn-preset" data-format="D">Mie</button>
+                                <button type="button" class="btn-preset" data-format="l">Miercoles</button>
+                                <button type="button" class="btn-preset" data-format="D d">Mie 30</button>
+                                <button type="button" class="btn-preset" data-format="d M">30 Abr</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group" id="fg-font">
                         <label>Fuente</label>
                         <select id="el-font">
@@ -383,6 +415,7 @@
     </div>
 
     <script src="js/color-utils.js"></script>
+    <script src="js/pixel-fonts.js"></script>
     <script src="js/elements.js"></script>
     <script src="js/canvas-renderer.js"></script>
     <script src="js/editor.js"></script>

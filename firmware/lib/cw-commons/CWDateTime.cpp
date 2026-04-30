@@ -1,5 +1,13 @@
 #include "CWDateTime.h"
 
+// Spanish day names
+const char* DAYS_ES_ABBR[] = {"Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"};
+const char* DAYS_ES_FULL[] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
+
+// Spanish month names
+const char* MONTHS_ES_ABBR[] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
+const char* MONTHS_ES_FULL[] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
+
 void CWDateTime::begin(const char *timeZone, bool use24format, const char *ntpServer = NTP_SERVER, const char *posixTZ = "")
 {
   Serial.printf("[Time] NTP Server: %s, Timezone: %s\n", ntpServer, timeZone);
@@ -15,18 +23,74 @@ void CWDateTime::begin(const char *timeZone, bool use24format, const char *ntpSe
   }
 
   this->use24hFormat = use24format;
+  this->useSpanish = true;
   ezt::updateNTP();
   waitForSync(10);
 }
 
+void CWDateTime::setSpanish(bool enabled)
+{
+  this->useSpanish = enabled;
+}
+
+String CWDateTime::getDayNameSpanish(bool abbreviated)
+{
+  int dayOfWeek = myTZ.dateTime("w").toInt(); // 0=Sunday, 6=Saturday
+  if (abbreviated) {
+    return String(DAYS_ES_ABBR[dayOfWeek]);
+  }
+  return String(DAYS_ES_FULL[dayOfWeek]);
+}
+
+String CWDateTime::getMonthNameSpanish(bool abbreviated)
+{
+  int month = myTZ.dateTime("n").toInt(); // 1-12
+  if (abbreviated) {
+    return String(MONTHS_ES_ABBR[month - 1]);
+  }
+  return String(MONTHS_ES_FULL[month - 1]);
+}
+
+String CWDateTime::translateToSpanish(String text)
+{
+  if (!useSpanish) return text;
+
+  // Translate abbreviated day names
+  text.replace("Sun", "Dom"); text.replace("Mon", "Lun"); text.replace("Tue", "Mar");
+  text.replace("Wed", "Mie"); text.replace("Thu", "Jue"); text.replace("Fri", "Vie");
+  text.replace("Sat", "Sab");
+
+  // Translate full day names
+  text.replace("Sunday", "Domingo"); text.replace("Monday", "Lunes");
+  text.replace("Tuesday", "Martes"); text.replace("Wednesday", "Miercoles");
+  text.replace("Thursday", "Jueves"); text.replace("Friday", "Viernes");
+  text.replace("Saturday", "Sabado");
+
+  // Translate abbreviated month names
+  text.replace("Jan", "Ene"); text.replace("Feb", "Feb"); text.replace("Mar", "Mar");
+  text.replace("Apr", "Abr"); text.replace("May", "May"); text.replace("Jun", "Jun");
+  text.replace("Jul", "Jul"); text.replace("Aug", "Ago"); text.replace("Sep", "Sep");
+  text.replace("Oct", "Oct"); text.replace("Nov", "Nov"); text.replace("Dec", "Dic");
+
+  // Translate full month names
+  text.replace("January", "Enero"); text.replace("February", "Febrero");
+  text.replace("March", "Marzo"); text.replace("April", "Abril");
+  text.replace("June", "Junio"); text.replace("July", "Julio");
+  text.replace("August", "Agosto"); text.replace("September", "Septiembre");
+  text.replace("October", "Octubre"); text.replace("November", "Noviembre");
+  text.replace("December", "Diciembre");
+
+  return text;
+}
+
 String CWDateTime::getFormattedTime()
 {
-  return myTZ.dateTime();
+  return translateToSpanish(myTZ.dateTime());
 }
 
 String CWDateTime::getFormattedTime(const char *format)
 {
-  return myTZ.dateTime(format);
+  return translateToSpanish(myTZ.dateTime(format));
 }
 
 char *CWDateTime::getHour(const char *format)

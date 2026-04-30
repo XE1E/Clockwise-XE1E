@@ -113,6 +113,8 @@ struct ClockwiseWebServer
         ClockwiseParams::getInstance()->swapBlueGreen = (value == "1");
       } else if (key == ClockwiseParams::getInstance()->PREF_USE_24H_FORMAT) {
         ClockwiseParams::getInstance()->use24hFormat = (value == "1");
+      } else if (key == ClockwiseParams::getInstance()->PREF_USE_SPANISH) {
+        ClockwiseParams::getInstance()->useSpanish = (value == "1");
       } else if (key == ClockwiseParams::getInstance()->PREF_LDR_PIN) {
         ClockwiseParams::getInstance()->ldrPin = value.toInt();
       } else if (key == ClockwiseParams::getInstance()->PREF_TIME_ZONE) {
@@ -155,6 +157,7 @@ struct ClockwiseWebServer
     client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_DISPLAY_ABC_MAX, ClockwiseParams::getInstance()->autoBrightMax);
     client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_SWAP_BLUE_GREEN, ClockwiseParams::getInstance()->swapBlueGreen);
     client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_USE_24H_FORMAT, ClockwiseParams::getInstance()->use24hFormat);
+    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_USE_SPANISH, ClockwiseParams::getInstance()->useSpanish);
     client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_LDR_PIN, ClockwiseParams::getInstance()->ldrPin);    
     client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_TIME_ZONE, ClockwiseParams::getInstance()->timeZone.c_str());
     client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_WIFI_SSID, ClockwiseParams::getInstance()->wifiSsid.c_str());

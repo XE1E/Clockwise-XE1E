@@ -476,6 +476,14 @@ class ClockfaceEditor {
             };
             reader.readAsDataURL(file);
         });
+
+        document.querySelectorAll('.btn-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const format = btn.dataset.format;
+                document.getElementById('el-content').value = format;
+                this.updateSelectedElement();
+            });
+        });
     }
 
     bindModals() {
@@ -513,11 +521,17 @@ class ClockfaceEditor {
             }
         });
 
-        document.getElementById('btn-copy-json').addEventListener('click', () => {
-            const textarea = document.getElementById('export-json');
-            textarea.select();
-            document.execCommand('copy');
-            alert('JSON copiado al portapapeles');
+        document.getElementById('btn-copy-json').addEventListener('click', async () => {
+            const json = document.getElementById('export-json').value;
+            try {
+                await navigator.clipboard.writeText(json);
+                alert('JSON copiado al portapapeles');
+            } catch (e) {
+                const textarea = document.getElementById('export-json');
+                textarea.select();
+                document.execCommand('copy');
+                alert('JSON copiado al portapapeles');
+            }
         });
 
         document.getElementById('btn-download-json').addEventListener('click', () => {
@@ -779,6 +793,7 @@ class ClockfaceEditor {
 
         const showFields = {
             'fg-content': ['datetime', 'text'],
+            'fg-format-presets': ['datetime'],
             'fg-font': ['datetime', 'text'],
             'fg-fgcolor': ['datetime', 'text'],
             'fg-bgcolor': ['datetime', 'text'],

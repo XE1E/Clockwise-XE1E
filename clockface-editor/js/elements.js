@@ -177,7 +177,8 @@ class RectElement extends ClockfaceElement {
             y: this.y,
             width: this.width,
             height: this.height,
-            color: this.color
+            color: this.color,
+            id: this.id
         };
     }
 }
@@ -197,7 +198,8 @@ class FillRectElement extends ClockfaceElement {
             y: this.y,
             width: this.width,
             height: this.height,
-            color: this.color
+            color: this.color,
+            id: this.id
         };
     }
 }
@@ -217,7 +219,8 @@ class LineElement extends ClockfaceElement {
             y: this.y,
             x1: this.x1,
             y1: this.y1,
-            color: this.color
+            color: this.color,
+            id: this.id
         };
     }
 }

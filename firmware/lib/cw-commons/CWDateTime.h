@@ -9,9 +9,13 @@ class CWDateTime
 private:
   Timezone myTZ;
   bool use24hFormat = true;
+  bool useSpanish = true;
+
+  String translateToSpanish(String text);
 
 public:
   void begin(const char *timeZone, bool use24format, const char *ntpServer, const char *posixTZ);
+  void setSpanish(bool enabled);
   String getFormattedTime();
   String getFormattedTime(const char* format);
 
@@ -25,6 +29,9 @@ public:
   int getDay();
   int getMonth();
   int getWeekday();
+
+  String getDayNameSpanish(bool abbreviated = true);
+  String getMonthNameSpanish(bool abbreviated = true);
 
   bool isAM();
   bool is24hFormat();

@@ -70,6 +70,14 @@ const char SETTINGS_PAGE[] PROGMEM = R""""(
           property: "use24hFormat"
         },
         {
+          title: "Idioma / Language",
+          description: "Usa nombres de dias y meses en español (Lun, Mar, Ene, Feb...) / Use Spanish day and month names",
+          formInput: "<input class='w3-check' type='checkbox' id='useSpanish' " + (settings.usespanish == '1' ? "checked" : "") + "><label for='useSpanish'> Español</label>",
+          icon: "fa-language",
+          save: "updatePreference('useSpanish', Number(useSpanish.checked))",
+          property: "useSpanish"
+        },
+        {
           title: "Swap Blue/Green pins?",
           description: "Swap Blue and Green pins because the panel is RBG instead of RGB",
           formInput: "<input class='w3-check' type='checkbox' id='swapBG' " + (settings.swapbluegreen == '1' ? "checked" : "") + "><label for='swapBG'> Yep</label>",

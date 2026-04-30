@@ -414,6 +414,43 @@ body {
     width: 30px;
 }
 
+/* Format Presets */
+.format-presets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preset-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+
+.preset-label {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    min-width: 45px;
+}
+
+.btn-preset {
+    padding: 3px 8px;
+    font-size: 0.75em;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-preset:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
 /* Buttons */
 .btn {
     padding: 8px 16px;
