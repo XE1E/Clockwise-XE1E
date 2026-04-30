@@ -581,6 +581,100 @@ Las funcionalidades de **complejidad baja** que agregan más valor son:
 
 ---
 
+## Web Flashing - Documentacion Tecnica
+
+El sistema de flasheo web permite actualizar el firmware del ESP32 directamente desde el navegador.
+
+### Tecnologia: ESP Web Tools
+
+- **Biblioteca:** [ESP Web Tools](https://esphome.github.io/esp-web-tools/) de ESPHome
+- **API:** WebSerial (Chrome 89+, Edge 89+, Opera 75+)
+- **Requisito:** HTTPS obligatorio
+
+### Estructura de Firmware
+
+```
+static/firmware/
+├── base_firmware/              # Archivos comunes a todos los clockfaces
+│   ├── bootloader_dio_40m.bin  # Bootloader ESP32
+│   ├── partitions.bin          # Tabla de particiones
+│   └── boot_app0.bin           # OTA data
+└── cw-cf-0x07/                 # Clockface especifico
+    ├── manifest.json           # Descriptor para ESP Web Tools
+    └── firmware.bin            # Aplicacion compilada
+```
+
+### Mapa de Memoria ESP32
+
+| Archivo | Offset | Hex | Descripcion |
+|---------|--------|-----|-------------|
+| bootloader.bin | 4096 | 0x1000 | Bootloader |
+| partitions.bin | 32768 | 0x8000 | Tabla de particiones |
+| boot_app0.bin | 57344 | 0xE000 | OTA data inicial |
+| firmware.bin | 65536 | 0x10000 | Aplicacion principal |
+
+### Formato manifest.json
+
+```json
+{
+    "name": "Clockwise Canvas",
+    "version": "1.4.2",
+    "builds": [
+        {
+            "chipFamily": "ESP32",
+            "improv": true,
+            "parts": [
+                {"path": "../base_firmware/bootloader_dio_40m.bin", "offset": 4096},
+                {"path": "../base_firmware/partitions.bin", "offset": 32768},
+                {"path": "../base_firmware/boot_app0.bin", "offset": 57344},
+                {"path": "firmware.bin", "offset": 65536}
+            ]
+        }
+    ]
+}
+```
+
+### Componente HTML
+
+```html
+<script type="module" 
+  src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module">
+</script>
+
+<esp-web-install-button manifest="static/firmware/cw-cf-0x07/manifest.json">
+    <button slot="activate">Flashear</button>
+    <span slot="unsupported">Navegador no compatible</span>
+    <span slot="not-allowed">Requiere HTTPS</span>
+</esp-web-install-button>
+```
+
+### Improv WiFi
+
+ESP Web Tools soporta Improv para configurar WiFi post-flasheo:
+- Se activa con `"improv": true` en el manifest
+- El firmware debe incluir la biblioteca Improv-WiFi-Library
+- Permite configurar WiFi sin necesidad de AP mode
+
+### Despliegue
+
+**GitHub Pages (Recomendado):**
+- HTTPS automatico
+- Gratis para repositorios publicos/privados
+- Rama `gh-pages` o carpeta `/docs`
+
+**Servidor propio:**
+- Requiere certificado SSL
+- Para desarrollo local: usar mkcert
+
+### Archivos Creados
+
+Se ha creado la carpeta `web-flasher/` con:
+- `index.html` - Pagina de flasheo personalizada
+- `static/firmware/` - Estructura para binarios
+- `README.md` - Documentacion de uso
+
+---
+
 ## Notas de Estudio
 
 *(Esta sección se actualizará conforme avancemos en el análisis)*

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clockwise Web Flasher</title>
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --text: #eaeaea;
+            --text-dim: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--highlight), #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: var(--highlight);
+        }
+
+        .clockface-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .clockface-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .clockface-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .clockface-option label {
+            display: block;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .clockface-option input:checked + label {
+            border-color: var(--highlight);
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .clockface-option label:hover {
+            transform: scale(1.05);
+        }
+
+        .clockface-option img {
+            width: 100%;
+            display: block;
+        }
+
+        .clockface-option .name {
+            background: var(--accent);
+            padding: 8px;
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        .flash-section {
+            text-align: center;
+            padding: 30px;
+        }
+
+        esp-web-install-button {
+            --esp-tools-button-color: var(--highlight);
+            --esp-tools-button-text-color: white;
+        }
+
+        #flash-button {
+            background: linear-gradient(135deg, var(--highlight), #ff6b6b);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #flash-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 25px rgba(233, 69, 96, 0.5);
+        }
+
+        .selected-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--accent);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-title {
+            color: #ffc107;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .steps {
+            counter-reset: step;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+            padding: 15px;
+            background: var(--accent);
+            border-radius: 8px;
+        }
+
+        .step::before {
+            counter-increment: step;
+            content: counter(step);
+            background: var(--highlight);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .unsupported, .not-allowed {
+            color: #ff6b6b;
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-dim);
+        }
+
+        footer a {
+            color: var(--highlight);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Clockwise Web Flasher</h1>
+            <p class="subtitle">Flashea tu reloj inteligente directamente desde el navegador</p>
+        </header>
+
+        <div class="card">
+            <h2>1. Selecciona una Clockface</h2>
+
+            <div class="clockface-grid">
+                <div class="clockface-option">
+                    <input type="radio" name="clockface" id="cf-0x01" value="cw-cf-0x01" checked>
+                    <label for="cf-0x01">
+                        <img src="https://github.com/jnthas/cw-cf-0x01/raw/main/cf_0x01_thumb.jpg" alt="Mario Bros">
+                        <div class="name">Mario Bros</div>
+                    </label>
+                </div>
+
+                <div class="clockface-option">
+                    <input type="radio" name="clockface" id="cf-0x02" value="cw-cf-0x02">
+                    <label for="cf-0x02">
+                        <img src="https://github.com/jnthas/cw-cf-0x02/raw/main/cf_0x02_thumb.jpg" alt="Time in Words">
+                        <div class="name">Time in Words</div>
+                    </label>
+                </div>
+
+                <div class="clockface-option">
+                    <input type="radio" name="clockface" id="cf-0x03" value="cw-cf-0x03">
+                    <label for="cf-0x03">
+                        <img src="https://github.com/jnthas/cw-cf-0x03/raw/main/cf_0x03_thumb.jpg" alt="World Map">
+                        <div class="name">World Map</div>
+                    </label>
+                </div>
+
+                <div class="clockface-option">
+                    <input type="radio" name="clockface" id="cf-0x04" value="cw-cf-0x04">
+                    <label for="cf-0x04">
+                        <img src="https://github.com/jnthas/cw-cf-0x04/raw/main/cf_0x04_thumb.jpg" alt="Castlevania">
+                        <div class="name">Castlevania</div>
+                    </label>
+                </div>
+
+                <div class="clockface-option">
+                    <input type="radio" name="clockface" id="cf-0x05" value="cw-cf-0x05">
+                    <label for="cf-0x05">
+                        <img src="https://github.com/jnthas/cw-cf-0x05/raw/main/cf_0x05_thumb.jpg" alt="Pacman">
+                        <div class="name">Pacman</div>
+                    </label>
+                </div>
+
+                <div class="clockface-option">
+                    <input type="radio" name="clockface" id="cf-0x06" value="cw-cf-0x06">
+                    <label for="cf-0x06">
+                        <img src="https://github.com/jnthas/cw-cf-0x06/raw/main/cf_0x06_thumb.jpg" alt="Pokedex">
+                        <div class="name">Pokedex</div>
+                    </label>
+                </div>
+
+                <div class="clockface-option">
+                    <input type="radio" name="clockface" id="cf-0x07" value="cw-cf-0x07">
+                    <label for="cf-0x07">
+                        <img src="https://github.com/jnthas/cw-cf-0x07/raw/main/cf_0x07_thumb.jpg" alt="Canvas">
+                        <div class="name">Canvas (JSON)</div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="selected-info">
+                Seleccionado: <strong id="selected-name">Mario Bros</strong>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>2. Conecta y Flashea</h2>
+
+            <div class="warning">
+                <div class="warning-title">Requisitos</div>
+                <ul>
+                    <li>Navegador con WebSerial (Chrome, Edge, Opera)</li>
+                    <li>ESP32 conectado por USB</li>
+                    <li>Conexion HTTPS (no funciona en HTTP)</li>
+                </ul>
+            </div>
+
+            <div class="flash-section">
+                <esp-web-install-button id="esp-web-button" manifest="static/firmware/cw-cf-0x01/manifest.json">
+                    <button id="flash-button" slot="activate">CONECTAR Y FLASHEAR</button>
+                    <span class="unsupported" slot="unsupported">
+                        Tu navegador no soporta WebSerial API. Usa Chrome, Edge u Opera en escritorio.
+                    </span>
+                    <span class="not-allowed" slot="not-allowed">
+                        WebSerial requiere HTTPS. Por favor accede via HTTPS.
+                    </span>
+                </esp-web-install-button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Instrucciones</h2>
+            <div class="steps">
+                <div class="step">Conecta tu ESP32 al puerto USB de tu computadora</div>
+                <div class="step">Selecciona la clockface que deseas instalar</div>
+                <div class="step">Haz clic en "CONECTAR Y FLASHEAR"</div>
+                <div class="step">Selecciona el puerto COM de tu ESP32 en el dialogo</div>
+                <div class="step">Espera a que termine el proceso de flasheo</div>
+                <div class="step">Configura el WiFi cuando aparezca el asistente</div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Basado en <a href="https://github.com/jnthas/clockwise" target="_blank">Clockwise</a> por jnthas</p>
+            <p>Usa <a href="https://esphome.github.io/esp-web-tools/" target="_blank">ESP Web Tools</a></p>
+        </footer>
+    </div>
+
+    <script>
+        const clockfaceNames = {
+            'cw-cf-0x01': 'Mario Bros',
+            'cw-cf-0x02': 'Time in Words',
+            'cw-cf-0x03': 'World Map',
+            'cw-cf-0x04': 'Castlevania',
+            'cw-cf-0x05': 'Pacman',
+            'cw-cf-0x06': 'Pokedex',
+            'cw-cf-0x07': 'Canvas (JSON)'
+        };
+
+        document.querySelectorAll('input[name="clockface"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const value = this.value;
+                document.getElementById('esp-web-button').setAttribute('manifest', `static/firmware/${value}/manifest.json`);
+                document.getElementById('selected-name').textContent = clockfaceNames[value];
+            });
+        });
+    </script>
+</body>
+</html>
