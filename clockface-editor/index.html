@@ -72,6 +72,7 @@
             <section class="canvas-area">
                 <div class="canvas-container">
                     <div class="canvas-wrapper">
+                        <img id="reference-image" class="reference-image hidden" alt="Reference">
                         <canvas id="editor-canvas" width="64" height="64"></canvas>
                         <div class="canvas-grid"></div>
                     </div>
@@ -87,6 +88,26 @@
                     <label class="checkbox-label">
                         <input type="checkbox" id="show-grid" checked>
                         Grid
+                    </label>
+                </div>
+                <!-- Reference Image Controls -->
+                <div class="reference-controls">
+                    <label class="btn btn-secondary btn-small" title="Cargar imagen de referencia para calcar">
+                        <input type="file" id="reference-file" accept="image/*" hidden>
+                        Imagen Referencia
+                    </label>
+                    <button id="btn-clear-reference" class="btn btn-small" title="Quitar referencia">X</button>
+                    <button id="btn-convert-reference" class="btn btn-small btn-primary" style="display:none;" title="Convertir a elemento 64x64">
+                        Usar como Fondo
+                    </button>
+                    <div class="opacity-control" id="opacity-control" style="display:none;">
+                        <label>Opacidad:</label>
+                        <input type="range" id="reference-opacity" min="10" max="90" value="50">
+                        <span id="opacity-value">50%</span>
+                    </div>
+                    <label class="checkbox-label" id="ref-position-label" style="display:none;">
+                        <input type="checkbox" id="reference-behind" checked>
+                        Detras
                     </label>
                 </div>
             </section>

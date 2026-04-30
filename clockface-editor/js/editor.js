@@ -8,6 +8,7 @@ class ClockfaceEditor {
         this.zoom = 8;
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
+        this.referenceImage = document.getElementById('reference-image');
 
         this.init();
     }
@@ -15,6 +16,7 @@ class ClockfaceEditor {
     init() {
         this.updateCanvasSize();
         this.bindEvents();
+        this.bindReferenceImage();
         this.render();
         this.startClock();
     }
@@ -28,6 +30,113 @@ class ClockfaceEditor {
 
         document.getElementById('zoom-level').textContent = `${this.zoom}x`;
         document.getElementById('canvas-zoom').textContent = `Zoom: ${this.zoom}x`;
+
+        if (this.referenceImage && !this.referenceImage.classList.contains('hidden')) {
+            this.referenceImage.style.width = `${64 * this.zoom}px`;
+            this.referenceImage.style.height = `${64 * this.zoom}px`;
+        }
+    }
+
+    bindReferenceImage() {
+        const fileInput = document.getElementById('reference-file');
+        const opacitySlider = document.getElementById('reference-opacity');
+        const opacityValue = document.getElementById('opacity-value');
+        const opacityControl = document.getElementById('opacity-control');
+        const positionLabel = document.getElementById('ref-position-label');
+        const behindCheckbox = document.getElementById('reference-behind');
+        const clearBtn = document.getElementById('btn-clear-reference');
+        const convertBtn = document.getElementById('btn-convert-reference');
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                this.referenceImage.src = event.target.result;
+                this.referenceImage.classList.remove('hidden');
+                this.referenceImage.style.width = `${64 * this.zoom}px`;
+                this.referenceImage.style.height = `${64 * this.zoom}px`;
+                opacityControl.style.display = 'flex';
+                positionLabel.style.display = 'flex';
+                convertBtn.style.display = 'inline-block';
+                this.updateReferencePosition();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        opacitySlider.addEventListener('input', (e) => {
+            const opacity = e.target.value / 100;
+            this.referenceImage.style.opacity = opacity;
+            opacityValue.textContent = `${e.target.value}%`;
+        });
+
+        behindCheckbox.addEventListener('change', () => {
+            this.updateReferencePosition();
+        });
+
+        clearBtn.addEventListener('click', () => {
+            this.clearReferenceImage();
+        });
+
+        convertBtn.addEventListener('click', () => {
+            this.convertReferenceToElement();
+        });
+    }
+
+    clearReferenceImage() {
+        this.referenceImage.src = '';
+        this.referenceImage.classList.add('hidden');
+        document.getElementById('opacity-control').style.display = 'none';
+        document.getElementById('ref-position-label').style.display = 'none';
+        document.getElementById('btn-convert-reference').style.display = 'none';
+        document.getElementById('reference-file').value = '';
+    }
+
+    convertReferenceToElement() {
+        if (!this.referenceImage.src) return;
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 64;
+        tempCanvas.height = 64;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.imageSmoothingEnabled = false;
+
+        const img = new Image();
+        img.onload = async () => {
+            const scale = Math.min(64 / img.width, 64 / img.height);
+            const newWidth = Math.floor(img.width * scale);
+            const newHeight = Math.floor(img.height * scale);
+            const offsetX = Math.floor((64 - newWidth) / 2);
+            const offsetY = Math.floor((64 - newHeight) / 2);
+
+            tempCtx.fillStyle = '#000000';
+            tempCtx.fillRect(0, 0, 64, 64);
+            tempCtx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+
+            const base64 = tempCanvas.toDataURL('image/png').split(',')[1];
+
+            const element = new ImageElement(0, 0);
+            element.image = base64;
+            await element.loadImage(base64);
+
+            this.clockface.elements.unshift(element);
+            this.selectedId = element.id;
+
+            this.clearReferenceImage();
+            this.updatePropertiesPanel();
+            this.updateLayersList();
+            this.render();
+
+            alert('Imagen convertida a 64x64 y agregada como fondo. Puedes ajustar su posicion.');
+        };
+        img.src = this.referenceImage.src;
+    }
+
+    updateReferencePosition() {
+        const behind = document.getElementById('reference-behind').checked;
+        this.referenceImage.classList.remove('behind', 'above');
+        this.referenceImage.classList.add(behind ? 'behind' : 'above');
     }
 
     bindEvents() {

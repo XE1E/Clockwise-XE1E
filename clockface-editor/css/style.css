@@ -136,12 +136,40 @@ body {
     border: 2px solid var(--border-color);
     background: #000;
     image-rendering: pixelated;
+    overflow: hidden;
+}
+
+.reference-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 1;
+}
+
+.reference-image.hidden {
+    display: none;
+}
+
+.reference-image.behind {
+    z-index: 0;
+}
+
+.reference-image.above {
+    z-index: 10;
 }
 
 #editor-canvas {
     display: block;
     image-rendering: pixelated;
     cursor: crosshair;
+    position: relative;
+    z-index: 5;
 }
 
 .canvas-grid {
@@ -174,6 +202,36 @@ body {
     align-items: center;
     gap: 10px;
     margin-top: 15px;
+}
+
+.reference-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.reference-controls label.btn {
+    cursor: pointer;
+}
+
+.opacity-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+.opacity-control input[type="range"] {
+    width: 80px;
+    cursor: pointer;
+}
+
+.opacity-control span {
+    min-width: 35px;
 }
 
 .zoom-controls .btn-small {
