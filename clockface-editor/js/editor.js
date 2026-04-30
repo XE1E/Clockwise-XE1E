@@ -140,12 +140,24 @@ class ClockfaceEditor {
     }
 
     bindImageTool() {
-        this.imageToolData = { originalImage: null, processedBase64: null };
+        this.imageToolData = {
+            originalImage: null,
+            processedBase64: null,
+            cropStart: null,
+            cropEnd: null,
+            displayScale: 1,
+            isCropping: false
+        };
+
+        const cropCanvas = document.getElementById('crop-canvas');
+        const cropSelection = document.getElementById('crop-selection');
+        const cropContainer = cropCanvas.parentElement;
 
         document.getElementById('btn-image-tool').addEventListener('click', () => {
             document.getElementById('image-modal').classList.add('active');
             document.getElementById('image-preview-section').style.display = 'none';
             document.getElementById('btn-add-image').style.display = 'none';
+            this.resetCropSelection();
         });
 
         document.getElementById('image-tool-file').addEventListener('change', (e) => {
@@ -159,24 +171,76 @@ class ClockfaceEditor {
                     this.imageToolData.originalImage = img;
                     document.getElementById('image-preview-section').style.display = 'block';
                     document.getElementById('btn-add-image').style.display = 'inline-block';
-                    document.getElementById('original-info').textContent = `${img.width}x${img.height} px`;
 
-                    const origCanvas = document.getElementById('preview-original');
-                    const origCtx = origCanvas.getContext('2d');
-                    origCtx.imageSmoothingEnabled = false;
-                    origCtx.fillStyle = '#000';
-                    origCtx.fillRect(0, 0, 128, 128);
-
-                    const scale = Math.min(128 / img.width, 128 / img.height);
-                    const w = img.width * scale;
-                    const h = img.height * scale;
-                    origCtx.drawImage(img, (128 - w) / 2, (128 - h) / 2, w, h);
-
+                    this.drawCropCanvas();
+                    this.resetCropSelection();
                     this.updateImagePreview();
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
+        });
+
+        cropCanvas.addEventListener('mousedown', (e) => {
+            const rect = cropCanvas.getBoundingClientRect();
+            this.imageToolData.cropStart = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+            this.imageToolData.isCropping = true;
+            cropSelection.classList.add('active');
+        });
+
+        cropCanvas.addEventListener('mousemove', (e) => {
+            if (!this.imageToolData.isCropping) return;
+
+            const rect = cropCanvas.getBoundingClientRect();
+            this.imageToolData.cropEnd = {
+                x: Math.max(0, Math.min(cropCanvas.width, e.clientX - rect.left)),
+                y: Math.max(0, Math.min(cropCanvas.height, e.clientY - rect.top))
+            };
+
+            const start = this.imageToolData.cropStart;
+            const end = this.imageToolData.cropEnd;
+
+            const left = Math.min(start.x, end.x);
+            const top = Math.min(start.y, end.y);
+            const width = Math.abs(end.x - start.x);
+            const height = Math.abs(end.y - start.y);
+
+            cropSelection.style.left = left + 'px';
+            cropSelection.style.top = top + 'px';
+            cropSelection.style.width = width + 'px';
+            cropSelection.style.height = height + 'px';
+        });
+
+        cropCanvas.addEventListener('mouseup', () => {
+            if (!this.imageToolData.isCropping) return;
+            this.imageToolData.isCropping = false;
+
+            const start = this.imageToolData.cropStart;
+            const end = this.imageToolData.cropEnd;
+
+            if (end && Math.abs(end.x - start.x) > 5 && Math.abs(end.y - start.y) > 5) {
+                const scale = this.imageToolData.displayScale;
+                const cropW = Math.round(Math.abs(end.x - start.x) / scale);
+                const cropH = Math.round(Math.abs(end.y - start.y) / scale);
+                document.getElementById('crop-info').textContent = `Seleccion: ${cropW}x${cropH} px`;
+                this.updateImagePreview();
+            } else {
+                this.resetCropSelection();
+            }
+        });
+
+        cropCanvas.addEventListener('mouseleave', () => {
+            if (this.imageToolData.isCropping) {
+                this.imageToolData.isCropping = false;
+            }
+        });
+
+        document.getElementById('btn-reset-crop').addEventListener('click', () => {
+            this.resetCropSelection();
+            this.updateImagePreview();
         });
 
         document.getElementById('btn-preview-update').addEventListener('click', () => {
@@ -209,6 +273,32 @@ class ClockfaceEditor {
         });
     }
 
+    drawCropCanvas() {
+        const img = this.imageToolData.originalImage;
+        if (!img) return;
+
+        const cropCanvas = document.getElementById('crop-canvas');
+        const ctx = cropCanvas.getContext('2d');
+
+        const maxW = 400, maxH = 300;
+        const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+        this.imageToolData.displayScale = scale;
+
+        cropCanvas.width = Math.round(img.width * scale);
+        cropCanvas.height = Math.round(img.height * scale);
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(img, 0, 0, cropCanvas.width, cropCanvas.height);
+    }
+
+    resetCropSelection() {
+        this.imageToolData.cropStart = null;
+        this.imageToolData.cropEnd = null;
+        document.getElementById('crop-selection').classList.remove('active');
+        document.getElementById('crop-selection').style.cssText = '';
+        document.getElementById('crop-info').textContent = 'Sin seleccion (usa imagen completa)';
+    }
+
     updateImagePreview() {
         if (!this.imageToolData.originalImage) return;
 
@@ -225,22 +315,36 @@ class ClockfaceEditor {
         tempCtx.fillStyle = '#000';
         tempCtx.fillRect(0, 0, 64, 64);
 
-        const scaleMode = document.getElementById('scale-mode').value;
         let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+        const cropStart = this.imageToolData.cropStart;
+        const cropEnd = this.imageToolData.cropEnd;
+        const displayScale = this.imageToolData.displayScale;
+
+        if (cropStart && cropEnd && displayScale) {
+            sx = Math.round(Math.min(cropStart.x, cropEnd.x) / displayScale);
+            sy = Math.round(Math.min(cropStart.y, cropEnd.y) / displayScale);
+            sw = Math.round(Math.abs(cropEnd.x - cropStart.x) / displayScale);
+            sh = Math.round(Math.abs(cropEnd.y - cropStart.y) / displayScale);
+        }
+
+        const scaleMode = document.getElementById('scale-mode').value;
         let dx = 0, dy = 0, dw = 64, dh = 64;
 
         if (scaleMode === 'contain') {
-            const scale = Math.min(64 / img.width, 64 / img.height);
-            dw = Math.floor(img.width * scale);
-            dh = Math.floor(img.height * scale);
+            const scale = Math.min(64 / sw, 64 / sh);
+            dw = Math.floor(sw * scale);
+            dh = Math.floor(sh * scale);
             dx = Math.floor((64 - dw) / 2);
             dy = Math.floor((64 - dh) / 2);
         } else if (scaleMode === 'cover') {
-            const scale = Math.max(64 / img.width, 64 / img.height);
-            sw = 64 / scale;
-            sh = 64 / scale;
-            sx = (img.width - sw) / 2;
-            sy = (img.height - sh) / 2;
+            const scale = Math.max(64 / sw, 64 / sh);
+            const newSw = 64 / scale;
+            const newSh = 64 / scale;
+            sx += (sw - newSw) / 2;
+            sy += (sh - newSh) / 2;
+            sw = newSw;
+            sh = newSh;
         }
 
         tempCtx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);

@@ -561,6 +561,54 @@ body {
     gap: 20px;
 }
 
+/* Crop Section */
+.crop-section {
+    text-align: center;
+}
+
+.crop-section h4 {
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+    font-weight: normal;
+}
+
+.crop-container {
+    position: relative;
+    display: inline-block;
+    border: 1px solid var(--border-color);
+    background: #000;
+    cursor: crosshair;
+}
+
+#crop-canvas {
+    display: block;
+}
+
+.crop-selection {
+    position: absolute;
+    border: 2px dashed var(--accent);
+    background: rgba(88, 166, 255, 0.2);
+    pointer-events: none;
+    display: none;
+}
+
+.crop-selection.active {
+    display: block;
+}
+
+.crop-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#crop-info {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
 .preview-row {
     display: flex;
     justify-content: center;

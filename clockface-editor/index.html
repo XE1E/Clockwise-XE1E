@@ -315,14 +315,22 @@
                     </div>
 
                     <div class="image-tool-preview" id="image-preview-section" style="display:none;">
+                        <!-- Crop Section -->
+                        <div class="crop-section">
+                            <h4>1. Seleccionar area (arrastra sobre la imagen)</h4>
+                            <div class="crop-container">
+                                <canvas id="crop-canvas" width="400" height="300"></canvas>
+                                <div id="crop-selection" class="crop-selection"></div>
+                            </div>
+                            <div class="crop-controls">
+                                <button id="btn-reset-crop" class="btn btn-small btn-secondary">Reset Seleccion</button>
+                                <span id="crop-info">Sin seleccion (usa imagen completa)</span>
+                            </div>
+                        </div>
+
                         <div class="preview-row">
                             <div class="preview-box">
-                                <h4>Original</h4>
-                                <canvas id="preview-original" width="128" height="128"></canvas>
-                                <span id="original-info"></span>
-                            </div>
-                            <div class="preview-box">
-                                <h4>64x64 Preview</h4>
+                                <h4>2. Vista Previa 64x64</h4>
                                 <canvas id="preview-64" width="128" height="128"></canvas>
                                 <span>64x64 px</span>
                             </div>
