@@ -1,0 +1,597 @@
+# Análisis del Proyecto Clockwise
+
+**Repositorio:** https://github.com/yuan910715/clockwise  
+**Fork de:** https://github.com/jnthas/clockwise  
+**Sitio web:** https://clockwise.page  
+**Fecha de análisis:** 2026-04-29
+
+---
+
+## Descripción General
+
+Clockwise es un **reloj de pared inteligente DIY** (hazlo tú mismo) basado en matrices LED RGB. Es una plataforma open-source que permite crear "Clockfaces" (carátulas de reloj) personalizadas con animaciones y efectos visuales.
+
+La idea surgió mientras el autor trabajaba con matrices LED 64x64. Estas pantallas tienen el tamaño aproximado de un reloj de pared, y combinadas con un ESP32, se obtiene conectividad WiFi, Bluetooth, botones táctiles y soporte para sensores.
+
+---
+
+## Información del Repositorio
+
+| Campo | Valor |
+|-------|-------|
+| **Nombre** | clockwise |
+| **Creado** | 2024-04-25 |
+| **Última actualización** | 2024-06-25 |
+| **Lenguaje principal** | C++ (73,935 bytes) |
+| **Otros lenguajes** | CMake (611 bytes) |
+| **Licencia** | MIT |
+| **Estrellas** | 3 |
+| **Forks** | 0 |
+| **Rama principal** | main |
+
+---
+
+## Hardware Requerido
+
+### Componentes Principales
+1. **Matriz LED HUB75/HUB75E** - 64x64 píxeles
+2. **ESP32** - Microcontrolador con WiFi/Bluetooth
+3. **Fuente de alimentación** - Mínimo 3A
+
+### Placas Compatibles Recomendadas
+- **ESP32 Trinity** (Brian Lough) - Plug & play
+- **Mario Clock PCB** (@Alexvanheu) - PCB diseñado específicamente
+- **ESP32 D1 Mini RGB Matrix Shield** (@hallard)
+
+### Conexionado
+El proyecto usa la biblioteca ESP32-HUB75-MatrixPanel-I2S-DMA con el siguiente cableado por defecto:
+- Documentación de cableado en el README del repositorio
+- Compatible con cualquier biblioteca Adafruit GFX
+
+---
+
+## Estructura del Proyecto
+
+```
+clockwise/
+├── .github/
+│   └── workflows/
+│       ├── clockwise-ci.yml      # CI/CD principal
+│       └── esp-idf.yml           # Build con esp-idf
+├── firmware/
+│   ├── lib/
+│   │   ├── cw-commons/           # Utilidades comunes
+│   │   │   ├── CWDateTime.cpp/h  # Manejo de fecha/hora
+│   │   │   ├── CWHttpClient.h    # Cliente HTTP
+│   │   │   ├── CWPreferences.h   # Almacenamiento de preferencias
+│   │   │   ├── CWWebServer.h     # Servidor web embebido
+│   │   │   ├── IClockface.h      # Interfaz para clockfaces
+│   │   │   ├── Icons.h           # Iconos del sistema
+│   │   │   ├── SettingsWebPage.h # Página de configuración
+│   │   │   ├── StatusController.h# Control de estado
+│   │   │   ├── WiFiController.h  # Control de WiFi
+│   │   │   └── picopixel.h       # Fuente de texto pequeña
+│   │   └── cw-gfx-engine/        # Motor gráfico
+│   │       ├── ColorUtil.h       # Utilidades de color
+│   │       ├── EventBus.cpp/h    # Sistema de eventos
+│   │       ├── EventTask.h       # Tareas basadas en eventos
+│   │       ├── Game.h            # Base para animaciones
+│   │       ├── ImageUtils.h      # Utilidades de imagen
+│   │       ├── Locator.cpp/h     # Service locator pattern
+│   │       ├── Macros.h          # Macros útiles
+│   │       ├── Object.h          # Objeto base
+│   │       ├── Sprite.cpp/h      # Sistema de sprites
+│   │       └── Tile.h            # Sistema de tiles
+│   ├── src/
+│   │   └── main.cpp              # Punto de entrada
+│   ├── test/
+│   │   ├── test_embedded/        # Tests para ESP32
+│   │   └── test_native/          # Tests nativos
+│   └── platformio.ini            # Configuración PlatformIO
+├── clockfaces/                   # Carpeta de clockfaces (submodules)
+├── CMakeLists.txt                # Build con esp-idf
+├── CHANGELOG.md                  # Historial de cambios
+├── LICENSE                       # Licencia MIT
+└── README.md                     # Documentación principal
+```
+
+---
+
+## Clockfaces Disponibles
+
+| Nombre | Repositorio | Descripción |
+|--------|-------------|-------------|
+| **Mario Bros. Clock** | cw-cf-0x01 | Reloj temático de Mario Bros |
+| **Time in Words** | cw-cf-0x02 | Hora escrita en palabras |
+| **World Map Clock** | cw-cf-0x03 | Mapa mundial con zonas horarias |
+| **Castlevania Clock Tower** | cw-cf-0x04 | Temática de Castlevania |
+| **Pacman** | cw-cf-0x05 | Temática de Pacman |
+| **Pokedex** | cw-cf-0x06 | Temática de Pokémon |
+| **Canvas** | cw-cf-0x07 | Renderiza temas desde JSON (especial) |
+
+### Canvas Clockface
+Canvas es un tipo especial de clockface que puede renderizar diferentes temas descritos en un archivo JSON, permitiendo crear nuevas carátulas sin programar.
+
+---
+
+## Características del Sistema
+
+### Conectividad
+- **WiFi 2.4GHz** - Requerido (no soporta 5GHz)
+- **Configuración Improv** - Setup WiFi vía web
+- **Servidor web embebido** - Página de configuración
+
+### Sincronización de Tiempo
+- **NTP** - Sincronización automática de hora
+- **Servidor por defecto:** time.google.com (configurable)
+- **Zonas horarias** - Formato IANA (America/New_York, Europe/Paris, etc.)
+- **Posix Timezone String** - Opcional para evitar lookups remotos
+
+### Configuración Disponible
+- Zona horaria
+- Servidor NTP
+- Intercambio de pines Blue/Green (para displays RBG)
+- Brillo del display
+- Formato 12h/24h
+- Brillo automático (con LDR)
+- Pin GPIO del LDR
+- Rotación del display
+
+### Sensor de Luz (LDR)
+- Pin por defecto: GPIO 35
+- Permite ajuste automático de brillo según luz ambiental
+
+---
+
+## Métodos de Instalación
+
+### 1. Web Flashing (Recomendado)
+1. Ir a https://clockwise.page
+2. Seleccionar clockface deseado
+3. Conectar ESP32 por USB
+4. Click en "Flash"
+5. Seleccionar puerto USB
+6. Seguir asistente de instalación
+7. Configurar WiFi con Improv
+
+### 2. PlatformIO
+```bash
+# Clonar repositorio
+git clone https://github.com/yuan910715/clockwise.git
+cd clockwise
+
+# Clonar submodules de clockfaces
+git submodule update --init firmware/clockfaces
+
+# Crear enlace simbólico al clockface deseado
+cd firmware/lib
+ln -s ../clockfaces/cw-cf-0x02/ timeinwords
+
+# Compilar y subir con PlatformIO
+```
+
+### 3. esp-idf
+```bash
+# Clonar con submodules
+git clone --recurse-submodules https://github.com/yuan910715/clockwise.git
+
+# Configurar
+idf.py reconfigure
+idf.py menuconfig  # Seleccionar clockface
+
+# Compilar y flashear
+idf.py flash
+idf.py monitor
+```
+
+---
+
+## Arquitectura de Software
+
+### Patrón Service Locator
+El proyecto usa el patrón Service Locator (`Locator.cpp/h`) para gestionar dependencias y servicios globales.
+
+### Sistema de Eventos
+`EventBus` proporciona un sistema de publicación/suscripción para comunicación entre componentes.
+
+### Interfaz IClockface
+Todas las clockfaces implementan la interfaz `IClockface`, permitiendo intercambiarlas fácilmente.
+
+### Motor Gráfico (cw-gfx-engine)
+- **Sprites** - Imágenes animadas
+- **Tiles** - Mapas de baldosas
+- **ColorUtil** - Conversiones y manipulación de colores
+- **ImageUtils** - Carga y procesamiento de imágenes
+
+---
+
+## Crear Nuevos Clockfaces
+
+### Opción 1: Código C++
+Partir del template: https://github.com/jnthas/cw-cf-0x00
+
+### Opción 2: Canvas (JSON) - Sin Programar
+Usar el sistema Canvas para crear clockfaces describiendo elementos en JSON.
+
+---
+
+## Sistema Canvas - Guía Completa
+
+El Canvas Clockface (0x07) es un sistema basado en JSON que permite crear carátulas personalizadas **sin necesidad de programar en C++**.
+
+### Cómo Funciona
+
+1. El ESP32 descarga un archivo JSON desde un servidor
+2. Interpreta las instrucciones del JSON
+3. Renderiza los elementos en la matriz LED
+
+### Configuración en Clockwise
+
+| Parámetro | Valor por defecto | Descripción |
+|-----------|-------------------|-------------|
+| **Server Address** | `raw.githubusercontent.com` | Servidor donde están los JSON |
+| **Description File** | nombre del tema | Archivo JSON (sin extensión) |
+
+### Estructura del JSON
+
+```json
+{
+  "name": "mi-tema",
+  "version": 1,
+  "author": "tu-nombre",
+  "bgColor": 0,
+  "delay": 250,
+  "setup": [],
+  "sprites": [],
+  "loop": []
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `name` | string | Identificador del tema |
+| `version` | number | Versión del tema |
+| `author` | string | Nombre del autor |
+| `bgColor` | number | Color de fondo (formato decimal RGB565) |
+| `delay` | number | Intervalo del loop en milisegundos |
+| `setup` | array | Elementos que se dibujan una vez |
+| `sprites` | array | Secuencias de imágenes para animaciones |
+| `loop` | array | Elementos que se redibujan cada ciclo |
+
+### Primitivas de Dibujo
+
+#### 1. DateTime - Mostrar Hora/Fecha
+```json
+{
+  "type": "datetime",
+  "x": 6,
+  "y": 11,
+  "content": "H:i:s",
+  "font": "square",
+  "fgColor": 65535,
+  "bgColor": 0
+}
+```
+
+**Formatos de fecha/hora (ezTime):**
+| Código | Resultado | Ejemplo |
+|--------|-----------|---------|
+| `H` | Hora 24h | 14 |
+| `h` | Hora 12h | 02 |
+| `i` | Minutos | 30 |
+| `s` | Segundos | 45 |
+| `A` | AM/PM | PM |
+| `d` | Día | 29 |
+| `m` | Mes | 04 |
+| `Y` | Año | 2026 |
+
+#### 2. Text - Texto Estático
+```json
+{
+  "type": "text",
+  "x": 2,
+  "y": 56,
+  "content": "Hola Mundo",
+  "font": "picopixel",
+  "fgColor": 65535,
+  "bgColor": 0
+}
+```
+
+**Fuentes disponibles:**
+- `picopixel` - Muy pequeña (3px)
+- `square` - Cuadrada, buena para hora
+- `medium` - Tamaño medio
+- `big` - Grande
+
+#### 3. Image - Imagen PNG en Base64
+```json
+{
+  "type": "image",
+  "x": 0,
+  "y": 0,
+  "image": "iVBORw0KGgoAAAANSUhEUgAAAAE..."
+}
+```
+
+#### 4. Line - Línea
+```json
+{
+  "type": "line",
+  "x": 0,
+  "y": 0,
+  "x1": 63,
+  "y1": 63,
+  "color": 65535
+}
+```
+
+#### 5. Rect - Rectángulo (contorno)
+```json
+{
+  "type": "rect",
+  "x": 10,
+  "y": 10,
+  "width": 20,
+  "height": 15,
+  "color": 65535
+}
+```
+
+#### 6. Fillrect - Rectángulo Relleno
+```json
+{
+  "type": "fillrect",
+  "x": 10,
+  "y": 10,
+  "width": 20,
+  "height": 15,
+  "color": 65535
+}
+```
+
+### Sistema de Sprites (Animaciones)
+
+Los sprites son secuencias de imágenes que se muestran en el loop:
+
+```json
+"sprites": [
+  [
+    {"image": "base64_frame1..."},
+    {"image": "base64_frame2..."},
+    {"image": "base64_frame3..."}
+  ]
+]
+```
+
+Uso en el loop:
+```json
+"loop": [
+  {
+    "type": "sprite",
+    "x": 17,
+    "y": 27,
+    "sprite": 0
+  }
+]
+```
+
+### Colores - Formato RGB565
+
+Los colores usan formato **RGB565 en decimal**. Conversión:
+
+```
+RGB565 = (R >> 3) << 11 | (G >> 2) << 5 | (B >> 3)
+```
+
+| Color | RGB | RGB565 Decimal |
+|-------|-----|----------------|
+| Negro | 0,0,0 | 0 |
+| Blanco | 255,255,255 | 65535 |
+| Rojo | 255,0,0 | 63488 |
+| Verde | 0,255,0 | 2016 |
+| Azul | 0,0,255 | 31 |
+| Amarillo | 255,255,0 | 65504 |
+| Cyan | 0,255,255 | 2047 |
+| Magenta | 255,0,255 | 63519 |
+
+### Coordenadas
+
+- Display: **64x64 píxeles**
+- Origen (0,0): esquina superior izquierda
+- X: 0-63 (izquierda a derecha)
+- Y: 0-63 (arriba a abajo)
+
+### Limitaciones Importantes
+
+- Todo se almacena en **RAM del ESP32** (limitada)
+- Evitar imágenes grandes (64x64 o mayores)
+- Preferir formas geométricas sobre imágenes
+- Eliminar metadatos de PNG al exportar
+- Optimizar tamaño de base64
+
+### Ejemplo Completo: Reloj Simple
+
+```json
+{
+  "name": "reloj-simple",
+  "version": 1,
+  "author": "mi-nombre",
+  "bgColor": 0,
+  "delay": 1000,
+  "setup": [
+    {
+      "type": "text",
+      "x": 20,
+      "y": 5,
+      "content": "HORA",
+      "font": "picopixel",
+      "fgColor": 2016,
+      "bgColor": 0
+    },
+    {
+      "type": "rect",
+      "x": 5,
+      "y": 15,
+      "width": 54,
+      "height": 25,
+      "color": 31
+    }
+  ],
+  "sprites": [],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 10,
+      "y": 22,
+      "content": "H:i:s",
+      "font": "big",
+      "fgColor": 65535,
+      "bgColor": 0
+    }
+  ]
+}
+```
+
+### Desarrollo Local
+
+Para probar temas sin subir a GitHub:
+
+1. Clonar clock-club: `git clone https://github.com/jnthas/clock-club`
+2. Ir a carpeta local: `cd clock-club/local`
+3. Ejecutar servidor: `python local-server.py`
+4. En Clockwise Settings:
+   - Server Address: `tu-ip-local` (ej: 192.168.1.100)
+   - Description file: `nombre-archivo` (sin .json)
+5. Reiniciar Clockwise
+
+### Temas Disponibles en Clock Club
+
+| Tema | Descripción |
+|------|-------------|
+| `donkey-kong` | Temática Donkey Kong |
+| `nyan-cat` | Nyan Cat animado |
+| `pac-man` | Temática Pacman |
+| `star-wars` | Star Wars |
+| `snoopy3` | Snoopy |
+| `retro-computer` | Computadora retro |
+| `clock-club` | Logo del club |
+| `goomba-move` | Goomba animado |
+
+---
+
+## Propuestas para Facilitar Diseño de Carátulas
+
+### Problema Actual
+Crear carátulas requiere:
+1. Escribir JSON manualmente
+2. Convertir imágenes a base64
+3. Calcular colores RGB565
+4. Prueba y error sin preview
+
+### Soluciones Propuestas
+
+#### 1. Editor Visual Web (Recomendado)
+Crear una aplicación web con:
+- Canvas interactivo 64x64
+- Drag & drop de elementos
+- Paleta de colores con conversión automática
+- Import de imágenes con conversión a base64
+- Preview en tiempo real
+- Exportar JSON listo para usar
+
+**Tecnología sugerida:** React/Vue + HTML Canvas
+
+#### 2. Plugin para Figma/Photoshop
+- Diseñar en herramienta conocida
+- Exportar a formato Canvas JSON
+
+#### 3. Herramientas CLI
+- Convertidor de imágenes a base64 optimizado
+- Validador de JSON
+- Calculadora RGB565
+
+#### 4. Simulador de Display
+- Aplicación que renderiza el JSON
+- Sin necesidad de hardware físico
+- Hot-reload al guardar cambios
+
+---
+
+## Propuestas de Nuevas Funcionalidades
+
+### 1. Integraciones y Notificaciones
+
+| Idea | Descripción | Complejidad |
+|------|-------------|-------------|
+| **Clima en tiempo real** | Mostrar temperatura, humedad, iconos del clima (API OpenWeather) | Media |
+| **Calendario/Eventos** | Próximos eventos de Google Calendar | Alta |
+| **Notificaciones push** | Alertas de teléfono vía Bluetooth | Alta |
+| **Home Assistant/MQTT** | Integración con domótica | Media |
+
+### 2. Funcionalidades de Productividad
+
+| Idea | Descripción | Complejidad |
+|------|-------------|-------------|
+| **Pomodoro Timer** | Temporizador visual 25/5 minutos con indicador de progreso | Baja |
+| **Alarma visual** | Animaciones de despertar, colores progresivos | Baja |
+| **Countdown** | Cuenta regresiva para eventos importantes | Baja |
+
+### 3. Entretenimiento
+
+| Idea | Descripción | Complejidad |
+|------|-------------|-------------|
+| **Visualizador de audio** | Reacción a música con micrófono (FFT) | Media |
+| **Mini-juegos** | Snake, Tetris, Pong controlados por web/botones | Media |
+| **Modo ambiente** | Animaciones relajantes (fuego, agua, aurora boreal) | Baja |
+
+### 4. Información en Vivo
+
+| Idea | Descripción | Complejidad |
+|------|-------------|-------------|
+| **Crypto/Stocks ticker** | Precios en tiempo real de criptomonedas o acciones | Media |
+| **Resultados deportivos** | Marcadores en vivo de equipos favoritos | Media |
+| **Mensajes personalizados** | API REST para mostrar texto desde otras apps | Baja |
+
+### 5. Sensores Adicionales
+
+| Idea | Descripción | Complejidad |
+|------|-------------|-------------|
+| **Sensor temperatura/humedad** | DHT22 o BME280 integrado en display | Baja |
+| **Detector de presencia** | PIR para encender/apagar automáticamente | Baja |
+| **Sensor de sonido** | Activar display con palmadas o voz | Baja |
+
+### 6. Mejoras del Sistema
+
+| Idea | Descripción | Complejidad |
+|------|-------------|-------------|
+| **Rotación automática de clockfaces** | Cambiar carátula cada X minutos | Baja |
+| **OTA Updates** | Actualizaciones de firmware sin cable USB | Media |
+| **App móvil** | Configuración desde el teléfono (Flutter/React Native) | Alta |
+| **Modo nocturno programado** | Apagar o atenuar display por horario | Baja |
+
+### Recomendaciones para Empezar
+
+Las funcionalidades de **complejidad baja** que agregan más valor son:
+
+1. **Pomodoro Timer** - Muy útil para productividad, fácil de implementar
+2. **Sensor de temperatura** - Hardware barato (~$2), código simple
+3. **Rotación de clockfaces** - Solo requiere lógica, sin hardware adicional
+4. **Modo nocturno programado** - Funcionalidad muy solicitada
+
+---
+
+## Notas de Estudio
+
+*(Esta sección se actualizará conforme avancemos en el análisis)*
+
+---
+
+## Referencias
+
+- **Repositorio principal:** https://github.com/jnthas/clockwise
+- **Fork analizado:** https://github.com/yuan910715/clockwise
+- **Sitio web:** https://clockwise.page
+- **Wiki:** https://github.com/jnthas/clockwise/wiki
+- **Clock Club:** https://github.com/jnthas/clock-club
+- **Biblioteca LED Matrix:** https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-I2S-DMA
