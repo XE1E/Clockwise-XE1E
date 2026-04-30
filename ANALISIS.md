@@ -858,7 +858,97 @@ El editor permite cargar una imagen como guia para calcar o diseñar encima.
 - Importar un diseño de Photoshop/Figma
 - Referenciar otra clockface mientras diseñas
 
-#### 9. Tips y Mejores Practicas
+#### 9. Preparar Imagenes (Herramienta Avanzada)
+
+El boton "Preparar Imagen" abre una herramienta completa para convertir cualquier imagen a 64x64.
+
+**Caracteristicas de imagen optimas para el display:**
+
+| Aspecto | Valor Optimo |
+|---------|--------------|
+| Resolucion final | 64x64 pixeles |
+| Formato | PNG |
+| Estilo ideal | Pixel art, iconos planos |
+| Colores | RGB565 (65,536 max) |
+| Tamaño archivo | < 10KB |
+| Contraste | Alto |
+
+**Limitacion RGB565:**
+```
+RGB888 (normal):  16.7 millones de colores
+RGB565 (display): 65,536 colores
+
+Rojo/Azul: 32 niveles cada uno
+Verde: 64 niveles
+```
+
+**Flujo de la herramienta:**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. CARGAR IMAGEN                                           │
+│     [Cargar Imagen] - Cualquier foto/logo/dibujo           │
+├─────────────────────────────────────────────────────────────┤
+│  2. RECORTAR (opcional)                                     │
+│     ┌─────────────────────┐                                │
+│     │   Arrastra para     │  Seleccion: 200x150 px         │
+│     │   seleccionar area  │  [Reset Seleccion]             │
+│     └─────────────────────┘                                │
+├─────────────────────────────────────────────────────────────┤
+│  3. AJUSTAR                                                 │
+│     Escala: [Ajustar ▼]   Colores: [16 ▼]                  │
+│     Contraste:  [────●────] 120%                           │
+│     Brillo:     [──●──────] 100%                           │
+│     Saturacion: [────────●] 150%                           │
+├─────────────────────────────────────────────────────────────┤
+│  4. PREVIEW                    ┌────────┐                   │
+│     [Actualizar Preview]       │ 64x64  │                   │
+│                                │preview │                   │
+│                                └────────┘                   │
+├─────────────────────────────────────────────────────────────┤
+│  5. AGREGAR                                                 │
+│     [Agregar al Canvas] - Inserta como elemento de imagen  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Opciones de escala:**
+
+| Modo | Descripcion | Mejor para |
+|------|-------------|------------|
+| Ajustar | Mantiene proporcion, bordes negros | Logos, iconos |
+| Recortar | Llena 64x64, corta exceso | Fotos, fondos |
+| Estirar | Deforma para llenar | Casi nunca |
+
+**Opciones de color:**
+
+| Modo | Colores | Uso |
+|------|---------|-----|
+| Full | 65,536 | Fotos, gradientes |
+| 16 | 16 | Estilo retro, logos |
+| 8 | 8 | Muy retro |
+| 4 | 4 | Estilo Game Boy |
+
+**Recomendaciones para mejores resultados:**
+
+1. **Recortar primero** - Selecciona solo la parte importante de la imagen
+2. **Aumentar contraste** a 120-150% (LEDs necesitan mas contraste)
+3. **Aumentar saturacion** a 130-150% (colores mas vivos en LEDs)
+4. **Reducir colores** si la imagen tiene muchos tonos similares
+5. **Usar "Recortar"** para fotos de caras/objetos centrados
+6. **Probar varias combinaciones** hasta encontrar el mejor resultado
+
+**Que funciona bien vs mal:**
+
+| Funciona Bien | Funciona Mal |
+|---------------|--------------|
+| Pixel art 8-bit/16-bit | Fotos realistas detalladas |
+| Iconos planos | Gradientes suaves |
+| Colores saturados | Tonos pastel |
+| Alto contraste | Sombras sutiles |
+| Sprites de videojuegos | Texto pequeño (<3px) |
+| Logos simples | Fotografias complejas |
+
+#### 10. Tips y Mejores Practicas
 
 **Rendimiento:**
 - Usar formas geometricas en lugar de imagenes cuando sea posible
