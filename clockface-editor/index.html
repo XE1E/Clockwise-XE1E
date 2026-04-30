@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clockwise - Editor de Clockfaces</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="logo-icon">&#9201;</span>
+                <span>Clockface Editor</span>
+            </div>
+            <div class="header-actions">
+                <button id="btn-new" class="btn btn-secondary" title="Nuevo">Nuevo</button>
+                <button id="btn-import" class="btn btn-secondary" title="Importar JSON">Importar</button>
+                <button id="btn-export" class="btn btn-primary" title="Exportar JSON">Exportar JSON</button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Toolbar -->
+            <aside class="toolbar">
+                <div class="tool-group">
+                    <div class="tool-group-title">Elementos</div>
+                    <button class="tool-btn" data-tool="select" title="Seleccionar">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M13.64,21.97C13.14,22.21 12.54,22 12.31,21.5L10.13,16.76L7.62,18.78C7.45,18.92 7.24,19 7,19A1,1 0 0,1 6,18V3A1,1 0 0,1 7,2C7.24,2 7.47,2.09 7.64,2.23L7.65,2.22L19.14,11.86C19.57,12.22 19.62,12.85 19.27,13.27C19.12,13.45 18.91,13.57 18.7,13.61L15.54,14.23L17.74,18.96C17.97,19.46 17.76,20.06 17.26,20.28L13.64,21.97Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="datetime" title="Fecha/Hora">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="text" title="Texto">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M18.5,4L19.66,8.35L18.7,8.61C18.25,7.74 17.79,6.87 17.26,6.43C16.73,6 16.11,6 15.5,6H13V16.5C13,17 13,17.5 13.33,17.75C13.67,18 14.33,18 15,18V19H9V18C9.67,18 10.33,18 10.67,17.75C11,17.5 11,17 11,16.5V6H8.5C7.89,6 7.27,6 6.74,6.43C6.21,6.87 5.75,7.74 5.3,8.61L4.34,8.35L5.5,4H18.5Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="image" title="Imagen">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>
+                    </button>
+                </div>
+                <div class="tool-group">
+                    <div class="tool-group-title">Formas</div>
+                    <button class="tool-btn" data-tool="rect" title="Rectangulo">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M4,6V19H20V6H4M18,17H6V8H18V17Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="fillrect" title="Rectangulo Relleno">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M4,6H20V19H4V6Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="line" title="Linea">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19,13H5V11H19V13Z" transform="rotate(-45 12 12)"/></svg>
+                    </button>
+                </div>
+                <div class="tool-group">
+                    <div class="tool-group-title">Acciones</div>
+                    <button class="tool-btn" data-action="delete" title="Eliminar seleccionado">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-action="duplicate" title="Duplicar">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-action="move-up" title="Mover arriba">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M7,15L12,10L17,15H7Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-action="move-down" title="Mover abajo">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M7,10L12,15L17,10H7Z"/></svg>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Canvas Area -->
+            <section class="canvas-area">
+                <div class="canvas-container">
+                    <div class="canvas-wrapper">
+                        <canvas id="editor-canvas" width="64" height="64"></canvas>
+                        <div class="canvas-grid"></div>
+                    </div>
+                    <div class="canvas-info">
+                        <span id="mouse-pos">X: 0, Y: 0</span>
+                        <span id="canvas-zoom">Zoom: 8x</span>
+                    </div>
+                </div>
+                <div class="zoom-controls">
+                    <button id="zoom-out" class="btn btn-small">-</button>
+                    <span id="zoom-level">8x</span>
+                    <button id="zoom-in" class="btn btn-small">+</button>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="show-grid" checked>
+                        Grid
+                    </label>
+                </div>
+            </section>
+
+            <!-- Properties Panel -->
+            <aside class="properties-panel">
+                <!-- Theme Properties -->
+                <div class="panel-section">
+                    <div class="panel-section-title">Tema</div>
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="theme-name" value="mi-clockface">
+                    </div>
+                    <div class="form-group">
+                        <label>Autor</label>
+                        <input type="text" id="theme-author" value="XE1E">
+                    </div>
+                    <div class="form-group">
+                        <label>Color de Fondo</label>
+                        <div class="color-input">
+                            <input type="color" id="bg-color" value="#000000">
+                            <span class="color-value" id="bg-color-value">0</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Delay (ms)</label>
+                        <input type="number" id="theme-delay" value="250" min="50" max="5000">
+                    </div>
+                </div>
+
+                <!-- Element Properties -->
+                <div class="panel-section" id="element-properties" style="display:none;">
+                    <div class="panel-section-title">Elemento: <span id="element-type"></span></div>
+
+                    <div class="form-group">
+                        <label>Posicion</label>
+                        <div class="input-row">
+                            <label class="small">X</label>
+                            <input type="number" id="el-x" min="0" max="63" value="0">
+                            <label class="small">Y</label>
+                            <input type="number" id="el-y" min="0" max="63" value="0">
+                        </div>
+                    </div>
+
+                    <!-- DateTime/Text specific -->
+                    <div class="form-group" id="fg-content">
+                        <label>Contenido</label>
+                        <input type="text" id="el-content" value="">
+                    </div>
+
+                    <div class="form-group" id="fg-font">
+                        <label>Fuente</label>
+                        <select id="el-font">
+                            <option value="">Default</option>
+                            <option value="picopixel">Picopixel (3px)</option>
+                            <option value="square">Square</option>
+                            <option value="medium">Medium</option>
+                            <option value="big">Big</option>
+                        </select>
+                    </div>
+
+                    <!-- Colors -->
+                    <div class="form-group" id="fg-fgcolor">
+                        <label>Color Texto</label>
+                        <div class="color-input">
+                            <input type="color" id="el-fgcolor" value="#ffffff">
+                            <span class="color-value" id="el-fgcolor-value">65535</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="fg-bgcolor">
+                        <label>Color Fondo</label>
+                        <div class="color-input">
+                            <input type="color" id="el-bgcolor" value="#000000">
+                            <span class="color-value" id="el-bgcolor-value">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Rect/Line specific -->
+                    <div class="form-group" id="fg-size">
+                        <label>Tamano</label>
+                        <div class="input-row">
+                            <label class="small">W</label>
+                            <input type="number" id="el-width" min="1" max="64" value="10">
+                            <label class="small">H</label>
+                            <input type="number" id="el-height" min="1" max="64" value="10">
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="fg-endpoint">
+                        <label>Punto Final</label>
+                        <div class="input-row">
+                            <label class="small">X1</label>
+                            <input type="number" id="el-x1" min="0" max="63" value="10">
+                            <label class="small">Y1</label>
+                            <input type="number" id="el-y1" min="0" max="63" value="10">
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="fg-color">
+                        <label>Color</label>
+                        <div class="color-input">
+                            <input type="color" id="el-color" value="#ffffff">
+                            <span class="color-value" id="el-color-value">65535</span>
+                        </div>
+                    </div>
+
+                    <!-- Image specific -->
+                    <div class="form-group" id="fg-image">
+                        <label>Imagen</label>
+                        <input type="file" id="el-image-file" accept="image/*">
+                        <small>PNG recomendado, max 64x64</small>
+                    </div>
+
+                    <div class="form-group" id="fg-in-loop">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="el-in-loop">
+                            En Loop (redibujar cada ciclo)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Elements List -->
+                <div class="panel-section">
+                    <div class="panel-section-title">Capas</div>
+                    <div id="layers-list" class="layers-list">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- DateTime Format Help -->
+                <div class="panel-section collapsed" id="format-help">
+                    <div class="panel-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+                        Formatos DateTime <span class="collapse-icon">&#9660;</span>
+                    </div>
+                    <div class="panel-section-content">
+                        <table class="format-table">
+                            <tr><td>H</td><td>Hora 24h (00-23)</td></tr>
+                            <tr><td>h</td><td>Hora 12h (01-12)</td></tr>
+                            <tr><td>i</td><td>Minutos (00-59)</td></tr>
+                            <tr><td>s</td><td>Segundos (00-59)</td></tr>
+                            <tr><td>A</td><td>AM/PM</td></tr>
+                            <tr><td>d</td><td>Dia (01-31)</td></tr>
+                            <tr><td>m</td><td>Mes (01-12)</td></tr>
+                            <tr><td>Y</td><td>Ano (2024)</td></tr>
+                        </table>
+                        <p><strong>Ejemplo:</strong> H:i:s = 14:30:45</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Importar JSON</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="import-json" placeholder="Pega aqui el JSON del clockface..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cancelar</button>
+                <button class="btn btn-primary" id="btn-do-import">Importar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="export-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Exportar JSON</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="export-json" readonly></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cerrar</button>
+                <button class="btn btn-primary" id="btn-copy-json">Copiar</button>
+                <button class="btn btn-primary" id="btn-download-json">Descargar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/color-utils.js"></script>
+    <script src="js/elements.js"></script>
+    <script src="js/canvas-renderer.js"></script>
+    <script src="js/editor.js"></script>
+</body>
+</html>
