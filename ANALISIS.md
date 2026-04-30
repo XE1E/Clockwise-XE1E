@@ -675,17 +675,294 @@ Se ha creado la carpeta `web-flasher/` con:
 
 ---
 
-## Notas de Estudio
+## Editor Visual de Clockfaces
 
-*(Esta sección se actualizará conforme avancemos en el análisis)*
+Se ha desarrollado un editor web interactivo para diseñar clockfaces sin escribir JSON manualmente.
+
+### Ubicacion
+
+```
+clockface-editor/
+├── index.html              # Aplicacion principal
+├── css/
+│   └── style.css           # Estilos (dark theme)
+└── js/
+    ├── color-utils.js      # Conversion RGB <-> RGB565
+    ├── elements.js         # Clases de elementos (DateTime, Text, etc.)
+    ├── canvas-renderer.js  # Motor de renderizado
+    └── editor.js           # Logica principal del editor
+```
+
+### Funcionalidades
+
+| Caracteristica | Descripcion |
+|----------------|-------------|
+| Canvas 64x64 | Preview pixelado con zoom ajustable (4x-16x) |
+| Herramientas | Select, DateTime, Text, Image, Rect, FillRect, Line |
+| Colores | Color picker con conversion automatica a RGB565 |
+| Capas | Lista de elementos ordenable, separacion setup/loop |
+| Import/Export | Compatible con formato JSON de Canvas Clockface |
+| Tiempo real | Elementos DateTime se actualizan cada segundo |
+| Atajos de teclado | Flechas para mover, Delete para eliminar, Esc para deseleccionar |
+| Grid | Overlay de cuadricula opcional para alineacion |
+
+### Como Usar el Editor
+
+#### 1. Iniciar el Editor
+
+**Opcion A - Servidor local:**
+```bash
+cd clockface-editor
+npx serve .
+# Abrir http://localhost:3000
+```
+
+**Opcion B - GitHub Pages:**
+- Configurar en Settings > Pages
+- URL: https://xe1e.github.io/Clockwise/clockface-editor/
+
+**Opcion C - Abrir directamente:**
+- Doble clic en `clockface-editor/index.html`
+- (Algunas funciones pueden no funcionar por restricciones CORS)
+
+#### 2. Interfaz del Editor
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  [Logo]                          [Nuevo] [Importar] [Exportar]  │
+├────────┬────────────────────────────────────┬───────────────────┤
+│        │                                    │ TEMA              │
+│ TOOLS  │                                    │ - Nombre          │
+│        │         CANVAS 64x64               │ - Autor           │
+│ Select │         (preview)                  │ - Color fondo     │
+│ Time   │                                    │ - Delay           │
+│ Text   │                                    ├───────────────────┤
+│ Image  │                                    │ ELEMENTO          │
+│ Rect   │                                    │ - Posicion X/Y    │
+│ FillR  │                                    │ - Propiedades     │
+│ Line   ├────────────────────────────────────┤ - Colores         │
+│        │  [-] [8x] [+]  [x] Grid            ├───────────────────┤
+│ DELETE │                                    │ CAPAS             │
+│ DUPLIC │                                    │ - datetime: H:i   │
+│ UP/DOWN│                                    │ - text: Hola      │
+└────────┴────────────────────────────────────┴───────────────────┘
+```
+
+#### 3. Crear un Clockface Paso a Paso
+
+**Paso 1: Configurar el tema**
+- Escribir nombre del clockface
+- Escribir nombre del autor
+- Seleccionar color de fondo (click en el cuadro de color)
+- Ajustar delay (velocidad de animacion en ms)
+
+**Paso 2: Agregar elementos**
+1. Click en una herramienta (ej: DateTime)
+2. Click en el canvas donde quieras colocar el elemento
+3. El elemento se crea y queda seleccionado
+4. Ajustar propiedades en el panel derecho
+
+**Paso 3: Editar elementos**
+- Click en un elemento para seleccionarlo
+- Arrastrar para mover
+- Usar flechas del teclado para ajuste fino
+- Modificar propiedades en el panel derecho
+
+**Paso 4: Organizar capas**
+- Los elementos se dibujan de abajo hacia arriba
+- Usar botones UP/DOWN para reordenar
+- Marcar "En Loop" para elementos que se actualizan
+
+**Paso 5: Exportar**
+1. Click en "Exportar JSON"
+2. Copiar el JSON o descargarlo
+3. Subir a Clock Club o servidor propio
+
+#### 4. Herramientas Disponibles
+
+| Herramienta | Icono | Uso |
+|-------------|-------|-----|
+| **Select** | Cursor | Seleccionar y mover elementos |
+| **DateTime** | Reloj | Mostrar hora/fecha (se actualiza) |
+| **Text** | T | Texto estatico |
+| **Image** | Imagen | Cargar PNG (se convierte a base64) |
+| **Rect** | Cuadrado vacio | Rectangulo con borde |
+| **FillRect** | Cuadrado lleno | Rectangulo relleno |
+| **Line** | Linea diagonal | Linea de punto a punto |
+
+#### 5. Propiedades por Tipo de Elemento
+
+**DateTime y Text:**
+- Posicion X, Y
+- Contenido (texto o formato de fecha)
+- Fuente (picopixel, square, medium, big)
+- Color de texto (fgColor)
+- Color de fondo (bgColor)
+
+**Rect y FillRect:**
+- Posicion X, Y
+- Ancho (width)
+- Alto (height)
+- Color
+
+**Line:**
+- Punto inicial X, Y
+- Punto final X1, Y1
+- Color
+
+**Image:**
+- Posicion X, Y
+- Archivo de imagen (se convierte a base64)
+
+#### 6. Atajos de Teclado
+
+| Tecla | Accion |
+|-------|--------|
+| Flechas | Mover elemento seleccionado 1px |
+| Delete/Backspace | Eliminar elemento seleccionado |
+| Escape | Deseleccionar |
+
+#### 7. Importar un Clockface Existente
+
+1. Click en "Importar"
+2. Pegar el JSON del clockface
+3. Click en "Importar"
+4. Los elementos apareceran en el canvas
+5. Editar y exportar nuevamente
+
+#### 8. Tips y Mejores Practicas
+
+**Rendimiento:**
+- Usar formas geometricas en lugar de imagenes cuando sea posible
+- Mantener imagenes pequenas (< 32x32 px ideal)
+- Minimizar elementos en el loop
+
+**Organizacion:**
+- Elementos estaticos (fondo, marcos) en Setup
+- Elementos dinamicos (hora, animaciones) en Loop
+- Nombrar elementos descriptivamente en el contenido
+
+**Colores:**
+- El editor convierte automaticamente a RGB565
+- Algunos colores pueden verse ligeramente diferentes en el display real
+- Probar con colores puros primero (rojo, verde, azul, blanco)
+
+### Ejemplo: Crear un Reloj Simple
+
+1. **Fondo:** Dejar negro (0) o elegir color
+2. **Agregar texto "HORA":**
+   - Tool: Text
+   - Click en posicion (20, 5)
+   - Content: "HORA"
+   - Font: picopixel
+   - fgColor: verde (2016)
+3. **Agregar marco:**
+   - Tool: Rect
+   - Click en (5, 15)
+   - Width: 54, Height: 30
+   - Color: azul (31)
+4. **Agregar hora:**
+   - Tool: DateTime
+   - Click en (15, 25)
+   - Content: "H:i:s"
+   - Font: big
+   - fgColor: blanco (65535)
+   - Marcar "En Loop"
+5. **Exportar** y usar en Clockwise
+
+### JSON Resultante
+
+```json
+{
+  "name": "reloj-simple",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "delay": 250,
+  "setup": [
+    {
+      "type": "text",
+      "x": 20,
+      "y": 5,
+      "content": "HORA",
+      "font": "picopixel",
+      "fgColor": 2016,
+      "bgColor": 0
+    },
+    {
+      "type": "rect",
+      "x": 5,
+      "y": 15,
+      "width": 54,
+      "height": 30,
+      "color": 31
+    }
+  ],
+  "sprites": [],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 15,
+      "y": 25,
+      "content": "H:i:s",
+      "font": "big",
+      "fgColor": 65535,
+      "bgColor": 0
+    }
+  ]
+}
+```
+
+---
+
+## Estructura del Proyecto Local
+
+```
+C:\Documents\GitHub\Clockwise\
+├── ANALISIS.md                 # Este documento
+├── clockface-editor/           # Editor visual de clockfaces
+│   ├── index.html
+│   ├── css/style.css
+│   └── js/*.js
+├── web-flasher/                # Herramienta de flasheo web
+│   ├── index.html
+│   ├── README.md
+│   └── static/firmware/
+├── firmware/                   # Codigo fuente del reloj
+│   ├── lib/
+│   │   ├── cw-commons/
+│   │   └── cw-gfx-engine/
+│   ├── src/main.cpp
+│   └── platformio.ini
+├── components/                 # Dependencias ESP32
+│   ├── arduino/
+│   ├── Adafruit-GFX-Library/
+│   └── ESP32-HUB75-MatrixPanel-I2S-DMA/
+└── README.md
+```
 
 ---
 
 ## Referencias
 
+### Proyecto Original
 - **Repositorio principal:** https://github.com/jnthas/clockwise
-- **Fork analizado:** https://github.com/yuan910715/clockwise
-- **Sitio web:** https://clockwise.page
+- **Fork base:** https://github.com/yuan910715/clockwise
+- **Sitio web oficial:** https://clockwise.page
 - **Wiki:** https://github.com/jnthas/clockwise/wiki
-- **Clock Club:** https://github.com/jnthas/clock-club
-- **Biblioteca LED Matrix:** https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-I2S-DMA
+- **Clock Club (temas):** https://github.com/jnthas/clock-club
+
+### Nuestro Repositorio
+- **GitHub:** https://github.com/XE1E/Clockwise
+- **Editor de Clockfaces:** /clockface-editor/
+- **Web Flasher:** /web-flasher/
+
+### Bibliotecas y Herramientas
+- **ESP32-HUB75-MatrixPanel-I2S-DMA:** https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-I2S-DMA
+- **ESP Web Tools:** https://esphome.github.io/esp-web-tools/
+- **Adafruit GFX:** https://github.com/adafruit/Adafruit-GFX-Library
+- **ezTime:** https://github.com/ropg/ezTime
+
+### Hardware Recomendado
+- **ESP32 Trinity:** https://github.com/witnessmenow/ESP32-Trinity
+- **Mario Clock PCB:** https://github.com/Alexvanheu/Mario-Clock-PCB-ESP32
