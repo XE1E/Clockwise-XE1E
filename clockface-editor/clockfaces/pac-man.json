@@ -1,0 +1,91 @@
+{
+  "name": "Pac Man 2",
+  "version": 1,
+  "author": "@jnthas",
+  "bgColor": 0, 
+  "delay": 200,
+  "setup": [
+    {
+      "type": "datetime",
+      "content": "H:i",
+      "font": "medium",
+      "fgColor": 65282,
+      "bgColor": 0,
+      "x": 19,
+      "y": 35
+    },
+    {
+      "type": "image",
+      "x": 0,
+      "y": 1,
+      "image": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAAKCAYAAAAEqljUAAAABGdBTUEAALGPC/xhBQAAAfVJREFUSMetVj1IHEEU/nZR2GZdEFkIuUKusBDEwAkpNIURhHRiClmjhYUJKb3tgpVgY8hilypgIdocwdJGbSSNmzKNTYrEwkr8IUkRfRbDY+f3dk/vwTBz3/fN7Ju37709j3IQLDb1Djj8rmKUi9kbg9VWEiBLVSzNgGwHlazsfBffCe57wO2JKiJAHXcnIMpBQ7UCCwOBUS7Wsj6OQNtrBS9zjMWR+Rx9sPbDksm9nbGfH0cFPj9tP4/3hAHI94rflIOsAZA3h4F6+T/HphObTROznVUlADynbwp88ZXmtOOSNk6eOwoACzgLZB3loNqA+gbaXfz9bIH5nqljTHaMcoGzw7YADA+afq0k9gDoL5Nxv6we+6Nizfb/Fvi1L9bjz9z70wzomwA+fzU5eejGNXtHYrj6wo+WiWUpUBuwn3d1DFz/Uzm/rNnUn5oO9D4X84tRoLfH3dQub7SHeapTrmbHPAfIpnvZMP3idXPBHVQj4HoK8RgfEel9cWRPcblRlpXA6hKo/qRId71u9RKo2idsele5OHk9AHKHb1ffrH89Cdpdb6/7+62zy1UNwGM0zDsTOAyA84Pyb3frI9BIgFps/+4y1kjQNbP1jYdoAMDT/wix82EgmkYVG50Dfp4Bn5rA8qzKfdkDNraA09/dc7qbdg8Hsln23OPm/QAAAABJRU5ErkJggg=="
+    }
+  ],
+  "sprites": [
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAK0lEQVQI12NkYGD4+VCIgYGBgYGBXf4dI4TDLv8OwmCES0IAEwMqYETTDwBjsAzfWoivZQAAAABJRU5ErkJggg=="
+      },
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAKklEQVQI12NkYGD4+VCIAQ5+PhSC8CEkI1ySXf4dAwMDE7JCBgYGRjT9AKMADo5fZMJKAAAAAElFTkSuQmCC"
+      }
+    ],
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAMUlEQVQI12NkYGCQfvSYgYGBgYHhqZwsg/Sjx////xcSegQhGeGSEMDEgAqYoNpgJABuSREN0yAfAQAAAABJRU5ErkJggg=="
+      }      
+    ],
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAMUlEQVQI12NkYGB4JCTEwMDAwMAg9+4dwyMhof///wsJPYKQjHBJCGBiQAVMUG0wEgAYRxEN+co2xwAAAABJRU5ErkJggg=="
+      }      
+    ],
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAMUlEQVQI12NkYGB4JHSQgYGBgYFB7p09wyOhg////xcSegQhGeGSEMDEgAqYoNpgJABdUhENqz+0gAAAAABJRU5ErkJggg=="
+      }      
+    ],
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAMUlEQVQI12NkYGD4+VCIgYGBgYGBXf4dw8+HQv///xcSegQhGeGSEMDEgAqYoNpgJABzBREN3uzfxgAAAABJRU5ErkJggg=="
+      }      
+    ]
+  ],
+  "loop": [
+    {
+      "type": "sprite",
+      "movement": 0,
+      "sprite": 0,
+      "x": 46,
+      "y": 50
+    },
+    {
+      "type": "sprite",
+      "movement": 0,
+      "sprite": 1,
+      "x": 36,
+      "y": 50
+    },
+    {
+      "type": "sprite",
+      "movement": 0,
+      "sprite": 2,
+      "x": 28,
+      "y": 50
+    },
+    {
+      "type": "sprite",
+      "movement": 0,
+      "sprite": 3,
+      "x": 20,
+      "y": 50
+    },
+    {
+      "type": "sprite",
+      "movement": 0,
+      "sprite": 4,
+      "x": 12,
+      "y": 50
+    }
+  ]
+}

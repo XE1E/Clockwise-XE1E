@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Thumbnails</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 { margin-bottom: 30px; }
+        .thumbs-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .thumb-item {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .thumb-item canvas {
+            display: block;
+            border: 1px solid #333;
+            image-rendering: pixelated;
+            width: 128px;
+            height: 128px;
+        }
+        .thumb-item .name {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .thumb-item a {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 5px 12px;
+            background: #0f4c75;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .thumb-item a:hover { background: #3282b8; }
+        .status { color: #888; margin: 20px 0; }
+        .btn {
+            padding: 12px 24px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .btn:hover { background: #ff6b6b; }
+        .instructions {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: left;
+        }
+        .instructions ol { margin-left: 20px; }
+        .instructions li { margin: 8px 0; }
+        code {
+            background: #0f3460;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generador de Thumbnails</h1>
+
+    <div class="instructions">
+        <h3>Instrucciones:</h3>
+        <ol>
+            <li>Haz clic en "Generar Thumbnails"</li>
+            <li>Descarga cada PNG haciendo clic en "Descargar"</li>
+            <li>Guarda los archivos en <code>clockfaces/thumbs/</code></li>
+        </ol>
+    </div>
+
+    <button class="btn" onclick="generateAll()">Generar Thumbnails</button>
+    <button class="btn" onclick="downloadAll()">Descargar Todos</button>
+
+    <p class="status" id="status">Listo para generar...</p>
+
+    <div class="thumbs-grid" id="thumbs-grid"></div>
+
+    <script src="js/color-utils.js"></script>
+    <script src="js/pixel-fonts.js"></script>
+    <script src="js/elements.js"></script>
+    <script src="js/canvas-renderer.js"></script>
+    <script>
+        const clockfaces = [
+            'nyan-cat',
+            'pac-man',
+            'goomba_move',
+            'snoopy3',
+            'christmassnoopy',
+            'clock-club',
+            'donkey-kong',
+            'eletrogate',
+            'pepsi-final-2',
+            'retro-computer',
+            'star-wars'
+        ];
+
+        const generatedThumbs = [];
+
+        async function generateAll() {
+            const grid = document.getElementById('thumbs-grid');
+            const status = document.getElementById('status');
+            grid.innerHTML = '';
+            generatedThumbs.length = 0;
+
+            for (const name of clockfaces) {
+                status.textContent = `Generando ${name}...`;
+
+                try {
+                    const response = await fetch(`clockfaces/${name}.json`);
+                    const json = await response.json();
+                    const clockface = Clockface.fromJSON(json);
+
+                    // Load images
+                    for (const el of clockface.elements) {
+                        if (el.type === 'image' && el.image) {
+                            await el.loadImage(el.image);
+                        }
+                        if (el.type === 'sprite') {
+                            await el.loadFrames(clockface.sprites);
+                        }
+                    }
+
+                    // Create canvas and render
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 64;
+                    canvas.height = 64;
+                    const renderer = new CanvasRenderer(canvas);
+                    renderer.render(clockface, null);
+
+                    const dataUrl = canvas.toDataURL('image/png');
+                    generatedThumbs.push({ name, dataUrl });
+
+                    // Display
+                    const item = document.createElement('div');
+                    item.className = 'thumb-item';
+                    item.innerHTML = `
+                        <canvas width="64" height="64"></canvas>
+                        <div class="name">${name}</div>
+                        <a href="${dataUrl}" download="${name}.png">Descargar</a>
+                    `;
+                    const displayCanvas = item.querySelector('canvas');
+                    displayCanvas.getContext('2d').drawImage(canvas, 0, 0);
+                    grid.appendChild(item);
+
+                } catch (e) {
+                    console.error(`Error with ${name}:`, e);
+                    const item = document.createElement('div');
+                    item.className = 'thumb-item';
+                    item.innerHTML = `<div class="name">${name}</div><div style="color:red;">Error</div>`;
+                    grid.appendChild(item);
+                }
+            }
+
+            status.textContent = `Generados: ${generatedThumbs.length} thumbnails`;
+        }
+
+        async function downloadAll() {
+            if (generatedThumbs.length === 0) {
+                alert('Primero genera los thumbnails');
+                return;
+            }
+
+            for (const thumb of generatedThumbs) {
+                const link = document.createElement('a');
+                link.href = thumb.dataUrl;
+                link.download = `${thumb.name}.png`;
+                link.click();
+                await new Promise(r => setTimeout(r, 300));
+            }
+        }
+
+        // Auto-generate on load
+        window.onload = () => {
+            setTimeout(generateAll, 500);
+        };
+    </script>
+</body>
+</html>

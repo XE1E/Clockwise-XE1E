@@ -59,6 +59,14 @@ class ClockfaceElement {
                 element.y1 = data.y1 || data.y + 10;
                 element.color = data.color || 65535;
                 break;
+            case 'sprite':
+                element = new SpriteElement(data.x, data.y);
+                element.sprite = data.sprite || 0;
+                element.frameDelay = data.frameDelay || 100;
+                element.loopDelay = data.loopDelay || 0;
+                element.moveX = data.moveX || 0;
+                element.moveY = data.moveY || 0;
+                break;
             default:
                 return null;
         }
@@ -93,15 +101,41 @@ class DateTimeElement extends ClockfaceElement {
     getDisplayText() {
         const now = new Date();
         let text = this.content;
-        text = text.replace(/H/g, now.getHours().toString().padStart(2, '0'));
-        text = text.replace(/h/g, (now.getHours() % 12 || 12).toString().padStart(2, '0'));
-        text = text.replace(/i/g, now.getMinutes().toString().padStart(2, '0'));
-        text = text.replace(/s/g, now.getSeconds().toString().padStart(2, '0'));
-        text = text.replace(/A/g, now.getHours() >= 12 ? 'PM' : 'AM');
-        text = text.replace(/d/g, now.getDate().toString().padStart(2, '0'));
-        text = text.replace(/m/g, (now.getMonth() + 1).toString().padStart(2, '0'));
-        text = text.replace(/Y/g, now.getFullYear().toString());
-        return text;
+
+        const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+        const diasCortos = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                             'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+        const replacements = {
+            'l': diasSemana[now.getDay()],
+            'D': diasCortos[now.getDay()],
+            'F': meses[now.getMonth()],
+            'M': mesesCortos[now.getMonth()],
+            'Y': now.getFullYear().toString(),
+            'y': now.getFullYear().toString().slice(-2),
+            'H': now.getHours().toString().padStart(2, '0'),
+            'h': (now.getHours() % 12 || 12).toString().padStart(2, '0'),
+            'i': now.getMinutes().toString().padStart(2, '0'),
+            's': now.getSeconds().toString().padStart(2, '0'),
+            'A': now.getHours() >= 12 ? 'PM' : 'AM',
+            'd': now.getDate().toString().padStart(2, '0'),
+            'j': now.getDate().toString(),
+            'm': (now.getMonth() + 1).toString().padStart(2, '0')
+        };
+
+        let result = '';
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            if (replacements.hasOwnProperty(char)) {
+                result += replacements[char];
+            } else {
+                result += char;
+            }
+        }
+        return result;
     }
 }
 
@@ -225,6 +259,53 @@ class LineElement extends ClockfaceElement {
     }
 }
 
+class SpriteElement extends ClockfaceElement {
+    constructor(x = 0, y = 0) {
+        super('sprite', x, y);
+        this.sprite = 0;
+        this.frameDelay = 100;
+        this.loopDelay = 0;
+        this.moveX = 0;
+        this.moveY = 0;
+        this.inLoop = true;
+        this.currentFrame = 0;
+        this.frameImages = [];
+    }
+
+    toJSON() {
+        const json = {
+            type: this.type,
+            x: this.x,
+            y: this.y,
+            sprite: this.sprite,
+            frameDelay: this.frameDelay,
+            id: this.id
+        };
+        if (this.loopDelay > 0) json.loopDelay = this.loopDelay;
+        if (this.moveX !== 0) json.moveX = this.moveX;
+        if (this.moveY !== 0) json.moveY = this.moveY;
+        return json;
+    }
+
+    async loadFrames(sprites) {
+        if (!sprites || !sprites[this.sprite]) return;
+        const spriteData = sprites[this.sprite];
+        this.frameImages = [];
+
+        for (const frame of spriteData.frames || []) {
+            if (frame.image) {
+                const img = new Image();
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = frame.image.startsWith('data:') ? frame.image : `data:image/png;base64,${frame.image}`;
+                });
+                this.frameImages.push(img);
+            }
+        }
+    }
+}
+
 class Clockface {
     constructor() {
         this.name = 'mi-clockface';
@@ -258,15 +339,54 @@ class Clockface {
         const index = this.elements.findIndex(el => el.id === id);
         if (index === -1) return false;
 
-        if (direction === 'up' && index > 0) {
+        if (direction === 'up' && index < this.elements.length - 1) {
+            [this.elements[index], this.elements[index + 1]] =
+            [this.elements[index + 1], this.elements[index]];
+            return true;
+        }
+        if (direction === 'down' && index > 0) {
             [this.elements[index], this.elements[index - 1]] =
             [this.elements[index - 1], this.elements[index]];
             return true;
         }
-        if (direction === 'down' && index < this.elements.length - 1) {
-            [this.elements[index], this.elements[index + 1]] =
-            [this.elements[index + 1], this.elements[index]];
+        return false;
+    }
+
+    addSprite(frames = []) {
+        const sprite = { frames: frames };
+        this.sprites.push(sprite);
+        return this.sprites.length - 1;
+    }
+
+    removeSprite(index) {
+        if (index >= 0 && index < this.sprites.length) {
+            this.sprites.splice(index, 1);
+            for (const el of this.elements) {
+                if (el.type === 'sprite') {
+                    if (el.sprite === index) el.sprite = 0;
+                    else if (el.sprite > index) el.sprite--;
+                }
+            }
             return true;
+        }
+        return false;
+    }
+
+    addFrameToSprite(spriteIndex, imageBase64) {
+        if (spriteIndex >= 0 && spriteIndex < this.sprites.length) {
+            this.sprites[spriteIndex].frames.push({ image: imageBase64 });
+            return true;
+        }
+        return false;
+    }
+
+    removeFrameFromSprite(spriteIndex, frameIndex) {
+        if (spriteIndex >= 0 && spriteIndex < this.sprites.length) {
+            const sprite = this.sprites[spriteIndex];
+            if (frameIndex >= 0 && frameIndex < sprite.frames.length) {
+                sprite.frames.splice(frameIndex, 1);
+                return true;
+            }
         }
         return false;
     }

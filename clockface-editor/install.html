@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clockwise - Instalador</title>
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #34a853;
+            --warning: #fbbc04;
+            --bg: #f8f9fa;
+            --text: #202124;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a73e8, #34a853);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            flex: 1;
+        }
+
+        .install-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .install-section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .install-section p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .install-button {
+            --esp-tools-button-color: var(--primary);
+            --esp-tools-button-text-color: white;
+        }
+
+        .install-button button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            font-size: 18px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .install-button button:hover {
+            background: #1557b0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+        }
+
+        .requirements {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .requirements h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .requirements ul {
+            color: #856404;
+            margin-left: 30px;
+        }
+
+        .requirements li {
+            margin-bottom: 5px;
+        }
+
+        .steps {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .steps h3 {
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .step {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .step-content p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: #e8f0fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary);
+        }
+
+        .feature h4 {
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .browser-warning {
+            display: none;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .version-select {
+            margin-bottom: 20px;
+        }
+
+        .version-select select {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .install-section {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Clockwise Installer</h1>
+        <p>Instala el firmware en tu ESP32 directamente desde el navegador</p>
+    </div>
+
+    <div class="container">
+        <div class="browser-warning" id="browser-warning">
+            <strong>Navegador no compatible</strong><br>
+            Este instalador requiere <strong>Google Chrome</strong> o <strong>Microsoft Edge</strong> en computadora de escritorio.
+        </div>
+
+        <div class="requirements">
+            <h3>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="#856404"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                Requisitos
+            </h3>
+            <ul>
+                <li>Navegador <strong>Chrome</strong> o <strong>Edge</strong> (en computadora)</li>
+                <li>Cable USB para conectar el ESP32</li>
+                <li>Drivers del ESP32 instalados (CP2102 o CH340)</li>
+            </ul>
+        </div>
+
+        <div class="install-section">
+            <h2>Instalar Clockwise</h2>
+            <p>
+                Conecta tu ESP32 por USB y haz clic en el boton de abajo.<br>
+                El proceso tomara aproximadamente 2 minutos.
+            </p>
+
+            <div class="version-select">
+                <select id="firmware-version">
+                    <option value="universal">Clockwise Universal (recomendado)</option>
+                    <option value="canvas">Clockwise Canvas</option>
+                </select>
+            </div>
+
+            <esp-web-install-button class="install-button" manifest="firmware/manifest.json">
+                <button slot="activate">Instalar Firmware</button>
+                <span slot="unsupported">Tu navegador no soporta Web Serial</span>
+                <span slot="not-allowed">No se pudo acceder al puerto serial</span>
+            </esp-web-install-button>
+        </div>
+
+        <div class="steps">
+            <h3>Pasos de instalacion</h3>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Conecta el ESP32</h4>
+                    <p>Usa un cable USB de datos (no solo de carga) para conectar tu ESP32 a la computadora.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Haz clic en "Instalar Firmware"</h4>
+                    <p>Selecciona el puerto COM de tu ESP32 cuando aparezca la ventana.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Espera la instalacion</h4>
+                    <p>El proceso toma ~2 minutos. No desconectes el cable durante la instalacion.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>Configura el WiFi</h4>
+                    <p>Al terminar, conectate a la red "Clockwise-WiFi" desde tu celular y sigue las instrucciones.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <h4>Sin software</h4>
+                <p>Instala directamente desde el navegador</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <h4>Universal</h4>
+                <p>Un firmware, multiples caratulas</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                </div>
+                <h4>Actualizable</h4>
+                <p>Actualiza via WiFi (OTA)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>
+            <a href="index.html">Editor de Caratulas</a> |
+            <a href="config-page.html">Configuracion</a> |
+            <a href="https://github.com/tu-usuario/clockwise" target="_blank">GitHub</a>
+        </p>
+        <p style="margin-top: 10px;">Clockwise - Reloj LED Matrix 64x64</p>
+    </div>
+
+    <script>
+        // Check browser compatibility
+        if (!('serial' in navigator)) {
+            document.getElementById('browser-warning').style.display = 'block';
+        }
+
+        // Version selector (for future use with multiple manifests)
+        document.getElementById('firmware-version').addEventListener('change', (e) => {
+            const button = document.querySelector('esp-web-install-button');
+            if (e.target.value === 'canvas') {
+                button.setAttribute('manifest', 'firmware/manifest-canvas.json');
+            } else {
+                button.setAttribute('manifest', 'firmware/manifest.json');
+            }
+        });
+    </script>
+</body>
+</html>

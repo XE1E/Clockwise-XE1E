@@ -9,6 +9,11 @@ class ClockfaceEditor {
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
         this.referenceImage = document.getElementById('reference-image');
+        this.spriteEditorState = {
+            selectedSpriteIndex: -1,
+            previewInterval: null,
+            currentPreviewFrame: 0
+        };
 
         this.init();
     }
@@ -471,10 +476,15 @@ class ClockfaceEditor {
                     const base64 = event.target.result.split(',')[1];
                     element.image = base64;
                     await element.loadImage(base64);
+                    this.updatePropertiesPanel();
                     this.render();
                 }
             };
             reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btn-apply-img-size').addEventListener('click', () => {
+            this.scaleSelectedImage();
         });
 
         document.querySelectorAll('.btn-preset').forEach(btn => {
@@ -483,6 +493,398 @@ class ClockfaceEditor {
                 document.getElementById('el-content').value = format;
                 this.updateSelectedElement();
             });
+        });
+    }
+
+    bindThumbnailGenerator() {
+        document.getElementById('btn-thumbnail').addEventListener('click', () => {
+            this.generateThumbnail();
+        });
+
+        document.getElementById('btn-batch-thumbs').addEventListener('click', () => {
+            this.openBatchThumbsModal();
+        });
+
+        document.getElementById('batch-file-input').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                this.processBatchThumbnails(Array.from(e.target.files));
+            }
+        });
+    }
+
+    generateThumbnail() {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 64;
+        tempCanvas.height = 64;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.imageSmoothingEnabled = false;
+
+        tempCtx.drawImage(this.canvas, 0, 0);
+
+        const link = document.createElement('a');
+        link.download = `${this.clockface.name}.png`;
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+    }
+
+    openBatchThumbsModal() {
+        document.getElementById('batch-thumbs-modal').classList.add('active');
+        document.getElementById('batch-file-input').value = '';
+        document.getElementById('batch-results').innerHTML = '<p>Selecciona archivos JSON de clockfaces para generar thumbnails.</p>';
+    }
+
+    async processBatchThumbnails(files) {
+        const results = document.getElementById('batch-results');
+        results.innerHTML = '<p>Procesando...</p>';
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 64;
+        tempCanvas.height = 64;
+        const tempRenderer = new CanvasRenderer(tempCanvas);
+
+        let processed = 0;
+        let errors = 0;
+        const thumbsData = [];
+
+        for (const file of files) {
+            try {
+                const text = await file.text();
+                const json = JSON.parse(text);
+                const clockface = Clockface.fromJSON(json);
+
+                for (const el of clockface.elements) {
+                    if (el.type === 'image' && el.image) {
+                        await el.loadImage(el.image);
+                    }
+                    if (el.type === 'sprite') {
+                        await el.loadFrames(clockface.sprites);
+                    }
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 100));
+                tempRenderer.render(clockface, null);
+
+                const dataUrl = tempCanvas.toDataURL('image/png');
+                thumbsData.push({
+                    name: clockface.name,
+                    dataUrl: dataUrl
+                });
+
+                processed++;
+            } catch (e) {
+                console.error(`Error processing ${file.name}:`, e);
+                errors++;
+            }
+        }
+
+        let html = `<p>Procesados: ${processed}, Errores: ${errors}</p>`;
+        html += '<div class="batch-thumbs-grid">';
+
+        for (const thumb of thumbsData) {
+            html += `
+                <div class="batch-thumb-item">
+                    <img src="${thumb.dataUrl}" alt="${thumb.name}">
+                    <span>${thumb.name}</span>
+                    <a href="${thumb.dataUrl}" download="${thumb.name}.png" class="btn btn-small">Descargar</a>
+                </div>
+            `;
+        }
+
+        html += '</div>';
+
+        if (thumbsData.length > 0) {
+            html += '<button id="btn-download-all-thumbs" class="btn btn-primary" style="margin-top:15px;">Descargar Todos (ZIP)</button>';
+        }
+
+        results.innerHTML = html;
+
+        document.getElementById('btn-download-all-thumbs')?.addEventListener('click', () => {
+            this.downloadAllThumbs(thumbsData);
+        });
+    }
+
+    async downloadAllThumbs(thumbsData) {
+        for (const thumb of thumbsData) {
+            const link = document.createElement('a');
+            link.download = `${thumb.name}.png`;
+            link.href = thumb.dataUrl;
+            link.click();
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+    }
+
+    bindSpriteEditor() {
+        document.getElementById('btn-edit-sprites').addEventListener('click', () => {
+            this.openSpriteModal();
+        });
+
+        document.getElementById('btn-add-sprite').addEventListener('click', () => {
+            this.clockface.addSprite([]);
+            this.updateSpriteList();
+            this.updateSpriteSelect();
+        });
+
+        document.getElementById('add-frame-file').addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+            if (spriteIndex < 0) return;
+
+            for (const file of files) {
+                const base64 = await this.fileToBase64(file);
+                const resized = await this.resizeImageTo64(base64);
+                this.clockface.addFrameToSprite(spriteIndex, resized);
+            }
+
+            this.updateFramesList();
+            this.updateSpriteList();
+            this.loadSpriteFrames();
+            e.target.value = '';
+        });
+
+        document.getElementById('btn-play-sprite').addEventListener('click', () => {
+            this.toggleSpritePreview();
+        });
+
+        ['el-sprite-index', 'el-frame-delay', 'el-loop-delay', 'el-move-x', 'el-move-y'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', () => this.updateSelectedElement());
+                if (el.type === 'number') {
+                    el.addEventListener('input', () => this.updateSelectedElement());
+                }
+            }
+        });
+    }
+
+    openSpriteModal() {
+        document.getElementById('sprite-modal').classList.add('active');
+        this.updateSpriteList();
+        if (this.clockface.sprites.length > 0) {
+            this.selectSpriteForEdit(0);
+        } else {
+            document.getElementById('frames-section').style.display = 'none';
+        }
+    }
+
+    updateSpriteList() {
+        const list = document.getElementById('sprite-list');
+        list.innerHTML = '';
+
+        if (this.clockface.sprites.length === 0) {
+            list.innerHTML = '<div class="empty-sprites">No hay sprites. Crea uno nuevo.</div>';
+            return;
+        }
+
+        this.clockface.sprites.forEach((sprite, index) => {
+            const item = document.createElement('div');
+            item.className = 'sprite-item' + (index === this.spriteEditorState.selectedSpriteIndex ? ' selected' : '');
+            item.innerHTML = `
+                <div class="sprite-item-info">
+                    <span class="sprite-item-name">Sprite ${index}</span>
+                    <span class="sprite-item-frames">${sprite.frames.length} frames</span>
+                </div>
+                <button class="sprite-item-delete" title="Eliminar">&times;</button>
+            `;
+            item.querySelector('.sprite-item-info').addEventListener('click', () => {
+                this.selectSpriteForEdit(index);
+            });
+            item.querySelector('.sprite-item-delete').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`Eliminar Sprite ${index}?`)) {
+                    this.clockface.removeSprite(index);
+                    this.updateSpriteList();
+                    this.updateSpriteSelect();
+                    if (this.spriteEditorState.selectedSpriteIndex >= this.clockface.sprites.length) {
+                        this.spriteEditorState.selectedSpriteIndex = this.clockface.sprites.length - 1;
+                    }
+                    if (this.clockface.sprites.length > 0) {
+                        this.selectSpriteForEdit(Math.max(0, this.spriteEditorState.selectedSpriteIndex));
+                    } else {
+                        document.getElementById('frames-section').style.display = 'none';
+                    }
+                }
+            });
+            list.appendChild(item);
+        });
+    }
+
+    selectSpriteForEdit(index) {
+        this.spriteEditorState.selectedSpriteIndex = index;
+        this.stopSpritePreview();
+
+        document.querySelectorAll('.sprite-item').forEach((el, i) => {
+            el.classList.toggle('selected', i === index);
+        });
+
+        document.getElementById('frames-section').style.display = 'block';
+        document.getElementById('current-sprite-index').textContent = index;
+        this.updateFramesList();
+        this.loadSpriteFrames();
+    }
+
+    updateFramesList() {
+        const list = document.getElementById('frames-list');
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+
+        if (spriteIndex < 0 || !this.clockface.sprites[spriteIndex]) {
+            list.innerHTML = '<div class="empty-frames">Selecciona un sprite</div>';
+            return;
+        }
+
+        const sprite = this.clockface.sprites[spriteIndex];
+        list.innerHTML = '';
+
+        if (sprite.frames.length === 0) {
+            list.innerHTML = '<div class="empty-frames">Sin frames. Agrega imagenes.</div>';
+            return;
+        }
+
+        sprite.frames.forEach((frame, frameIndex) => {
+            const item = document.createElement('div');
+            item.className = 'frame-item';
+            const imgSrc = frame.image.startsWith('data:') ? frame.image : `data:image/png;base64,${frame.image}`;
+            item.innerHTML = `
+                <img src="${imgSrc}" alt="Frame ${frameIndex}">
+                <span class="frame-item-index">${frameIndex}</span>
+                <button class="frame-item-delete" title="Eliminar">&times;</button>
+            `;
+            item.querySelector('.frame-item-delete').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.clockface.removeFrameFromSprite(spriteIndex, frameIndex);
+                this.updateFramesList();
+                this.updateSpriteList();
+                this.loadSpriteFrames();
+            });
+            list.appendChild(item);
+        });
+    }
+
+    async loadSpriteFrames() {
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+        if (spriteIndex < 0 || !this.clockface.sprites[spriteIndex]) return;
+
+        for (const el of this.clockface.elements) {
+            if (el.type === 'sprite' && el.sprite === spriteIndex) {
+                await el.loadFrames(this.clockface.sprites);
+            }
+        }
+
+        this.spriteEditorState.currentPreviewFrame = 0;
+        this.drawSpritePreviewFrame();
+        document.getElementById('sprite-frame-info').textContent =
+            `Frame: 0/${this.clockface.sprites[spriteIndex].frames.length}`;
+    }
+
+    drawSpritePreviewFrame() {
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+        if (spriteIndex < 0 || !this.clockface.sprites[spriteIndex]) return;
+
+        const sprite = this.clockface.sprites[spriteIndex];
+        const canvas = document.getElementById('sprite-preview-canvas');
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 128, 128);
+
+        if (sprite.frames.length === 0) return;
+
+        const frame = sprite.frames[this.spriteEditorState.currentPreviewFrame];
+        if (!frame || !frame.image) return;
+
+        const img = new Image();
+        img.onload = () => {
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(img, 0, 0, 128, 128);
+        };
+        img.src = frame.image.startsWith('data:') ? frame.image : `data:image/png;base64,${frame.image}`;
+    }
+
+    toggleSpritePreview() {
+        const btn = document.getElementById('btn-play-sprite');
+        if (this.spriteEditorState.previewInterval) {
+            this.stopSpritePreview();
+            btn.textContent = 'Play';
+        } else {
+            this.startSpritePreview();
+            btn.textContent = 'Stop';
+        }
+    }
+
+    startSpritePreview() {
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+        if (spriteIndex < 0 || !this.clockface.sprites[spriteIndex]) return;
+
+        const sprite = this.clockface.sprites[spriteIndex];
+        if (sprite.frames.length === 0) return;
+
+        this.spriteEditorState.previewInterval = setInterval(() => {
+            this.spriteEditorState.currentPreviewFrame =
+                (this.spriteEditorState.currentPreviewFrame + 1) % sprite.frames.length;
+            this.drawSpritePreviewFrame();
+            document.getElementById('sprite-frame-info').textContent =
+                `Frame: ${this.spriteEditorState.currentPreviewFrame}/${sprite.frames.length}`;
+        }, 100);
+    }
+
+    stopSpritePreview() {
+        if (this.spriteEditorState.previewInterval) {
+            clearInterval(this.spriteEditorState.previewInterval);
+            this.spriteEditorState.previewInterval = null;
+        }
+        document.getElementById('btn-play-sprite').textContent = 'Play';
+    }
+
+    updateSpriteSelect() {
+        const select = document.getElementById('el-sprite-index');
+        select.innerHTML = '';
+
+        if (this.clockface.sprites.length === 0) {
+            select.innerHTML = '<option value="0">Sin sprites</option>';
+            return;
+        }
+
+        this.clockface.sprites.forEach((sprite, index) => {
+            const opt = document.createElement('option');
+            opt.value = index;
+            opt.textContent = `Sprite ${index} (${sprite.frames.length} frames)`;
+            select.appendChild(opt);
+        });
+    }
+
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    resizeImageTo64(base64) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false;
+
+                const scale = Math.min(64 / img.width, 64 / img.height);
+                const w = Math.floor(img.width * scale);
+                const h = Math.floor(img.height * scale);
+                const x = Math.floor((64 - w) / 2);
+                const y = Math.floor((64 - h) / 2);
+
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, 64, 64);
+                ctx.drawImage(img, x, y, w, h);
+
+                resolve(canvas.toDataURL('image/png').split(',')[1]);
+            };
+            img.src = base64;
         });
     }
 
@@ -546,6 +948,8 @@ class ClockfaceEditor {
         });
 
         this.bindImageTool();
+        this.bindSpriteEditor();
+        this.bindThumbnailGenerator();
 
         document.querySelectorAll('.modal-close').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -565,7 +969,34 @@ class ClockfaceEditor {
             if (el.type === 'image' && el.image) {
                 await el.loadImage(el.image);
             }
+            if (el.type === 'sprite') {
+                await el.loadFrames(this.clockface.sprites);
+            }
         }
+        this.render();
+    }
+
+    async scaleSelectedImage() {
+        if (!this.selectedId) return;
+        const element = this.clockface.getElementById(this.selectedId);
+        if (!element || element.type !== 'image' || !element.imageData) return;
+
+        const newWidth = parseInt(document.getElementById('el-img-width').value) || 64;
+        const newHeight = parseInt(document.getElementById('el-img-height').value) || 64;
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = newWidth;
+        tempCanvas.height = newHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.imageSmoothingEnabled = false;
+
+        tempCtx.drawImage(element.imageData, 0, 0, newWidth, newHeight);
+
+        const base64 = tempCanvas.toDataURL('image/png').split(',')[1];
+        element.image = base64;
+        await element.loadImage(base64);
+
+        this.updatePropertiesPanel();
         this.render();
     }
 
@@ -728,6 +1159,14 @@ class ClockfaceEditor {
             case 'line':
                 element = new LineElement(coords.x, coords.y);
                 break;
+            case 'sprite':
+                if (this.clockface.sprites.length === 0) {
+                    alert('Primero crea un sprite en el editor de sprites (boton Editar)');
+                    return;
+                }
+                element = new SpriteElement(coords.x, coords.y);
+                element.loadFrames(this.clockface.sprites);
+                break;
             default:
                 return;
         }
@@ -765,6 +1204,18 @@ class ClockfaceEditor {
             element.color = ColorUtils.hexToRgb565(document.getElementById('el-color').value);
         }
 
+        if (element.type === 'sprite') {
+            const newSpriteIndex = parseInt(document.getElementById('el-sprite-index').value) || 0;
+            if (newSpriteIndex !== element.sprite) {
+                element.sprite = newSpriteIndex;
+                element.loadFrames(this.clockface.sprites);
+            }
+            element.frameDelay = parseInt(document.getElementById('el-frame-delay').value) || 100;
+            element.loopDelay = parseInt(document.getElementById('el-loop-delay').value) || 0;
+            element.moveX = parseInt(document.getElementById('el-move-x').value) || 0;
+            element.moveY = parseInt(document.getElementById('el-move-y').value) || 0;
+        }
+
         element.inLoop = document.getElementById('el-in-loop').checked;
 
         this.render();
@@ -800,7 +1251,11 @@ class ClockfaceEditor {
             'fg-size': ['rect', 'fillrect'],
             'fg-endpoint': ['line'],
             'fg-color': ['rect', 'fillrect', 'line'],
-            'fg-image': ['image']
+            'fg-image': ['image'],
+            'fg-image-size': ['image'],
+            'fg-sprite-select': ['sprite'],
+            'fg-sprite-timing': ['sprite'],
+            'fg-sprite-move': ['sprite']
         };
 
         for (const [fieldId, types] of Object.entries(showFields)) {
@@ -832,6 +1287,20 @@ class ClockfaceEditor {
             document.getElementById('el-color').value = ColorUtils.rgb565ToHex(element.color);
             document.getElementById('el-color-value').textContent = element.color;
         }
+
+        if (element.type === 'image') {
+            document.getElementById('el-img-width').value = element.width || 64;
+            document.getElementById('el-img-height').value = element.height || 64;
+        }
+
+        if (element.type === 'sprite') {
+            this.updateSpriteSelect();
+            document.getElementById('el-sprite-index').value = element.sprite;
+            document.getElementById('el-frame-delay').value = element.frameDelay;
+            document.getElementById('el-loop-delay').value = element.loopDelay;
+            document.getElementById('el-move-x').value = element.moveX;
+            document.getElementById('el-move-y').value = element.moveY;
+        }
     }
 
     updateLayersList() {
@@ -842,8 +1311,16 @@ class ClockfaceEditor {
             const el = this.clockface.elements[i];
             const item = document.createElement('div');
             item.className = 'layer-item' + (el.id === this.selectedId ? ' selected' : '');
+
+            let label = el.type;
+            if (el.content) {
+                label += ': ' + el.content.substring(0, 10);
+            } else if (el.type === 'sprite') {
+                label += ` #${el.sprite}`;
+            }
+
             item.innerHTML = `
-                <span>${el.type}${el.content ? ': ' + el.content.substring(0, 10) : ''}</span>
+                <span>${label}</span>
                 <span class="layer-type">${el.inLoop ? 'loop' : 'setup'}</span>
             `;
             item.addEventListener('click', () => {
@@ -865,6 +1342,7 @@ class ClockfaceEditor {
 
         this.updatePropertiesPanel();
         this.updateLayersList();
+        this.updateSpriteSelect();
     }
 
     render() {
@@ -878,6 +1356,19 @@ class ClockfaceEditor {
                 this.render();
             }
         }, 1000);
+
+        setInterval(() => {
+            let hasAnimatedSprite = false;
+            for (const el of this.clockface.elements) {
+                if (el.type === 'sprite' && el.frameImages && el.frameImages.length > 1) {
+                    el.currentFrame = (el.currentFrame + 1) % el.frameImages.length;
+                    hasAnimatedSprite = true;
+                }
+            }
+            if (hasAnimatedSprite) {
+                this.render();
+            }
+        }, 100);
     }
 }
 

@@ -8,9 +8,11 @@ class CanvasRenderer {
 
         this.fontMap = {
             'picopixel': 'picopixel',
+            'tomthumb': 'tomthumb',
             'square': 'square',
             'medium': 'medium',
             'big': 'big',
+            'bold': 'bold',
             '': 'picopixel'
         };
     }
@@ -55,6 +57,9 @@ class CanvasRenderer {
                 break;
             case 'line':
                 this.renderLine(element);
+                break;
+            case 'sprite':
+                this.renderSprite(element);
                 break;
         }
     }
@@ -122,6 +127,26 @@ class CanvasRenderer {
         this.ctx.stroke();
     }
 
+    renderSprite(element) {
+        if (element.frameImages && element.frameImages.length > 0) {
+            const frameIndex = element.currentFrame % element.frameImages.length;
+            const img = element.frameImages[frameIndex];
+            if (img) {
+                this.ctx.drawImage(img, element.x, element.y);
+            }
+        } else {
+            this.ctx.strokeStyle = '#ff00ff';
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeRect(element.x + 0.5, element.y + 0.5, 15, 15);
+            this.ctx.beginPath();
+            this.ctx.moveTo(element.x, element.y);
+            this.ctx.lineTo(element.x + 16, element.y + 16);
+            this.ctx.moveTo(element.x + 16, element.y);
+            this.ctx.lineTo(element.x, element.y + 16);
+            this.ctx.stroke();
+        }
+    }
+
     drawSelection(element) {
         this.ctx.strokeStyle = '#00ff00';
         this.ctx.lineWidth = 1;
@@ -142,7 +167,7 @@ class CanvasRenderer {
                 const metrics = PixelFonts.measureText(mappedFont, text);
                 return {
                     x: element.x,
-                    y: element.y,
+                    y: element.y + metrics.yOffset,
                     width: metrics.width,
                     height: metrics.height
                 };
@@ -169,6 +194,14 @@ class CanvasRenderer {
                     width: Math.abs(element.x1 - element.x) || 1,
                     height: Math.abs(element.y1 - element.y) || 1
                 };
+            case 'sprite': {
+                let w = 16, h = 16;
+                if (element.frameImages && element.frameImages.length > 0 && element.frameImages[0]) {
+                    w = element.frameImages[0].width || 16;
+                    h = element.frameImages[0].height || 16;
+                }
+                return { x: element.x, y: element.y, width: w, height: h };
+            }
             default:
                 return { x: element.x, y: element.y, width: 10, height: 10 };
         }

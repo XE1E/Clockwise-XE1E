@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clockwise - Configuracion</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --success: #34a853;
+            --warning: #fbbc04;
+            --danger: #ea4335;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a73e8, #34a853);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .header .version {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .toolbar {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .toolbar-info {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .toolbar-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-restart {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-restart:hover {
+            background: #c5221f;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: var(--primary-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary);
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            background: #f1f3f4;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .card-header svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-secondary);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-input[type="range"] {
+            padding: 0;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .form-checkbox label {
+            cursor: pointer;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-row .form-input {
+            flex: 1;
+        }
+
+        .range-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .wifi-network {
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .wifi-network-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .wifi-network-title {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .wifi-priority {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: #e8f0fe;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .btn-scan {
+            background: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-scan:hover {
+            background: #2d9249;
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--success);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+
+        .status-bar.show {
+            transform: translateY(0);
+        }
+
+        .clockface-preview {
+            width: 128px;
+            height: 128px;
+            background: #000;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f0;
+            font-family: monospace;
+        }
+
+        .help-link {
+            font-size: 12px;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .help-link:hover {
+            text-decoration: underline;
+        }
+
+        .clockface-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .clockface-item {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clockface-item:hover {
+            border-color: var(--primary);
+        }
+
+        .clockface-item.selected {
+            border-color: var(--success);
+            background: #e6f4ea;
+        }
+
+        .clockface-item .preview-img {
+            width: 64px;
+            height: 64px;
+            background: #000;
+            margin: 0 auto 8px;
+            border-radius: 4px;
+            image-rendering: pixelated;
+            display: block;
+        }
+
+        .clockface-item .preview-fallback {
+            width: 64px;
+            height: 64px;
+            background: #000;
+            margin: 0 auto 8px;
+            border-radius: 4px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .clockface-item .name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .night-mode-preview {
+            width: 100%;
+            height: 80px;
+            background: #000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .night-mode-preview .time {
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-picker-row input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .dropdown-input {
+            position: relative;
+        }
+
+        .dropdown-input .form-input {
+            padding-right: 35px;
+        }
+
+        .dropdown-input .dropdown-btn {
+            position: absolute;
+            right: 1px;
+            top: 1px;
+            bottom: 1px;
+            width: 34px;
+            background: var(--bg);
+            border: none;
+            border-left: 1px solid var(--border);
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dropdown-input .dropdown-btn:hover {
+            background: #e8e8e8;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu .dropdown-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background: #f1f3f4;
+        }
+
+        .dropdown-menu .dropdown-item small {
+            color: var(--text-secondary);
+            display: block;
+            font-size: 11px;
+        }
+
+        @media (max-width: 600px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .tab {
+                padding: 10px 15px;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Clockwise</h1>
+        <div class="version">Firmware v<span id="fw-version">2.0.0</span> | <span id="clockface-name">cw-cf-0x07</span></div>
+    </div>
+
+    <div class="toolbar">
+        <div class="toolbar-info">
+            <span id="wifi-status">WiFi: <strong id="current-ssid">MiRed</strong></span>
+            <span>IP: <strong id="ip-address">192.168.1.100</strong></span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-save" onclick="saveAll()">Guardar Todo</button>
+            <button class="btn btn-restart" onclick="restartDevice()">Reiniciar</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="wifi">WiFi</button>
+            <button class="tab" data-tab="display">Pantalla</button>
+            <button class="tab" data-tab="time">Hora y Fecha</button>
+            <button class="tab" data-tab="canvas">Canvas</button>
+            <button class="tab" data-tab="advanced">Avanzado</button>
+        </div>
+
+        <!-- WiFi Tab -->
+        <div class="tab-content active" id="tab-wifi">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24"><path d="M12 3C7.5 3 3.75 4.95 1 8l1.5 1.5C4.75 7 8.25 5.5 12 5.5s7.25 1.5 9.5 4L23 8c-2.75-3.05-6.5-5-11-5zm0 5c-3 0-5.75 1.35-7.5 3.5L6 13c1.35-1.65 3.4-2.75 6-2.75s4.65 1.1 6 2.75l1.5-1.5C17.75 9.35 15 8 12 8zm0 5c-1.85 0-3.35.85-4.5 2L12 19l4.5-4c-1.15-1.15-2.65-2-4.5-2z"/></svg>
+                Configuracion WiFi
+            </div>
+            <p class="card-description" style="margin-bottom: 20px;">Configura hasta 3 redes WiFi. El dispositivo intentara conectarse en orden de prioridad.</p>
+
+            <button class="btn-scan" onclick="scanNetworks()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                Buscar Redes
+            </button>
+
+            <div style="margin-top: 20px;">
+                <div class="wifi-network">
+                    <div class="wifi-network-header">
+                        <span class="wifi-network-title">Red WiFi 1</span>
+                        <span class="wifi-priority">Prioridad Alta</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nombre de Red (SSID)</label>
+                        <input type="text" class="form-input" id="wifi1-ssid" placeholder="Nombre de la red WiFi">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contrasena</label>
+                        <input type="password" class="form-input" id="wifi1-pass" placeholder="Contrasena WiFi">
+                    </div>
+                </div>
+
+                <div class="wifi-network">
+                    <div class="wifi-network-header">
+                        <span class="wifi-network-title">Red WiFi 2</span>
+                        <span class="wifi-priority">Prioridad Media</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nombre de Red (SSID)</label>
+                        <input type="text" class="form-input" id="wifi2-ssid" placeholder="Red alternativa">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contrasena</label>
+                        <input type="password" class="form-input" id="wifi2-pass" placeholder="Contrasena WiFi">
+                    </div>
+                </div>
+
+                <div class="wifi-network">
+                    <div class="wifi-network-header">
+                        <span class="wifi-network-title">Red WiFi 3</span>
+                        <span class="wifi-priority">Prioridad Baja</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nombre de Red (SSID)</label>
+                        <input type="text" class="form-input" id="wifi3-ssid" placeholder="Red de respaldo">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contrasena</label>
+                        <input type="password" class="form-input" id="wifi3-pass" placeholder="Contrasena WiFi">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display Tab -->
+        <div class="tab-content" id="tab-display">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24"><path d="M20 3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h3l-1 1v2h12v-2l-1-1h3c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 13H4V5h16v11z"/></svg>
+                Configuracion de Pantalla
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M20 15.31L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+                        <h3>Brillo</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Ajusta el brillo de la pantalla. 0 = apagado, 255 = maximo</p>
+                        <div class="form-group">
+                            <label class="form-label">Valor: <span class="range-value" id="bright-value">128</span></label>
+                            <input type="range" class="form-input" id="brightness" min="0" max="255" value="128"
+                                oninput="document.getElementById('bright-value').textContent = this.value">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+                        <h3>Brillo Automatico</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Configura los valores del sensor LDR para ajuste automatico (0-4095)</p>
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label class="form-label">Min (oscuro)</label>
+                                <input type="number" class="form-input" id="auto-bright-min" min="0" max="4095" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Max (claro)</label>
+                                <input type="number" class="form-input" id="auto-bright-max" min="0" max="4095" value="800">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M7.34 6.41L.86 12.9l6.49 6.48 6.49-6.48-6.5-6.49zM3.69 12.9l3.66-3.66L11 12.9l-3.66 3.66-3.65-3.66zm15.67-6H11.6l2 2h5.76l-2.38 5.76c-.18.44.37.85.76.56l4.67-3.54-3.05-4.78zM17.36 7.9L18 9h-2.64l1-1.1z"/></svg>
+                        <h3>Rotacion</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Orientacion de la pantalla</p>
+                        <div class="form-group">
+                            <select class="form-select" id="rotation">
+                                <option value="0">0 grados (normal)</option>
+                                <option value="1">90 grados</option>
+                                <option value="2">180 grados</option>
+                                <option value="3">270 grados</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M7.52 21.48A10.487 10.487 0 011.55 13H.05C.56 19.16 5.71 24 12 24l.66-.03-3.81-3.81-1.33 1.32zm.89-6.52c-.19 0-.37-.03-.52-.08-.16-.06-.29-.13-.4-.24-.11-.1-.2-.22-.26-.37-.06-.14-.09-.3-.09-.47h-1.3c0 .36.07.68.21.95.14.27.33.5.56.69.24.18.51.32.82.41.3.1.62.15.96.15.37 0 .72-.05 1.03-.15.32-.1.6-.25.83-.44s.42-.43.55-.72.2-.61.2-.97c0-.19-.02-.38-.07-.56-.05-.18-.12-.35-.23-.51-.1-.16-.24-.3-.4-.43-.17-.13-.37-.23-.61-.31.2-.09.37-.2.52-.33.15-.13.27-.27.37-.42.1-.15.17-.3.22-.46.05-.16.07-.32.07-.48 0-.36-.06-.68-.18-.96-.12-.28-.29-.51-.51-.69-.2-.19-.47-.33-.77-.43C9.1 8.05 8.76 8 8.39 8c-.36 0-.69.05-1 .16-.3.11-.57.26-.79.45-.21.19-.38.41-.51.67-.12.26-.18.54-.18.85h1.3c0-.17.03-.32.09-.45s.14-.25.25-.34c.11-.09.23-.17.38-.22.15-.05.3-.08.48-.08.4 0 .7.1.89.31.19.2.29.49.29.86 0 .18-.03.34-.08.49-.05.15-.14.27-.25.37-.11.1-.25.18-.41.24-.16.06-.36.09-.58.09H7.5v1.03h.77c.22 0 .42.02.6.07s.33.13.45.23c.12.11.22.24.29.4.07.16.1.35.1.57 0 .41-.12.72-.35.93-.23.23-.55.33-.95.33zm8.55-5.92c-.32-.33-.7-.59-1.14-.77-.43-.18-.92-.27-1.46-.27H12v8h2.3c.55 0 1.06-.09 1.51-.27.45-.18.84-.43 1.16-.76.32-.33.57-.73.74-1.19.17-.47.26-.99.26-1.57v-.4c0-.58-.09-1.1-.26-1.57-.18-.47-.43-.87-.75-1.2zm-.39 3.16c0 .42-.05.79-.14 1.13-.1.33-.24.62-.43.85-.19.23-.43.41-.71.53-.29.12-.62.18-.99.18h-.91V9.12h.97c.72 0 1.27.23 1.64.69.38.46.57 1.12.57 1.99v.4zM12 0l-.66.03 3.81 3.81 1.33-1.33c3.27 1.55 5.61 4.72 5.96 8.48h1.5C23.44 4.84 18.29 0 12 0z"/></svg>
+                        <h3>Panel RGB/RBG</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Intercambia pines Blue/Green si los colores se ven mal</p>
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="swap-bg">
+                            <label for="swap-bg">Intercambiar Blue/Green</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.92 6-4.72 7.28L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.94 2.55 2 6.81 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.28 2.28C5.92 18 4 15.21 4 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg>
+                        <h3>Pin LDR</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Puerto GPIO donde esta conectado el sensor de luz</p>
+                        <div class="form-group">
+                            <label class="form-label">GPIO Pin</label>
+                            <div class="input-row">
+                                <input type="number" class="form-input" id="ldr-pin" min="0" max="39" value="35">
+                                <button class="btn btn-save" onclick="readPin()">Leer</button>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 13px;">Valor actual: <strong id="ldr-value">0</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Tab -->
+        <div class="tab-content" id="tab-time">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                Hora y Fecha
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        <h3>Zona Horaria</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Selecciona tu zona horaria o configura manualmente el offset UTC</p>
+                        <div class="form-group">
+                            <label class="form-label">Seleccionar zona</label>
+                            <div class="dropdown-input">
+                                <input type="text" class="form-input" id="timezone" value="America/Mexico_City" placeholder="Buscar zona horaria...">
+                                <button type="button" class="dropdown-btn" onclick="toggleTimezoneDropdown()">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="#666"><path d="M7 10l5 5 5-5z"/></svg>
+                                </button>
+                                <div class="dropdown-menu" id="timezone-dropdown">
+                                    <div class="dropdown-item" onclick="selectTimezone('America/Mexico_City', 'UTC-6')">America/Mexico_City <small>UTC-6 (CST)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('America/New_York', 'UTC-5')">America/New_York <small>UTC-5 (EST)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('America/Chicago', 'UTC-6')">America/Chicago <small>UTC-6 (CST)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('America/Los_Angeles', 'UTC-8')">America/Los_Angeles <small>UTC-8 (PST)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('America/Bogota', 'UTC-5')">America/Bogota <small>UTC-5</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('America/Lima', 'UTC-5')">America/Lima <small>UTC-5</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('America/Santiago', 'UTC-4')">America/Santiago <small>UTC-4</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('America/Buenos_Aires', 'UTC-3')">America/Buenos_Aires <small>UTC-3</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('America/Sao_Paulo', 'UTC-3')">America/Sao_Paulo <small>UTC-3</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('Europe/London', 'UTC+0')">Europe/London <small>UTC+0 (GMT)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('Europe/Madrid', 'UTC+1')">Europe/Madrid <small>UTC+1 (CET)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('Europe/Paris', 'UTC+1')">Europe/Paris <small>UTC+1 (CET)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('Europe/Berlin', 'UTC+1')">Europe/Berlin <small>UTC+1 (CET)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('Asia/Tokyo', 'UTC+9')">Asia/Tokyo <small>UTC+9 (JST)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('Asia/Shanghai', 'UTC+8')">Asia/Shanghai <small>UTC+8 (CST)</small></div>
+                                    <div class="dropdown-item" onclick="selectTimezone('Australia/Sydney', 'UTC+10')">Australia/Sydney <small>UTC+10 (AEST)</small></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label class="form-label">O configura manualmente:</label>
+                            <div class="input-row">
+                                <select class="form-select" id="utc-offset" style="flex: 1;">
+                                    <option value="-12">UTC-12</option>
+                                    <option value="-11">UTC-11</option>
+                                    <option value="-10">UTC-10</option>
+                                    <option value="-9">UTC-9</option>
+                                    <option value="-8">UTC-8</option>
+                                    <option value="-7">UTC-7</option>
+                                    <option value="-6" selected>UTC-6</option>
+                                    <option value="-5">UTC-5</option>
+                                    <option value="-4">UTC-4</option>
+                                    <option value="-3">UTC-3</option>
+                                    <option value="-2">UTC-2</option>
+                                    <option value="-1">UTC-1</option>
+                                    <option value="0">UTC+0</option>
+                                    <option value="1">UTC+1</option>
+                                    <option value="2">UTC+2</option>
+                                    <option value="3">UTC+3</option>
+                                    <option value="4">UTC+4</option>
+                                    <option value="5">UTC+5</option>
+                                    <option value="6">UTC+6</option>
+                                    <option value="7">UTC+7</option>
+                                    <option value="8">UTC+8</option>
+                                    <option value="9">UTC+9</option>
+                                    <option value="10">UTC+10</option>
+                                    <option value="11">UTC+11</option>
+                                    <option value="12">UTC+12</option>
+                                </select>
+                                <div class="form-checkbox" style="flex: 1;">
+                                    <input type="checkbox" id="use-dst">
+                                    <label for="use-dst">Horario de verano (DST)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M2 17h20v2H2v-2zm11.84-9.21c.1-.24.16-.51.16-.79 0-1.1-.9-2-2-2s-2 .9-2 2c0 .28.06.55.16.79C6.25 8.6 3.27 11.93 3 16h18c-.27-4.07-3.25-7.4-7.16-8.21z"/></svg>
+                        <h3>Servidor NTP</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Servidor para sincronizar la hora</p>
+                        <div class="form-group">
+                            <label class="form-label">Servidor</label>
+                            <div class="dropdown-input">
+                                <input type="text" class="form-input" id="ntp-server" value="pool.ntp.org" placeholder="Servidor NTP">
+                                <button type="button" class="dropdown-btn" onclick="toggleNtpDropdown()">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="#666"><path d="M7 10l5 5 5-5z"/></svg>
+                                </button>
+                                <div class="dropdown-menu" id="ntp-dropdown">
+                                    <div class="dropdown-item" onclick="selectNtp('pool.ntp.org')">pool.ntp.org <small>NTP Pool Project - Global</small></div>
+                                    <div class="dropdown-item" onclick="selectNtp('north-america.pool.ntp.org')">north-america.pool.ntp.org <small>NTP Pool - Norteamerica</small></div>
+                                    <div class="dropdown-item" onclick="selectNtp('europe.pool.ntp.org')">europe.pool.ntp.org <small>NTP Pool - Europa</small></div>
+                                    <div class="dropdown-item" onclick="selectNtp('asia.pool.ntp.org')">asia.pool.ntp.org <small>NTP Pool - Asia</small></div>
+                                    <div class="dropdown-item" onclick="selectNtp('time.google.com')">time.google.com <small>Google Public NTP</small></div>
+                                    <div class="dropdown-item" onclick="selectNtp('time.cloudflare.com')">time.cloudflare.com <small>Cloudflare NTP</small></div>
+                                    <div class="dropdown-item" onclick="selectNtp('time.windows.com')">time.windows.com <small>Microsoft NTP</small></div>
+                                    <div class="dropdown-item" onclick="selectNtp('time.apple.com')">time.apple.com <small>Apple NTP</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        <h3>Formato de Hora</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Elige entre formato de 24 horas o 12 horas (AM/PM)</p>
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="use-24h" checked>
+                            <label for="use-24h">Usar formato 24 horas</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+                        <h3>Idioma</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Nombres de dias y meses en espanol (Lun, Mar, Ene, Feb...)</p>
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="use-spanish" checked>
+                            <label for="use-spanish">Usar espanol</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                        <h3>Posix Timezone</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">
+                            Cadena Posix manual para evitar consultas remotas.
+                            <a href="https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv" target="_blank" class="help-link">Ver lista</a>
+                        </p>
+                        <div class="form-group">
+                            <label class="form-label">Posix String (opcional)</label>
+                            <input type="text" class="form-input" id="posix-tz" placeholder="CST6CDT,M3.2.0,M11.1.0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Tab -->
+        <div class="tab-content" id="tab-canvas">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM5 15h14v3H5z"/></svg>
+                Canvas Clockface
+            </div>
+            <div class="cards">
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
+                        <h3>Rotacion de Caratulas</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Selecciona multiples caratulas para mostrar una diferente cada dia. Haz clic para seleccionar/deseleccionar.</p>
+                        <div class="form-checkbox" style="margin-bottom: 15px;">
+                            <input type="checkbox" id="enable-rotation" onchange="toggleClockfaceRotation()">
+                            <label for="enable-rotation">Activar rotacion automatica</label>
+                        </div>
+                        <h4 style="margin-bottom:10px; color:var(--text-secondary);">Built-in (compiladas)</h4>
+                        <div class="clockface-grid" id="clockface-grid-builtin">
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="cw-cf-0x01" data-builtin="true">
+                                <img class="preview-img" src="clockfaces/thumbs/cw-cf-0x01.png" alt="Mario Bros" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🍄</div>
+                                <div class="name">Mario Bros</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="cw-cf-0x02" data-builtin="true">
+                                <img class="preview-img" src="clockfaces/thumbs/cw-cf-0x02.png" alt="Time Words" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🔤</div>
+                                <div class="name">Time in Words</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="cw-cf-0x03" data-builtin="true">
+                                <img class="preview-img" src="clockfaces/thumbs/cw-cf-0x03.png" alt="World Map" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🌍</div>
+                                <div class="name">World Map</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="cw-cf-0x04" data-builtin="true">
+                                <img class="preview-img" src="clockfaces/thumbs/cw-cf-0x04.png" alt="Clock Tower" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🕰️</div>
+                                <div class="name">Clock Tower</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="cw-cf-0x05" data-builtin="true">
+                                <img class="preview-img" src="clockfaces/thumbs/cw-cf-0x05.png" alt="Pac-Man" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">👾</div>
+                                <div class="name">Pac-Man</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="cw-cf-0x06" data-builtin="true">
+                                <img class="preview-img" src="clockfaces/thumbs/cw-cf-0x06.png" alt="Pokedex" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">📱</div>
+                                <div class="name">Pokedex</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="cw-cf-0x07" data-builtin="true">
+                                <img class="preview-img" src="clockfaces/thumbs/cw-cf-0x07.png" alt="Canvas" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🎨</div>
+                                <div class="name">Canvas (JSON)</div>
+                            </div>
+                        </div>
+
+                        <h4 style="margin: 20px 0 10px; color:var(--text-secondary);">JSON (descargables)</h4>
+                        <div class="clockface-grid" id="clockface-grid">
+                            <div class="clockface-item selected" onclick="toggleClockface(this)" data-name="nyan-cat">
+                                <img class="preview-img" src="clockfaces/thumbs/nyan-cat.png" alt="Nyan Cat" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🌈</div>
+                                <div class="name">Nyan Cat</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="pac-man">
+                                <img class="preview-img" src="clockfaces/thumbs/pac-man.png" alt="Pac-Man" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">👾</div>
+                                <div class="name">Pac-Man</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="goomba_move">
+                                <img class="preview-img" src="clockfaces/thumbs/goomba_move.png" alt="Goomba" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🍄</div>
+                                <div class="name">Goomba</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="donkey-kong">
+                                <img class="preview-img" src="clockfaces/thumbs/donkey-kong.png" alt="Donkey Kong" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🦍</div>
+                                <div class="name">Donkey Kong</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="snoopy3">
+                                <img class="preview-img" src="clockfaces/thumbs/snoopy3.png" alt="Snoopy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🐕</div>
+                                <div class="name">Snoopy</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="christmassnoopy">
+                                <img class="preview-img" src="clockfaces/thumbs/christmassnoopy.png" alt="Snoopy Navidad" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🎄</div>
+                                <div class="name">Snoopy Navidad</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="star-wars">
+                                <img class="preview-img" src="clockfaces/thumbs/star-wars.png" alt="Star Wars" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">⭐</div>
+                                <div class="name">Star Wars</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="clock-club">
+                                <img class="preview-img" src="clockfaces/thumbs/clock-club.png" alt="Clock Club" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">⏰</div>
+                                <div class="name">Clock Club</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="retro-computer">
+                                <img class="preview-img" src="clockfaces/thumbs/retro-computer.png" alt="Retro Computer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">💻</div>
+                                <div class="name">Retro PC</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="eletrogate">
+                                <img class="preview-img" src="clockfaces/thumbs/eletrogate.png" alt="Eletrogate" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">⚡</div>
+                                <div class="name">Eletrogate</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="pepsi-final-2">
+                                <img class="preview-img" src="clockfaces/thumbs/pepsi-final-2.png" alt="Pepsi" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="preview-fallback">🥤</div>
+                                <div class="name">Pepsi</div>
+                            </div>
+                            <div class="clockface-item" onclick="toggleClockface(this)" data-name="custom">
+                                <div class="preview-fallback" style="display:flex;">✏️</div>
+                                <div class="name">Personalizado</div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 13px; color: var(--text-secondary);">
+                            Seleccionados: <strong id="selected-count">1</strong> caratulas
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                        <h3>Archivo de Descripcion</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Nombre del archivo JSON del clockface (sin extension)</p>
+                        <div class="form-group">
+                            <label class="form-label">Nombre del archivo</label>
+                            <input type="text" class="form-input" id="canvas-file" value="mi-clockface" placeholder="nombre-clockface">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+                        <h3>Servidor Canvas</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Direccion del servidor donde estan los archivos de clockface</p>
+                        <div class="form-group">
+                            <label class="form-label">Servidor</label>
+                            <input type="text" class="form-input" id="canvas-server" value="raw.githubusercontent.com" placeholder="raw.githubusercontent.com">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M9 2c-1.05 0-2.05.16-3 .46 4.06 1.27 7 5.06 7 9.54 0 4.48-2.94 8.27-7 9.54.95.3 1.95.46 3 .46 5.52 0 10-4.48 10-10S14.52 2 9 2z"/></svg>
+                        <h3>Modo Nocturno</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Muestra numeros grandes durante la noche con brillo y color personalizados</p>
+                        <div class="form-checkbox" style="margin-bottom: 15px;">
+                            <input type="checkbox" id="enable-night-mode" onchange="toggleNightMode()">
+                            <label for="enable-night-mode">Activar modo nocturno</label>
+                        </div>
+                        <div id="night-mode-settings" style="display: none;">
+                            <div class="input-row" style="margin-bottom: 15px;">
+                                <div class="form-group" style="flex: 1;">
+                                    <label class="form-label">Hora inicio</label>
+                                    <input type="time" class="form-input" id="night-start" value="22:00">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label class="form-label">Hora fin</label>
+                                    <input type="time" class="form-input" id="night-end" value="07:00">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Color de los numeros</label>
+                                <div class="color-picker-row">
+                                    <input type="color" id="night-color" value="#ff0000" onchange="updateNightPreview()">
+                                    <span id="night-color-name">Rojo</span>
+                                    <div style="display: flex; gap: 5px; margin-left: auto;">
+                                        <button type="button" class="btn" style="background: #ff0000; width: 30px; height: 30px; padding: 0;" onclick="setNightColor('#ff0000', 'Rojo')"></button>
+                                        <button type="button" class="btn" style="background: #00ff00; width: 30px; height: 30px; padding: 0;" onclick="setNightColor('#00ff00', 'Verde')"></button>
+                                        <button type="button" class="btn" style="background: #0066ff; width: 30px; height: 30px; padding: 0;" onclick="setNightColor('#0066ff', 'Azul')"></button>
+                                        <button type="button" class="btn" style="background: #ffaa00; width: 30px; height: 30px; padding: 0;" onclick="setNightColor('#ffaa00', 'Naranja')"></button>
+                                        <button type="button" class="btn" style="background: #ffffff; width: 30px; height: 30px; padding: 0; border: 1px solid #ccc;" onclick="setNightColor('#ffffff', 'Blanco')"></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Brillo nocturno: <span class="range-value" id="night-bright-value">30</span></label>
+                                <input type="range" class="form-input" id="night-brightness" min="1" max="100" value="30"
+                                    oninput="document.getElementById('night-bright-value').textContent = this.value; updateNightPreview()">
+                            </div>
+                            <div class="night-mode-preview">
+                                <span class="time" id="night-preview-time" style="font-size: 36px; color: #ff0000;">23:45</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        <h3>Informacion</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">
+                            El Canvas Clockface descarga un archivo JSON que define como se muestra el reloj.<br>
+                            Puedes crear tus propios disenos usando el <strong>Editor de Clockface</strong> incluido en este proyecto.
+                        </p>
+                        <div style="margin-top: 15px;">
+                            <a href="index.html" class="btn btn-save" style="text-decoration: none; display: inline-block;">Abrir Editor</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div class="tab-content" id="tab-advanced">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+                Configuracion Avanzada
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <h3>Informacion del Dispositivo</h3>
+                    </div>
+                    <div class="card-body">
+                        <table style="width: 100%; font-size: 14px;">
+                            <tr><td style="padding: 5px 0;">Firmware:</td><td><strong id="info-firmware">v2.0.0</strong></td></tr>
+                            <tr><td style="padding: 5px 0;">Clockface:</td><td><strong id="info-clockface">cw-cf-0x07</strong></td></tr>
+                            <tr><td style="padding: 5px 0;">WiFi SSID:</td><td><strong id="info-ssid">MiRed</strong></td></tr>
+                            <tr><td style="padding: 5px 0;">IP:</td><td><strong id="info-ip">192.168.1.100</strong></td></tr>
+                            <tr><td style="padding: 5px 0;">MAC:</td><td><strong id="info-mac">AA:BB:CC:DD:EE:FF</strong></td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                        <h3>Acciones</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button class="btn btn-save" onclick="restartDevice()">Reiniciar Dispositivo</button>
+                            <button class="btn" style="background: var(--warning); color: #333;" onclick="resetWifi()">Borrar Config WiFi</button>
+                            <button class="btn btn-restart" onclick="factoryReset()">Reset de Fabrica</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        <h3>Actualizacion OTA</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">Actualiza el firmware sin conectar cables</p>
+                        <div class="form-group">
+                            <label class="form-label">Archivo .bin</label>
+                            <input type="file" class="form-input" id="ota-file" accept=".bin" style="padding: 8px;">
+                        </div>
+                        <button class="btn btn-save" onclick="uploadOTA()" style="margin-top: 10px;">Subir Firmware</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar" id="status-bar">
+        Guardado correctamente. Reinicia el dispositivo para aplicar cambios.
+    </div>
+
+    <script>
+        // Tab navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Simulated settings (for local testing)
+        const mockSettings = {
+            displaybright: 128,
+            autobrightmin: 0,
+            autobrightmax: 800,
+            swapbluegreen: 0,
+            use24hformat: 1,
+            usespanish: 1,
+            timezone: 'America/Mexico_City',
+            ntpserver: 'pool.ntp.org',
+            ldrpin: 35,
+            canvasfile: 'mi-clockface',
+            canvasserver: 'raw.githubusercontent.com',
+            manualposix: '',
+            displayrotation: 0,
+            cw_fw_version: '2.0.0',
+            cw_fw_name: 'clockwise',
+            clockface_name: 'cw-cf-0x07',
+            wifissid: 'MiRed',
+            wifi1ssid: 'MiRed',
+            wifi1pass: '',
+            wifi2ssid: '',
+            wifi2pass: '',
+            wifi3ssid: '',
+            wifi3pass: ''
+        };
+
+        // Load settings
+        function loadSettings() {
+            // In real device, this would fetch from /get
+            // For local testing, use mock data
+            applySettings(mockSettings);
+        }
+
+        function applySettings(s) {
+            document.getElementById('brightness').value = s.displaybright;
+            document.getElementById('bright-value').textContent = s.displaybright;
+            document.getElementById('auto-bright-min').value = s.autobrightmin;
+            document.getElementById('auto-bright-max').value = s.autobrightmax;
+            document.getElementById('swap-bg').checked = s.swapbluegreen == 1;
+            document.getElementById('use-24h').checked = s.use24hformat == 1;
+            document.getElementById('use-spanish').checked = s.usespanish == 1;
+            document.getElementById('timezone').value = s.timezone;
+            document.getElementById('ntp-server').value = s.ntpserver;
+            document.getElementById('ldr-pin').value = s.ldrpin;
+            document.getElementById('canvas-file').value = s.canvasfile;
+            document.getElementById('canvas-server').value = s.canvasserver;
+            document.getElementById('posix-tz').value = s.manualposix;
+            document.getElementById('rotation').value = s.displayrotation;
+
+            document.getElementById('fw-version').textContent = s.cw_fw_version;
+            document.getElementById('clockface-name').textContent = s.clockface_name;
+            document.getElementById('current-ssid').textContent = s.wifissid;
+            document.getElementById('info-firmware').textContent = 'v' + s.cw_fw_version;
+            document.getElementById('info-clockface').textContent = s.clockface_name;
+            document.getElementById('info-ssid').textContent = s.wifissid;
+
+            if (s.wifi1ssid) document.getElementById('wifi1-ssid').value = s.wifi1ssid;
+            if (s.wifi2ssid) document.getElementById('wifi2-ssid').value = s.wifi2ssid;
+            if (s.wifi3ssid) document.getElementById('wifi3-ssid').value = s.wifi3ssid;
+        }
+
+        function showStatus(message) {
+            const bar = document.getElementById('status-bar');
+            bar.textContent = message || 'Guardado correctamente. Reinicia el dispositivo para aplicar cambios.';
+            bar.classList.add('show');
+            setTimeout(() => bar.classList.remove('show'), 3000);
+        }
+
+        function savePreference(key, value) {
+            console.log('Saving:', key, '=', value);
+            // In real device: POST /set?key=value
+            // fetch('/set?' + key + '=' + encodeURIComponent(value), { method: 'POST' });
+            showStatus();
+        }
+
+        function saveAll() {
+            // Collect all values and save
+            savePreference('displayBright', document.getElementById('brightness').value);
+            savePreference('use24hFormat', document.getElementById('use-24h').checked ? 1 : 0);
+            savePreference('useSpanish', document.getElementById('use-spanish').checked ? 1 : 0);
+            savePreference('swapBlueGreen', document.getElementById('swap-bg').checked ? 1 : 0);
+            savePreference('timeZone', document.getElementById('timezone').value);
+            savePreference('ntpServer', document.getElementById('ntp-server').value);
+            savePreference('ldrPin', document.getElementById('ldr-pin').value);
+            savePreference('displayRotation', document.getElementById('rotation').value);
+            savePreference('canvasFile', document.getElementById('canvas-file').value);
+            savePreference('canvasServer', document.getElementById('canvas-server').value);
+            savePreference('manualPosix', document.getElementById('posix-tz').value);
+
+            // WiFi networks
+            savePreference('wifi1Ssid', document.getElementById('wifi1-ssid').value);
+            savePreference('wifi1Pass', document.getElementById('wifi1-pass').value);
+            savePreference('wifi2Ssid', document.getElementById('wifi2-ssid').value);
+            savePreference('wifi2Pass', document.getElementById('wifi2-pass').value);
+            savePreference('wifi3Ssid', document.getElementById('wifi3-ssid').value);
+            savePreference('wifi3Pass', document.getElementById('wifi3-pass').value);
+
+            showStatus('Todas las configuraciones guardadas');
+        }
+
+        function restartDevice() {
+            if (confirm('Reiniciar el dispositivo?')) {
+                console.log('Restarting device...');
+                // fetch('/restart', { method: 'POST' });
+                showStatus('Reiniciando dispositivo...');
+            }
+        }
+
+        function resetWifi() {
+            if (confirm('Borrar configuracion WiFi? El dispositivo entrara en modo AP.')) {
+                console.log('Resetting WiFi...');
+                showStatus('Configuracion WiFi borrada');
+            }
+        }
+
+        function factoryReset() {
+            if (confirm('ATENCION: Esto borrara TODA la configuracion. Continuar?')) {
+                console.log('Factory reset...');
+                showStatus('Reset de fabrica completado');
+            }
+        }
+
+        function scanNetworks() {
+            showStatus('Buscando redes WiFi...');
+            // In real device, would scan and show results
+            console.log('Scanning networks...');
+        }
+
+        function readPin() {
+            const pin = document.getElementById('ldr-pin').value;
+            console.log('Reading pin:', pin);
+            // Simulate reading
+            const value = Math.floor(Math.random() * 4096);
+            document.getElementById('ldr-value').textContent = value;
+        }
+
+        function uploadOTA() {
+            const file = document.getElementById('ota-file').files[0];
+            if (!file) {
+                alert('Selecciona un archivo .bin');
+                return;
+            }
+            showStatus('Subiendo firmware... NO apagues el dispositivo');
+            console.log('Uploading:', file.name);
+        }
+
+        // Dropdown functions
+        function toggleTimezoneDropdown() {
+            document.getElementById('timezone-dropdown').classList.toggle('show');
+            document.getElementById('ntp-dropdown').classList.remove('show');
+        }
+
+        function toggleNtpDropdown() {
+            document.getElementById('ntp-dropdown').classList.toggle('show');
+            document.getElementById('timezone-dropdown').classList.remove('show');
+        }
+
+        function selectTimezone(tz, offset) {
+            document.getElementById('timezone').value = tz;
+            document.getElementById('timezone-dropdown').classList.remove('show');
+        }
+
+        function selectNtp(server) {
+            document.getElementById('ntp-server').value = server;
+            document.getElementById('ntp-dropdown').classList.remove('show');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown-input')) {
+                document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
+            }
+        });
+
+        // Clockface rotation
+        function toggleClockface(item) {
+            item.classList.toggle('selected');
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('.clockface-item.selected').length;
+            document.getElementById('selected-count').textContent = count;
+        }
+
+        function toggleClockfaceRotation() {
+            const grid = document.getElementById('clockface-grid');
+            const enabled = document.getElementById('enable-rotation').checked;
+            grid.style.opacity = enabled ? '1' : '0.5';
+            grid.style.pointerEvents = enabled ? 'auto' : 'none';
+        }
+
+        // Night mode
+        function toggleNightMode() {
+            const settings = document.getElementById('night-mode-settings');
+            const enabled = document.getElementById('enable-night-mode').checked;
+            settings.style.display = enabled ? 'block' : 'none';
+            if (enabled) updateNightPreview();
+        }
+
+        function setNightColor(color, name) {
+            document.getElementById('night-color').value = color;
+            document.getElementById('night-color-name').textContent = name;
+            updateNightPreview();
+        }
+
+        function updateNightPreview() {
+            const color = document.getElementById('night-color').value;
+            const brightness = document.getElementById('night-brightness').value;
+            const preview = document.getElementById('night-preview-time');
+
+            // Adjust color brightness
+            const opacity = brightness / 100;
+            preview.style.color = color;
+            preview.style.opacity = opacity;
+            preview.style.textShadow = `0 0 ${brightness/5}px ${color}`;
+
+            // Update time
+            const now = new Date();
+            preview.textContent = now.getHours().toString().padStart(2, '0') + ':' +
+                                  now.getMinutes().toString().padStart(2, '0');
+        }
+
+        // Update night preview time every minute
+        setInterval(() => {
+            if (document.getElementById('enable-night-mode').checked) {
+                updateNightPreview();
+            }
+        }, 60000);
+
+        // Initialize clockface rotation state
+        toggleClockfaceRotation();
+
+        // Initialize
+        loadSettings();
+    </script>
+</body>
+</html>

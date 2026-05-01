@@ -18,6 +18,8 @@
                 <button id="btn-new" class="btn btn-secondary" title="Nuevo">Nuevo</button>
                 <button id="btn-import" class="btn btn-secondary" title="Importar JSON">Importar</button>
                 <button id="btn-image-tool" class="btn btn-secondary" title="Optimizar imagen para 64x64">Preparar Imagen</button>
+                <button id="btn-thumbnail" class="btn btn-secondary" title="Generar thumbnail PNG">Thumbnail</button>
+                <button id="btn-batch-thumbs" class="btn btn-secondary" title="Generar todos los thumbnails">Batch Thumbs</button>
                 <button id="btn-export" class="btn btn-primary" title="Exportar JSON">Exportar JSON</button>
             </div>
         </header>
@@ -38,6 +40,9 @@
                     </button>
                     <button class="tool-btn" data-tool="image" title="Imagen">
                         <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="sprite" title="Sprite Animado">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M13,2.05V4.05C17.39,4.59 20.5,8.58 19.96,12.97C19.5,16.61 16.64,19.5 13,19.93V21.93C18.5,21.38 22.5,16.5 21.95,11C21.5,6.25 17.73,2.5 13,2.05M5.67,19.74C7.18,21 9.04,21.79 11,22V20C9.58,19.82 8.23,19.25 7.1,18.37L5.67,19.74M7.1,5.74C8.22,4.84 9.57,4.26 11,4.06V2.06C9.05,2.25 7.19,3 5.67,4.26L7.1,5.74M5.69,7.1L4.26,5.67C3,7.19 2.25,9.04 2.05,11H4.05C4.24,9.58 4.8,8.23 5.69,7.1M4.06,13H2.06C2.26,14.96 3.03,16.81 4.27,18.33L5.69,16.9C4.81,15.77 4.24,14.42 4.06,13M10,16.5L16,12L10,7.5V16.5Z"/></svg>
                     </button>
                 </div>
                 <div class="tool-group">
@@ -170,23 +175,15 @@
                             </div>
                             <div class="preset-group">
                                 <span class="preset-label">12H:</span>
-                                <button type="button" class="btn-preset" data-format="h:i">2:30</button>
-                                <button type="button" class="btn-preset" data-format="h:i:s">2:30:45</button>
                                 <button type="button" class="btn-preset" data-format="h:i A">2:30 PM</button>
                                 <button type="button" class="btn-preset" data-format="h:i:s A">2:30:45 PM</button>
                             </div>
                             <div class="preset-group">
                                 <span class="preset-label">Fecha:</span>
-                                <button type="button" class="btn-preset" data-format="d/m">30/04</button>
-                                <button type="button" class="btn-preset" data-format="d/m/y">30/04/26</button>
-                                <button type="button" class="btn-preset" data-format="d-m-Y">30-04-2026</button>
-                            </div>
-                            <div class="preset-group">
-                                <span class="preset-label">Dia:</span>
-                                <button type="button" class="btn-preset" data-format="D">Mie</button>
-                                <button type="button" class="btn-preset" data-format="l">Miercoles</button>
-                                <button type="button" class="btn-preset" data-format="D d">Mie 30</button>
-                                <button type="button" class="btn-preset" data-format="d M">30 Abr</button>
+                                <button type="button" class="btn-preset" data-format="l">Jueves</button>
+                                <button type="button" class="btn-preset" data-format="l j">Jueves 30</button>
+                                <button type="button" class="btn-preset" data-format="d-M-y">30-Abr-26</button>
+                                <button type="button" class="btn-preset" data-format="j F">30 Abril</button>
                             </div>
                         </div>
                     </div>
@@ -194,11 +191,13 @@
                     <div class="form-group" id="fg-font">
                         <label>Fuente</label>
                         <select id="el-font">
-                            <option value="">Default</option>
+                            <option value="">Default (picopixel)</option>
                             <option value="picopixel">Picopixel (3px)</option>
-                            <option value="square">Square</option>
-                            <option value="medium">Medium</option>
-                            <option value="big">Big</option>
+                            <option value="tomthumb">TomThumb (5px legible)</option>
+                            <option value="square">Square (numeros)</option>
+                            <option value="medium">Medium (7px)</option>
+                            <option value="big">Big (8px)</option>
+                            <option value="bold">Bold (13px gruesa)</option>
                         </select>
                     </div>
 
@@ -252,7 +251,52 @@
                     <div class="form-group" id="fg-image">
                         <label>Imagen</label>
                         <input type="file" id="el-image-file" accept="image/*">
-                        <small>PNG recomendado, max 64x64</small>
+                        <small>PNG recomendado</small>
+                    </div>
+
+                    <div class="form-group" id="fg-image-size">
+                        <label>Tamano Imagen</label>
+                        <div class="input-row">
+                            <label class="small">W</label>
+                            <input type="number" id="el-img-width" min="1" max="64" value="64">
+                            <label class="small">H</label>
+                            <input type="number" id="el-img-height" min="1" max="64" value="64">
+                        </div>
+                        <button type="button" class="btn btn-small" id="btn-apply-img-size">Aplicar Escala</button>
+                        <small>Escala y guarda la imagen al nuevo tamano</small>
+                    </div>
+
+                    <!-- Sprite specific -->
+                    <div class="form-group" id="fg-sprite-select">
+                        <label>Sprite</label>
+                        <div class="input-row">
+                            <select id="el-sprite-index">
+                                <option value="0">Sprite 0</option>
+                            </select>
+                            <button type="button" class="btn btn-small" id="btn-edit-sprites">Editar</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="fg-sprite-timing">
+                        <label>Timing (ms)</label>
+                        <div class="input-row">
+                            <label class="small">Frame</label>
+                            <input type="number" id="el-frame-delay" min="16" max="5000" value="100">
+                            <label class="small">Loop</label>
+                            <input type="number" id="el-loop-delay" min="0" max="10000" value="0">
+                        </div>
+                        <small>Frame: delay entre frames. Loop: pausa al terminar ciclo.</small>
+                    </div>
+
+                    <div class="form-group" id="fg-sprite-move">
+                        <label>Movimiento (px/ciclo)</label>
+                        <div class="input-row">
+                            <label class="small">X</label>
+                            <input type="number" id="el-move-x" min="-64" max="64" value="0">
+                            <label class="small">Y</label>
+                            <input type="number" id="el-move-y" min="-64" max="64" value="0">
+                        </div>
+                        <small>Desplazamiento despues de cada ciclo de animacion.</small>
                     </div>
 
                     <div class="form-group" id="fg-in-loop">
@@ -410,6 +454,78 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary modal-close">Cancelar</button>
                 <button class="btn btn-primary" id="btn-add-image" style="display:none;">Agregar al Canvas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Thumbnails Modal -->
+    <div id="batch-thumbs-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Generar Thumbnails en Lote</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="batch-input-section">
+                    <label class="btn btn-primary">
+                        <input type="file" id="batch-file-input" accept=".json" multiple hidden>
+                        Seleccionar archivos JSON
+                    </label>
+                    <p class="help-text">Selecciona uno o mas archivos .json de clockfaces</p>
+                </div>
+                <div id="batch-results" class="batch-results">
+                    <p>Selecciona archivos JSON de clockfaces para generar thumbnails.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sprite Editor Modal -->
+    <div id="sprite-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Editor de Sprites</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="sprite-editor-container">
+                    <div class="sprite-list-section">
+                        <div class="sprite-list-header">
+                            <h4>Sprites</h4>
+                            <button class="btn btn-small btn-primary" id="btn-add-sprite">+ Nuevo</button>
+                        </div>
+                        <div id="sprite-list" class="sprite-list">
+                            <!-- Dynamic sprite list -->
+                        </div>
+                    </div>
+
+                    <div class="frames-section" id="frames-section" style="display:none;">
+                        <div class="frames-header">
+                            <h4>Frames del Sprite <span id="current-sprite-index">0</span></h4>
+                            <label class="btn btn-small btn-primary">
+                                <input type="file" id="add-frame-file" accept="image/*" multiple hidden>
+                                + Agregar Frames
+                            </label>
+                        </div>
+                        <div id="frames-list" class="frames-list">
+                            <!-- Dynamic frames -->
+                        </div>
+                        <div class="sprite-preview">
+                            <h4>Preview</h4>
+                            <canvas id="sprite-preview-canvas" width="128" height="128"></canvas>
+                            <div class="preview-controls">
+                                <button class="btn btn-small" id="btn-play-sprite">Play</button>
+                                <span id="sprite-frame-info">Frame: 0/0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cerrar</button>
             </div>
         </div>
     </div>
