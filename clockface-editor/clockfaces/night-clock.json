@@ -1,0 +1,30 @@
+{
+  "name": "night-clock",
+  "version": 1,
+  "author": "Clockwise",
+  "description": "Reloj nocturno con digitos grandes en diagonal",
+  "bgColor": 0,
+  "delay": 1000,
+  "setup": [],
+  "sprites": [],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 2,
+      "y": 26,
+      "content": "H",
+      "font": "bold",
+      "fgColor": 2016,
+      "bgColor": 0
+    },
+    {
+      "type": "datetime",
+      "x": 34,
+      "y": 56,
+      "content": "i",
+      "font": "bold",
+      "fgColor": 2016,
+      "bgColor": 0
+    }
+  ]
+}
