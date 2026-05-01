@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Digit Designer - Night Clock</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 { text-align: center; margin-bottom: 20px; }
+        .container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .editor-section {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .grid-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .pixel-grid {
+            display: grid;
+            grid-template-columns: repeat(17, 20px);
+            gap: 1px;
+            background: #333;
+            padding: 1px;
+            border: 2px solid #444;
+        }
+        .pixel {
+            width: 20px;
+            height: 20px;
+            background: #000;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .pixel.on {
+            background: #00ff88;
+        }
+        .pixel:hover {
+            opacity: 0.7;
+        }
+        .preview-section {
+            text-align: center;
+        }
+        .preview-canvas {
+            border: 1px solid #444;
+            background: #000;
+            image-rendering: pixelated;
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary { background: #0f4c75; color: white; }
+        .btn-danger { background: #c0392b; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn:hover { opacity: 0.8; }
+        .digit-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .digit-tab {
+            padding: 10px 20px;
+            background: #0f3460;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .digit-tab.active {
+            background: #00ff88;
+            color: #000;
+        }
+        .output-section {
+            margin-top: 20px;
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .output-section textarea {
+            width: 100%;
+            height: 100px;
+            background: #1a1a2e;
+            color: #0f0;
+            border: 1px solid #444;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .all-digits {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .digit-preview {
+            text-align: center;
+        }
+        .digit-preview canvas {
+            border: 1px solid #444;
+            background: #000;
+            image-rendering: pixelated;
+        }
+        .digit-preview span {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .size-info {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Night Clock Digit Designer</h1>
+    <p class="size-info" style="text-align:center;">Tamaño de dígitos: 17 x 28 píxeles (basado en fotos del reloj original)</p>
+
+    <div class="container">
+        <div class="editor-section">
+            <div class="digit-tabs" id="digit-tabs"></div>
+
+            <div class="grid-container">
+                <div class="pixel-grid" id="pixel-grid"></div>
+                <div class="preview-section">
+                    <h3>Preview 1:1</h3>
+                    <canvas id="preview-1x" class="preview-canvas" width="17" height="28"></canvas>
+                    <h3 style="margin-top:15px;">Preview 4x</h3>
+                    <canvas id="preview-4x" class="preview-canvas" width="68" height="112"></canvas>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-danger" onclick="clearGrid()">Limpiar</button>
+                <button class="btn btn-primary" onclick="saveDigit()">Guardar Dígito</button>
+                <button class="btn btn-success" onclick="exportAll()">Exportar Todos (JSON)</button>
+                <button class="btn btn-primary" onclick="downloadPNGs()">Descargar PNGs</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="output-section" style="max-width: 800px; margin: 20px auto;">
+        <h3>Todos los dígitos</h3>
+        <div class="all-digits" id="all-digits"></div>
+        <h3 style="margin-top:20px;">JSON Output</h3>
+        <textarea id="json-output" readonly></textarea>
+    </div>
+
+    <script>
+        const WIDTH = 17;
+        const HEIGHT = 28;
+        let currentDigit = 0;
+        let isDrawing = false;
+        let drawMode = true; // true = draw, false = erase
+
+        // Storage for all digits (10 digits, each is WIDTH x HEIGHT array)
+        const digits = {};
+        for (let i = 0; i <= 9; i++) {
+            digits[i] = createEmptyGrid();
+        }
+
+        // Pre-fill with approximate digit patterns based on photos
+        initializeDigits();
+
+        function createEmptyGrid() {
+            return Array(HEIGHT).fill(null).map(() => Array(WIDTH).fill(0));
+        }
+
+        function initializeDigits() {
+            // These patterns are approximations based on the night clock photos
+            // User can refine them in the editor
+
+            // Digit 0 - oval shape
+            digits[0] = parsePattern(`
+                ....*******....
+                ..**.......**..
+                .**.........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                .**.........**
+                ..**.......**..
+                ....*******....
+                .................
+            `);
+
+            // Digit 1 - narrow
+            digits[1] = parsePattern(`
+                ......****.....
+                ....******....
+                ...***..**....
+                ..**....**....
+                .**.....**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                .......**....
+                ....*******...
+                ....*******...
+                .................
+            `);
+
+            // Digit 2 - curved top, diagonal
+            digits[2] = parsePattern(`
+                ....*******....
+                ..**.......**..
+                .**.........**
+                **...........**
+                **..........**
+                ............**
+                ............**
+                ...........**
+                ...........**
+                ..........**
+                .........*.
+                ........**..
+                ........*...
+                .......**...
+                ......**....
+                .....**....
+                ....**.....
+                ....**......
+                ...**.......
+                ..**.........
+                .**..........
+                .**..........
+                **...........
+                **...........
+                **...........
+                **************
+                **************
+                .................
+            `);
+
+            // Digit 3
+            digits[3] = parsePattern(`
+                ....*******....
+                ..**.......**..
+                .**.........**
+                **...........**
+                .............**
+                .............**
+                .............**
+                .............**
+                ...........**..
+                ........***....
+                ........***....
+                ...........**..
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                **...........**
+                .**.........**
+                ..**.......**..
+                ....*******....
+                .................
+                .................
+            `);
+
+            // Digit 4
+            digits[4] = parsePattern(`
+                ...........**..
+                ..........**...
+                .........**....
+                ........**....
+                .......**......
+                ......**......
+                .....**........
+                ....**........
+                ...**.........
+                ...**..........
+                ..**..........
+                .**...........
+                **............
+                **......**....
+                **......**....
+                **......**....
+                ***************
+                ***************
+                ........**....
+                ........**....
+                ........**....
+                ........**....
+                ........**....
+                ........**....
+                ........**....
+                ........**....
+                ........**....
+                .................
+            `);
+
+            // Digit 5 - from photos
+            digits[5] = parsePattern(`
+                **************
+                **************
+                **...........
+                **............
+                **............
+                **............
+                **............
+                **............
+                **............
+                *********......
+                **......**....
+                **.........**.
+                **...........**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                **...........**
+                **...........**
+                .**.........**
+                ..**.......**..
+                ....*******....
+                .................
+                .................
+            `);
+
+            // Digit 6
+            digits[6] = parsePattern(`
+                ....*******....
+                ..**.......**..
+                .**.........**
+                **...........**
+                **............
+                **............
+                **............
+                **............
+                **............
+                *********......
+                **.......**....
+                **..........**.
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                .**.........**
+                ..**.......**..
+                ....*******....
+                .................
+                .................
+            `);
+
+            // Digit 7 - from photos
+            digits[7] = parsePattern(`
+                ***************
+                ***************
+                .............**
+                .............**
+                ............**
+                ...........**
+                ...........**
+                ..........**
+                ..........**
+                .........**
+                .........**
+                ........**
+                ........**
+                .......**
+                .......**
+                ......**
+                ......**
+                .....**
+                .....**
+                .....**
+                .....**
+                .....**
+                .....**
+                .....**
+                .....**
+                .....**
+                .....**
+                .................
+            `);
+
+            // Digit 8 - from photos (double circles)
+            digits[8] = parsePattern(`
+                ....*******....
+                ..**.......**..
+                .**.........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                .**.........**
+                ..**.......**..
+                ....*******....
+                ..**.......**..
+                .**.........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                .**.........**
+                ..**.......**..
+                ....*******....
+                .................
+                .................
+            `);
+
+            // Digit 9
+            digits[9] = parsePattern(`
+                ....*******....
+                ..**.......**..
+                .**.........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                **...........**
+                .**.........**
+                ..**.......****
+                ....********.**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                .............**
+                **...........**
+                .**.........**
+                ..**.......**..
+                ....*******....
+                .................
+                .................
+            `);
+        }
+
+        function parsePattern(str) {
+            const lines = str.trim().split('\n').map(l => l.trim());
+            const grid = createEmptyGrid();
+            for (let y = 0; y < HEIGHT && y < lines.length; y++) {
+                for (let x = 0; x < WIDTH && x < lines[y].length; x++) {
+                    grid[y][x] = lines[y][x] === '*' ? 1 : 0;
+                }
+            }
+            return grid;
+        }
+
+        function createGrid() {
+            const grid = document.getElementById('pixel-grid');
+            grid.innerHTML = '';
+
+            for (let y = 0; y < HEIGHT; y++) {
+                for (let x = 0; x < WIDTH; x++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'pixel' + (digits[currentDigit][y][x] ? ' on' : '');
+                    pixel.dataset.x = x;
+                    pixel.dataset.y = y;
+
+                    pixel.addEventListener('mousedown', (e) => {
+                        isDrawing = true;
+                        drawMode = !pixel.classList.contains('on');
+                        togglePixel(pixel);
+                    });
+                    pixel.addEventListener('mouseenter', () => {
+                        if (isDrawing) togglePixel(pixel);
+                    });
+
+                    grid.appendChild(pixel);
+                }
+            }
+
+            document.addEventListener('mouseup', () => isDrawing = false);
+        }
+
+        function togglePixel(pixel) {
+            const x = parseInt(pixel.dataset.x);
+            const y = parseInt(pixel.dataset.y);
+
+            if (drawMode) {
+                pixel.classList.add('on');
+                digits[currentDigit][y][x] = 1;
+            } else {
+                pixel.classList.remove('on');
+                digits[currentDigit][y][x] = 0;
+            }
+
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const canvas1x = document.getElementById('preview-1x');
+            const ctx1x = canvas1x.getContext('2d');
+            const canvas4x = document.getElementById('preview-4x');
+            const ctx4x = canvas4x.getContext('2d');
+
+            ctx1x.fillStyle = '#000';
+            ctx1x.fillRect(0, 0, WIDTH, HEIGHT);
+            ctx4x.fillStyle = '#000';
+            ctx4x.fillRect(0, 0, WIDTH * 4, HEIGHT * 4);
+
+            ctx1x.fillStyle = '#00ff88';
+            ctx4x.fillStyle = '#00ff88';
+
+            for (let y = 0; y < HEIGHT; y++) {
+                for (let x = 0; x < WIDTH; x++) {
+                    if (digits[currentDigit][y][x]) {
+                        ctx1x.fillRect(x, y, 1, 1);
+                        ctx4x.fillRect(x * 4, y * 4, 4, 4);
+                    }
+                }
+            }
+        }
+
+        function createTabs() {
+            const tabs = document.getElementById('digit-tabs');
+            tabs.innerHTML = '';
+            for (let i = 0; i <= 9; i++) {
+                const tab = document.createElement('button');
+                tab.className = 'digit-tab' + (i === currentDigit ? ' active' : '');
+                tab.textContent = i;
+                tab.onclick = () => selectDigit(i);
+                tabs.appendChild(tab);
+            }
+        }
+
+        function selectDigit(n) {
+            currentDigit = n;
+            createTabs();
+            createGrid();
+            updatePreview();
+        }
+
+        function clearGrid() {
+            digits[currentDigit] = createEmptyGrid();
+            createGrid();
+            updatePreview();
+        }
+
+        function saveDigit() {
+            updateAllDigitsPreview();
+            alert(`Dígito ${currentDigit} guardado en memoria`);
+        }
+
+        function updateAllDigitsPreview() {
+            const container = document.getElementById('all-digits');
+            container.innerHTML = '';
+
+            for (let i = 0; i <= 9; i++) {
+                const div = document.createElement('div');
+                div.className = 'digit-preview';
+
+                const canvas = document.createElement('canvas');
+                canvas.width = WIDTH;
+                canvas.height = HEIGHT;
+                canvas.style.width = (WIDTH * 3) + 'px';
+                canvas.style.height = (HEIGHT * 3) + 'px';
+
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, WIDTH, HEIGHT);
+                ctx.fillStyle = '#00ff88';
+
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        if (digits[i][y][x]) {
+                            ctx.fillRect(x, y, 1, 1);
+                        }
+                    }
+                }
+
+                div.appendChild(canvas);
+                div.innerHTML += `<span>${i}</span>`;
+                container.appendChild(div);
+            }
+        }
+
+        function getDigitBase64(digitIndex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = WIDTH;
+            canvas.height = HEIGHT;
+            const ctx = canvas.getContext('2d');
+
+            // Transparent background, green pixels
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+            ctx.fillStyle = '#00ff88';
+
+            for (let y = 0; y < HEIGHT; y++) {
+                for (let x = 0; x < WIDTH; x++) {
+                    if (digits[digitIndex][y][x]) {
+                        ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+            }
+
+            return canvas.toDataURL('image/png').split(',')[1];
+        }
+
+        function exportAll() {
+            const output = {};
+            for (let i = 0; i <= 9; i++) {
+                output[i] = getDigitBase64(i);
+            }
+
+            document.getElementById('json-output').value = JSON.stringify(output, null, 2);
+            updateAllDigitsPreview();
+        }
+
+        function downloadPNGs() {
+            for (let i = 0; i <= 9; i++) {
+                const canvas = document.createElement('canvas');
+                canvas.width = WIDTH;
+                canvas.height = HEIGHT;
+                const ctx = canvas.getContext('2d');
+
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, WIDTH, HEIGHT);
+                ctx.fillStyle = '#00ff88';
+
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        if (digits[i][y][x]) {
+                            ctx.fillRect(x, y, 1, 1);
+                        }
+                    }
+                }
+
+                const link = document.createElement('a');
+                link.download = `digit-${i}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+
+        // Initialize
+        createTabs();
+        createGrid();
+        updatePreview();
+        updateAllDigitsPreview();
+    </script>
+</body>
+</html>

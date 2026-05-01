@@ -2,6 +2,11 @@
 
 ## Por hacer
 
+### Night Clock - Dígitos grandes
+- [ ] Perfeccionar dígitos 0-9 en `digit-designer.html`
+- [ ] Crear fuente GFX grande (24pt+) o modificar firmware para soportar digit-sprites
+- [ ] Integrar dígitos bitmap en night-clock.json
+
 ### Thumbnails
 - [ ] Generar thumbnails de las 11 caratulas JSON (abrir `clockface-editor/generate-thumbs.html` con servidor local)
 - [ ] Capturar screenshots de las 7 caratulas built-in del reloj fisico y guardarlas en `clockface-editor/clockfaces/thumbs/`
