@@ -2,6 +2,22 @@
 
 ---
 
+## Clonar el Repositorio
+
+Para clonar el proyecto en una computadora nueva:
+```bash
+git clone --recursive https://github.com/XE1E/Clockwise-XE1E.git
+```
+
+El flag `--recursive` descarga todos los submodulos (clockfaces, librerias).
+
+Si ya clonaste sin `--recursive`:
+```bash
+git submodule update --init --recursive
+```
+
+---
+
 ## Compilacion del Firmware
 
 ### Requisitos
