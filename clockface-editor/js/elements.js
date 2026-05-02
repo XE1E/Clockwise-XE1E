@@ -59,6 +59,16 @@ class ClockfaceElement {
                 element.y1 = data.y1 || data.y + 10;
                 element.color = data.color || 65535;
                 break;
+            case 'circle':
+                element = new CircleElement(data.x, data.y);
+                element.radius = data.radius || 5;
+                element.color = data.color || 65535;
+                break;
+            case 'fillcircle':
+                element = new FillCircleElement(data.x, data.y);
+                element.radius = data.radius || 5;
+                element.color = data.color || 65535;
+                break;
             case 'sprite':
                 element = new SpriteElement(data.x, data.y);
                 element.sprite = data.sprite || 0;
@@ -253,6 +263,44 @@ class LineElement extends ClockfaceElement {
             y: this.y,
             x1: this.x1,
             y1: this.y1,
+            color: this.color,
+            id: this.id
+        };
+    }
+}
+
+class CircleElement extends ClockfaceElement {
+    constructor(x = 0, y = 0) {
+        super('circle', x, y);
+        this.radius = 5;
+        this.color = 65535;
+    }
+
+    toJSON() {
+        return {
+            type: this.type,
+            x: this.x,
+            y: this.y,
+            radius: this.radius,
+            color: this.color,
+            id: this.id
+        };
+    }
+}
+
+class FillCircleElement extends ClockfaceElement {
+    constructor(x = 0, y = 0) {
+        super('fillcircle', x, y);
+        this.radius = 5;
+        this.color = 65535;
+    }
+
+    toJSON() {
+        return {
+            type: this.type,
+            x: this.x,
+            y: this.y,
+            radius: this.radius,
             color: this.color,
             id: this.id
         };

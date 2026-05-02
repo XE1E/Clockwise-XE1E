@@ -418,8 +418,15 @@ class ClockfaceEditor {
             document.querySelector('.canvas-grid').classList.toggle('hidden', !e.target.checked);
         });
 
+        document.getElementById('rounded-pixels').addEventListener('change', (e) => {
+            document.querySelector('.canvas-wrapper').classList.toggle('rounded-pixels', e.target.checked);
+        });
+
         document.getElementById('theme-name').addEventListener('input', (e) => {
             this.clockface.name = e.target.value;
+        });
+        document.getElementById('theme-version').addEventListener('input', (e) => {
+            this.clockface.version = parseInt(e.target.value) || 1;
         });
         document.getElementById('theme-author').addEventListener('input', (e) => {
             this.clockface.author = e.target.value;
@@ -442,7 +449,7 @@ class ClockfaceEditor {
     }
 
     bindElementProperties() {
-        const inputs = ['el-x', 'el-y', 'el-content', 'el-font', 'el-width', 'el-height', 'el-x1', 'el-y1', 'el-in-loop'];
+        const inputs = ['el-x', 'el-y', 'el-content', 'el-font', 'el-width', 'el-height', 'el-x1', 'el-y1', 'el-radius', 'el-in-loop'];
 
         inputs.forEach(id => {
             const el = document.getElementById(id);
@@ -1159,6 +1166,12 @@ class ClockfaceEditor {
             case 'line':
                 element = new LineElement(coords.x, coords.y);
                 break;
+            case 'circle':
+                element = new CircleElement(coords.x, coords.y);
+                break;
+            case 'fillcircle':
+                element = new FillCircleElement(coords.x, coords.y);
+                break;
             case 'sprite':
                 if (this.clockface.sprites.length === 0) {
                     alert('Primero crea un sprite en el editor de sprites (boton Editar)');
@@ -1201,6 +1214,11 @@ class ClockfaceEditor {
         if (element.type === 'line') {
             element.x1 = parseInt(document.getElementById('el-x1').value) || 0;
             element.y1 = parseInt(document.getElementById('el-y1').value) || 0;
+            element.color = ColorUtils.hexToRgb565(document.getElementById('el-color').value);
+        }
+
+        if (element.type === 'circle' || element.type === 'fillcircle') {
+            element.radius = parseInt(document.getElementById('el-radius').value) || 5;
             element.color = ColorUtils.hexToRgb565(document.getElementById('el-color').value);
         }
 
@@ -1249,8 +1267,9 @@ class ClockfaceEditor {
             'fg-fgcolor': ['datetime', 'text'],
             'fg-bgcolor': ['datetime', 'text'],
             'fg-size': ['rect', 'fillrect'],
+            'fg-radius': ['circle', 'fillcircle'],
             'fg-endpoint': ['line'],
-            'fg-color': ['rect', 'fillrect', 'line'],
+            'fg-color': ['rect', 'fillrect', 'line', 'circle', 'fillcircle'],
             'fg-image': ['image'],
             'fg-image-size': ['image'],
             'fg-sprite-select': ['sprite'],
@@ -1284,6 +1303,12 @@ class ClockfaceEditor {
         if (element.type === 'line') {
             document.getElementById('el-x1').value = element.x1;
             document.getElementById('el-y1').value = element.y1;
+            document.getElementById('el-color').value = ColorUtils.rgb565ToHex(element.color);
+            document.getElementById('el-color-value').textContent = element.color;
+        }
+
+        if (element.type === 'circle' || element.type === 'fillcircle') {
+            document.getElementById('el-radius').value = element.radius;
             document.getElementById('el-color').value = ColorUtils.rgb565ToHex(element.color);
             document.getElementById('el-color-value').textContent = element.color;
         }
@@ -1335,6 +1360,7 @@ class ClockfaceEditor {
 
     updateUI() {
         document.getElementById('theme-name').value = this.clockface.name;
+        document.getElementById('theme-version').value = this.clockface.version;
         document.getElementById('theme-author').value = this.clockface.author;
         document.getElementById('theme-delay').value = this.clockface.delay;
         document.getElementById('bg-color').value = ColorUtils.rgb565ToHex(this.clockface.bgColor);

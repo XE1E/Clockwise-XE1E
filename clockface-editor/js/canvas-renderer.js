@@ -58,6 +58,12 @@ class CanvasRenderer {
             case 'line':
                 this.renderLine(element);
                 break;
+            case 'circle':
+                this.renderCircle(element);
+                break;
+            case 'fillcircle':
+                this.renderFillCircle(element);
+                break;
             case 'sprite':
                 this.renderSprite(element);
                 break;
@@ -127,6 +133,23 @@ class CanvasRenderer {
         this.ctx.stroke();
     }
 
+    renderCircle(element) {
+        const rgb = ColorUtils.rgb565ToRgb(element.color);
+        this.ctx.strokeStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.arc(element.x + 0.5, element.y + 0.5, element.radius, 0, 2 * Math.PI);
+        this.ctx.stroke();
+    }
+
+    renderFillCircle(element) {
+        const rgb = ColorUtils.rgb565ToRgb(element.color);
+        this.ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        this.ctx.beginPath();
+        this.ctx.arc(element.x, element.y, element.radius, 0, 2 * Math.PI);
+        this.ctx.fill();
+    }
+
     renderSprite(element) {
         if (element.frameImages && element.frameImages.length > 0) {
             const frameIndex = element.currentFrame % element.frameImages.length;
@@ -193,6 +216,14 @@ class CanvasRenderer {
                     y: Math.min(element.y, element.y1),
                     width: Math.abs(element.x1 - element.x) || 1,
                     height: Math.abs(element.y1 - element.y) || 1
+                };
+            case 'circle':
+            case 'fillcircle':
+                return {
+                    x: element.x - element.radius,
+                    y: element.y - element.radius,
+                    width: element.radius * 2,
+                    height: element.radius * 2
                 };
             case 'sprite': {
                 let w = 16, h = 16;

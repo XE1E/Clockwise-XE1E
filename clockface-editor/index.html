@@ -53,6 +53,12 @@
                     <button class="tool-btn" data-tool="fillrect" title="Rectangulo Relleno">
                         <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M4,6H20V19H4V6Z"/></svg>
                     </button>
+                    <button class="tool-btn" data-tool="circle" title="Circulo">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="fillcircle" title="Circulo Relleno">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    </button>
                     <button class="tool-btn" data-tool="line" title="Linea">
                         <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19,13H5V11H19V13Z" transform="rotate(-45 12 12)"/></svg>
                     </button>
@@ -95,6 +101,10 @@
                         <input type="checkbox" id="show-grid" checked>
                         Grid
                     </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="rounded-pixels">
+                        Pixels Redondeados
+                    </label>
                 </div>
                 <!-- Reference Image Controls -->
                 <div class="reference-controls">
@@ -126,6 +136,10 @@
                     <div class="form-group">
                         <label>Nombre</label>
                         <input type="text" id="theme-name" value="mi-clockface">
+                    </div>
+                    <div class="form-group">
+                        <label>Version</label>
+                        <input type="number" id="theme-version" value="1" min="1">
                     </div>
                     <div class="form-group">
                         <label>Autor</label>
@@ -227,6 +241,12 @@
                             <label class="small">H</label>
                             <input type="number" id="el-height" min="1" max="64" value="10">
                         </div>
+                    </div>
+
+                    <!-- Circle specific -->
+                    <div class="form-group" id="fg-radius" style="display:none;">
+                        <label>Radio</label>
+                        <input type="number" id="el-radius" min="1" max="32" value="5">
                     </div>
 
                     <div class="form-group" id="fg-endpoint">
