@@ -1,6 +1,6 @@
 [submodule "firmware/clockfaces/cw-cf-0x01"]
 	path = firmware/clockfaces/cw-cf-0x01
-	url = https://github.com/jnthas/cw-cf-0x01.git
+	url = https://github.com/XE1E/cw-cf-0x01.git
 	shallow = true
 [submodule "firmware/clockfaces/cw-cf-0x02"]
 	path = firmware/clockfaces/cw-cf-0x02
