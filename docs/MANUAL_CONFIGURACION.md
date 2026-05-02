@@ -57,6 +57,49 @@ python -m platformio run --target clean
 python -m platformio run
 ```
 
+### Solucion de Problemas al Flashear
+
+#### El ESP32 no es detectado
+1. Verifica que el cable USB sea de datos (no solo de carga)
+2. Prueba otro puerto USB
+3. Instala los drivers si es necesario:
+   - **CP2102:** https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
+   - **CH340:** https://www.wch.cn/download/CH341SER_EXE.html
+4. En Windows, revisa el Administrador de Dispositivos para ver si aparece el puerto COM
+
+#### Modo Boot Manual
+Si el upload falla con "Failed to connect", pon el ESP32 en modo boot:
+1. Manten presionado el boton **BOOT** (o IO0)
+2. Presiona y suelta el boton **EN** (reset)
+3. Suelta el boton **BOOT**
+4. Ejecuta el comando de upload inmediatamente
+
+#### Error "A fatal error occurred: Failed to connect"
+- El ESP32 no entro en modo boot automaticamente
+- Usa el metodo manual descrito arriba
+- Algunos modelos requieren un capacitor en el pin EN
+
+#### Error "Permission denied" o "Access denied"
+- Cierra cualquier programa que use el puerto serial (monitor, IDE)
+- En Windows: cierra el Serial Monitor de Arduino IDE si esta abierto
+- En Linux: agrega tu usuario al grupo `dialout`:
+```bash
+sudo usermod -a -G dialout $USER
+```
+Reinicia sesion despues de ejecutar.
+
+#### El upload se queda en "Connecting..."
+- El ESP32 no responde, prueba el modo boot manual
+- Desconecta cualquier componente del pin GPIO0
+- Algunos paneles LED interfieren - desconecta el panel temporalmente
+
+#### Verificar que el firmware se subio correctamente
+Despues de flashear, abre el monitor serial:
+```bash
+python -m platformio device monitor --baud 115200
+```
+Deberias ver mensajes de inicio del Clockwise.
+
 ---
 
 ## Herramientas Web (Editor, Designer, Thumbnails)
@@ -212,6 +255,32 @@ Cambia automaticamente entre diferentes caratulas segun un intervalo de tiempo.
 | night-clock | Reloj Nocturno |
 
 **Nota:** La rotacion se pausa automaticamente durante el modo nocturno.
+
+---
+
+## Configuracion Canvas
+
+El sistema Canvas permite cargar y mostrar caratulas dinamicas desde archivos JSON. Estas opciones solo aparecen si el firmware esta compilado con el clockface Canvas (cw-cf-0x07).
+
+### Archivo de Descripcion
+- Nombre del archivo JSON que define la caratula (sin extension)
+- **Ejemplos:** `nyan-cat`, `pac-man`, `snoopy3`
+- Los archivos se descargan automaticamente del servidor configurado
+
+### Direccion del Servidor
+- URL del servidor donde estan los archivos de caratulas
+- **Por defecto:** `https://clockwise.page/canvas/`
+- **Para pruebas locales:** `http://192.168.1.XXX:8000/` (cambia la IP por la de tu computadora)
+
+### Como probar caratulas localmente
+1. Inicia el servidor local:
+```bash
+cd C:\Documents\GitHub\Clockwise-XE1E\clockface-editor
+python -m http.server 8000
+```
+2. En la configuracion del reloj, cambia "Server Address" a tu IP local (ej: `http://192.168.1.100:8000/`)
+3. En "Description file" pon el nombre de tu caratula
+4. Reinicia el reloj
 
 ---
 

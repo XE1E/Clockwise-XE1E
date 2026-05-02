@@ -72,6 +72,50 @@ const char SETTINGS_PAGE[] PROGMEM = R""""(
       }
     }
 
+    const nightColors = [
+      {name: 'Rojo', hex: '#ff0000', rgb565: 63488},
+      {name: 'Rojo Oscuro', hex: '#800000', rgb565: 32768},
+      {name: 'Naranja', hex: '#ff8000', rgb565: 64512},
+      {name: 'Amarillo', hex: '#ffff00', rgb565: 65504},
+      {name: 'Verde', hex: '#00ff00', rgb565: 2016},
+      {name: 'Verde Oscuro', hex: '#008000', rgb565: 1024},
+      {name: 'Cyan', hex: '#00ffff', rgb565: 2047},
+      {name: 'Azul', hex: '#0000ff', rgb565: 31},
+      {name: 'Azul Oscuro', hex: '#000080', rgb565: 16},
+      {name: 'Magenta', hex: '#ff00ff', rgb565: 63519},
+      {name: 'Rosa', hex: '#ff0080', rgb565: 63504},
+      {name: 'Blanco', hex: '#ffffff', rgb565: 65535}
+    ];
+
+    function buildColorPalette(selectedRgb565) {
+      return "<div style='display:flex;flex-wrap:wrap;gap:5px;'>" +
+        nightColors.map(c =>
+          "<div onclick='selectNightColor(" + c.rgb565 + ", \"" + c.hex + "\")' " +
+          "style='width:30px;height:30px;background:" + c.hex + ";cursor:pointer;border:2px solid " +
+          (c.rgb565 == selectedRgb565 ? "#fff" : "#333") + ";border-radius:4px;' title='" + c.name + "'></div>"
+        ).join('') +
+        "</div><input type='hidden' id='nightColorValue' value='" + selectedRgb565 + "'>" +
+        "<div style='margin-top:10px;'><input type='color' id='nightColor' value='" + rgb565ToHex(selectedRgb565) + "' onchange='selectNightColorCustom(this.value)'> <span>Color personalizado</span></div>";
+    }
+
+    function selectNightColor(rgb565, hex) {
+      document.getElementById('nightColorValue').value = rgb565;
+      document.getElementById('nightColor').value = hex;
+      document.querySelectorAll('#formInput-nightColor div[onclick]').forEach(el => {
+        el.style.border = '2px solid #333';
+      });
+      event.target.style.border = '2px solid #fff';
+    }
+
+    function selectNightColorCustom(hex) {
+      const rgb565 = hexToRgb565(hex);
+      document.getElementById('nightColorValue').value = rgb565;
+    }
+
+    function getNightColorValue() {
+      return document.getElementById('nightColorValue').value;
+    }
+
     const availableClockfaces = [
       {id: 'nyan-cat', name: 'Nyan Cat'},
       {id: 'pac-man', name: 'Pac-Man'},
@@ -236,10 +280,10 @@ const char SETTINGS_PAGE[] PROGMEM = R""""(
         },
         {
           title: "Color Nocturno",
-          description: "Color de los digitos en modo nocturno. <span id='nightColorPreview' style='display:inline-block;width:20px;height:20px;border:1px solid #fff;vertical-align:middle;'></span>",
-          formInput: "<input id='nightColor' class='w3-input w3-light-grey' type='color' value='" + rgb565ToHex(settings.nightcolor || 63488) + "' onchange='updateColorPreview()'>",
+          description: "Color de los digitos en modo nocturno.",
+          formInput: buildColorPalette(settings.nightcolor || 63488),
           icon: "fa-paint-brush",
-          save: "updatePreference('nightColor', hexToRgb565(nightColor.value))",
+          save: "updatePreference('nightColor', getNightColorValue())",
           property: "nightColor"
         },
         {
