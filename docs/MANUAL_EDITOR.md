@@ -13,12 +13,13 @@ Editor visual web para diseñar clockfaces de Clockwise sin escribir JSON manual
 5. [Crear un Clockface](#crear-un-clockface)
 6. [Herramientas](#herramientas)
 7. [Propiedades de Elementos](#propiedades-de-elementos)
-8. [Atajos de Teclado](#atajos-de-teclado)
-9. [Importar/Exportar](#importar-exportar)
-10. [Imagen de Referencia](#imagen-de-referencia)
-11. [Preparar Imagenes](#preparar-imagenes)
-12. [Tips y Mejores Practicas](#tips-y-mejores-practicas)
-13. [Ejemplo Completo](#ejemplo-completo)
+8. [Pixels Redondeados](#pixels-redondeados)
+9. [Atajos de Teclado](#atajos-de-teclado)
+10. [Importar/Exportar](#importar-exportar)
+11. [Imagen de Referencia](#imagen-de-referencia)
+12. [Preparar Imagenes](#preparar-imagenes)
+13. [Tips y Mejores Practicas](#tips-y-mejores-practicas)
+14. [Ejemplo Completo](#ejemplo-completo)
 
 ---
 
@@ -43,13 +44,15 @@ clockface-editor/
 | Caracteristica | Descripcion |
 |----------------|-------------|
 | Canvas 64x64 | Preview pixelado con zoom ajustable (4x-16x) |
-| Herramientas | Select, DateTime, Text, Image, Rect, FillRect, Line |
+| Herramientas | Select, DateTime, Text, Image, Sprite, Rect, FillRect, Circle, FillCircle, Line |
 | Colores | Color picker con conversion automatica a RGB565 |
 | Capas | Lista de elementos ordenable, separacion setup/loop |
 | Import/Export | Compatible con formato JSON de Canvas Clockface |
 | Tiempo real | Elementos DateTime se actualizan cada segundo |
+| Sprites | Animaciones con multiples frames |
 | Atajos de teclado | Flechas para mover, Delete para eliminar, Esc para deseleccionar |
 | Grid | Overlay de cuadricula opcional para alineacion |
+| Pixels redondeados | Efecto visual que simula LEDs reales |
 | Imagen de referencia | Cargar imagen para calcar o usar como fondo |
 | Preparar imagen | Recortar, ajustar y convertir imagenes a 64x64 |
 
@@ -86,15 +89,17 @@ npx serve .
 ├────────┬────────────────────────────────────┬───────────────────┤
 │        │                                    │ TEMA              │
 │ TOOLS  │                                    │ - Nombre          │
-│        │         CANVAS 64x64               │ - Autor           │
-│ Select │         (preview)                  │ - Color fondo     │
-│ Time   │                                    │ - Delay           │
-│ Text   │                                    ├───────────────────┤
-│ Image  │                                    │ ELEMENTO          │
+│        │         CANVAS 64x64               │ - Version         │
+│ Select │         (preview)                  │ - Autor           │
+│ Time   │                                    │ - Color fondo     │
+│ Text   │                                    │ - Delay           │
+│ Image  │                                    ├───────────────────┤
+│ Sprite │                                    │ ELEMENTO          │
 │ Rect   │                                    │ - Posicion X/Y    │
 │ FillR  │                                    │ - Propiedades     │
-│ Line   ├────────────────────────────────────┤ - Colores         │
-│        │  [-] [8x] [+]  [x] Grid            ├───────────────────┤
+│ Circle │                                    │ - Colores         │
+│ Line   ├────────────────────────────────────┤                   │
+│        │  [-] [8x] [+]  [x] Grid  [Rounded] ├───────────────────┤
 │ DELETE │  [Imagen Referencia] [Opacidad]   │ CAPAS             │
 │ DUPLIC │                                    │ - datetime: H:i   │
 │ UP/DOWN│                                    │ - text: Hola      │
@@ -117,6 +122,7 @@ npx serve .
 ### Paso 1: Configurar el tema
 
 - Escribir nombre del clockface
+- Escribir version (numero entero, ej: 1, 2, 3)
 - Escribir nombre del autor
 - Seleccionar color de fondo (click en el cuadro de color)
 - Ajustar delay (velocidad de animacion en ms)
@@ -157,8 +163,11 @@ npx serve .
 | **DateTime** | Reloj | Mostrar hora/fecha (se actualiza automaticamente) |
 | **Text** | T | Texto estatico |
 | **Image** | Imagen | Cargar PNG (se convierte a base64) |
+| **Sprite** | Pelicula | Animacion con multiples frames |
 | **Rect** | Cuadrado vacio | Rectangulo con borde |
 | **FillRect** | Cuadrado lleno | Rectangulo relleno |
+| **Circle** | Circulo vacio | Circulo con borde |
+| **FillCircle** | Circulo lleno | Circulo relleno |
 | **Line** | Linea diagonal | Linea de punto a punto |
 
 ### Acciones
@@ -221,12 +230,49 @@ npx serve .
 | X1, Y1 | Punto final |
 | Color | Color de la linea (RGB565) |
 
+### Circle y FillCircle
+
+| Propiedad | Descripcion |
+|-----------|-------------|
+| X, Y | Centro del circulo |
+| Radius | Radio en pixeles (1-32) |
+| Color | Color del borde o relleno (RGB565) |
+
 ### Image
 
 | Propiedad | Descripcion |
 |-----------|-------------|
 | X, Y | Posicion de esquina superior izquierda |
 | Image File | Archivo PNG (se convierte a base64) |
+
+### Sprite
+
+| Propiedad | Descripcion |
+|-----------|-------------|
+| X, Y | Posicion de esquina superior izquierda |
+| Sprite | Indice del sprite a usar |
+| Frame Delay | Tiempo entre frames (ms) |
+| Loop Delay | Pausa al terminar animacion (ms) |
+| Move X/Y | Movimiento por frame (px) |
+
+#### Editor de Sprites
+
+1. Click en "Editar" junto al selector de sprite
+2. Crear nuevo sprite con "+" 
+3. Agregar frames cargando imagenes PNG
+4. Preview la animacion con "Play"
+5. Eliminar frames con "X" en cada frame
+
+---
+
+## Pixels Redondeados
+
+El checkbox "Pixels Redondeados" activa un efecto visual que simula como se ven los LEDs reales del display.
+
+- **Desactivado**: Pixeles cuadrados perfectos
+- **Activado**: Pixeles con efecto de LED redondo
+
+Este efecto es solo visual en el editor. No afecta el archivo JSON exportado.
 
 ---
 
