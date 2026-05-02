@@ -133,28 +133,30 @@
                 <!-- Theme Properties -->
                 <div class="panel-section">
                     <div class="panel-section-title">Tema</div>
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" id="theme-name" value="mi-clockface">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="theme-name" value="mi-clockface">
+                        </div>
+                        <div class="form-group">
+                            <label>Version</label>
+                            <input type="number" id="theme-version" value="1" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Autor</label>
+                            <input type="text" id="theme-author" value="XE1E">
+                        </div>
+                        <div class="form-group">
+                            <label>Delay (ms)</label>
+                            <input type="number" id="theme-delay" value="250" min="50" max="5000">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Version</label>
-                        <input type="number" id="theme-version" value="1" min="1">
-                    </div>
-                    <div class="form-group">
-                        <label>Autor</label>
-                        <input type="text" id="theme-author" value="XE1E">
-                    </div>
-                    <div class="form-group">
-                        <label>Color de Fondo</label>
+                        <label>Color Fondo</label>
                         <div class="color-input">
                             <input type="color" id="bg-color" value="#000000">
                             <span class="color-value" id="bg-color-value">0</span>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Delay (ms)</label>
-                        <input type="number" id="theme-delay" value="250" min="50" max="5000">
                     </div>
                 </div>
 
@@ -216,19 +218,20 @@
                     </div>
 
                     <!-- Colors -->
-                    <div class="form-group" id="fg-fgcolor">
-                        <label>Color Texto</label>
-                        <div class="color-input">
-                            <input type="color" id="el-fgcolor" value="#ffffff">
-                            <span class="color-value" id="el-fgcolor-value">65535</span>
+                    <div class="form-grid" id="fg-colors-grid">
+                        <div class="form-group" id="fg-fgcolor">
+                            <label>Color Texto</label>
+                            <div class="color-input">
+                                <input type="color" id="el-fgcolor" value="#ffffff">
+                                <span class="color-value" id="el-fgcolor-value">65535</span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="form-group" id="fg-bgcolor">
-                        <label>Color Fondo</label>
-                        <div class="color-input">
-                            <input type="color" id="el-bgcolor" value="#000000">
-                            <span class="color-value" id="el-bgcolor-value">0</span>
+                        <div class="form-group" id="fg-bgcolor">
+                            <label>Color Fondo</label>
+                            <div class="color-input">
+                                <input type="color" id="el-bgcolor" value="#000000">
+                                <span class="color-value" id="el-bgcolor-value">0</span>
+                            </div>
                         </div>
                     </div>
 

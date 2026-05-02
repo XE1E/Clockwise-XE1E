@@ -242,7 +242,7 @@ body {
 
 /* Properties Panel */
 .properties-panel {
-    width: 280px;
+    width: 300px;
     background: var(--bg-medium);
     border-left: 1px solid var(--border-color);
     overflow-y: auto;
@@ -276,6 +276,23 @@ body {
 .collapse-icon {
     font-size: 0.8em;
     transition: transform 0.2s;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 10px;
+    margin-bottom: 12px;
+}
+
+.form-grid .form-group {
+    margin-bottom: 0;
+}
+
+.form-grid .form-group input,
+.form-grid .form-group select {
+    font-size: 0.85em;
+    padding: 6px 8px;
 }
 
 .form-group {
@@ -327,19 +344,20 @@ body {
 .color-input {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
 }
 
 .color-input input[type="color"] {
-    width: 40px;
-    height: 30px;
+    width: 32px;
+    height: 26px;
     padding: 0;
     border: none;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .color-value {
-    font-size: 0.85em;
+    font-size: 0.75em;
     color: var(--text-secondary);
     font-family: monospace;
 }

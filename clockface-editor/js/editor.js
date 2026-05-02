@@ -1264,8 +1264,7 @@ class ClockfaceEditor {
             'fg-content': ['datetime', 'text'],
             'fg-format-presets': ['datetime'],
             'fg-font': ['datetime', 'text'],
-            'fg-fgcolor': ['datetime', 'text'],
-            'fg-bgcolor': ['datetime', 'text'],
+            'fg-colors-grid': ['datetime', 'text'],
             'fg-size': ['rect', 'fillrect'],
             'fg-radius': ['circle', 'fillcircle'],
             'fg-endpoint': ['line'],
@@ -1280,7 +1279,8 @@ class ClockfaceEditor {
         for (const [fieldId, types] of Object.entries(showFields)) {
             const field = document.getElementById(fieldId);
             if (field) {
-                field.style.display = types.includes(element.type) ? 'block' : 'none';
+                const displayStyle = fieldId === 'fg-colors-grid' ? 'grid' : 'block';
+                field.style.display = types.includes(element.type) ? displayStyle : 'none';
             }
         }
 
