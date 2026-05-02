@@ -30,11 +30,13 @@ class ClockfaceEditor {
         this.canvas.style.width = `${64 * this.zoom}px`;
         this.canvas.style.height = `${64 * this.zoom}px`;
 
+        const wrapper = document.querySelector('.canvas-wrapper');
         const grid = document.querySelector('.canvas-grid');
+
         grid.style.backgroundSize = `${this.zoom}px ${this.zoom}px`;
+        wrapper.style.setProperty('--pixel-size', `${this.zoom}px`);
 
         document.getElementById('zoom-level').textContent = `${this.zoom}x`;
-        document.getElementById('canvas-zoom').textContent = `Zoom: ${this.zoom}x`;
 
         if (this.referenceImage && !this.referenceImage.classList.contains('hidden')) {
             this.referenceImage.style.width = `${64 * this.zoom}px`;

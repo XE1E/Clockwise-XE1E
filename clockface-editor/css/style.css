@@ -1205,8 +1205,8 @@ body {
 }
 
 /* Rounded Pixels Effect */
-.canvas-wrapper.rounded-pixels #editor-canvas {
-    filter: url(#rounded-pixel-filter);
+.canvas-wrapper {
+    --pixel-size: 8px;
 }
 
 .canvas-wrapper.rounded-pixels::after {
@@ -1218,6 +1218,6 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: 6;
-    background-image: radial-gradient(circle at center, transparent 45%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 55%);
-    background-size: 8px 8px;
+    background-image: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.7) 50%);
+    background-size: var(--pixel-size) var(--pixel-size);
 }
