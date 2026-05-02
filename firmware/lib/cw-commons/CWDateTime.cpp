@@ -112,6 +112,11 @@ int CWDateTime::getHour()
   return myTZ.dateTime((use24hFormat ? "H" : "h")).toInt();
 }
 
+int CWDateTime::getHour24()
+{
+  return myTZ.dateTime("H").toInt();
+}
+
 int CWDateTime::getMinute()
 {
   return myTZ.dateTime("i").toInt();

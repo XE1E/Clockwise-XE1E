@@ -81,9 +81,11 @@
     <div class="instructions">
         <h3>Instrucciones:</h3>
         <ol>
-            <li>Haz clic en "Generar Thumbnails"</li>
-            <li>Descarga cada PNG haciendo clic en "Descargar"</li>
-            <li>Guarda los archivos en <code>clockfaces/thumbs/</code></li>
+            <li>Abre una terminal en <code>clockface-editor/</code></li>
+            <li>Ejecuta: <code>python -m http.server 8000</code></li>
+            <li>Abre <code>http://localhost:8000/generate-thumbs.html</code></li>
+            <li>Los thumbnails se generan automáticamente</li>
+            <li>Descarga cada PNG o usa "Descargar Todos"</li>
         </ol>
     </div>
 
@@ -121,6 +123,13 @@
             const status = document.getElementById('status');
             grid.innerHTML = '';
             generatedThumbs.length = 0;
+
+            // Check if running from file:// protocol
+            if (window.location.protocol === 'file:') {
+                status.innerHTML = `<span style="color:#ff6b6b;">Error: Abre esta página desde un servidor local.</span><br>
+                    <small style="color:#888;">Ejecuta: <code>python -m http.server 8000</code> en clockface-editor/</small>`;
+                return;
+            }
 
             for (const name of clockfaces) {
                 status.textContent = `Generando ${name}...`;

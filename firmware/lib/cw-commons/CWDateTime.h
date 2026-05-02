@@ -22,6 +22,7 @@ public:
   char *getHour(const char *format);
   char *getMinute(const char *format);
   int getHour();
+  int getHour24();
   int getMinute();
   int getSecond();
   long getMilliseconds();

@@ -50,6 +50,63 @@ const char SETTINGS_PAGE[] PROGMEM = R""""(
     </div>
   </div>
   <script>
+    function rgb565ToHex(rgb565) {
+      const r = ((rgb565 >> 11) & 0x1F) << 3;
+      const g = ((rgb565 >> 5) & 0x3F) << 2;
+      const b = (rgb565 & 0x1F) << 3;
+      return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    function hexToRgb565(hex) {
+      const r = parseInt(hex.slice(1, 3), 16) >> 3;
+      const g = parseInt(hex.slice(3, 5), 16) >> 2;
+      const b = parseInt(hex.slice(5, 7), 16) >> 3;
+      return (r << 11) | (g << 5) | b;
+    }
+
+    function updateColorPreview() {
+      const preview = document.getElementById('nightColorPreview');
+      const colorInput = document.getElementById('nightColor');
+      if (preview && colorInput) {
+        preview.style.backgroundColor = colorInput.value;
+      }
+    }
+
+    const availableClockfaces = [
+      {id: 'nyan-cat', name: 'Nyan Cat'},
+      {id: 'pac-man', name: 'Pac-Man'},
+      {id: 'goomba_move', name: 'Goomba'},
+      {id: 'snoopy3', name: 'Snoopy'},
+      {id: 'christmassnoopy', name: 'Snoopy Navidad'},
+      {id: 'clock-club', name: 'Clock Club'},
+      {id: 'donkey-kong', name: 'Donkey Kong'},
+      {id: 'eletrogate', name: 'Eletrogate'},
+      {id: 'pepsi-final-2', name: 'Pepsi'},
+      {id: 'retro-computer', name: 'Retro Computer'},
+      {id: 'star-wars', name: 'Star Wars'},
+      {id: 'night-clock', name: 'Reloj Nocturno'}
+    ];
+
+    function buildClockfaceCheckboxes(selectedList) {
+      const selected = selectedList ? selectedList.split(',').map(s => s.trim()) : [];
+      return availableClockfaces.map(cf =>
+        "<label style='display:block;margin:3px 0;'><input type='checkbox' class='rotCheck' value='" + cf.id + "'" +
+        (selected.includes(cf.id) ? " checked" : "") + "> " + cf.name + "</label>"
+      ).join('');
+    }
+
+    function buildClockfaceSelect(selectedValue, selectId) {
+      return "<select id='" + selectId + "' class='w3-select w3-light-grey'>" +
+        availableClockfaces.map(cf =>
+          "<option value='" + cf.id + "'" + (cf.id === selectedValue ? " selected" : "") + ">" + cf.name + "</option>"
+        ).join('') + "</select>";
+    }
+
+    function getSelectedClockfaces() {
+      const checks = document.querySelectorAll('.rotCheck:checked');
+      return Array.from(checks).map(c => c.value).join(',');
+    }
+
     function createCards(settings) {
       console.log(settings);
       const cards = [
@@ -151,6 +208,71 @@ const char SETTINGS_PAGE[] PROGMEM = R""""(
           icon: "fa-rotate-right",
           save: "updatePreference('displayRotation', rotation.value)",
           property: "displayRotation"
+        },
+        {
+          title: "Modo Nocturno",
+          description: "Activa un clockface especial con brillo reducido durante la noche.",
+          formInput: "<input class='w3-check' type='checkbox' id='nightEnabled' " + (settings.nightenabled == '1' ? "checked" : "") + "><label for='nightEnabled'> Activar</label>",
+          icon: "fa-moon-o",
+          save: "updatePreference('nightEnabled', Number(nightEnabled.checked))",
+          property: "nightEnabled"
+        },
+        {
+          title: "Horario Nocturno",
+          description: "Hora de inicio y fin del modo nocturno (formato 24h HH:MM).",
+          formInput: "<input id='nightStart' class='w3-input w3-light-grey w3-cell w3-margin-right' style='width:45%;' type='time' value='" + (settings.nightstart || '22:00') + "'>" +
+                     "<input id='nightEnd' class='w3-input w3-light-grey w3-cell' style='width:45%;' type='time' value='" + (settings.nightend || '07:00') + "'>",
+          icon: "fa-clock-o",
+          save: "updatePreference('nightStart', nightStart.value); updatePreference('nightEnd', nightEnd.value)",
+          property: "nightSchedule"
+        },
+        {
+          title: "Brillo Nocturno",
+          description: "Brillo del display en modo nocturno. Valor: <strong><output id='nightBrightValue'>" + (settings.nightbright || 8) + "</output></strong>",
+          formInput: "<input class='w3-input w3-border' type='range' min='1' max='64' value='" + (settings.nightbright || 8) + "' id='nightBright' oninput='nightBrightValue.value=value'>",
+          icon: "fa-adjust",
+          save: "updatePreference('nightBright', nightBright.value)",
+          property: "nightBright"
+        },
+        {
+          title: "Color Nocturno",
+          description: "Color de los digitos en modo nocturno. <span id='nightColorPreview' style='display:inline-block;width:20px;height:20px;border:1px solid #fff;vertical-align:middle;'></span>",
+          formInput: "<input id='nightColor' class='w3-input w3-light-grey' type='color' value='" + rgb565ToHex(settings.nightcolor || 63488) + "' onchange='updateColorPreview()'>",
+          icon: "fa-paint-brush",
+          save: "updatePreference('nightColor', hexToRgb565(nightColor.value))",
+          property: "nightColor"
+        },
+        {
+          title: "Caratula Nocturna",
+          description: "Selecciona la caratula que se mostrara en modo nocturno.",
+          formInput: buildClockfaceSelect(settings.nightclock || 'night-clock', 'nightClock'),
+          icon: "fa-moon-o",
+          save: "updatePreference('nightClock', nightClock.value)",
+          property: "nightClock"
+        },
+        {
+          title: "Rotacion de Caratulas",
+          description: "Cambia automaticamente entre las caratulas seleccionadas.",
+          formInput: "<input class='w3-check' type='checkbox' id='rotEnabled' " + (settings.rotenabled == '1' ? "checked" : "") + "><label for='rotEnabled'> Activar</label>",
+          icon: "fa-refresh",
+          save: "updatePreference('rotEnabled', Number(rotEnabled.checked))",
+          property: "rotEnabled"
+        },
+        {
+          title: "Intervalo de Rotacion",
+          description: "Tiempo en minutos entre cada cambio de caratula.",
+          formInput: "<input id='rotInterval' class='w3-input w3-light-grey' type='number' min='1' max='10080' value='" + (settings.rotinterval || 1440) + "'>",
+          icon: "fa-hourglass-half",
+          save: "updatePreference('rotInterval', rotInterval.value)",
+          property: "rotInterval"
+        },
+        {
+          title: "Caratulas en Rotacion",
+          description: "Selecciona las caratulas que rotaran automaticamente.",
+          formInput: "<div style='max-height:200px;overflow-y:auto;'>" + buildClockfaceCheckboxes(settings.rotlist) + "</div>",
+          icon: "fa-list",
+          save: "updatePreference('rotList', getSelectedClockfaces())",
+          property: "rotList"
         }
       ];
 

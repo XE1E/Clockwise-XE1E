@@ -26,6 +26,115 @@ bool autoBrightEnabled;
 long autoBrightMillis = 0;
 uint8_t currentBrightSlot = -1;
 
+bool nightModeActive = false;
+long rotationMillis = 0;
+bool needsClockfaceReload = false;
+String currentClockface = "";
+
+int parseHour(String timeStr) {
+  int colonPos = timeStr.indexOf(':');
+  if (colonPos > 0) {
+    return timeStr.substring(0, colonPos).toInt();
+  }
+  return 0;
+}
+
+int parseMinute(String timeStr) {
+  int colonPos = timeStr.indexOf(':');
+  if (colonPos > 0) {
+    return timeStr.substring(colonPos + 1).toInt();
+  }
+  return 0;
+}
+
+bool isNightTime() {
+  if (!ClockwiseParams::getInstance()->nightModeEnabled) return false;
+
+  int currentHour = cwDateTime.getHour24();
+  int currentMinute = cwDateTime.getMinute();
+  int currentTime = currentHour * 60 + currentMinute;
+
+  String startStr = ClockwiseParams::getInstance()->nightModeStart;
+  String endStr = ClockwiseParams::getInstance()->nightModeEnd;
+
+  int startTime = parseHour(startStr) * 60 + parseMinute(startStr);
+  int endTime = parseHour(endStr) * 60 + parseMinute(endStr);
+
+  if (startTime > endTime) {
+    return (currentTime >= startTime || currentTime < endTime);
+  } else {
+    return (currentTime >= startTime && currentTime < endTime);
+  }
+}
+
+void checkNightMode() {
+  if (!ClockwiseParams::getInstance()->nightModeEnabled) {
+    if (nightModeActive) {
+      nightModeActive = false;
+      dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
+      ClockwiseParams::getInstance()->canvasFile = currentClockface;
+      needsClockfaceReload = true;
+    }
+    return;
+  }
+
+  bool shouldBeNight = isNightTime();
+
+  if (shouldBeNight && !nightModeActive) {
+    nightModeActive = true;
+    currentClockface = ClockwiseParams::getInstance()->canvasFile;
+    dma_display->setBrightness8(ClockwiseParams::getInstance()->nightBrightness);
+    ClockwiseParams::getInstance()->canvasFile = ClockwiseParams::getInstance()->nightClockface;
+    needsClockfaceReload = true;
+  } else if (!shouldBeNight && nightModeActive) {
+    nightModeActive = false;
+    dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
+    ClockwiseParams::getInstance()->canvasFile = currentClockface;
+    needsClockfaceReload = true;
+  }
+}
+
+void checkClockfaceRotation() {
+  if (!ClockwiseParams::getInstance()->rotationEnabled || nightModeActive) return;
+
+  String rotList = ClockwiseParams::getInstance()->rotationList;
+  if (rotList.length() == 0) return;
+
+  unsigned long intervalMs = ClockwiseParams::getInstance()->rotationInterval * 60000UL;
+
+  if (millis() - rotationMillis >= intervalMs) {
+    int count = 1;
+    for (int i = 0; i < rotList.length(); i++) {
+      if (rotList[i] == ',') count++;
+    }
+
+    uint8_t nextIndex = (ClockwiseParams::getInstance()->rotationIndex + 1) % count;
+    ClockwiseParams::getInstance()->rotationIndex = nextIndex;
+    ClockwiseParams::getInstance()->save();
+
+    int currentPos = 0;
+    int commaCount = 0;
+    int startPos = 0;
+
+    for (int i = 0; i <= rotList.length(); i++) {
+      if (i == rotList.length() || rotList[i] == ',') {
+        if (commaCount == nextIndex) {
+          String nextClockface = rotList.substring(startPos, i);
+          nextClockface.trim();
+          ClockwiseParams::getInstance()->canvasFile = nextClockface;
+          currentClockface = nextClockface;
+          needsClockfaceReload = true;
+          break;
+        }
+        commaCount++;
+        startPos = i + 1;
+      }
+    }
+
+    rotationMillis = millis();
+  }
+}
+
 void displaySetup(bool swapBlueGreen, uint8_t displayBright, uint8_t displayRotation)
 {
   HUB75_I2S_CFG mxconfig(64, 64, 1);
@@ -93,6 +202,8 @@ void setup()
   clockface = new Clockface(dma_display);
 
   autoBrightEnabled = (ClockwiseParams::getInstance()->autoBrightMax > 0);
+  currentClockface = ClockwiseParams::getInstance()->canvasFile;
+  rotationMillis = millis();
 
   StatusController::getInstance()->clockwiseLogo();
   delay(1000);
@@ -122,8 +233,18 @@ void loop()
 
   if (wifi.connectionSucessfulOnce)
   {
+    checkNightMode();
+    checkClockfaceRotation();
+
+    if (needsClockfaceReload) {
+      needsClockfaceReload = false;
+      clockface->setup(&cwDateTime);
+    }
+
     clockface->update();
   }
 
-  automaticBrightControl();
+  if (!nightModeActive) {
+    automaticBrightControl();
+  }
 }

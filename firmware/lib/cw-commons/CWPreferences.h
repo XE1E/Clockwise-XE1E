@@ -26,6 +26,16 @@ struct ClockwiseParams
     const char* const PREF_CANVAS_SERVER = "canvasServer";
     const char* const PREF_MANUAL_POSIX = "manualPosix";
     const char* const PREF_DISPLAY_ROTATION = "displayRotation";
+    const char* const PREF_NIGHT_MODE_ENABLED = "nightEnabled";
+    const char* const PREF_NIGHT_MODE_START = "nightStart";
+    const char* const PREF_NIGHT_MODE_END = "nightEnd";
+    const char* const PREF_NIGHT_BRIGHTNESS = "nightBright";
+    const char* const PREF_NIGHT_COLOR = "nightColor";
+    const char* const PREF_NIGHT_CLOCKFACE = "nightClock";
+    const char* const PREF_ROTATION_ENABLED = "rotEnabled";
+    const char* const PREF_ROTATION_LIST = "rotList";
+    const char* const PREF_ROTATION_INDEX = "rotIndex";
+    const char* const PREF_ROTATION_INTERVAL = "rotInterval";
 
     bool swapBlueGreen;
     bool use24hFormat;
@@ -42,6 +52,16 @@ struct ClockwiseParams
     String canvasServer;
     String manualPosix;
     uint8_t displayRotation;
+    bool nightModeEnabled;
+    String nightModeStart;
+    String nightModeEnd;
+    uint8_t nightBrightness;
+    uint16_t nightColor;
+    String nightClockface;
+    bool rotationEnabled;
+    String rotationList;
+    uint8_t rotationIndex;
+    uint16_t rotationInterval;
 
 
     ClockwiseParams() {
@@ -72,6 +92,16 @@ struct ClockwiseParams
         preferences.putString(PREF_CANVAS_SERVER, canvasServer);
         preferences.putString(PREF_MANUAL_POSIX, manualPosix);
         preferences.putUInt(PREF_DISPLAY_ROTATION, displayRotation);
+        preferences.putBool(PREF_NIGHT_MODE_ENABLED, nightModeEnabled);
+        preferences.putString(PREF_NIGHT_MODE_START, nightModeStart);
+        preferences.putString(PREF_NIGHT_MODE_END, nightModeEnd);
+        preferences.putUInt(PREF_NIGHT_BRIGHTNESS, nightBrightness);
+        preferences.putUInt(PREF_NIGHT_COLOR, nightColor);
+        preferences.putString(PREF_NIGHT_CLOCKFACE, nightClockface);
+        preferences.putBool(PREF_ROTATION_ENABLED, rotationEnabled);
+        preferences.putString(PREF_ROTATION_LIST, rotationList);
+        preferences.putUInt(PREF_ROTATION_INDEX, rotationIndex);
+        preferences.putUInt(PREF_ROTATION_INTERVAL, rotationInterval);
     }
 
     void load()
@@ -91,6 +121,16 @@ struct ClockwiseParams
         canvasServer = preferences.getString(PREF_CANVAS_SERVER, "raw.githubusercontent.com");
         manualPosix = preferences.getString(PREF_MANUAL_POSIX, "");
         displayRotation = preferences.getUInt(PREF_DISPLAY_ROTATION, 0);
+        nightModeEnabled = preferences.getBool(PREF_NIGHT_MODE_ENABLED, false);
+        nightModeStart = preferences.getString(PREF_NIGHT_MODE_START, "22:00");
+        nightModeEnd = preferences.getString(PREF_NIGHT_MODE_END, "07:00");
+        nightBrightness = preferences.getUInt(PREF_NIGHT_BRIGHTNESS, 8);
+        nightColor = preferences.getUInt(PREF_NIGHT_COLOR, 63488);
+        nightClockface = preferences.getString(PREF_NIGHT_CLOCKFACE, "night-clock");
+        rotationEnabled = preferences.getBool(PREF_ROTATION_ENABLED, false);
+        rotationList = preferences.getString(PREF_ROTATION_LIST, "");
+        rotationIndex = preferences.getUInt(PREF_ROTATION_INDEX, 0);
+        rotationInterval = preferences.getUInt(PREF_ROTATION_INTERVAL, 1440);
     }
 
 };
