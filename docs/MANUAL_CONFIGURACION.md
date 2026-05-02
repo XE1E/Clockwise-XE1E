@@ -318,6 +318,52 @@ python -m http.server 8000
 
 ---
 
+## Fuentes Disponibles
+
+### Fuentes Personalizadas (en clockfaces)
+
+| Fuente | Tamaño | Ubicacion | Uso |
+|---|---|---|---|
+| small4pt7b | 4pt | cw-cf-0x02, cw-cf-0x03 | Texto pequeño, fechas |
+| minute7pt7b | 7pt | cw-cf-0x02 | Minutos en palabras |
+| hour8pt7b | 8pt | cw-cf-0x02 | Horas en palabras |
+| Super_Mario_Bros__24pt7b | 24pt | cw-cf-0x01 | Estilo Mario Bros |
+| FreeSansBold9pt7b | 9pt | cw-cf-0x07 | Reloj nocturno |
+| TomThumb | 3pt | cw-cf-0x07 | Texto muy pequeño |
+
+### Fuentes Adafruit GFX (libreria estandar)
+
+Disponibles en `firmware/.pio/libdeps/esp32dev/Adafruit GFX Library/Fonts/`
+
+| Familia | Tamaños Disponibles |
+|---|---|
+| FreeMono | 9, 12, 18, 24pt |
+| FreeMonoBold | 9, 12, 18, 24pt |
+| FreeSans | 9, 12, 18, 24pt |
+| FreeSansBold | 9, 12, 18, 24pt |
+| FreeSerif | 9, 12, 18, 24pt |
+| FreeSerifBold | 9, 12, 18, 24pt |
+| TomThumb | 3pt (muy pequeña) |
+
+### Como usar una fuente
+
+```cpp
+#include <Fonts/FreeSansBold12pt7b.h>
+
+// En el codigo:
+display->setFont(&FreeSansBold12pt7b);
+display->print("Hola");
+```
+
+### Crear fuentes personalizadas
+
+Usa la herramienta **fontconvert** de Adafruit GFX para convertir fuentes TTF:
+```bash
+./fontconvert mifuente.ttf 12 > mifuente12pt7b.h
+```
+
+---
+
 ## Solucion de Problemas
 
 ### El brillo automatico no funciona
