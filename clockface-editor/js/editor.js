@@ -43,14 +43,30 @@ class ClockfaceEditor {
     }
 
     bindReferenceImage() {
+        const popup = document.getElementById('reference-popup');
+        const openBtn = document.getElementById('btn-open-reference');
+        const closeBtn = document.getElementById('btn-close-reference');
         const fileInput = document.getElementById('reference-file');
         const opacitySlider = document.getElementById('reference-opacity');
-        const opacityValue = document.getElementById('opacity-value');
-        const opacityControl = document.getElementById('opacity-control');
-        const positionLabel = document.getElementById('ref-position-label');
+        const referenceOptions = document.getElementById('reference-options');
         const behindCheckbox = document.getElementById('reference-behind');
         const clearBtn = document.getElementById('btn-clear-reference');
         const convertBtn = document.getElementById('btn-convert-reference');
+
+        openBtn.addEventListener('click', () => {
+            popup.style.display = 'flex';
+            if (this.referenceImage.src && !this.referenceImage.classList.contains('hidden')) {
+                referenceOptions.style.display = 'flex';
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) popup.style.display = 'none';
+        });
 
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -62,9 +78,7 @@ class ClockfaceEditor {
                 this.referenceImage.classList.remove('hidden');
                 this.referenceImage.style.width = `${64 * this.zoom}px`;
                 this.referenceImage.style.height = `${64 * this.zoom}px`;
-                opacityControl.style.display = 'flex';
-                positionLabel.style.display = 'flex';
-                convertBtn.style.display = 'inline-block';
+                referenceOptions.style.display = 'flex';
                 this.updateReferencePosition();
             };
             reader.readAsDataURL(file);
@@ -73,7 +87,6 @@ class ClockfaceEditor {
         opacitySlider.addEventListener('input', (e) => {
             const opacity = e.target.value / 100;
             this.referenceImage.style.opacity = opacity;
-            opacityValue.textContent = `${e.target.value}%`;
         });
 
         behindCheckbox.addEventListener('change', () => {
@@ -86,15 +99,14 @@ class ClockfaceEditor {
 
         convertBtn.addEventListener('click', () => {
             this.convertReferenceToElement();
+            popup.style.display = 'none';
         });
     }
 
     clearReferenceImage() {
         this.referenceImage.src = '';
         this.referenceImage.classList.add('hidden');
-        document.getElementById('opacity-control').style.display = 'none';
-        document.getElementById('ref-position-label').style.display = 'none';
-        document.getElementById('btn-convert-reference').style.display = 'none';
+        document.getElementById('reference-options').style.display = 'none';
         document.getElementById('reference-file').value = '';
     }
 

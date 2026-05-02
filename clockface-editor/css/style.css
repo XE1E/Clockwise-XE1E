@@ -66,13 +66,14 @@ body {
 
 /* Toolbar */
 .toolbar {
-    width: 95px;
+    width: 105px;
     background: var(--bg-medium);
     border-right: 1px solid var(--border-color);
     padding: 10px 8px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    overflow-y: auto;
 }
 
 .tool-group {
@@ -96,8 +97,8 @@ body {
 }
 
 .tool-btn {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
     border: none;
     background: transparent;
     color: var(--text-secondary);
@@ -117,6 +118,231 @@ body {
 .tool-btn.active {
     background: var(--accent);
     color: white;
+}
+
+/* Display Controls in Toolbar */
+.display-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.zoom-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-zoom {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-light);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.btn-zoom:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+#zoom-level {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    min-width: 24px;
+    text-align: center;
+}
+
+.toolbar-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7em;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.toolbar-checkbox input {
+    width: 14px;
+    height: 14px;
+}
+
+.toolbar-checkbox span {
+    flex: 1;
+}
+
+.toolbar-file-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.65em;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toolbar-file-btn:hover {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+}
+
+.btn-ref-clear {
+    width: 100%;
+    padding: 3px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.65em;
+    color: var(--danger);
+    cursor: pointer;
+}
+
+.btn-ref-clear:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.reference-options {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-top: 5px;
+    border-top: 1px solid var(--border-color);
+}
+
+.reference-options input[type="range"] {
+    width: 100%;
+    height: 4px;
+}
+
+.btn-ref-use {
+    width: 100%;
+    padding: 4px;
+    background: var(--accent);
+    border: none;
+    border-radius: 4px;
+    font-size: 0.65em;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-ref-use:hover {
+    background: var(--accent-hover);
+}
+
+/* Reference Image Popup */
+.ref-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ref-popup-content {
+    background: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.ref-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 500;
+}
+
+.ref-popup-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.4em;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.ref-popup-close:hover {
+    color: var(--text-primary);
+}
+
+.ref-popup-body {
+    padding: 15px;
+}
+
+.ref-load-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: var(--bg-light);
+    border: 2px dashed var(--border-color);
+    border-radius: 6px;
+    text-align: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ref-load-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.ref-options {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ref-option-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ref-option-row label {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+.ref-option-row input[type="range"] {
+    width: 100%;
+}
+
+.ref-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.ref-buttons .btn-ref-use {
+    flex: 1;
+    padding: 8px;
+    font-size: 0.8em;
+}
+
+.ref-buttons .btn-ref-clear {
+    padding: 8px 12px;
+    font-size: 0.8em;
 }
 
 /* Canvas Area */
@@ -185,9 +411,10 @@ body {
     width: 100%;
     height: 100%;
     pointer-events: none;
+    z-index: 15;
     background-image:
-        linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255,255,255,0.25) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.25) 1px, transparent 1px);
     background-size: 8px 8px;
 }
 
@@ -203,48 +430,6 @@ body {
     color: var(--text-secondary);
 }
 
-.zoom-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.reference-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.reference-controls label.btn {
-    cursor: pointer;
-}
-
-.opacity-control {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85em;
-    color: var(--text-secondary);
-}
-
-.opacity-control input[type="range"] {
-    width: 80px;
-    cursor: pointer;
-}
-
-.opacity-control span {
-    min-width: 35px;
-}
-
-.zoom-controls .btn-small {
-    width: 30px;
-    height: 30px;
-    padding: 0;
-}
 
 /* Properties Panel */
 .properties-panel {
