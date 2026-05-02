@@ -368,6 +368,15 @@ body {
     font-family: monospace;
 }
 
+#font-preview {
+    display: block;
+    margin-top: 6px;
+    background: #000;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    image-rendering: pixelated;
+}
+
 .checkbox-label {
     display: flex;
     align-items: center;

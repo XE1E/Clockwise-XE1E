@@ -472,6 +472,10 @@ class ClockfaceEditor {
             });
         });
 
+        document.getElementById('el-font').addEventListener('change', () => {
+            this.updateFontPreview();
+        });
+
         document.getElementById('el-image-file').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1291,6 +1295,7 @@ class ClockfaceEditor {
             document.getElementById('el-fgcolor-value').textContent = element.fgColor;
             document.getElementById('el-bgcolor').value = ColorUtils.rgb565ToHex(element.bgColor);
             document.getElementById('el-bgcolor-value').textContent = element.bgColor;
+            this.updateFontPreview();
         }
 
         if (element.type === 'rect' || element.type === 'fillrect') {
@@ -1369,6 +1374,19 @@ class ClockfaceEditor {
         this.updatePropertiesPanel();
         this.updateLayersList();
         this.updateSpriteSelect();
+    }
+
+    updateFontPreview() {
+        const canvas = document.getElementById('font-preview');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const fontName = document.getElementById('el-font').value || 'picopixel';
+        PixelFonts.drawText(ctx, fontName, '12:45', 2, 2, '#fff', null);
     }
 
     render() {
