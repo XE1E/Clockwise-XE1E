@@ -2,7 +2,9 @@
 
 ## Por hacer
 
-### Night Clock - Dígitos grandes
+### Editor de Dígitos/Caracteres
+- [ ] Hacer tamaño de caracter configurable (ancho x alto pixeles) en lugar de fijo 20x28
+- [ ] Conectar editor de dígitos con editor de clockfaces para usar caracteres personalizados
 - [ ] Perfeccionar dígitos 0-9 en `digit-designer.html`
 - [ ] Crear fuente GFX grande (24pt+) o modificar firmware para soportar digit-sprites
 - [ ] Integrar dígitos bitmap en night-clock.json
