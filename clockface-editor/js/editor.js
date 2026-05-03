@@ -522,6 +522,8 @@ class ClockfaceEditor {
     }
 
     bindThumbnailGenerator() {
+        this.generatedThumbs = [];
+
         document.getElementById('btn-thumbnail').addEventListener('click', () => {
             this.generateThumbnail();
         });
@@ -534,6 +536,18 @@ class ClockfaceEditor {
             if (e.target.files.length > 0) {
                 this.processBatchThumbnails(Array.from(e.target.files));
             }
+        });
+
+        document.getElementById('btn-select-folder').addEventListener('click', () => {
+            this.selectFolderForThumbnails();
+        });
+
+        document.getElementById('btn-download-all-thumbs').addEventListener('click', () => {
+            this.downloadAllThumbs();
+        });
+
+        document.getElementById('btn-save-to-folder').addEventListener('click', () => {
+            this.saveThumbsToFolder();
         });
     }
 
@@ -555,12 +569,46 @@ class ClockfaceEditor {
     openBatchThumbsModal() {
         document.getElementById('batch-thumbs-modal').classList.add('active');
         document.getElementById('batch-file-input').value = '';
-        document.getElementById('batch-results').innerHTML = '<p>Selecciona archivos JSON de clockfaces para generar thumbnails.</p>';
+        document.getElementById('batch-results').innerHTML = '<p>Selecciona archivos JSON o una carpeta con clockfaces.</p>';
+        document.getElementById('batch-actions').style.display = 'none';
+        this.generatedThumbs = [];
+    }
+
+    async selectFolderForThumbnails() {
+        if (!('showDirectoryPicker' in window)) {
+            alert('Tu navegador no soporta seleccion de carpetas. Usa Chrome o Edge.');
+            return;
+        }
+
+        try {
+            const dirHandle = await window.showDirectoryPicker();
+            const files = [];
+
+            for await (const entry of dirHandle.values()) {
+                if (entry.kind === 'file' && entry.name.endsWith('.json')) {
+                    const file = await entry.getFile();
+                    files.push(file);
+                }
+            }
+
+            if (files.length === 0) {
+                alert('No se encontraron archivos .json en la carpeta seleccionada.');
+                return;
+            }
+
+            this.processBatchThumbnails(files);
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                console.error('Error selecting folder:', e);
+            }
+        }
     }
 
     async processBatchThumbnails(files) {
         const results = document.getElementById('batch-results');
+        const actions = document.getElementById('batch-actions');
         results.innerHTML = '<p>Procesando...</p>';
+        actions.style.display = 'none';
 
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = 64;
@@ -569,7 +617,7 @@ class ClockfaceEditor {
 
         let processed = 0;
         let errors = 0;
-        const thumbsData = [];
+        this.generatedThumbs = [];
 
         for (const file of files) {
             try {
@@ -590,7 +638,7 @@ class ClockfaceEditor {
                 tempRenderer.render(clockface, null);
 
                 const dataUrl = tempCanvas.toDataURL('image/png');
-                thumbsData.push({
+                this.generatedThumbs.push({
                     name: clockface.name,
                     dataUrl: dataUrl
                 });
@@ -605,36 +653,70 @@ class ClockfaceEditor {
         let html = `<p>Procesados: ${processed}, Errores: ${errors}</p>`;
         html += '<div class="batch-thumbs-grid">';
 
-        for (const thumb of thumbsData) {
+        for (const thumb of this.generatedThumbs) {
             html += `
                 <div class="batch-thumb-item">
                     <img src="${thumb.dataUrl}" alt="${thumb.name}">
                     <span>${thumb.name}</span>
-                    <a href="${thumb.dataUrl}" download="${thumb.name}.png" class="btn btn-small">Descargar</a>
+                    <a href="${thumb.dataUrl}" download="${thumb.name}.png" class="btn btn-small">PNG</a>
                 </div>
             `;
         }
 
         html += '</div>';
-
-        if (thumbsData.length > 0) {
-            html += '<button id="btn-download-all-thumbs" class="btn btn-primary" style="margin-top:15px;">Descargar Todos (ZIP)</button>';
-        }
-
         results.innerHTML = html;
 
-        document.getElementById('btn-download-all-thumbs')?.addEventListener('click', () => {
-            this.downloadAllThumbs(thumbsData);
-        });
+        if (this.generatedThumbs.length > 0) {
+            actions.style.display = 'flex';
+        }
     }
 
-    async downloadAllThumbs(thumbsData) {
-        for (const thumb of thumbsData) {
+    async downloadAllThumbs() {
+        if (this.generatedThumbs.length === 0) {
+            alert('No hay thumbnails generados.');
+            return;
+        }
+
+        for (const thumb of this.generatedThumbs) {
             const link = document.createElement('a');
             link.download = `${thumb.name}.png`;
             link.href = thumb.dataUrl;
             link.click();
             await new Promise(resolve => setTimeout(resolve, 200));
+        }
+    }
+
+    async saveThumbsToFolder() {
+        if (this.generatedThumbs.length === 0) {
+            alert('No hay thumbnails generados.');
+            return;
+        }
+
+        if (!('showDirectoryPicker' in window)) {
+            alert('Tu navegador no soporta guardar en carpeta. Usa "Descargar Todos".');
+            return;
+        }
+
+        try {
+            const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+
+            for (const thumb of this.generatedThumbs) {
+                const fileHandle = await dirHandle.getFileHandle(`${thumb.name}.png`, { create: true });
+                const writable = await fileHandle.createWritable();
+
+                const response = await fetch(thumb.dataUrl);
+                const blob = await response.blob();
+
+                await writable.write(blob);
+                await writable.close();
+            }
+
+            alert(`${this.generatedThumbs.length} thumbnails guardados correctamente.`);
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                console.error('Error saving to folder:', e);
+                alert('Error al guardar: ' + e.message);
+            }
         }
     }
 
@@ -1400,7 +1482,13 @@ class ClockfaceEditor {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const fontName = document.getElementById('el-font').value || 'picopixel';
-        PixelFonts.drawText(ctx, fontName, '12:45', 2, 2, '#fff', null);
+        const fontHeights = {
+            'picopixel': 7, 'tomthumb': 6, 'square': 11,
+            'medium': 12, 'big': 15, 'bold': 22
+        };
+        const fontHeight = fontHeights[fontName] || 7;
+        const y = Math.floor((canvas.height - fontHeight) / 2) + fontHeight;
+        PixelFonts.drawText(ctx, fontName, '12:45', 2, y, '#fff', null);
     }
 
     render() {

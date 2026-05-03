@@ -241,7 +241,7 @@
                             <option value="big">Big (14px)</option>
                             <option value="bold">Bold (13px gruesa)</option>
                         </select>
-                        <canvas id="font-preview" width="120" height="20"></canvas>
+                        <canvas id="font-preview" width="100" height="28"></canvas>
                     </div>
 
                     <!-- Colors -->
@@ -512,19 +512,26 @@
     <div id="batch-thumbs-modal" class="modal">
         <div class="modal-content modal-large">
             <div class="modal-header">
-                <h3>Generar Thumbnails en Lote</h3>
+                <h3>Generar Thumbnails</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="batch-input-section">
-                    <label class="btn btn-primary">
-                        <input type="file" id="batch-file-input" accept=".json" multiple hidden>
-                        Seleccionar archivos JSON
-                    </label>
-                    <p class="help-text">Selecciona uno o mas archivos .json de clockfaces</p>
+                    <div class="batch-buttons">
+                        <label class="btn btn-primary">
+                            <input type="file" id="batch-file-input" accept=".json" multiple hidden>
+                            Seleccionar JSONs
+                        </label>
+                        <button id="btn-select-folder" class="btn btn-secondary">Seleccionar Carpeta</button>
+                    </div>
+                    <p class="help-text">Selecciona archivos .json o una carpeta con clockfaces</p>
                 </div>
                 <div id="batch-results" class="batch-results">
                     <p>Selecciona archivos JSON de clockfaces para generar thumbnails.</p>
+                </div>
+                <div id="batch-actions" class="batch-actions" style="display:none;">
+                    <button id="btn-download-all-thumbs" class="btn btn-primary">Descargar Todos</button>
+                    <button id="btn-save-to-folder" class="btn btn-secondary">Guardar en Carpeta</button>
                 </div>
             </div>
             <div class="modal-footer">

@@ -13,13 +13,14 @@ Editor visual web para diseñar clockfaces de Clockwise sin escribir JSON manual
 5. [Crear un Clockface](#crear-un-clockface)
 6. [Herramientas](#herramientas)
 7. [Propiedades de Elementos](#propiedades-de-elementos)
-8. [Pixels Redondeados](#pixels-redondeados)
-9. [Atajos de Teclado](#atajos-de-teclado)
-10. [Importar/Exportar](#importar-exportar)
-11. [Imagen de Referencia](#imagen-de-referencia)
-12. [Preparar Imagenes](#preparar-imagenes)
-13. [Tips y Mejores Practicas](#tips-y-mejores-practicas)
-14. [Ejemplo Completo](#ejemplo-completo)
+8. [Seccion Pantalla](#seccion-pantalla)
+9. [Generador de Thumbnails](#generador-de-thumbnails)
+10. [Atajos de Teclado](#atajos-de-teclado)
+11. [Importar/Exportar](#importar-exportar)
+12. [Imagen de Referencia](#imagen-de-referencia)
+13. [Adaptar Imagenes](#adaptar-imagenes)
+14. [Tips y Mejores Practicas](#tips-y-mejores-practicas)
+15. [Ejemplo Completo](#ejemplo-completo)
 
 ---
 
@@ -84,36 +85,38 @@ npx serve .
 ## Interfaz del Editor
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  [Logo]              [Nuevo] [Importar] [Preparar] [Exportar]   │
-├────────┬────────────────────────────────────┬───────────────────┤
-│        │                                    │ TEMA              │
-│ TOOLS  │                                    │ - Nombre          │
-│        │         CANVAS 64x64               │ - Version         │
-│ Select │         (preview)                  │ - Autor           │
-│ Time   │                                    │ - Color fondo     │
-│ Text   │                                    │ - Delay           │
-│ Image  │                                    ├───────────────────┤
-│ Sprite │                                    │ ELEMENTO          │
-│ Rect   │                                    │ - Posicion X/Y    │
-│ FillR  │                                    │ - Propiedades     │
-│ Circle │                                    │ - Colores         │
-│ Line   ├────────────────────────────────────┤                   │
-│        │  [-] [8x] [+]  [x] Grid  [Rounded] ├───────────────────┤
-│ DELETE │  [Imagen Referencia] [Opacidad]   │ CAPAS             │
-│ DUPLIC │                                    │ - datetime: H:i   │
-│ UP/DOWN│                                    │ - text: Hola      │
-└────────┴────────────────────────────────────┴───────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│ [Logo]   [Nuevo] [Importar] [Adaptar] [Thumbnail] [Batch] [Exportar]│
+├─────────┬─────────────────────────────────────┬──────────────────────┤
+│ TOOLS   │                                     │ TEMA                 │
+│ ┌─────┐ │                                     │ - Nombre             │
+│ │Sel│Tm│ │        CANVAS 64x64                │ - Version            │
+│ │Txt│Im│ │        (preview)                   │ - Autor              │
+│ │Spr│Rc│ │                                     │ - Color fondo        │
+│ │FRc│Cr│ │                                     │ - Delay              │
+│ │FCr│Ln│ │                                     ├──────────────────────┤
+│ └─────┘ │                                     │ ELEMENTO             │
+│         │                                     │ - Posicion X/Y       │
+│ ACCIONES│                                     │ - Fuente [preview]   │
+│ [Eliminar]                                    │ - Colores            │
+│ [Duplicar]                                    ├──────────────────────┤
+│ [Subir/Bajar]─────────────────────────────────┤ CAPAS                │
+│         │ PANTALLA                            │ - datetime: H:i      │
+│ PANTALLA│ Zoom: [-] 8x [+]                    │ - text: Hola         │
+│ Zoom 8x │ [x] Grid  [x] Pixels Redondeados    │ - rect               │
+│ Grid    │ [Imagen Referencia...]              │                      │
+│ Rounded │                                     │                      │
+└─────────┴─────────────────────────────────────┴──────────────────────┘
 ```
 
 ### Paneles
 
 | Panel | Ubicacion | Contenido |
 |-------|-----------|-----------|
-| Toolbar | Izquierda | Herramientas y acciones |
-| Canvas | Centro | Vista previa 64x64 con zoom |
-| Propiedades | Derecha | Configuracion del tema y elemento seleccionado |
-| Capas | Derecha inferior | Lista de elementos ordenable |
+| Toolbar | Izquierda | Herramientas en grid 2 columnas, acciones, seccion Pantalla |
+| Canvas | Centro | Vista previa 64x64 con zoom ajustable (4x-16x) |
+| Propiedades | Derecha | Tema, elemento seleccionado con preview de fuente |
+| Capas | Derecha inferior | Lista de elementos con orden de dibujo |
 
 ---
 
@@ -189,10 +192,23 @@ npx serve .
 |-----------|-------------|
 | X, Y | Posicion en pixeles (0-63) |
 | Content | Texto o formato de fecha |
-| Font | picopixel, square, medium, big |
+| Font | picopixel, tomthumb, square, medium, big, bold |
 | fgColor | Color del texto (RGB565) |
 | bgColor | Color de fondo del texto (RGB565) |
 | En Loop | Si debe redibujarse cada ciclo |
+
+**Preview de fuente:** Al seleccionar una fuente, se muestra un preview con "12:45" para ver como se ve cada tipografia antes de aplicarla.
+
+#### Fuentes disponibles
+
+| Fuente | Altura | Descripcion |
+|--------|--------|-------------|
+| picopixel | 5px | Muy pequeña, ideal para textos secundarios |
+| tomthumb | 4px | La mas pequeña, para espacios reducidos |
+| square | 11px | Solo numeros, estilo cuadrado |
+| medium | 10px | Tamaño medio, buena legibilidad |
+| big | 14px | Grande, para hora principal |
+| bold | 13px | Gruesa, alto contraste |
 
 #### Formatos de DateTime (ezTime)
 
@@ -265,14 +281,77 @@ npx serve .
 
 ---
 
-## Pixels Redondeados
+## Seccion Pantalla
+
+La seccion "Pantalla" en la barra lateral izquierda agrupa los controles de visualizacion del canvas.
+
+### Controles disponibles
+
+| Control | Descripcion |
+|---------|-------------|
+| **Zoom** | Ajusta el tamaño del preview (4x a 16x) |
+| **Grid** | Muestra cuadricula de pixeles para alineacion |
+| **Pixels Redondeados** | Efecto visual que simula LEDs reales |
+| **Imagen Referencia** | Abre dialogo para cargar imagen de fondo |
+
+### Pixels Redondeados
 
 El checkbox "Pixels Redondeados" activa un efecto visual que simula como se ven los LEDs reales del display.
 
 - **Desactivado**: Pixeles cuadrados perfectos
-- **Activado**: Pixeles con efecto de LED redondo
+- **Activado**: Pixeles con efecto de LED redondo (gradiente radial)
 
-Este efecto es solo visual en el editor. No afecta el archivo JSON exportado.
+Este efecto se sincroniza con el nivel de zoom para mantener la proporcion correcta. Es solo visual en el editor y no afecta el archivo JSON exportado.
+
+### Grid
+
+La cuadricula ayuda a alinear elementos pixel por pixel. Se ajusta automaticamente al nivel de zoom para coincidir con los pixels del canvas.
+
+---
+
+## Generador de Thumbnails
+
+El editor incluye herramientas para generar imagenes PNG de 64x64 de los clockfaces.
+
+### Thumbnail Individual
+
+1. Click en boton **"Thumbnail"** en la barra superior
+2. Se descarga automaticamente un PNG con el nombre del clockface
+
+### Thumbnails en Lote (Batch)
+
+1. Click en boton **"Batch Thumbs"** en la barra superior
+2. Se abre un dialogo con opciones:
+
+| Opcion | Descripcion |
+|--------|-------------|
+| **Seleccionar JSONs** | Elegir archivos .json individuales |
+| **Seleccionar Carpeta** | Elegir carpeta con multiples .json (Chrome/Edge) |
+
+3. Los thumbnails se generan y muestran en preview
+4. Opciones de guardado:
+
+| Boton | Accion |
+|-------|--------|
+| **PNG** (en cada thumb) | Descargar thumbnail individual |
+| **Descargar Todos** | Descarga cada PNG uno por uno |
+| **Guardar en Carpeta** | Elegir carpeta destino (Chrome/Edge) |
+
+### Requisitos del navegador
+
+- **Seleccionar Carpeta** y **Guardar en Carpeta** usan File System Access API
+- Solo disponible en Chrome, Edge y navegadores basados en Chromium
+- Firefox/Safari: usar seleccion individual de archivos
+
+### Herramienta Standalone
+
+Tambien existe `generate-thumbs.html` que genera thumbnails de todos los clockfaces en la carpeta `clockfaces/`:
+
+```bash
+cd clockface-editor
+python -m http.server 8000
+# Abrir http://localhost:8000/generate-thumbs.html
+```
 
 ---
 
@@ -341,9 +420,9 @@ El editor permite cargar una imagen como guia para calcar o diseñar encima.
 
 ---
 
-## Preparar Imagenes
+## Adaptar Imagenes
 
-El boton "Preparar Imagen" abre una herramienta completa para convertir cualquier imagen a 64x64.
+El boton "Adaptar Imagen" abre una herramienta completa para convertir cualquier imagen a 64x64.
 
 ### Caracteristicas de imagen optimas para el display
 

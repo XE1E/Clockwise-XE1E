@@ -136,8 +136,20 @@ Deja la terminal abierta mientras usas las herramientas.
 |---|---|---|
 | Editor de Clockfaces | http://localhost:8000/index.html | Crear y editar caratulas |
 | Digit Designer | http://localhost:8000/digit-designer.html | Diseñar digitos para reloj nocturno |
-| Generador Thumbnails | http://localhost:8000/generate-thumbs.html | Generar miniaturas de caratulas |
+| Generador Thumbnails | http://localhost:8000/generate-thumbs.html | Generar miniaturas de todas las caratulas |
 | Pagina Config | http://localhost:8000/config-page.html | Preview de pagina configuracion |
+
+### Generador de Thumbnails
+
+Hay dos formas de generar thumbnails:
+
+1. **Desde el Editor** (recomendado):
+   - Boton "Thumbnail": genera PNG del clockface actual
+   - Boton "Batch Thumbs": genera multiples thumbnails seleccionando JSONs o carpeta
+
+2. **Pagina standalone** (generate-thumbs.html):
+   - Genera thumbnails de todos los clockfaces en carpeta `clockfaces/`
+   - Requiere servidor local
 
 ### Digit Designer - Uso
 

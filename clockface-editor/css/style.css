@@ -556,6 +556,8 @@ body {
 #font-preview {
     display: block;
     margin-top: 6px;
+    width: 200px;
+    height: 56px;
     background: #000;
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -1155,8 +1157,24 @@ body {
     margin-bottom: 20px;
 }
 
+.batch-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
 .batch-input-section label.btn {
     cursor: pointer;
+}
+
+.batch-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
 }
 
 .batch-results {
