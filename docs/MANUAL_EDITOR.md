@@ -15,12 +15,15 @@ Editor visual web para diseñar clockfaces de Clockwise sin escribir JSON manual
 7. [Propiedades de Elementos](#propiedades-de-elementos)
 8. [Seccion Pantalla](#seccion-pantalla)
 9. [Generador de Thumbnails](#generador-de-thumbnails)
-10. [Atajos de Teclado](#atajos-de-teclado)
-11. [Importar/Exportar](#importar-exportar)
-12. [Imagen de Referencia](#imagen-de-referencia)
-13. [Adaptar Imagenes](#adaptar-imagenes)
-14. [Tips y Mejores Practicas](#tips-y-mejores-practicas)
-15. [Ejemplo Completo](#ejemplo-completo)
+10. [Font Converter](#font-converter-convertidor-de-fuentes)
+11. [Character Designer](#character-designer-editor-de-fuentes)
+12. [Digit Designer](#digit-designer)
+13. [Atajos de Teclado](#atajos-de-teclado)
+14. [Importar/Exportar](#importar-exportar)
+15. [Imagen de Referencia](#imagen-de-referencia)
+16. [Adaptar Imagenes](#adaptar-imagenes)
+17. [Tips y Mejores Practicas](#tips-y-mejores-practicas)
+18. [Ejemplo Completo](#ejemplo-completo)
 
 ---
 
@@ -351,6 +354,390 @@ Tambien existe `generate-thumbs.html` que genera thumbnails de todos los clockfa
 cd clockface-editor
 python -m http.server 8000
 # Abrir http://localhost:8000/generate-thumbs.html
+```
+
+---
+
+## Sistema de Fuentes
+
+Clockwise tiene un sistema de fuentes que permite usar fuentes predefinidas o agregar fuentes personalizadas.
+
+### Galeria de Fuentes
+
+Las fuentes disponibles se muestran automaticamente en el dropdown del editor de caratulas.
+
+**Fuentes predefinidas** (en `js/pixel-fonts.js`):
+- picopixel (5x6)
+- tomthumb (3x6)
+- square (7x11) - solo numeros
+- medium (8x10)
+- big (12x15)
+- bold (14x18)
+
+**Fuentes personalizadas** (en carpeta `fonts/`):
+- Se cargan automaticamente al abrir el editor
+- Aparecen en el dropdown junto con las predefinidas
+
+### Estructura de archivos
+
+```
+clockface-editor/
+├── js/
+│   └── pixel-fonts.js    # Fuentes predefinidas
+├── fonts/
+│   ├── index.json        # Indice de fuentes personalizadas
+│   ├── mi-fuente.json    # Fuente personalizada
+│   └── otra-fuente.json  # Otra fuente
+└── char-designer.html    # Editor de fuentes
+```
+
+---
+
+## Font Converter (Convertidor de Fuentes)
+
+Herramienta para convertir fuentes BDF a formato Clockwise. Acceder en `font-converter.html`.
+
+### Iniciar
+
+```bash
+cd clockface-editor
+python -m http.server 8000
+# Abrir http://localhost:8000/font-converter.html
+```
+
+### Cuando usar cada herramienta
+
+| Herramienta | Usar cuando... |
+|-------------|----------------|
+| **Font Converter** | Quieres convertir una fuente BDF existente rapidamente |
+| **Character Designer** | Quieres editar caracteres o crear una fuente desde cero |
+
+### Como usar
+
+1. **Cargar BDF**: Click en "Seleccionar archivo BDF"
+2. **Configurar**: Pon nombre y selecciona que caracteres incluir (0-9, A-Z, etc.)
+3. **Convertir**: Click en "Generar codigo JS"
+4. **Copiar**: Click en "Copiar al portapapeles"
+5. **Pegar**: En `js/pixel-fonts.js` dentro del objeto `PixelFonts`
+
+**Nota:** Para usuarios avanzados. La forma mas facil es usar Character Designer con "Guardar en fonts/".
+
+---
+
+## Character Designer (Editor de Fuentes)
+
+Editor para crear y modificar fuentes pixel. Acceder en `char-designer.html`.
+
+### Iniciar
+
+```bash
+cd clockface-editor
+python -m http.server 8000
+# Abrir http://localhost:8000/char-designer.html
+```
+
+### Flujo simple (recomendado)
+
+```
+1. Cargar fuente base (BDF, sistema, o crear nueva)
+              ↓
+2. Editar caracteres si es necesario
+              ↓
+3. Click "Guardar en fonts/"
+   (selecciona la carpeta fonts/)
+              ↓
+4. Recargar editor de caratulas
+   → La fuente aparece en el dropdown
+```
+
+### Interfaz de tres paneles
+
+```
+┌─────────────────┬──────────────────────────┬─────────────────┐
+│  CARGAR FUENTE  │    EDITOR DE CARACTER    │  GUARDAR        │
+│                 │                          │                 │
+│ 1. Fuentes del  │   [0][1][2]...[9]       │ [Guardar en     │
+│    Sistema      │   [A][B][C]...[Z]       │  fonts/]        │
+│                 │   [a][b][c]...[z]       │ → Agrega a la   │
+│ 2. Archivo JSON │   [!][@][#]...[?]       │   galeria       │
+│                 │                          │                 │
+│ 3. Archivo BDF  │   ┌─────────────────┐    │ [Guardar JSON]  │
+│                 │   │  Grid de        │    │ → Backup        │
+│ 4. Carpeta      │   │  edicion        │    │                 │
+│    fonts/       │   │  pixel x pixel  │    │ [Exportar PNG]  │
+│                 │   └─────────────────┘    │ → Imagenes      │
+└─────────────────┴──────────────────────────┴─────────────────┘
+```
+
+### Cargar una fuente
+
+| Fuente | Como cargar | Uso |
+|--------|-------------|-----|
+| **Sistema** | Seleccionar dropdown y "Cargar" | Modificar fuentes existentes |
+| **Archivo JSON** | "Importar archivo .json" | Cargar backup previo |
+| **Archivo BDF** | "Importar archivo .bdf" | Cargar fuente externa |
+| **Carpeta fonts/** | "Cargar del Repo" | Sincronizar desde GitHub |
+
+### Guardar fuente
+
+| Opcion | Resultado |
+|--------|-----------|
+| **Guardar en fonts/** | Guarda en galeria, disponible en editor de caratulas |
+| **Guardar JSON** | Backup para sincronizar entre PCs via GitHub |
+| **Guardar PNGs** | Imagenes de cada caracter |
+
+### Importar fuentes externas (BDF)
+
+El editor soporta archivos BDF (Bitmap Distribution Format), un formato estandar para fuentes bitmap.
+
+**Donde encontrar fuentes BDF:**
+- [dafont.com](https://www.dafont.com) - Seccion "Bitmap"
+- [FontStruct](https://fontstruct.com) - Fuentes pixel personalizadas
+- [Unifont](https://unifoundry.com/unifont/) - Fuente Unicode completa
+- Paquetes de sistema Linux (`/usr/share/fonts/misc/*.bdf`)
+
+**Como importar:**
+1. Descargar archivo `.bdf` de cualquier fuente
+2. Click "Importar archivo .bdf"
+3. Seleccionar el archivo
+4. El editor muestra tamaño y caracteres encontrados
+5. Confirmar para cargar
+6. Editar los caracteres que necesites
+7. Exportar a JSON (backup) o JS (para usar en clockfaces)
+
+### Grupos de caracteres
+
+| Grupo | Caracteres |
+|-------|------------|
+| 0-9 | Digitos numericos |
+| A-Z | Letras mayusculas |
+| a-z | Letras minusculas |
+| Simbolos | Espacios, puntuacion, signos |
+
+### Formatos de exportacion
+
+| Formato | Proposito | Donde se guarda |
+|---------|-----------|-----------------|
+| **JSON** | Backup y transferencia entre PCs | `clockface-editor/fonts/` |
+| **JS** | Usar la fuente en el editor de caratulas | Pegar en `js/pixel-fonts.js` |
+
+#### Formato JSON (backup)
+
+Archivo para guardar, transferir y volver a cargar en el editor:
+
+```json
+{
+  "name": "mi-fuente",
+  "version": 1,
+  "width": 8,
+  "height": 12,
+  "characters": {
+    "48": [[0,1,1,0], ...],
+    "65": [[1,1,1,1], ...],
+    ...
+  }
+}
+```
+
+**Uso:** Guardalo en `clockface-editor/fonts/` y sincroniza via GitHub para trabajar en varias PCs.
+
+#### Formato JS (integracion)
+
+Codigo JavaScript listo para agregar a `pixel-fonts.js`:
+
+```javascript
+custom: {
+    bitmaps: [0xE8,0xB4,...],
+    glyphs: [
+        [0,3,5,4,0,-5],  // [offset, width, height, xAdvance, xOffset, yOffset]
+        ...
+    ],
+    first: 0x20, last: 0x7E, yAdvance: 12
+}
+```
+
+**Uso:** Copia este codigo y pegalo en `clockface-editor/js/pixel-fonts.js` dentro del objeto `fonts`. Despues la fuente aparecera en el dropdown de fuentes del editor principal.
+
+### Flujo de trabajo completo
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  1. DISEÑAR                                                      │
+│     - Cargar fuente base (sistema, JSON, o repo)                │
+│     - Editar caracteres pixel por pixel                         │
+│     - Se guarda automaticamente en localStorage                  │
+├──────────────────────────────────────────────────────────────────┤
+│  2. EXPORTAR JSON (para backup)                                  │
+│     - Click "Exportar JSON"                                      │
+│     - Guardar archivo en clockface-editor/fonts/                │
+│     - git add, commit, push                                      │
+├──────────────────────────────────────────────────────────────────┤
+│  3. EXPORTAR JS (para usar la fuente)                            │
+│     - Click "Exportar JS"                                        │
+│     - Copiar el codigo generado                                  │
+│     - Pegar en js/pixel-fonts.js                                 │
+│     - La fuente aparece en el editor de clockfaces              │
+├──────────────────────────────────────────────────────────────────┤
+│  4. SINCRONIZAR (otra PC)                                        │
+│     - git pull                                                   │
+│     - Iniciar servidor local                                     │
+│     - Abrir char-designer.html                                   │
+│     - Click "Cargar del Repo"                                    │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Estructura de archivos
+
+```
+clockface-editor/
+├── char-designer.html      # Editor de fuentes
+├── js/
+│   └── pixel-fonts.js      # Fuentes usadas por el editor (pegar JS aqui)
+└── fonts/
+    ├── mi-fuente.json      # Backup de fuente personalizada
+    └── otra-fuente.json    # Otro backup
+```
+
+---
+
+## Digit Designer
+
+Herramienta simplificada para diseñar solo digitos (0-9) para el Night Clock. Acceder en `digit-designer.html`.
+
+### Iniciar
+
+```bash
+cd clockface-editor
+python -m http.server 8000
+# Abrir http://localhost:8000/digit-designer.html
+```
+
+### Interfaz
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  Ancho: [20]  Alto: [28]  [Aplicar] [Reset Todo] [Cargar Default]   │
+├──────────────────────────────────────────────────────────────────────┤
+│  [0] [1] [2] [3] [4] [5] [6] [7] [8] [9]   <- Pestañas de digitos   │
+│       (borde verde = guardado en localStorage)                       │
+├─────────────────────────────────┬────────────────────────────────────┤
+│                                 │  Preview 1:1                       │
+│     Grid de pixels              │  ┌────┐                            │
+│     (click/arrastrar            │  │    │                            │
+│      para dibujar)              │  └────┘                            │
+│                                 │  Preview 4x                        │
+│                                 │  ┌────────┐                        │
+│                                 │  │        │                        │
+│                                 │  └────────┘                        │
+├─────────────────────────────────┴────────────────────────────────────┤
+│  [Limpiar] [Guardar Local] ✓ Guardado                               │
+│  ─────────────────────────────────────────────────────────────────   │
+│  Archivo: [Exportar Digito] [Importar Digito]                       │
+│           [Exportar Todos]  [Importar Todos]                        │
+│  ─────────────────────────────────────────────────────────────────   │
+│  GitHub:  [Cargar Digito del Repo] [Cargar Todos del Repo]          │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### Tamaño Configurable
+
+| Control | Descripcion |
+|---------|-------------|
+| Ancho | Pixeles de ancho (8-64) |
+| Alto | Pixeles de alto (8-64) |
+| Aplicar Tamaño | Cambiar dimensiones (borra memoria actual) |
+| Reset Todo | Borrar todos los digitos de localStorage |
+| Cargar Patrones Default | Restaurar digitos prediseñados (solo 20x28) |
+
+Tamaño por defecto: **20x28 pixeles**
+
+### Dibujar
+
+- **Click** en un pixel para encender/apagar
+- **Arrastrar** para dibujar multiples pixels
+- El modo (dibujar/borrar) se determina por el primer pixel clickeado
+
+### Guardado Local (localStorage)
+
+| Boton | Descripcion |
+|-------|-------------|
+| Guardar Local | Guarda el digito actual en el navegador |
+
+- Los datos persisten aunque cierres el navegador
+- Los digitos guardados muestran **borde verde** en las pestañas
+- Cada digito se guarda independientemente
+
+### Archivos (Export/Import)
+
+| Boton | Descripcion |
+|-------|-------------|
+| Exportar Digito | Descarga `digit-X.json` del digito actual |
+| Importar Digito | Carga un digito desde archivo JSON |
+| Exportar Todos | Descarga `all-digits-WxH.json` con todos |
+| Importar Todos | Carga todos los digitos desde archivo JSON |
+
+### GitHub (Sincronizacion entre PCs)
+
+| Boton | Descripcion |
+|-------|-------------|
+| Cargar Digito del Repo | Fetch desde `digits/digit-X.json` |
+| Cargar Todos del Repo | Fetch desde `digits/all-digits.json` |
+
+**Requiere servidor local** (`python -m http.server`) para funcionar.
+
+### Flujo para Sincronizar entre PCs
+
+```
+PC1 (guardar):
+  1. Editar digitos
+  2. Click "Exportar Digito" o "Exportar Todos"
+  3. Guardar JSON en clockface-editor/digits/
+  4. git add, commit, push
+
+PC2 (cargar):
+  1. git pull
+  2. Iniciar servidor local
+  3. Click "Cargar Digito del Repo" o "Cargar Todos del Repo"
+```
+
+### Estructura de Archivos
+
+```
+clockface-editor/
+├── digit-designer.html
+└── digits/
+    ├── README.md
+    ├── digit-0.json      # Digito individual
+    ├── digit-1.json
+    ├── ...
+    └── all-digits.json   # Todos los digitos
+```
+
+### Formato JSON
+
+**Digito individual** (`digit-X.json`):
+```json
+{
+  "version": 1,
+  "digit": 0,
+  "width": 20,
+  "height": 28,
+  "data": [[0,0,1,1,...], [0,1,1,0,...], ...]
+}
+```
+
+**Todos los digitos** (`all-digits.json`):
+```json
+{
+  "version": 1,
+  "width": 20,
+  "height": 28,
+  "digits": {
+    "0": [[...], ...],
+    "1": [[...], ...],
+    ...
+  }
+}
 ```
 
 ---

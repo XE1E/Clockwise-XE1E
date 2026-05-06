@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Digit Designer - Night Clock</title>
+    <title>Character Designer - Clockwise Font Editor</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -135,14 +135,119 @@
             font-size: 12px;
             margin-bottom: 10px;
         }
+        .size-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #0f3460;
+            border-radius: 8px;
+        }
+        .size-controls label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .size-controls input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            background: #1a1a2e;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .saved-indicator {
+            color: #27ae60;
+            font-size: 12px;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .saved-indicator.show {
+            opacity: 1;
+        }
+        .digit-tab.has-saved {
+            border: 2px solid #27ae60;
+        }
+        .group-btn {
+            background: #0f3460;
+            color: white;
+        }
+        .group-btn.active {
+            background: #e94560;
+            color: white;
+        }
+        .char-preview-row {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding: 10px;
+            background: #0a0a1a;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .char-mini {
+            text-align: center;
+            cursor: pointer;
+            padding: 2px;
+            border: 1px solid transparent;
+            border-radius: 3px;
+        }
+        .char-mini:hover {
+            border-color: #00ff88;
+        }
+        .char-mini canvas {
+            display: block;
+            image-rendering: pixelated;
+        }
+        .char-mini span {
+            font-size: 9px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
-    <h1>Night Clock Digit Designer</h1>
-    <p class="size-info" style="text-align:center;">Tamaño de dígitos: 20 x 28 píxeles (basado en fotos del reloj original)</p>
+    <h1>Character Designer - Font Editor</h1>
+    <p class="size-info" style="text-align:center;">Editor universal de caracteres para fuentes pixel. Los datos se guardan en localStorage.</p>
 
     <div class="container">
         <div class="editor-section">
+            <div class="size-controls">
+                <label>Ancho: <input type="number" id="digit-width" min="3" max="64" value="20"></label>
+                <label>Alto: <input type="number" id="digit-height" min="3" max="64" value="28"></label>
+                <button class="btn btn-primary btn-small" onclick="applyNewSize()">Aplicar Tamaño</button>
+                <button class="btn btn-danger btn-small" onclick="resetAllChars()">Reset Todo</button>
+                <span class="size-info" id="current-size">Actual: 20 x 28 px</span>
+            </div>
+            <div class="size-controls">
+                <label>Fuente:
+                    <select id="font-select" onchange="loadFontFromPixelFonts()">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="picopixel">Picopixel (5px)</option>
+                        <option value="tomthumb">TomThumb (6px)</option>
+                        <option value="square">Square (11px, solo números)</option>
+                        <option value="medium">Medium (12px)</option>
+                        <option value="big">Big (15px)</option>
+                        <option value="bold">Bold (22px)</option>
+                    </select>
+                </label>
+                <button class="btn btn-small" style="background:#8e44ad;color:white;" onclick="loadFontFromPixelFonts()">Cargar Fuente</button>
+                <label>Nombre fuente: <input type="text" id="font-name" value="custom" style="width:100px;padding:5px;background:#1a1a2e;color:#fff;border:1px solid #444;border-radius:4px;"></label>
+            </div>
+            <div class="char-groups" id="char-groups" style="display:flex;gap:5px;margin-bottom:10px;">
+                <button class="btn btn-small group-btn active" data-group="digits" onclick="selectCharGroup('digits')">0-9</button>
+                <button class="btn btn-small group-btn" data-group="upper" onclick="selectCharGroup('upper')">A-Z</button>
+                <button class="btn btn-small group-btn" data-group="lower" onclick="selectCharGroup('lower')">a-z</button>
+                <button class="btn btn-small group-btn" data-group="symbols" onclick="selectCharGroup('symbols')">!@#</button>
+                <button class="btn btn-small group-btn" data-group="punct" onclick="selectCharGroup('punct')">.,;:</button>
+            </div>
             <div class="digit-tabs" id="digit-tabs"></div>
 
             <div class="grid-container">
@@ -157,8 +262,22 @@
 
             <div class="controls">
                 <button class="btn btn-danger" onclick="clearGrid()">Limpiar</button>
-                <button class="btn btn-primary" onclick="saveDigit()">Guardar Dígito</button>
-                <button class="btn btn-success" onclick="exportAll()">Exportar Todos (JSON)</button>
+                <button class="btn btn-success" onclick="saveDigit()">Guardar Local</button>
+                <span class="saved-indicator" id="saved-indicator">✓ Guardado</span>
+            </div>
+            <div class="controls" style="margin-top:10px; padding-top:10px; border-top:1px solid #444;">
+                <span style="color:#888; font-size:12px;">Archivo:</span>
+                <button class="btn btn-primary" onclick="exportDigitToFile()">Exportar Dígito</button>
+                <button class="btn btn-primary" onclick="document.getElementById('import-digit-file').click()">Importar Dígito</button>
+                <input type="file" id="import-digit-file" accept=".json" style="display:none" onchange="importDigitFromFile(event)">
+                <button class="btn btn-success" onclick="exportAllToFile()">Exportar Todos</button>
+                <button class="btn btn-success" onclick="document.getElementById('import-all-file').click()">Importar Todos</button>
+                <input type="file" id="import-all-file" accept=".json" style="display:none" onchange="importAllFromFile(event)">
+            </div>
+            <div class="controls" style="margin-top:10px; padding-top:10px; border-top:1px solid #444;">
+                <span style="color:#888; font-size:12px;">GitHub (repo):</span>
+                <button class="btn" style="background:#6e5494;color:white;" onclick="loadDigitFromServer()">Cargar Dígito del Repo</button>
+                <button class="btn" style="background:#6e5494;color:white;" onclick="loadAllFromServer()">Cargar Todos del Repo</button>
                 <button class="btn btn-primary" onclick="downloadPNGs()">Descargar PNGs</button>
             </div>
         </div>
@@ -172,20 +291,67 @@
     </div>
 
     <script>
-        const WIDTH = 20;
-        const HEIGHT = 28;
+        const STORAGE_KEY = 'clockwise-digit-designer';
+        let WIDTH = 20;
+        let HEIGHT = 28;
         let currentDigit = 0;
         let isDrawing = false;
-        let drawMode = true; // true = draw, false = erase
+        let drawMode = true;
 
-        // Storage for all digits (10 digits, each is WIDTH x HEIGHT array)
         const digits = {};
-        for (let i = 0; i <= 9; i++) {
-            digits[i] = createEmptyGrid();
+
+        function loadSettings() {
+            const saved = localStorage.getItem(STORAGE_KEY + '-settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                WIDTH = settings.width || 20;
+                HEIGHT = settings.height || 28;
+            }
+            document.getElementById('digit-width').value = WIDTH;
+            document.getElementById('digit-height').value = HEIGHT;
+            updateSizeDisplay();
         }
 
-        // Pre-fill with approximate digit patterns based on photos
-        initializeDigits();
+        function saveSettings() {
+            localStorage.setItem(STORAGE_KEY + '-settings', JSON.stringify({ width: WIDTH, height: HEIGHT }));
+        }
+
+        function updateSizeDisplay() {
+            document.getElementById('current-size').textContent = `Actual: ${WIDTH} x ${HEIGHT} px`;
+        }
+
+        function initDigitsStorage() {
+            for (let i = 0; i <= 9; i++) {
+                const saved = localStorage.getItem(STORAGE_KEY + '-digit-' + i);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        if (parsed.width === WIDTH && parsed.height === HEIGHT) {
+                            digits[i] = parsed.data;
+                        } else {
+                            digits[i] = createEmptyGrid();
+                        }
+                    } catch (e) {
+                        digits[i] = createEmptyGrid();
+                    }
+                } else {
+                    digits[i] = createEmptyGrid();
+                }
+            }
+        }
+
+        function hasStoredDigit(n) {
+            const saved = localStorage.getItem(STORAGE_KEY + '-digit-' + n);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    return parsed.width === WIDTH && parsed.height === HEIGHT;
+                } catch (e) {
+                    return false;
+                }
+            }
+            return false;
+        }
 
         function createEmptyGrid() {
             return Array(HEIGHT).fill(null).map(() => Array(WIDTH).fill(0));
@@ -597,8 +763,12 @@
             tabs.innerHTML = '';
             for (let i = 0; i <= 9; i++) {
                 const tab = document.createElement('button');
-                tab.className = 'digit-tab' + (i === currentDigit ? ' active' : '');
+                let className = 'digit-tab';
+                if (i === currentDigit) className += ' active';
+                if (hasStoredDigit(i)) className += ' has-saved';
+                tab.className = className;
                 tab.textContent = i;
+                tab.title = hasStoredDigit(i) ? 'Guardado en localStorage' : 'No guardado';
                 tab.onclick = () => selectDigit(i);
                 tabs.appendChild(tab);
             }
@@ -618,8 +788,124 @@
         }
 
         function saveDigit() {
+            const data = {
+                width: WIDTH,
+                height: HEIGHT,
+                data: digits[currentDigit]
+            };
+            localStorage.setItem(STORAGE_KEY + '-digit-' + currentDigit, JSON.stringify(data));
+
+            showIndicator('Dígito ' + currentDigit + ' guardado');
+            createTabs();
             updateAllDigitsPreview();
-            alert(`Dígito ${currentDigit} guardado en memoria`);
+        }
+
+        function loadDigitFromStorage() {
+            const saved = localStorage.getItem(STORAGE_KEY + '-digit-' + currentDigit);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.width === WIDTH && parsed.height === HEIGHT) {
+                        digits[currentDigit] = parsed.data;
+                        createGrid();
+                        updatePreview();
+                        alert(`Dígito ${currentDigit} cargado desde almacenamiento`);
+                    } else {
+                        alert(`El dígito guardado tiene diferente tamaño (${parsed.width}x${parsed.height})`);
+                    }
+                } catch (e) {
+                    alert('Error al cargar el dígito');
+                }
+            } else {
+                alert(`No hay dígito ${currentDigit} guardado`);
+            }
+        }
+
+        function applyNewSize() {
+            const newWidth = parseInt(document.getElementById('digit-width').value);
+            const newHeight = parseInt(document.getElementById('digit-height').value);
+
+            if (newWidth < 8 || newWidth > 64 || newHeight < 8 || newHeight > 64) {
+                alert('Tamaño debe estar entre 8 y 64 píxeles');
+                return;
+            }
+
+            if (newWidth !== WIDTH || newHeight !== HEIGHT) {
+                if (!confirm(`¿Cambiar tamaño a ${newWidth}x${newHeight}? Los dígitos actuales en memoria se perderán (los guardados en localStorage se conservan con su tamaño original).`)) {
+                    return;
+                }
+
+                WIDTH = newWidth;
+                HEIGHT = newHeight;
+                saveSettings();
+                updateSizeDisplay();
+
+                for (let i = 0; i <= 9; i++) {
+                    digits[i] = createEmptyGrid();
+                }
+
+                updateGridStyles();
+                updateCanvasSizes();
+                createTabs();
+                createGrid();
+                updatePreview();
+                updateAllDigitsPreview();
+            }
+        }
+
+        function resetAllDigits() {
+            if (!confirm('¿Borrar TODOS los dígitos guardados en localStorage? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            for (let i = 0; i <= 9; i++) {
+                localStorage.removeItem(STORAGE_KEY + '-digit-' + i);
+                digits[i] = createEmptyGrid();
+            }
+
+            createTabs();
+            createGrid();
+            updatePreview();
+            updateAllDigitsPreview();
+            alert('Todos los dígitos han sido borrados');
+        }
+
+        function loadDefaultPatterns() {
+            if (WIDTH !== 20 || HEIGHT !== 28) {
+                alert('Los patrones por defecto solo están disponibles para tamaño 20x28. Cambia el tamaño primero.');
+                return;
+            }
+            if (!confirm('¿Cargar los patrones por defecto? Esto reemplazará los dígitos actuales en memoria (no afecta los guardados en localStorage).')) {
+                return;
+            }
+            initializeDigits();
+            createGrid();
+            updatePreview();
+            updateAllDigitsPreview();
+        }
+
+        function updateGridStyles() {
+            const grid = document.getElementById('pixel-grid');
+            grid.style.gridTemplateColumns = `repeat(${WIDTH}, 18px)`;
+        }
+
+        function updateCanvasSizes() {
+            const canvas1x = document.getElementById('preview-1x');
+            const canvas4x = document.getElementById('preview-4x');
+            canvas1x.width = WIDTH;
+            canvas1x.height = HEIGHT;
+            canvas4x.width = WIDTH * 4;
+            canvas4x.height = HEIGHT * 4;
+        }
+
+        function showIndicator(message) {
+            const indicator = document.getElementById('saved-indicator');
+            indicator.textContent = '✓ ' + message;
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+                indicator.textContent = '✓ Guardado';
+            }, 2000);
         }
 
         function updateAllDigitsPreview() {
@@ -712,7 +998,219 @@
             }
         }
 
+        // === File Export/Import Functions ===
+
+        function exportDigitToFile() {
+            const data = {
+                version: 1,
+                digit: currentDigit,
+                width: WIDTH,
+                height: HEIGHT,
+                data: digits[currentDigit]
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.download = `digit-${currentDigit}.json`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        function importDigitFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.width !== WIDTH || data.height !== HEIGHT) {
+                        if (!confirm(`El archivo tiene tamaño ${data.width}x${data.height}, pero el actual es ${WIDTH}x${HEIGHT}. ¿Cambiar al tamaño del archivo?`)) {
+                            return;
+                        }
+                        WIDTH = data.width;
+                        HEIGHT = data.height;
+                        saveSettings();
+                        updateSizeDisplay();
+                        document.getElementById('digit-width').value = WIDTH;
+                        document.getElementById('digit-height').value = HEIGHT;
+                        for (let i = 0; i <= 9; i++) {
+                            if (i !== data.digit) digits[i] = createEmptyGrid();
+                        }
+                        updateGridStyles();
+                        updateCanvasSizes();
+                    }
+
+                    const targetDigit = data.digit !== undefined ? data.digit : currentDigit;
+                    digits[targetDigit] = data.data;
+                    currentDigit = targetDigit;
+
+                    createTabs();
+                    createGrid();
+                    updatePreview();
+                    updateAllDigitsPreview();
+                    showIndicator('Dígito ' + targetDigit + ' importado');
+                } catch (err) {
+                    alert('Error al leer el archivo: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function exportAllToFile() {
+            const data = {
+                version: 1,
+                width: WIDTH,
+                height: HEIGHT,
+                digits: {}
+            };
+            for (let i = 0; i <= 9; i++) {
+                data.digits[i] = digits[i];
+            }
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.download = `all-digits-${WIDTH}x${HEIGHT}.json`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        function importAllFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.width !== WIDTH || data.height !== HEIGHT) {
+                        if (!confirm(`El archivo tiene tamaño ${data.width}x${data.height}, pero el actual es ${WIDTH}x${HEIGHT}. ¿Cambiar al tamaño del archivo?`)) {
+                            return;
+                        }
+                        WIDTH = data.width;
+                        HEIGHT = data.height;
+                        saveSettings();
+                        updateSizeDisplay();
+                        document.getElementById('digit-width').value = WIDTH;
+                        document.getElementById('digit-height').value = HEIGHT;
+                        updateGridStyles();
+                        updateCanvasSizes();
+                    }
+
+                    for (let i = 0; i <= 9; i++) {
+                        if (data.digits && data.digits[i]) {
+                            digits[i] = data.digits[i];
+                        }
+                    }
+
+                    createTabs();
+                    createGrid();
+                    updatePreview();
+                    updateAllDigitsPreview();
+                    showIndicator('Todos los dígitos importados');
+                } catch (err) {
+                    alert('Error al leer el archivo: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // === Server/Repo Functions ===
+
+        async function loadDigitFromServer() {
+            const url = `digits/digit-${currentDigit}.json`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Archivo no encontrado');
+                const data = await response.json();
+
+                if (data.width !== WIDTH || data.height !== HEIGHT) {
+                    if (!confirm(`El archivo tiene tamaño ${data.width}x${data.height}, pero el actual es ${WIDTH}x${HEIGHT}. ¿Cambiar al tamaño del archivo?`)) {
+                        return;
+                    }
+                    WIDTH = data.width;
+                    HEIGHT = data.height;
+                    saveSettings();
+                    updateSizeDisplay();
+                    document.getElementById('digit-width').value = WIDTH;
+                    document.getElementById('digit-height').value = HEIGHT;
+                    for (let i = 0; i <= 9; i++) {
+                        if (i !== currentDigit) digits[i] = createEmptyGrid();
+                    }
+                    updateGridStyles();
+                    updateCanvasSizes();
+                }
+
+                digits[currentDigit] = data.data;
+                createTabs();
+                createGrid();
+                updatePreview();
+                updateAllDigitsPreview();
+                showIndicator('Dígito ' + currentDigit + ' cargado del repo');
+            } catch (err) {
+                alert(`No se pudo cargar digit-${currentDigit}.json del servidor.\n\nAsegúrate de:\n1. Estar corriendo el servidor local (python -m http.server)\n2. El archivo existe en clockface-editor/digits/`);
+            }
+        }
+
+        async function loadAllFromServer() {
+            const url = `digits/all-digits.json`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Archivo no encontrado');
+                const data = await response.json();
+
+                if (data.width !== WIDTH || data.height !== HEIGHT) {
+                    if (!confirm(`El archivo tiene tamaño ${data.width}x${data.height}, pero el actual es ${WIDTH}x${HEIGHT}. ¿Cambiar al tamaño del archivo?`)) {
+                        return;
+                    }
+                    WIDTH = data.width;
+                    HEIGHT = data.height;
+                    saveSettings();
+                    updateSizeDisplay();
+                    document.getElementById('digit-width').value = WIDTH;
+                    document.getElementById('digit-height').value = HEIGHT;
+                    updateGridStyles();
+                    updateCanvasSizes();
+                }
+
+                for (let i = 0; i <= 9; i++) {
+                    if (data.digits && data.digits[i]) {
+                        digits[i] = data.digits[i];
+                    }
+                }
+
+                createTabs();
+                createGrid();
+                updatePreview();
+                updateAllDigitsPreview();
+                showIndicator('Todos los dígitos cargados del repo');
+            } catch (err) {
+                alert(`No se pudo cargar all-digits.json del servidor.\n\nAsegúrate de:\n1. Estar corriendo el servidor local (python -m http.server)\n2. El archivo existe en clockface-editor/digits/`);
+            }
+        }
+
         // Initialize
+        loadSettings();
+        initDigitsStorage();
+
+        // If no saved digits, initialize with default patterns (only for 20x28)
+        if (WIDTH === 20 && HEIGHT === 28) {
+            let hasAnySaved = false;
+            for (let i = 0; i <= 9; i++) {
+                if (hasStoredDigit(i)) {
+                    hasAnySaved = true;
+                    break;
+                }
+            }
+            if (!hasAnySaved) {
+                initializeDigits();
+            }
+        }
+
+        updateGridStyles();
+        updateCanvasSizes();
         createTabs();
         createGrid();
         updatePreview();

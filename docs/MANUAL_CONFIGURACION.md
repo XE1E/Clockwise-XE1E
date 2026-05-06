@@ -138,6 +138,9 @@ Deja la terminal abierta mientras usas las herramientas.
 | Digit Designer | http://localhost:8000/digit-designer.html | Diseñar digitos para reloj nocturno |
 | Generador Thumbnails | http://localhost:8000/generate-thumbs.html | Generar miniaturas de todas las caratulas |
 | Pagina Config | http://localhost:8000/config-page.html | Preview de pagina configuracion |
+| **Character Designer** | http://localhost:8000/char-designer.html | Editor de fuentes (importar, editar, guardar en galeria) |
+| **Font Converter** | http://localhost:8000/font-converter.html | Convertir BDF a JS (avanzado) |
+| Digit Designer | http://localhost:8000/digit-designer.html | Editor de digitos para Night Clock |
 
 ### Generador de Thumbnails
 
@@ -156,17 +159,53 @@ Hay dos formas de generar thumbnails:
 1. Selecciona el digito (0-9) en las pestañas
 2. Haz clic en los pixels para encender/apagar
 3. Arrastra para dibujar multiples pixels
-4. Usa "Guardar Digito" para guardar cambios
-5. Usa "Exportar Todos (JSON)" para obtener el codigo
-6. Los digitos son de 20x28 pixels
+4. Los digitos guardados muestran borde verde en las pestañas
+
+**Tamaño configurable:**
+- Cambia Ancho y Alto (8-64 px) y haz clic en "Aplicar Tamaño"
+- Tamaño por defecto: 20x28 pixels
+- Los patrones prediseñados solo estan disponibles para 20x28
+
+**Guardado local (localStorage):**
+- **Guardar Local:** Guarda el digito actual en el navegador
+- Los datos persisten aunque cierres el navegador
+
+**Archivos (Export/Import):**
+- **Exportar Digito:** Descarga el digito actual como JSON
+- **Importar Digito:** Carga un digito desde archivo JSON
+- **Exportar Todos:** Descarga todos los digitos como un solo JSON
+- **Importar Todos:** Carga todos los digitos desde archivo JSON
+
+**GitHub (sincronizacion entre PCs):**
+- **Cargar Digito del Repo:** Carga desde `clockface-editor/digits/digit-X.json`
+- **Cargar Todos del Repo:** Carga desde `clockface-editor/digits/all-digits.json`
+
+### Sincronizar entre PCs via GitHub
+
+1. **Guardar cambios (PC actual):**
+   - Edita los digitos
+   - Usa "Exportar Digito" o "Exportar Todos"
+   - Guarda los JSON en `clockface-editor/digits/`
+   - Commit y push a GitHub
+
+2. **Cargar cambios (otra PC):**
+   - Pull del repositorio
+   - Abre digit-designer con servidor local
+   - Usa "Cargar Digito del Repo" o "Cargar Todos del Repo"
 
 ---
 
 ## Acceso a la Configuracion
 
 1. Conecta el reloj a tu red WiFi
-2. Abre un navegador y accede a la IP del reloj
+2. Abre un navegador y accede a: **http://clockwise.local**
 3. La pagina de configuracion se mostrara automaticamente
+
+**Alternativa:** Si `clockwise.local` no funciona (Windows sin Bonjour instalado), usa la IP del reloj directamente. La IP se muestra en el monitor serial al iniciar:
+```
+[WiFi] mDNS started: http://clockwise.local
+[WiFi] Connected to MiRed, IP address 192.168.1.50
+```
 
 ---
 
@@ -372,6 +411,96 @@ display->print("Hola");
 Usa la herramienta **fontconvert** de Adafruit GFX para convertir fuentes TTF:
 ```bash
 ./fontconvert mifuente.ttf 12 > mifuente12pt7b.h
+```
+
+### Recursos de Fuentes Externas
+
+#### Fuentes BDF (Bitmap Distribution Format)
+
+| Sitio | URL | Descripcion |
+|---|---|---|
+| Font Library | https://fontlibrary.org | Muchas fuentes libres, buscar "bitmap" |
+| Bitmap Fonts Collection | https://github.com/Tecate/bitmap-fonts | Gran coleccion de BDF |
+| Unifont | https://unifoundry.com/unifont/ | Unicode completo, ideal para simbolos |
+| Xorg Fonts | https://gitlab.freedesktop.org/xorg/font | Fuentes clasicas X11 |
+| Adobe Source Code Pro | https://github.com/adobe-fonts/source-code-pro | Fuentes de Adobe en BDF |
+
+#### Fuentes Adafruit GFX
+
+| Recurso | URL |
+|---|---|
+| Repositorio oficial | https://github.com/adafruit/Adafruit-GFX-Library/tree/master/Fonts |
+| GFX Font Customiser | https://tchapi.github.io/Adafruit-GFX-Font-Customiser/ |
+| fontconvert (herramienta) | Incluido en Adafruit-GFX-Library |
+
+#### Convertidores TTF a BDF
+
+| Herramienta | Uso |
+|---|---|
+| FontForge | Editor de fuentes gratuito. Abre TTF, exporta como BDF |
+| otf2bdf | Linea de comandos: `otf2bdf -p 12 font.ttf -o font.bdf` |
+| BDF2GFX | Convierte BDF a formato Adafruit GFX (.h) |
+
+#### Como agregar fuentes a la galeria
+
+**Metodo simple (recomendado):**
+
+1. Descarga un archivo `.bdf` de cualquiera de los sitios anteriores
+2. Abre `char-designer.html` con servidor local
+3. Click en "Importar archivo .bdf"
+4. Edita los caracteres si lo deseas
+5. Click en **"Guardar en fonts/"**
+6. Selecciona la carpeta `clockface-editor/fonts/`
+7. Recarga el editor de caratulas
+8. La fuente aparece en el dropdown
+
+**Metodo avanzado (manual):**
+
+1. Usa `font-converter.html` para generar codigo JS
+2. Copia el codigo generado
+3. Pega en `js/pixel-fonts.js` dentro del objeto `PixelFonts`
+
+#### Flujo de trabajo
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  GALERIA DE FUENTES                                             │
+│  ├── js/pixel-fonts.js  (fuentes predefinidas)                 │
+│  └── fonts/*.json       (fuentes personalizadas)               │
+│                                                                 │
+│  → Se muestran automaticamente en el editor de caratulas       │
+└─────────────────────────────────────────────────────────────────┘
+                           ▲
+                           │
+              ┌────────────┴────────────┐
+              │    Character Designer    │
+              │    (char-designer.html)  │
+              │                          │
+              │  1. Importar BDF/JSON    │
+              │  2. Editar si necesario  │
+              │  3. Guardar en fonts/    │
+              └────────────┬────────────┘
+                           │
+              ┌────────────┴────────────┐
+              │     Fuentes externas     │
+              │  - dafont.com (.bdf)     │
+              │  - fontstruct.com        │
+              │  - github repos          │
+              └─────────────────────────┘
+```
+
+#### Estructura de carpetas
+
+```
+clockface-editor/
+├── js/
+│   └── pixel-fonts.js      # Fuentes del sistema
+├── fonts/
+│   ├── index.json          # Indice (se actualiza automatico)
+│   ├── mi-fuente.json      # Fuente personalizada
+│   └── otra-fuente.json    # Otra fuente
+├── char-designer.html      # Editor de fuentes
+└── font-converter.html     # Convertidor BDF (avanzado)
 ```
 
 ---

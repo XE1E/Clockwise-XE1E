@@ -20,10 +20,52 @@ class ClockfaceEditor {
 
     init() {
         this.updateCanvasSize();
+        this.loadCustomFonts().then(() => {
+            this.populateFontDropdown();
+        });
+        this.populateFontDropdown();
         this.bindEvents();
         this.bindReferenceImage();
         this.render();
         this.startClock();
+    }
+
+    async loadCustomFonts() {
+        try {
+            const loaded = await PixelFonts.loadFromFolder('fonts/');
+            if (loaded.length > 0) {
+                console.log('[Editor] Custom fonts loaded:', loaded);
+            }
+        } catch (e) {
+            console.warn('[Editor] Could not load custom fonts:', e);
+        }
+    }
+
+    populateFontDropdown() {
+        const select = document.getElementById('el-font');
+        if (!select || typeof PixelFonts === 'undefined') return;
+
+        select.innerHTML = '<option value="">Default (picopixel)</option>';
+
+        for (const [name, font] of Object.entries(PixelFonts)) {
+            if (typeof font !== 'object' || !font.glyphs) continue;
+
+            let maxW = 0, minYOff = 0, maxYEnd = 0;
+            for (const g of font.glyphs) {
+                if (!g || g[1] === 0) continue;
+                const [off, w, h, xAdv, xOff, yOff] = g;
+                if (w > maxW) maxW = w;
+                if (yOff < minYOff) minYOff = yOff;
+                const yEnd = yOff + h;
+                if (yEnd > maxYEnd) maxYEnd = yEnd;
+            }
+            const totalH = maxYEnd - minYOff;
+
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = `${name} (${maxW}x${totalH})`;
+            select.appendChild(opt);
+        }
     }
 
     updateCanvasSize() {
@@ -1482,11 +1524,8 @@ class ClockfaceEditor {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const fontName = document.getElementById('el-font').value || 'picopixel';
-        const fontHeights = {
-            'picopixel': 7, 'tomthumb': 6, 'square': 11,
-            'medium': 12, 'big': 15, 'bold': 22
-        };
-        const fontHeight = fontHeights[fontName] || 7;
+        const font = PixelFonts[fontName] || PixelFonts.picopixel;
+        const fontHeight = font ? font.yAdvance : 7;
         const y = Math.floor((canvas.height - fontHeight) / 2) + fontHeight;
         PixelFonts.drawText(ctx, fontName, '12:45', 2, y, '#fff', null);
     }

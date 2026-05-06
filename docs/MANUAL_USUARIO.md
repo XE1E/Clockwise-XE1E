@@ -30,11 +30,13 @@
 ### 3. Acceder a la Configuracion
 
 1. Asegurate de estar en la misma red WiFi que el reloj
-2. Busca la IP del reloj:
+2. Abre un navegador y escribe: **http://clockwise.local**
+3. La pagina de configuracion se mostrara
+
+**Nota:** Si `clockwise.local` no funciona (comun en Windows sin Bonjour), busca la IP del reloj:
    - Revisa tu router para ver dispositivos conectados
    - O usa una app como "Fing" para escanear la red
-3. Abre un navegador y escribe la IP (ej: `192.168.1.50`)
-4. La pagina de configuracion se mostrara
+   - Luego escribe la IP directamente (ej: `192.168.1.50`)
 
 ---
 
@@ -165,7 +167,8 @@ Algunos cambios requieren reinicio para aplicarse:
 - Reinicia el reloj desconectando y conectando la fuente
 
 ### Olvide la IP del reloj
-- Revisa la lista de dispositivos en tu router
+- Intenta acceder a **http://clockwise.local** (mDNS)
+- Si no funciona, revisa la lista de dispositivos en tu router
 - Usa una app como "Fing" para escanear la red
 - Busca un dispositivo llamado "ESP32" o "Clockwise"
 

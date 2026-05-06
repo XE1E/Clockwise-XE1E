@@ -32,6 +32,7 @@ struct WiFiController
     if (MDNS.begin("clockwise"))
     {
       MDNS.addService("http", "tcp", 80);
+      Serial.printf("[WiFi] mDNS started: http://clockwise.local\n");
     }
   }
 
@@ -90,6 +91,13 @@ struct WiFiController
       {
         connectionSucessfulOnce = true;
         ClockwiseWebServer::getInstance()->startWebServer();
+
+        if (MDNS.begin("clockwise"))
+        {
+          MDNS.addService("http", "tcp", 80);
+          Serial.printf("[WiFi] mDNS started: http://clockwise.local\n");
+        }
+
         Serial.printf("[WiFi] Connected to %s, IP address %s\n", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
         return true;
       }

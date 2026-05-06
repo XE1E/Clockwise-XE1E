@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Character Designer - Clockwise Font Editor</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 { text-align: center; margin-bottom: 5px; }
+        h3 { margin: 10px 0 5px 0; color: #888; font-size: 13px; }
+        .subtitle { text-align: center; color: #888; font-size: 12px; margin-bottom: 20px; }
+
+        .main-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+        }
+        @media (max-width: 900px) {
+            .main-container { flex-wrap: wrap; }
+        }
+
+        /* Panel izquierdo - Fuentes */
+        .source-panel {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 10px;
+            width: 280px;
+            flex-shrink: 0;
+        }
+        .source-section {
+            background: #0f3460;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .source-section h4 {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            color: #00ff88;
+        }
+
+        /* Panel central - Editor */
+        .editor-panel {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 350px;
+            max-width: 500px;
+            flex-shrink: 0;
+        }
+
+        /* Panel derecho - Exportar */
+        .export-panel {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 10px;
+            width: 280px;
+            flex-shrink: 0;
+        }
+
+        .pixel-grid {
+            display: grid;
+            gap: 1px;
+            background: #333;
+            padding: 1px;
+            border: 2px solid #444;
+            margin: 10px 0;
+        }
+        .pixel {
+            width: 14px;
+            height: 14px;
+            background: #000;
+            cursor: pointer;
+        }
+        .pixel.on { background: #00ff88; }
+        .pixel:hover { opacity: 0.7; }
+
+        .preview-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .preview-box {
+            text-align: center;
+        }
+        .preview-box span { font-size: 10px; color: #666; display: block; }
+        .preview-canvas {
+            border: 1px solid #444;
+            background: #000;
+            image-rendering: pixelated;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .btn-small { padding: 5px 10px; width: auto; margin: 0; }
+        .btn-primary { background: #0f4c75; color: white; }
+        .btn-danger { background: #c0392b; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-purple { background: #8e44ad; color: white; }
+        .btn:hover { opacity: 0.85; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        select, input[type="text"], input[type="number"] {
+            padding: 6px;
+            background: #1a1a2e;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        input[type="number"] { width: 60px; }
+
+        .char-groups {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .group-btn {
+            padding: 6px 10px;
+            background: #0f3460;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .group-btn.active { background: #e94560; }
+
+        .char-tabs {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        .char-tab {
+            padding: 6px 10px;
+            background: #0f3460;
+            border: 2px solid transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 32px;
+            text-align: center;
+        }
+        .char-tab.active { background: #00ff88; color: #000; }
+        .char-tab.has-data { border-color: #27ae60; }
+
+        .current-char {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00ff88;
+            text-align: center;
+            padding: 10px;
+            background: #0a0a1a;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .all-chars {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #0a0a1a;
+            border-radius: 5px;
+        }
+        .char-mini {
+            text-align: center;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 3px;
+        }
+        .char-mini:hover { background: #333; }
+        .char-mini canvas { image-rendering: pixelated; }
+        .char-mini span { font-size: 8px; color: #666; display: block; }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: #0a0a1a;
+            color: #0f0;
+            border: 1px solid #444;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 10px;
+            border-radius: 4px;
+        }
+
+        .size-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .size-row label { font-size: 12px; }
+
+        .status {
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .status.info { background: #0f4c75; }
+        .status.success { background: #27ae60; }
+        .status.warning { background: #e67e22; }
+        .status.error { background: #c0392b; }
+
+        .help-text {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Character Designer</h1>
+    <p class="subtitle">Editor de fuentes pixel para Clockwise</p>
+
+    <div class="main-container">
+        <!-- Panel izquierdo: Cargar fuentes -->
+        <div class="source-panel">
+            <h3>CARGAR FUENTE</h3>
+
+            <div class="source-section">
+                <h4>1. Fuentes del sistema</h4>
+                <select id="system-font-select">
+                    <option value="">-- Seleccionar fuente --</option>
+                </select>
+                <button class="btn btn-primary" onclick="loadSystemFont()">Cargar fuente del sistema</button>
+                <p class="help-text">Fuentes incluidas en pixel-fonts.js</p>
+            </div>
+
+            <div class="source-section">
+                <h4>2. Archivo JSON</h4>
+                <button class="btn btn-purple" onclick="document.getElementById('import-json').click()">Importar archivo .json</button>
+                <input type="file" id="import-json" accept=".json" style="display:none" onchange="importFromJSON(event)">
+                <p class="help-text">Carga una fuente exportada previamente</p>
+            </div>
+
+            <div class="source-section">
+                <h4>3. Archivo BDF (externo)</h4>
+                <button class="btn btn-purple" onclick="document.getElementById('import-bdf').click()">Importar archivo .bdf</button>
+                <input type="file" id="import-bdf" accept=".bdf" style="display:none" onchange="importFromBDF(event)">
+                <p class="help-text">Formato Bitmap Distribution Format<br>Buscar en dafont.com, fontstruct.com</p>
+            </div>
+
+            <div class="source-section">
+                <h4>4. Carpeta fonts/ (GitHub)</h4>
+                <select id="repo-font-select">
+                    <option value="">-- Seleccionar --</option>
+                </select>
+                <button class="btn btn-purple" onclick="loadFromRepo()">Cargar del repositorio</button>
+                <button class="btn btn-small btn-primary" onclick="scanRepoFonts()" style="width:100%;margin-top:5px;">Escanear carpeta fonts/</button>
+                <p class="help-text">Requiere servidor local (python -m http.server)</p>
+            </div>
+
+            <div class="source-section">
+                <h4>Configuracion</h4>
+                <div class="size-row">
+                    <label>Ancho:</label>
+                    <input type="number" id="char-width" min="3" max="32" value="8">
+                    <label>Alto:</label>
+                    <input type="number" id="char-height" min="3" max="32" value="12">
+                </div>
+                <button class="btn btn-small btn-primary" onclick="applySize()">Aplicar tamaño</button>
+                <button class="btn btn-small btn-danger" onclick="resetAll()">Reset todo</button>
+            </div>
+        </div>
+
+        <!-- Panel central: Editor -->
+        <div class="editor-panel">
+            <div class="char-groups">
+                <button class="group-btn active" onclick="selectGroup('digits')">0-9</button>
+                <button class="group-btn" onclick="selectGroup('upper')">A-Z</button>
+                <button class="group-btn" onclick="selectGroup('lower')">a-z</button>
+                <button class="group-btn" onclick="selectGroup('symbols')">!@#</button>
+            </div>
+
+            <div class="char-tabs" id="char-tabs"></div>
+
+            <div style="display:flex;gap:15px;">
+                <div>
+                    <div class="current-char" id="current-char-display">0</div>
+                    <div class="pixel-grid" id="pixel-grid"></div>
+                    <div class="controls-row">
+                        <button class="btn btn-small btn-danger" onclick="clearChar()">Limpiar</button>
+                        <button class="btn btn-small btn-success" onclick="saveChar()">Guardar</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="preview-row">
+                        <div class="preview-box">
+                            <span>1x</span>
+                            <canvas id="preview-1x" class="preview-canvas"></canvas>
+                        </div>
+                        <div class="preview-box">
+                            <span>4x</span>
+                            <canvas id="preview-4x" class="preview-canvas"></canvas>
+                        </div>
+                    </div>
+                    <h3>Vista previa de fuente</h3>
+                    <div class="all-chars" id="all-chars"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel derecho: Exportar -->
+        <div class="export-panel">
+            <h3>GUARDAR / EXPORTAR</h3>
+
+            <div class="source-section">
+                <h4>Guardar JSON (backup)</h4>
+                <input type="text" id="font-name" placeholder="Nombre de fuente" value="mi-fuente">
+                <button class="btn btn-success" onclick="saveToFolder()">Guardar en carpeta...</button>
+                <button class="btn btn-small btn-primary" onclick="exportToJSON()" style="width:100%;margin-top:5px;">Descargar (a Downloads)</button>
+                <p class="help-text">Recomendado: guardar en fonts/ para sincronizar</p>
+            </div>
+
+            <div class="source-section">
+                <h4>Agregar a galeria</h4>
+                <button class="btn btn-success" onclick="saveToGallery()">Guardar en fonts/</button>
+                <p class="help-text">Guarda en carpeta fonts/ y queda disponible en el editor de caratulas</p>
+            </div>
+
+            <div class="source-section">
+                <h4>Codigo JS (avanzado)</h4>
+                <button class="btn btn-small btn-primary" onclick="exportToJS()" style="width:100%;">Generar codigo</button>
+                <button class="btn btn-small btn-primary" onclick="copyJS()" style="width:100%;margin-top:5px;">Copiar al portapapeles</button>
+                <textarea id="js-output" readonly placeholder="El codigo aparecera aqui..." style="height:80px;"></textarea>
+                <p class="help-text">Para pegar manualmente en pixel-fonts.js</p>
+            </div>
+
+            <div class="source-section">
+                <h4>Exportar imagenes PNG</h4>
+                <button class="btn btn-primary" onclick="savePNGsToFolder()">Guardar en carpeta...</button>
+                <button class="btn btn-small btn-primary" onclick="downloadAllPNG()" style="width:100%;margin-top:5px;">Descargar (a Downloads)</button>
+            </div>
+
+            <div id="status-area"></div>
+        </div>
+    </div>
+
+    <script src="js/pixel-fonts.js"></script>
+    <script>
+        // ==================== CONFIGURACION ====================
+        const STORAGE_KEY = 'clockwise-char-designer';
+        const CHAR_GROUPS = {
+            digits: '0123456789',
+            upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            lower: 'abcdefghijklmnopqrstuvwxyz',
+            symbols: ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+        };
+
+        let WIDTH = 8;
+        let HEIGHT = 12;
+        let currentChar = '0';
+        let currentGroup = 'digits';
+        let isDrawing = false;
+        let drawMode = true;
+        const chars = {};
+
+        // ==================== INICIALIZACION ====================
+        function init() {
+            loadSettings();
+            initAllChars();
+            updateUI();
+            scanRepoFonts();
+            populateSystemFonts();
+        }
+
+        function populateSystemFonts() {
+            const select = document.getElementById('system-font-select');
+            select.innerHTML = '<option value="">-- Seleccionar fuente --</option>';
+
+            if (typeof PixelFonts === 'undefined') return;
+
+            for (const [name, font] of Object.entries(PixelFonts)) {
+                if (typeof font !== 'object' || !font.glyphs) continue;
+
+                let maxW = 0, minYOff = 0, maxYEnd = 0;
+                for (const g of font.glyphs) {
+                    if (!g || g[1] === 0) continue;
+                    const [off, w, h, xAdv, xOff, yOff] = g;
+                    if (w > maxW) maxW = w;
+                    if (yOff < minYOff) minYOff = yOff;
+                    const yEnd = yOff + h;
+                    if (yEnd > maxYEnd) maxYEnd = yEnd;
+                }
+                const totalH = maxYEnd - minYOff;
+
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = `${name} (${maxW}x${totalH})`;
+                select.appendChild(opt);
+            }
+        }
+
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY + '-settings');
+                if (saved) {
+                    const s = JSON.parse(saved);
+                    WIDTH = s.width || 8;
+                    HEIGHT = s.height || 12;
+                }
+            } catch(e) {}
+            document.getElementById('char-width').value = WIDTH;
+            document.getElementById('char-height').value = HEIGHT;
+        }
+
+        function saveSettings() {
+            localStorage.setItem(STORAGE_KEY + '-settings', JSON.stringify({ width: WIDTH, height: HEIGHT }));
+        }
+
+        function initAllChars() {
+            const allChars = Object.values(CHAR_GROUPS).join('');
+            for (const c of allChars) {
+                const saved = localStorage.getItem(STORAGE_KEY + '-c-' + c.charCodeAt(0));
+                if (saved) {
+                    try {
+                        const p = JSON.parse(saved);
+                        if (p.w === WIDTH && p.h === HEIGHT) {
+                            chars[c] = p.d;
+                            continue;
+                        }
+                    } catch(e) {}
+                }
+                chars[c] = createEmptyGrid();
+            }
+        }
+
+        function createEmptyGrid() {
+            return Array(HEIGHT).fill(null).map(() => Array(WIDTH).fill(0));
+        }
+
+        function hasData(c) {
+            if (!chars[c]) return false;
+            for (let y = 0; y < HEIGHT; y++) {
+                for (let x = 0; x < WIDTH; x++) {
+                    if (chars[c][y][x]) return true;
+                }
+            }
+            return false;
+        }
+
+        // ==================== UI ====================
+        function updateUI() {
+            createTabs();
+            createGrid();
+            updatePreviews();
+            updateAllCharsPreview();
+        }
+
+        function selectGroup(group) {
+            currentGroup = group;
+            currentChar = CHAR_GROUPS[group][0];
+            document.querySelectorAll('.group-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', Object.keys(CHAR_GROUPS)[i] === group);
+            });
+            updateUI();
+        }
+
+        function createTabs() {
+            const container = document.getElementById('char-tabs');
+            container.innerHTML = '';
+            for (const c of CHAR_GROUPS[currentGroup]) {
+                const tab = document.createElement('button');
+                tab.className = 'char-tab' + (c === currentChar ? ' active' : '') + (hasData(c) ? ' has-data' : '');
+                tab.textContent = c === ' ' ? '␣' : c;
+                tab.onclick = () => selectChar(c);
+                container.appendChild(tab);
+            }
+            document.getElementById('current-char-display').textContent = currentChar === ' ' ? '␣' : currentChar;
+        }
+
+        function selectChar(c) {
+            currentChar = c;
+            createTabs();
+            createGrid();
+            updatePreviews();
+        }
+
+        function createGrid() {
+            const grid = document.getElementById('pixel-grid');
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${WIDTH}, 14px)`;
+
+            if (!chars[currentChar]) chars[currentChar] = createEmptyGrid();
+
+            for (let y = 0; y < HEIGHT; y++) {
+                for (let x = 0; x < WIDTH; x++) {
+                    const px = document.createElement('div');
+                    px.className = 'pixel' + (chars[currentChar][y][x] ? ' on' : '');
+                    px.dataset.x = x;
+                    px.dataset.y = y;
+                    px.onmousedown = () => { isDrawing = true; drawMode = !px.classList.contains('on'); toggle(px); };
+                    px.onmouseenter = () => { if (isDrawing) toggle(px); };
+                    grid.appendChild(px);
+                }
+            }
+        }
+
+        document.addEventListener('mouseup', () => isDrawing = false);
+
+        function toggle(px) {
+            const x = +px.dataset.x, y = +px.dataset.y;
+            chars[currentChar][y][x] = drawMode ? 1 : 0;
+            px.classList.toggle('on', drawMode);
+            updatePreviews();
+        }
+
+        function updatePreviews() {
+            const c1 = document.getElementById('preview-1x');
+            const c4 = document.getElementById('preview-4x');
+            c1.width = WIDTH; c1.height = HEIGHT;
+            c1.style.width = WIDTH * 2 + 'px'; c1.style.height = HEIGHT * 2 + 'px';
+            c4.width = WIDTH * 4; c4.height = HEIGHT * 4;
+
+            const ctx1 = c1.getContext('2d');
+            const ctx4 = c4.getContext('2d');
+            ctx1.fillStyle = ctx4.fillStyle = '#000';
+            ctx1.fillRect(0, 0, WIDTH, HEIGHT);
+            ctx4.fillRect(0, 0, WIDTH * 4, HEIGHT * 4);
+
+            if (chars[currentChar]) {
+                ctx1.fillStyle = ctx4.fillStyle = '#00ff88';
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        if (chars[currentChar][y][x]) {
+                            ctx1.fillRect(x, y, 1, 1);
+                            ctx4.fillRect(x * 4, y * 4, 4, 4);
+                        }
+                    }
+                }
+            }
+        }
+
+        function updateAllCharsPreview() {
+            const container = document.getElementById('all-chars');
+            container.innerHTML = '';
+            const all = Object.values(CHAR_GROUPS).join('');
+
+            for (const c of all) {
+                if (!hasData(c)) continue;
+
+                const div = document.createElement('div');
+                div.className = 'char-mini';
+                div.onclick = () => {
+                    for (const [g, cs] of Object.entries(CHAR_GROUPS)) {
+                        if (cs.includes(c)) { selectGroup(g); break; }
+                    }
+                    selectChar(c);
+                };
+
+                const canvas = document.createElement('canvas');
+                canvas.width = WIDTH; canvas.height = HEIGHT;
+                canvas.style.width = WIDTH * 2 + 'px'; canvas.style.height = HEIGHT * 2 + 'px';
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, WIDTH, HEIGHT);
+                ctx.fillStyle = '#00ff88';
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        if (chars[c][y][x]) ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+
+                div.appendChild(canvas);
+                const lbl = document.createElement('span');
+                lbl.textContent = c === ' ' ? '␣' : c;
+                div.appendChild(lbl);
+                container.appendChild(div);
+            }
+
+            if (!container.children.length) {
+                container.innerHTML = '<p style="color:#666;width:100%;text-align:center;font-size:11px;">Sin caracteres</p>';
+            }
+        }
+
+        function showStatus(msg, type = 'info') {
+            const area = document.getElementById('status-area');
+            area.innerHTML = `<div class="status ${type}">${msg}</div>`;
+            setTimeout(() => area.innerHTML = '', 3000);
+        }
+
+        // ==================== ACCIONES ====================
+        function clearChar() {
+            chars[currentChar] = createEmptyGrid();
+            createGrid();
+            updatePreviews();
+        }
+
+        function saveChar() {
+            localStorage.setItem(STORAGE_KEY + '-c-' + currentChar.charCodeAt(0),
+                JSON.stringify({ w: WIDTH, h: HEIGHT, d: chars[currentChar] }));
+            createTabs();
+            updateAllCharsPreview();
+            showStatus('Caracter "' + (currentChar === ' ' ? '␣' : currentChar) + '" guardado', 'success');
+        }
+
+        function applySize() {
+            const w = +document.getElementById('char-width').value;
+            const h = +document.getElementById('char-height').value;
+            if (w < 3 || w > 32 || h < 3 || h > 32) {
+                alert('Tamaño: 3-32 píxeles'); return;
+            }
+            if (w !== WIDTH || h !== HEIGHT) {
+                if (!confirm('¿Cambiar a ' + w + 'x' + h + '? Se reiniciarán los caracteres.')) return;
+                WIDTH = w; HEIGHT = h;
+                saveSettings();
+                const all = Object.values(CHAR_GROUPS).join('');
+                for (const c of all) chars[c] = createEmptyGrid();
+                updateUI();
+            }
+        }
+
+        function resetAll() {
+            if (!confirm('¿Borrar TODOS los caracteres?')) return;
+            const all = Object.values(CHAR_GROUPS).join('');
+            for (const c of all) {
+                localStorage.removeItem(STORAGE_KEY + '-c-' + c.charCodeAt(0));
+                chars[c] = createEmptyGrid();
+            }
+            updateUI();
+            showStatus('Todo reiniciado', 'warning');
+        }
+
+        // ==================== CARGAR FUENTES ====================
+
+        // 1. Cargar fuente del sistema (pixel-fonts.js)
+        function loadSystemFont() {
+            const name = document.getElementById('system-font-select').value;
+            if (!name) { alert('Selecciona una fuente'); return; }
+            if (typeof PixelFonts === 'undefined' || !PixelFonts[name]) {
+                alert('Fuente no disponible'); return;
+            }
+
+            const font = PixelFonts[name];
+
+            // Calcular dimensiones reales de los glyphs
+            let maxW = 0, maxH = 0;
+            let minYOff = 0, maxYEnd = 0;
+
+            for (const g of font.glyphs) {
+                if (!g || g[1] === 0) continue;
+                const [off, w, h, xAdv, xOff, yOff] = g;
+                if (w > maxW) maxW = w;
+                // yOffset es negativo (hacia arriba desde baseline)
+                // Calcular rango vertical total
+                if (yOff < minYOff) minYOff = yOff;
+                const yEnd = yOff + h;
+                if (yEnd > maxYEnd) maxYEnd = yEnd;
+            }
+
+            // Altura total = desde el yOffset más negativo hasta el final más bajo
+            const totalH = maxYEnd - minYOff;
+
+            if (!confirm(`Cargar "${name}" (${maxW}x${totalH})?\nEsto reemplazará los caracteres actuales.`)) return;
+
+            WIDTH = maxW || 8;
+            HEIGHT = totalH || 12;
+            saveSettings();
+            document.getElementById('char-width').value = WIDTH;
+            document.getElementById('char-height').value = HEIGHT;
+            document.getElementById('font-name').value = name;
+
+            const all = Object.values(CHAR_GROUPS).join('');
+            for (const c of all) {
+                chars[c] = createEmptyGrid();
+                const code = c.charCodeAt(0);
+                if (code < font.first || code > font.last) continue;
+                const g = font.glyphs[code - font.first];
+                if (!g || !g[1]) continue;
+
+                const [off, w, h, xAdv, xOff, yOff] = g;
+
+                // Calcular posición Y en el grid
+                // minYOff es el más negativo, lo usamos como referencia superior
+                const startY = yOff - minYOff;
+
+                let bit = off * 8;
+                for (let row = 0; row < h; row++) {
+                    for (let col = 0; col < w; col++) {
+                        const byteIdx = Math.floor(bit / 8);
+                        const bitPos = 7 - (bit % 8);
+                        const val = (font.bitmaps[byteIdx] >> bitPos) & 1;
+
+                        const destY = startY + row;
+                        const destX = col; // xOff se ignora, centramos en el grid
+
+                        if (destY >= 0 && destY < HEIGHT && destX >= 0 && destX < WIDTH) {
+                            chars[c][destY][destX] = val;
+                        }
+                        bit++;
+                    }
+                }
+            }
+
+            updateUI();
+            showStatus(`Fuente "${name}" cargada (${maxW}x${HEIGHT})`, 'success');
+        }
+
+        // 2. Importar desde archivo JSON
+        function importFromJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    WIDTH = data.width || 8;
+                    HEIGHT = data.height || 12;
+                    saveSettings();
+                    document.getElementById('char-width').value = WIDTH;
+                    document.getElementById('char-height').value = HEIGHT;
+                    if (data.name) document.getElementById('font-name').value = data.name;
+
+                    const all = Object.values(CHAR_GROUPS).join('');
+                    for (const c of all) chars[c] = createEmptyGrid();
+
+                    if (data.chars) {
+                        for (const [code, info] of Object.entries(data.chars)) {
+                            const c = info.char || String.fromCharCode(+code);
+                            if (chars[c] !== undefined && info.data) {
+                                chars[c] = info.data;
+                            }
+                        }
+                    }
+
+                    updateUI();
+                    showStatus('Archivo importado: ' + file.name, 'success');
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        // 3. Importar desde archivo BDF (Bitmap Distribution Format)
+        function importFromBDF(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                try {
+                    const bdf = parseBDF(ev.target.result);
+                    if (!bdf.chars.length) {
+                        alert('No se encontraron caracteres en el archivo BDF');
+                        return;
+                    }
+
+                    const info = `Fuente: ${bdf.name || file.name}\nTamaño: ${bdf.width}x${bdf.height}\nCaracteres: ${bdf.chars.length}`;
+                    if (!confirm(info + '\n\n¿Cargar esta fuente?')) return;
+
+                    WIDTH = bdf.width;
+                    HEIGHT = bdf.height;
+                    saveSettings();
+                    document.getElementById('char-width').value = WIDTH;
+                    document.getElementById('char-height').value = HEIGHT;
+                    document.getElementById('font-name').value = bdf.name || file.name.replace('.bdf', '');
+
+                    const all = Object.values(CHAR_GROUPS).join('');
+                    for (const c of all) chars[c] = createEmptyGrid();
+
+                    let loaded = 0;
+                    for (const ch of bdf.chars) {
+                        const c = String.fromCharCode(ch.code);
+                        if (chars[c] !== undefined && ch.bitmap) {
+                            chars[c] = ch.bitmap;
+                            loaded++;
+                        }
+                    }
+
+                    updateUI();
+                    showStatus(`BDF cargado: ${loaded} caracteres`, 'success');
+                } catch (err) {
+                    alert('Error al parsear BDF: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        function parseBDF(content) {
+            const lines = content.split(/\r?\n/);
+            const result = { name: '', width: 8, height: 12, chars: [] };
+
+            let fontBBW = 0, fontBBH = 0, fontBBXOff = 0, fontBBYOff = 0;
+            let inChar = false, inBitmap = false;
+            let curChar = null;
+            let bitmapLines = [];
+
+            for (const line of lines) {
+                const parts = line.trim().split(/\s+/);
+                const cmd = parts[0];
+
+                if (cmd === 'FONT' && parts.length > 1) {
+                    const fontParts = parts.slice(1).join(' ').split('-');
+                    result.name = fontParts.find(p => p && p !== 'misc' && p !== 'fixed' && !p.match(/^\d/)) || 'bdf-font';
+                }
+                else if (cmd === 'FONTBOUNDINGBOX') {
+                    fontBBW = parseInt(parts[1]) || 8;
+                    fontBBH = parseInt(parts[2]) || 12;
+                    fontBBXOff = parseInt(parts[3]) || 0;
+                    fontBBYOff = parseInt(parts[4]) || 0;
+                    result.width = fontBBW;
+                    result.height = fontBBH;
+                }
+                else if (cmd === 'STARTCHAR') {
+                    inChar = true;
+                    curChar = { code: 0, width: fontBBW, height: fontBBH, xoff: 0, yoff: 0, bitmap: null };
+                }
+                else if (cmd === 'ENCODING' && inChar) {
+                    curChar.code = parseInt(parts[1]) || 0;
+                }
+                else if (cmd === 'BBX' && inChar) {
+                    curChar.width = parseInt(parts[1]) || fontBBW;
+                    curChar.height = parseInt(parts[2]) || fontBBH;
+                    curChar.xoff = parseInt(parts[3]) || 0;
+                    curChar.yoff = parseInt(parts[4]) || 0;
+                }
+                else if (cmd === 'BITMAP' && inChar) {
+                    inBitmap = true;
+                    bitmapLines = [];
+                }
+                else if (cmd === 'ENDCHAR') {
+                    if (curChar && bitmapLines.length) {
+                        curChar.bitmap = createEmptyGrid();
+                        const baseY = result.height - curChar.height - (curChar.yoff - fontBBYOff);
+
+                        for (let row = 0; row < bitmapLines.length; row++) {
+                            const hex = bitmapLines[row];
+                            const bits = parseInt(hex, 16);
+                            const bitLen = hex.length * 4;
+
+                            for (let col = 0; col < curChar.width; col++) {
+                                const bitPos = bitLen - 1 - col;
+                                const val = (bits >> bitPos) & 1;
+                                const destY = baseY + row;
+                                const destX = curChar.xoff - fontBBXOff + col;
+
+                                if (destY >= 0 && destY < result.height && destX >= 0 && destX < result.width) {
+                                    curChar.bitmap[destY][destX] = val;
+                                }
+                            }
+                        }
+                        result.chars.push(curChar);
+                    }
+                    inChar = false;
+                    inBitmap = false;
+                    curChar = null;
+                }
+                else if (inBitmap && line.trim().match(/^[0-9A-Fa-f]+$/)) {
+                    bitmapLines.push(line.trim());
+                }
+            }
+
+            return result;
+        }
+
+        // 3. Cargar desde carpeta fonts/ del repo
+        async function scanRepoFonts() {
+            const select = document.getElementById('repo-font-select');
+            select.innerHTML = '<option value="">-- Escaneando... --</option>';
+
+            try {
+                // Try to fetch index or common names
+                const names = ['custom', 'night-clock', 'digits', 'mi-fuente'];
+                const found = [];
+
+                for (const name of names) {
+                    try {
+                        const res = await fetch('fonts/' + name + '.json', { method: 'HEAD' });
+                        if (res.ok) found.push(name);
+                    } catch (e) {}
+                }
+
+                select.innerHTML = '<option value="">-- Seleccionar --</option>';
+                if (found.length) {
+                    for (const name of found) {
+                        select.innerHTML += '<option value="' + name + '">' + name + '.json</option>';
+                    }
+                } else {
+                    select.innerHTML += '<option value="" disabled>No hay fuentes en fonts/</option>';
+                }
+            } catch (e) {
+                select.innerHTML = '<option value="">Error al escanear</option>';
+            }
+        }
+
+        async function loadFromRepo() {
+            const name = document.getElementById('repo-font-select').value;
+            if (!name) { alert('Selecciona un archivo'); return; }
+
+            try {
+                const res = await fetch('fonts/' + name + '.json');
+                if (!res.ok) throw new Error('No encontrado');
+                const data = await res.json();
+
+                WIDTH = data.width || 8;
+                HEIGHT = data.height || 12;
+                saveSettings();
+                document.getElementById('char-width').value = WIDTH;
+                document.getElementById('char-height').value = HEIGHT;
+                if (data.name) document.getElementById('font-name').value = data.name;
+
+                const all = Object.values(CHAR_GROUPS).join('');
+                for (const c of all) chars[c] = createEmptyGrid();
+
+                if (data.chars) {
+                    for (const [code, info] of Object.entries(data.chars)) {
+                        const c = info.char || String.fromCharCode(+code);
+                        if (chars[c] !== undefined && info.data) chars[c] = info.data;
+                    }
+                }
+
+                updateUI();
+                showStatus('Cargado: ' + name + '.json', 'success');
+            } catch (e) {
+                alert('Error: ' + e.message + '\n\nAsegúrate de correr: python -m http.server');
+            }
+        }
+
+        // ==================== EXPORTAR ====================
+
+        function exportToJSON() {
+            const name = document.getElementById('font-name').value || 'custom';
+            const data = {
+                version: 1,
+                name: name,
+                width: WIDTH,
+                height: HEIGHT,
+                chars: {}
+            };
+
+            const all = Object.values(CHAR_GROUPS).join('');
+            for (const c of all) {
+                if (hasData(c)) {
+                    data.chars[c.charCodeAt(0)] = { char: c, data: chars[c] };
+                }
+            }
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.download = name + '.json';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            showStatus('Descargado: ' + name + '.json (en Downloads)', 'success');
+        }
+
+        async function saveToFolder() {
+            if (!window.showDirectoryPicker) {
+                alert('Tu navegador no soporta selección de carpeta.\nUsa Chrome o Edge, o usa "Descargar" y mueve el archivo manualmente.');
+                return;
+            }
+
+            try {
+                const dirHandle = await window.showDirectoryPicker({
+                    mode: 'readwrite',
+                    startIn: 'documents'
+                });
+
+                const name = document.getElementById('font-name').value || 'custom';
+                const data = {
+                    version: 1,
+                    name: name,
+                    width: WIDTH,
+                    height: HEIGHT,
+                    chars: {}
+                };
+
+                const all = Object.values(CHAR_GROUPS).join('');
+                for (const c of all) {
+                    if (hasData(c)) {
+                        data.chars[c.charCodeAt(0)] = { char: c, data: chars[c] };
+                    }
+                }
+
+                const fileHandle = await dirHandle.getFileHandle(name + '.json', { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(JSON.stringify(data, null, 2));
+                await writable.close();
+
+                showStatus('Guardado: ' + name + '.json en carpeta seleccionada', 'success');
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    showStatus('Error: ' + e.message, 'warning');
+                }
+            }
+        }
+
+        function copyJS() {
+            const js = document.getElementById('js-output').value;
+            if (!js || js.includes('aparecera')) {
+                alert('Primero genera el codigo JS');
+                return;
+            }
+            navigator.clipboard.writeText(js).then(() => {
+                showStatus('Codigo copiado al portapapeles', 'success');
+            }).catch(() => {
+                showStatus('Error al copiar', 'warning');
+            });
+        }
+
+        async function saveToGallery() {
+            const name = document.getElementById('font-name').value.trim();
+            if (!name) {
+                alert('Escribe un nombre para la fuente');
+                return;
+            }
+
+            // Validar nombre (solo letras, numeros, guiones)
+            if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+                alert('El nombre solo puede contener letras, numeros, guiones y guion bajo');
+                return;
+            }
+
+            const all = Object.values(CHAR_GROUPS).join('');
+            let charCount = 0;
+            for (const c of all) {
+                if (hasData(c)) charCount++;
+            }
+
+            if (charCount === 0) {
+                alert('No hay caracteres para guardar');
+                return;
+            }
+
+            // Crear datos de fuente en formato compatible con PixelFonts.register()
+            const sorted = [...all].sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
+            let first = null, last = null;
+            for (const c of sorted) {
+                if (hasData(c)) {
+                    const code = c.charCodeAt(0);
+                    if (first === null) first = code;
+                    last = code;
+                }
+            }
+
+            const glyphs = [];
+            const bytes = [];
+
+            for (let code = first; code <= last; code++) {
+                const c = String.fromCharCode(code);
+                if (!hasData(c)) {
+                    glyphs.push([bytes.length, 0, 0, WIDTH, 0, 0]);
+                    continue;
+                }
+
+                let minX = WIDTH, maxX = 0, minY = HEIGHT, maxY = 0;
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        if (chars[c][y][x]) {
+                            minX = Math.min(minX, x);
+                            maxX = Math.max(maxX, x);
+                            minY = Math.min(minY, y);
+                            maxY = Math.max(maxY, y);
+                        }
+                    }
+                }
+
+                const gW = maxX - minX + 1;
+                const gH = maxY - minY + 1;
+                const offset = bytes.length;
+
+                let curByte = 0, bitCount = 0;
+                for (let y = minY; y <= maxY; y++) {
+                    for (let x = minX; x <= maxX; x++) {
+                        curByte = (curByte << 1) | (chars[c][y][x] ? 1 : 0);
+                        bitCount++;
+                        if (bitCount === 8) {
+                            bytes.push(curByte);
+                            curByte = 0;
+                            bitCount = 0;
+                        }
+                    }
+                }
+                if (bitCount > 0) {
+                    bytes.push(curByte << (8 - bitCount));
+                }
+
+                glyphs.push([offset, gW, gH, gW + 1, minX, minY - HEIGHT]);
+            }
+
+            const fontData = {
+                name: name,
+                bitmaps: bytes,
+                glyphs: glyphs,
+                first: first,
+                last: last,
+                yAdvance: HEIGHT
+            };
+
+            if (!window.showDirectoryPicker) {
+                // Fallback: descargar y dar instrucciones
+                const blob = new Blob([JSON.stringify(fontData, null, 2)], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.download = name + '.json';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                alert('Archivo descargado.\\n\\nPara agregarlo a la galeria:\\n1. Mueve ' + name + '.json a clockface-editor/fonts/\\n2. Edita fonts/index.json y agrega "' + name + '.json" al array "fonts"');
+                return;
+            }
+
+            try {
+                // Pedir carpeta fonts/
+                alert('Selecciona la carpeta "fonts" dentro de clockface-editor');
+                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+
+                // Guardar archivo de fuente
+                const fontFile = await dirHandle.getFileHandle(name + '.json', { create: true });
+                const fontWritable = await fontFile.createWritable();
+                await fontWritable.write(JSON.stringify(fontData, null, 2));
+                await fontWritable.close();
+
+                // Actualizar index.json
+                let index = { fonts: [] };
+                try {
+                    const indexFile = await dirHandle.getFileHandle('index.json');
+                    const file = await indexFile.getFile();
+                    index = JSON.parse(await file.text());
+                } catch (e) {}
+
+                if (!index.fonts.includes(name + '.json')) {
+                    index.fonts.push(name + '.json');
+                    const indexFileWrite = await dirHandle.getFileHandle('index.json', { create: true });
+                    const indexWritable = await indexFileWrite.createWritable();
+                    await indexWritable.write(JSON.stringify(index, null, 2));
+                    await indexWritable.close();
+                }
+
+                showStatus('Fuente "' + name + '" guardada en galeria', 'success');
+                alert('Fuente guardada!\\n\\nRecarga el editor de caratulas para usarla.');
+
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    showStatus('Error: ' + e.message, 'error');
+                }
+            }
+        }
+
+        async function savePNGsToFolder() {
+            if (!window.showDirectoryPicker) {
+                alert('Tu navegador no soporta selección de carpeta.\nUsa Chrome o Edge, o usa "Descargar".');
+                return;
+            }
+
+            try {
+                const dirHandle = await window.showDirectoryPicker({
+                    mode: 'readwrite',
+                    startIn: 'documents'
+                });
+
+                const all = Object.values(CHAR_GROUPS).join('');
+                let count = 0;
+
+                for (const c of all) {
+                    if (!hasData(c)) continue;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = WIDTH;
+                    canvas.height = HEIGHT;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+                    ctx.fillStyle = '#00ff88';
+
+                    for (let y = 0; y < HEIGHT; y++) {
+                        for (let x = 0; x < WIDTH; x++) {
+                            if (chars[c][y][x]) ctx.fillRect(x, y, 1, 1);
+                        }
+                    }
+
+                    const fontName = document.getElementById('font-name').value || 'font';
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    const fileName = fontName + '-' + c.charCodeAt(0).toString(16).padStart(2, '0') + '.png';
+                    const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    count++;
+                }
+
+                showStatus(count + ' PNGs guardados en carpeta', 'success');
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    showStatus('Error: ' + e.message, 'warning');
+                }
+            }
+        }
+
+        function exportToJS() {
+            const all = Object.values(CHAR_GROUPS).join('');
+            const sorted = [...all].sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
+
+            let first = null, last = null;
+            for (const c of sorted) {
+                if (hasData(c)) {
+                    const code = c.charCodeAt(0);
+                    if (first === null) first = code;
+                    last = code;
+                }
+            }
+
+            if (first === null) { alert('No hay caracteres'); return; }
+
+            const glyphs = [];
+            const bytes = [];
+
+            for (let code = first; code <= last; code++) {
+                const c = String.fromCharCode(code);
+                if (!hasData(c)) {
+                    glyphs.push([bytes.length, 0, 0, WIDTH, 0, 0]);
+                    continue;
+                }
+
+                // Find bounding box
+                let minX = WIDTH, maxX = 0, minY = HEIGHT, maxY = 0;
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        if (chars[c][y][x]) {
+                            minX = Math.min(minX, x);
+                            maxX = Math.max(maxX, x);
+                            minY = Math.min(minY, y);
+                            maxY = Math.max(maxY, y);
+                        }
+                    }
+                }
+
+                const gW = maxX - minX + 1;
+                const gH = maxY - minY + 1;
+                const offset = bytes.length;
+
+                let curByte = 0, bitCount = 0;
+                for (let y = minY; y <= maxY; y++) {
+                    for (let x = minX; x <= maxX; x++) {
+                        curByte = (curByte << 1) | (chars[c][y][x] ? 1 : 0);
+                        bitCount++;
+                        if (bitCount === 8) {
+                            bytes.push(curByte);
+                            curByte = 0;
+                            bitCount = 0;
+                        }
+                    }
+                }
+                if (bitCount > 0) {
+                    bytes.push(curByte << (8 - bitCount));
+                }
+
+                glyphs.push([offset, gW, gH, gW + 1, minX, minY - HEIGHT]);
+            }
+
+            const name = document.getElementById('font-name').value || 'custom';
+            let js = `    ${name}: {\n`;
+            js += `        bitmaps: [${bytes.map(b => '0x' + b.toString(16).toUpperCase().padStart(2, '0')).join(',')}],\n`;
+            js += `        glyphs: [\n`;
+            for (let i = 0; i < glyphs.length; i++) {
+                js += `            [${glyphs[i].join(',')}]${i < glyphs.length - 1 ? ',' : ''}\n`;
+            }
+            js += `        ],\n`;
+            js += `        first: 0x${first.toString(16).toUpperCase()}, last: 0x${last.toString(16).toUpperCase()}, yAdvance: ${HEIGHT}\n`;
+            js += `    }`;
+
+            document.getElementById('js-output').value = js;
+            showStatus('Codigo JS generado', 'success');
+        }
+
+        function downloadAllPNG() {
+            const all = Object.values(CHAR_GROUPS).join('');
+            let count = 0;
+            for (const c of all) {
+                if (!hasData(c)) continue;
+                const canvas = document.createElement('canvas');
+                canvas.width = WIDTH; canvas.height = HEIGHT;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, WIDTH, HEIGHT);
+                ctx.fillStyle = '#00ff88';
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        if (chars[c][y][x]) ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+                const fontName = document.getElementById('font-name').value || 'font';
+                const link = document.createElement('a');
+                link.download = fontName + '-' + c.charCodeAt(0).toString(16).padStart(2, '0') + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                count++;
+            }
+            showStatus(count + ' PNGs descargados', 'success');
+        }
+
+        // ==================== INICIAR ====================
+        init();
+    </script>
+</body>
+</html>

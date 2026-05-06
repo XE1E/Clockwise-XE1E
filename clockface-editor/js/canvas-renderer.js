@@ -6,15 +6,8 @@ class CanvasRenderer {
         this.width = 64;
         this.height = 64;
 
-        this.fontMap = {
-            'picopixel': 'picopixel',
-            'tomthumb': 'tomthumb',
-            'square': 'square',
-            'medium': 'medium',
-            'big': 'big',
-            'bold': 'bold',
-            '': 'picopixel'
-        };
+        // Font map is now dynamic - any font in PixelFonts is available
+        this.fontMap = { '': 'picopixel' };
     }
 
     clear(bgColor = 0) {
@@ -80,7 +73,7 @@ class CanvasRenderer {
     }
 
     drawText(text, x, y, fontName, fgColor, bgColor) {
-        const mappedFont = this.fontMap[fontName] || 'picopixel';
+        const mappedFont = (fontName && PixelFonts[fontName]) ? fontName : 'picopixel';
         const fgRgb = ColorUtils.rgb565ToRgb(fgColor);
         const bgRgb = ColorUtils.rgb565ToRgb(bgColor);
 
@@ -186,7 +179,7 @@ class CanvasRenderer {
             case 'datetime':
             case 'text': {
                 const text = element.type === 'datetime' ? element.getDisplayText() : element.content;
-                const mappedFont = this.fontMap[element.font] || 'picopixel';
+                const mappedFont = (element.font && PixelFonts[element.font]) ? element.font : 'picopixel';
                 const metrics = PixelFonts.measureText(mappedFont, text);
                 return {
                     x: element.x,

@@ -125,5 +125,51 @@ const PixelFonts = {
         const yOffset = isDefaultFont ? 0 : minYOffset;
 
         return { width, height: maxHeight || font.yAdvance, yOffset };
+    },
+
+    // Registrar fuente externa
+    register(name, fontData) {
+        if (name && fontData && fontData.bitmaps && fontData.glyphs) {
+            this[name] = fontData;
+            console.log('[PixelFonts] Registered:', name);
+            return true;
+        }
+        return false;
+    },
+
+    // Cargar fuentes desde carpeta fonts/
+    async loadFromFolder(folderPath = 'fonts/') {
+        try {
+            const indexRes = await fetch(folderPath + 'index.json');
+            if (!indexRes.ok) return [];
+
+            const index = await indexRes.json();
+            const loaded = [];
+
+            for (const fontFile of index.fonts || []) {
+                try {
+                    const res = await fetch(folderPath + fontFile);
+                    if (res.ok) {
+                        const fontData = await res.json();
+                        if (fontData.name && this.register(fontData.name, fontData)) {
+                            loaded.push(fontData.name);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[PixelFonts] Error loading', fontFile, e);
+                }
+            }
+
+            return loaded;
+        } catch (e) {
+            return [];
+        }
+    },
+
+    // Lista de fuentes disponibles
+    list() {
+        return Object.keys(this).filter(k =>
+            typeof this[k] === 'object' && this[k].glyphs
+        );
     }
 };
