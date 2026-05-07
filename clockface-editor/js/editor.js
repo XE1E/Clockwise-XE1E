@@ -8,6 +8,7 @@ class ClockfaceEditor {
         this.zoom = 8;
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
+        this.activeHandle = null;
         this.referenceImage = document.getElementById('reference-image');
         this.spriteEditorState = {
             selectedSpriteIndex: -1,
@@ -23,6 +24,12 @@ class ClockfaceEditor {
             currentTool: 'draw',
             showGrid: true,
             isDrawing: false
+        };
+        this.spriteAnimationState = {
+            enabled: true,
+            lastUpdate: 0,
+            animationFrame: null,
+            elementStates: new Map()
         };
 
         this.init();
@@ -854,6 +861,10 @@ class ClockfaceEditor {
             this.openSpriteModal();
         });
 
+        document.getElementById('btn-reset-sprites').addEventListener('click', () => {
+            this.resetSpritePositionsForExport();
+        });
+
         document.getElementById('btn-add-sprite').addEventListener('click', () => {
             this.clockface.addSprite([]);
             this.updateSpriteList();
@@ -1424,6 +1435,7 @@ class ClockfaceEditor {
         });
 
         document.getElementById('btn-export').addEventListener('click', () => {
+            this.resetSpritePositionsForExport();
             const json = JSON.stringify(this.clockface.toJSON(), null, 2);
             document.getElementById('export-json').value = json;
             document.getElementById('export-modal').classList.add('active');
@@ -1597,10 +1609,19 @@ class ClockfaceEditor {
                 const el = this.clockface.getElementById(this.selectedId);
                 if (el) {
                     const json = el.toJSON();
+                    delete json.id;
                     json.x += 5;
                     json.y += 5;
                     const newEl = ClockfaceElement.fromJSON(json);
                     newEl.inLoop = el.inLoop;
+                    if (newEl.type === 'sprite') {
+                        newEl.frameImages = [...el.frameImages];
+                    }
+                    if (newEl.type === 'image' && el.imageData) {
+                        newEl.imageData = el.imageData;
+                        newEl.width = el.width;
+                        newEl.height = el.height;
+                    }
                     this.clockface.addElement(newEl);
                     this.selectedId = newEl.id;
                 }
@@ -1632,13 +1653,29 @@ class ClockfaceEditor {
         const coords = this.getCanvasCoords(e);
 
         if (this.currentTool === 'select') {
+            if (this.selectedId) {
+                const element = this.clockface.getElementById(this.selectedId);
+                if (element) {
+                    const handle = this.renderer.hitTestHandle(coords.x, coords.y, element);
+                    if (handle) {
+                        this.activeHandle = handle;
+                        this.isDragging = true;
+                        this.updatePropertiesPanel();
+                        this.render();
+                        return;
+                    }
+                }
+            }
+
             const hit = this.renderer.hitTest(coords.x, coords.y, this.clockface);
             if (hit) {
                 this.selectedId = hit.id;
                 this.isDragging = true;
+                this.activeHandle = null;
                 this.dragOffset = { x: coords.x - hit.x, y: coords.y - hit.y };
             } else {
                 this.selectedId = null;
+                this.activeHandle = null;
             }
         } else {
             this.createElement(coords);
@@ -1655,17 +1692,78 @@ class ClockfaceEditor {
 
         if (this.isDragging && this.selectedId) {
             const element = this.clockface.getElementById(this.selectedId);
-            if (element) {
-                element.x = Math.max(0, Math.min(63, coords.x - this.dragOffset.x));
-                element.y = Math.max(0, Math.min(63, coords.y - this.dragOffset.y));
-                this.updatePropertiesPanel();
-                this.render();
+            if (!element) return;
+
+            if (this.activeHandle) {
+                this.resizeWithHandle(element, coords);
+            } else {
+                const newX = Math.max(0, Math.min(63, coords.x - this.dragOffset.x));
+                const newY = Math.max(0, Math.min(63, coords.y - this.dragOffset.y));
+                const deltaX = newX - element.x;
+                const deltaY = newY - element.y;
+                element.x = newX;
+                element.y = newY;
+                if (element.type === 'line') {
+                    element.x1 = Math.max(0, Math.min(63, element.x1 + deltaX));
+                    element.y1 = Math.max(0, Math.min(63, element.y1 + deltaY));
+                }
+            }
+            this.updatePropertiesPanel();
+            this.render();
+        }
+    }
+
+    resizeWithHandle(element, coords) {
+        const x = Math.max(0, Math.min(63, coords.x));
+        const y = Math.max(0, Math.min(63, coords.y));
+
+        if (element.type === 'rect' || element.type === 'fillrect') {
+            switch (this.activeHandle) {
+                case 'tl':
+                    element.width = Math.max(1, element.x + element.width - x);
+                    element.height = Math.max(1, element.y + element.height - y);
+                    element.x = x;
+                    element.y = y;
+                    break;
+                case 'tr':
+                    element.width = Math.max(1, x - element.x);
+                    element.height = Math.max(1, element.y + element.height - y);
+                    element.y = y;
+                    break;
+                case 'bl':
+                    element.width = Math.max(1, element.x + element.width - x);
+                    element.height = Math.max(1, y - element.y);
+                    element.x = x;
+                    break;
+                case 'br':
+                    element.width = Math.max(1, x - element.x);
+                    element.height = Math.max(1, y - element.y);
+                    break;
+            }
+        } else if (element.type === 'circle' || element.type === 'fillcircle') {
+            const dx = Math.abs(x - element.x);
+            const dy = Math.abs(y - element.y);
+            element.radius = Math.max(1, Math.max(dx, dy));
+        } else if (element.type === 'line') {
+            if (this.activeHandle === 'start') {
+                element.x = x;
+                element.y = y;
+            } else if (this.activeHandle === 'end') {
+                element.x1 = x;
+                element.y1 = y;
             }
         }
     }
 
     onMouseUp() {
+        if (this.isDragging && this.selectedId) {
+            const element = this.clockface.getElementById(this.selectedId);
+            if (element && element.type === 'sprite') {
+                this.updateSpriteBasePosition(element);
+            }
+        }
         this.isDragging = false;
+        this.activeHandle = null;
     }
 
     onKeyDown(e) {
@@ -1766,8 +1864,15 @@ class ClockfaceEditor {
         const element = this.clockface.getElementById(this.selectedId);
         if (!element) return;
 
-        element.x = parseInt(document.getElementById('el-x').value) || 0;
-        element.y = parseInt(document.getElementById('el-y').value) || 0;
+        const newX = parseInt(document.getElementById('el-x').value) || 0;
+        const newY = parseInt(document.getElementById('el-y').value) || 0;
+        const posChanged = element.x !== newX || element.y !== newY;
+        element.x = newX;
+        element.y = newY;
+
+        if (element.type === 'sprite' && posChanged) {
+            this.updateSpriteBasePosition(element);
+        }
 
         if (element.type === 'datetime' || element.type === 'text') {
             element.content = document.getElementById('el-content').value;
@@ -1798,11 +1903,20 @@ class ClockfaceEditor {
             if (newSpriteIndex !== element.sprite) {
                 element.sprite = newSpriteIndex;
                 element.loadFrames(this.clockface.sprites);
+                this.resetSpriteAnimationState(element.id);
+            }
+            const newMoveX = parseInt(document.getElementById('el-move-x').value) || 0;
+            const newMoveY = parseInt(document.getElementById('el-move-y').value) || 0;
+            if (newMoveX !== element.moveX || newMoveY !== element.moveY) {
+                element.moveX = newMoveX;
+                element.moveY = newMoveY;
+                this.resetSpriteAnimationState(element.id);
+            } else {
+                element.moveX = newMoveX;
+                element.moveY = newMoveY;
             }
             element.frameDelay = parseInt(document.getElementById('el-frame-delay').value) || 100;
             element.loopDelay = parseInt(document.getElementById('el-loop-delay').value) || 0;
-            element.moveX = parseInt(document.getElementById('el-move-x').value) || 0;
-            element.moveY = parseInt(document.getElementById('el-move-y').value) || 0;
         }
 
         element.inLoop = document.getElementById('el-in-loop').checked;
@@ -1971,18 +2085,117 @@ class ClockfaceEditor {
             }
         }, 1000);
 
-        setInterval(() => {
-            let hasAnimatedSprite = false;
+        this.startSpriteAnimations();
+    }
+
+    startSpriteAnimations() {
+        const animate = (timestamp) => {
+            const sas = this.spriteAnimationState;
+            if (!sas.enabled) {
+                sas.animationFrame = requestAnimationFrame(animate);
+                return;
+            }
+
+            let needsRender = false;
+
             for (const el of this.clockface.elements) {
-                if (el.type === 'sprite' && el.frameImages && el.frameImages.length > 1) {
-                    el.currentFrame = (el.currentFrame + 1) % el.frameImages.length;
-                    hasAnimatedSprite = true;
+                if (el.type !== 'sprite' || !el.frameImages || el.frameImages.length === 0) continue;
+
+                let state = sas.elementStates.get(el.id);
+                if (!state) {
+                    state = {
+                        lastFrameTime: timestamp,
+                        lastLoopTime: timestamp,
+                        baseX: el.x,
+                        baseY: el.y,
+                        cycleCount: 0,
+                        inLoopDelay: false
+                    };
+                    sas.elementStates.set(el.id, state);
+                }
+
+                const frameCount = el.frameImages.length;
+                const frameDelay = el.frameDelay || 100;
+                const loopDelay = el.loopDelay || 0;
+
+                if (state.inLoopDelay) {
+                    if (timestamp - state.lastLoopTime >= loopDelay) {
+                        state.inLoopDelay = false;
+                        state.lastFrameTime = timestamp;
+                        el.currentFrame = 0;
+                        state.cycleCount++;
+                        el.x = state.baseX + (el.moveX || 0) * state.cycleCount;
+                        el.y = state.baseY + (el.moveY || 0) * state.cycleCount;
+                        if (el.x < -64 || el.x > 128 || el.y < -64 || el.y > 128) {
+                            el.x = state.baseX;
+                            el.y = state.baseY;
+                            state.cycleCount = 0;
+                        }
+                        needsRender = true;
+                    }
+                } else if (timestamp - state.lastFrameTime >= frameDelay) {
+                    state.lastFrameTime = timestamp;
+                    el.currentFrame = (el.currentFrame + 1) % frameCount;
+                    needsRender = true;
+
+                    if (el.currentFrame === 0 && loopDelay > 0) {
+                        state.inLoopDelay = true;
+                        state.lastLoopTime = timestamp;
+                    } else if (el.currentFrame === 0) {
+                        state.cycleCount++;
+                        el.x = state.baseX + (el.moveX || 0) * state.cycleCount;
+                        el.y = state.baseY + (el.moveY || 0) * state.cycleCount;
+                        if (el.x < -64 || el.x > 128 || el.y < -64 || el.y > 128) {
+                            el.x = state.baseX;
+                            el.y = state.baseY;
+                            state.cycleCount = 0;
+                        }
+                    }
                 }
             }
-            if (hasAnimatedSprite) {
+
+            if (needsRender) {
                 this.render();
             }
-        }, 100);
+
+            sas.animationFrame = requestAnimationFrame(animate);
+        };
+
+        this.spriteAnimationState.animationFrame = requestAnimationFrame(animate);
+    }
+
+    resetSpriteAnimationState(elementId) {
+        const sas = this.spriteAnimationState;
+        if (elementId) {
+            sas.elementStates.delete(elementId);
+        } else {
+            sas.elementStates.clear();
+        }
+    }
+
+    updateSpriteBasePosition(element) {
+        const state = this.spriteAnimationState.elementStates.get(element.id);
+        if (state) {
+            state.baseX = element.x;
+            state.baseY = element.y;
+            state.cycleCount = 0;
+        }
+    }
+
+    resetSpritePositionsForExport() {
+        const sas = this.spriteAnimationState;
+        for (const el of this.clockface.elements) {
+            if (el.type === 'sprite') {
+                const state = sas.elementStates.get(el.id);
+                if (state) {
+                    el.x = state.baseX;
+                    el.y = state.baseY;
+                    el.currentFrame = 0;
+                    state.cycleCount = 0;
+                }
+            }
+        }
+        this.render();
     }
 }
 

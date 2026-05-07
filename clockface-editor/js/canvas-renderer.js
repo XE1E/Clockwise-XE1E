@@ -172,6 +172,52 @@ class CanvasRenderer {
         this.ctx.strokeRect(bounds.x - 1, bounds.y - 1, bounds.width + 2, bounds.height + 2);
 
         this.ctx.setLineDash([]);
+
+        const handles = this.getHandles(element);
+        if (handles.length > 0) {
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.strokeStyle = '#00ff00';
+            this.ctx.lineWidth = 1;
+            for (const handle of handles) {
+                this.ctx.fillRect(handle.x - 1, handle.y - 1, 3, 3);
+                this.ctx.strokeRect(handle.x - 1, handle.y - 1, 3, 3);
+            }
+        }
+    }
+
+    getHandles(element) {
+        const handles = [];
+        switch (element.type) {
+            case 'rect':
+            case 'fillrect':
+                handles.push({ type: 'tl', x: element.x, y: element.y });
+                handles.push({ type: 'tr', x: element.x + element.width, y: element.y });
+                handles.push({ type: 'bl', x: element.x, y: element.y + element.height });
+                handles.push({ type: 'br', x: element.x + element.width, y: element.y + element.height });
+                break;
+            case 'circle':
+            case 'fillcircle':
+                handles.push({ type: 'top', x: element.x, y: element.y - element.radius });
+                handles.push({ type: 'right', x: element.x + element.radius, y: element.y });
+                handles.push({ type: 'bottom', x: element.x, y: element.y + element.radius });
+                handles.push({ type: 'left', x: element.x - element.radius, y: element.y });
+                break;
+            case 'line':
+                handles.push({ type: 'start', x: element.x, y: element.y });
+                handles.push({ type: 'end', x: element.x1, y: element.y1 });
+                break;
+        }
+        return handles;
+    }
+
+    hitTestHandle(x, y, element) {
+        const handles = this.getHandles(element);
+        for (const handle of handles) {
+            if (Math.abs(x - handle.x) <= 2 && Math.abs(y - handle.y) <= 2) {
+                return handle.type;
+            }
+        }
+        return null;
     }
 
     getElementBounds(element) {
