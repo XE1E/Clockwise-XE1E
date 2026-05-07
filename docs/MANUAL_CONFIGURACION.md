@@ -142,6 +142,126 @@ Deja la terminal abierta mientras usas las herramientas.
 | **Font Converter** | http://localhost:8000/font-converter.html | Convertir BDF a JS (avanzado) |
 | Digit Designer | http://localhost:8000/digit-designer.html | Editor de digitos para Night Clock |
 
+### Editor de Clockfaces - Uso
+
+El editor permite crear caratulas con elementos estaticos y animados.
+
+#### Elementos disponibles
+
+| Elemento | Descripcion |
+|---|---|
+| Fecha/Hora | Muestra hora, fecha, dia de semana con formato configurable |
+| Texto | Texto estatico con fuente y color personalizable |
+| Imagen | Imagen PNG/JPG (se redimensiona a 64x64 max) |
+| Sprite | Animacion con multiples frames |
+| Rectangulo | Forma rectangular (contorno o relleno) |
+| Circulo | Forma circular (contorno o relleno) |
+| Linea | Linea entre dos puntos |
+
+#### Como crear un Sprite (animacion)
+
+Los sprites son animaciones compuestas por multiples imagenes (frames) que se reproducen en secuencia.
+
+**Paso 1: Abrir el Editor de Sprites**
+1. En la barra lateral izquierda, busca la seccion "Sprites"
+2. Haz clic en el boton de sprites (icono con lineas horizontales)
+3. Se abre el modal "Editor de Sprites"
+
+**Paso 2: Crear un nuevo Sprite**
+1. En el modal, haz clic en "+ Nuevo"
+2. Aparece "Sprite 0" en la lista con "0 frames"
+3. Selecciona el sprite haciendo clic en el
+
+**Paso 3: Agregar frames al Sprite**
+
+Hay dos formas de agregar frames:
+
+**Opcion A: Importar imagenes**
+1. Con el sprite seleccionado, haz clic en "+ Importar"
+2. Selecciona una o varias imagenes PNG/JPG
+3. Las imagenes se redimensionan automaticamente a 64x64
+4. Cada imagen se convierte en un frame del sprite
+
+**Opcion B: Dibujar con el Editor de Pixeles**
+1. Con el sprite seleccionado, haz clic en "+ Dibujar"
+2. Se abre el editor de pixeles integrado
+3. Configura el tamaño (4x4 a 64x64 pixeles)
+4. Usa las herramientas para dibujar:
+   - ✏️ **Dibujar**: pinta pixeles con el color seleccionado
+   - 🧹 **Borrar**: elimina pixeles (transparente)
+   - 🪣 **Rellenar**: rellena un area del mismo color
+   - 💉 **Tomar color**: copia el color de un pixel existente
+5. Selecciona colores de la paleta o usa el selector personalizado
+6. Activa/desactiva la cuadricula con "Grid"
+7. Haz clic en "Agregar como Frame" para guardar
+
+**Copiar y editar un frame existente:**
+1. Haz clic en "Copiar Frame Actual"
+2. Indica el numero de frame a copiar
+3. El frame se carga en el editor de pixeles
+4. Modifica y guarda como nuevo frame
+
+**Paso 4: Previsualizar la animacion**
+1. Haz clic en "Play" para ver la animacion
+2. Los frames se reproducen en secuencia
+3. Haz clic en "Stop" para detener
+
+**Paso 5: Usar el Sprite en el canvas**
+1. Cierra el editor de sprites
+2. Selecciona la herramienta "Sprite" en la barra lateral
+3. Haz clic en el canvas donde quieres colocar el sprite
+4. En el panel derecho configura:
+   - **Sprite**: cual sprite usar (si tienes varios)
+   - **Frame delay**: milisegundos entre cada frame (100 = rapido, 500 = lento)
+   - **Loop delay**: pausa al terminar un ciclo (0 = sin pausa)
+   - **Movimiento X/Y**: pixeles que se mueve por frame (para sprites que se desplazan)
+
+#### Consejos para Sprites
+
+- **Tamano**: Las imagenes se escalan a 64x64, usa imagenes cuadradas para mejor resultado
+- **Transparencia**: PNG con fondo transparente funciona mejor
+- **Frames**: Mas frames = animacion mas suave pero archivo JSON mas grande
+- **Delay**: 100ms es buena velocidad para animaciones fluidas
+- **Movimiento**: Usa moveX/moveY negativo para mover hacia izquierda/arriba
+
+#### Ejemplo 1: Sprite de Nyan Cat (importar imagenes)
+
+1. Descarga los 6 frames del gato (imagenes PNG)
+2. Abre Editor de Sprites > "+ Nuevo"
+3. "+ Importar" > selecciona las 6 imagenes en orden
+4. Previsualiza con "Play"
+5. Cierra el modal
+6. Herramienta Sprite > clic en canvas
+7. Configura: Frame delay = 100ms, Loop delay = 0
+
+#### Ejemplo 2: Punto que parpadea (editor de pixeles)
+
+1. Editor de Sprites > "+ Nuevo"
+2. "+ Dibujar" > Tamaño: 8x8 > Aplicar
+3. Selecciona color blanco, dibuja un punto en el centro
+4. "Agregar como Frame"
+5. "Limpiar" (canvas vacio = transparente)
+6. "Agregar como Frame"
+7. Cierra el modal
+8. Herramienta Sprite > clic en canvas
+9. Configura: Frame delay = 500ms (parpadeo lento)
+
+#### Ejemplo 3: Punto que se mueve
+
+1. Editor de Sprites > "+ Nuevo"
+2. "+ Dibujar" > Tamaño: 8x8
+3. Dibuja un punto en posicion (0,4)
+4. "Agregar como Frame"
+5. "Limpiar", dibuja punto en (2,4)
+6. "Agregar como Frame"
+7. "Limpiar", dibuja punto en (4,4)
+8. "Agregar como Frame"
+9. Configura: Frame delay = 100ms
+
+**Alternativa sin multiples frames:**
+- Un solo frame con el punto
+- Usa moveX=1 para movimiento automatico continuo
+
 ### Generador de Thumbnails
 
 Hay dos formas de generar thumbnails:

@@ -14,6 +14,16 @@ class ClockfaceEditor {
             previewInterval: null,
             currentPreviewFrame: 0
         };
+        this.pixelEditorState = {
+            canvas: null,
+            ctx: null,
+            size: 16,
+            pixels: [],
+            currentColor: '#ffffff',
+            currentTool: 'draw',
+            showGrid: true,
+            isDrawing: false
+        };
 
         this.init();
     }
@@ -567,7 +577,15 @@ class ClockfaceEditor {
         this.generatedThumbs = [];
 
         document.getElementById('btn-thumbnail').addEventListener('click', () => {
-            this.generateThumbnail();
+            this.openThumbModal();
+        });
+
+        document.getElementById('btn-download-thumb').addEventListener('click', () => {
+            this.downloadThumbnail();
+        });
+
+        document.getElementById('btn-save-thumb-folder').addEventListener('click', () => {
+            this.saveThumbnailToFolder();
         });
 
         document.getElementById('btn-batch-thumbs').addEventListener('click', () => {
@@ -593,19 +611,84 @@ class ClockfaceEditor {
         });
     }
 
-    generateThumbnail() {
+    openThumbModal() {
+        const preview = document.getElementById('thumb-preview');
+        const ctx = preview.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(this.canvas, 0, 0);
+        document.getElementById('thumb-filename').textContent = `${this.clockface.name}.png`;
+        document.getElementById('thumb-modal').classList.add('active');
+    }
+
+    downloadThumbnail() {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = 64;
         tempCanvas.height = 64;
         const tempCtx = tempCanvas.getContext('2d');
         tempCtx.imageSmoothingEnabled = false;
-
         tempCtx.drawImage(this.canvas, 0, 0);
 
         const link = document.createElement('a');
         link.download = `${this.clockface.name}.png`;
         link.href = tempCanvas.toDataURL('image/png');
         link.click();
+    }
+
+    async saveThumbnailToFolder() {
+        if (!('showDirectoryPicker' in window)) {
+            alert('Tu navegador no soporta guardar en carpeta. Usa Chrome o Edge.');
+            return;
+        }
+
+        try {
+            const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            const fileHandle = await dirHandle.getFileHandle(`${this.clockface.name}.png`, { create: true });
+            const writable = await fileHandle.createWritable();
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 64;
+            tempCanvas.height = 64;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.imageSmoothingEnabled = false;
+            tempCtx.drawImage(this.canvas, 0, 0);
+
+            const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/png'));
+            await writable.write(blob);
+            await writable.close();
+
+            alert(`Thumbnail guardado: ${this.clockface.name}.png`);
+            document.getElementById('thumb-modal').classList.remove('active');
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                console.error('Error saving thumbnail:', e);
+                alert('Error al guardar: ' + e.message);
+            }
+        }
+    }
+
+    async saveJsonToFolder() {
+        if (!('showDirectoryPicker' in window)) {
+            alert('Tu navegador no soporta guardar en carpeta. Usa Chrome o Edge.');
+            return;
+        }
+
+        try {
+            const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            const fileHandle = await dirHandle.getFileHandle(`${this.clockface.name}.json`, { create: true });
+            const writable = await fileHandle.createWritable();
+
+            const json = document.getElementById('export-json').value;
+            await writable.write(json);
+            await writable.close();
+
+            alert(`JSON guardado: ${this.clockface.name}.json`);
+            document.getElementById('export-modal').classList.remove('active');
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                console.error('Error saving JSON:', e);
+                alert('Error al guardar: ' + e.message);
+            }
+        }
     }
 
     openBatchThumbsModal() {
@@ -767,6 +850,10 @@ class ClockfaceEditor {
             this.openSpriteModal();
         });
 
+        document.getElementById('btn-open-sprites').addEventListener('click', () => {
+            this.openSpriteModal();
+        });
+
         document.getElementById('btn-add-sprite').addEventListener('click', () => {
             this.clockface.addSprite([]);
             this.updateSpriteList();
@@ -805,6 +892,283 @@ class ClockfaceEditor {
                 }
             }
         });
+
+        this.initPixelEditor();
+    }
+
+    initPixelEditor() {
+        const pe = this.pixelEditorState;
+        pe.canvas = document.getElementById('pixel-editor-canvas');
+        pe.ctx = pe.canvas.getContext('2d');
+
+        const defaultColors = [
+            '#000000', '#ffffff', '#ff0000', '#00ff00',
+            '#0000ff', '#ffff00', '#ff00ff', '#00ffff',
+            '#ff8000', '#8000ff', '#0080ff', '#ff0080',
+            '#808080', '#c0c0c0', '#800000', '#008000'
+        ];
+
+        const presetsContainer = document.getElementById('color-presets');
+        defaultColors.forEach(color => {
+            const btn = document.createElement('div');
+            btn.className = 'color-preset';
+            btn.style.background = color;
+            btn.dataset.color = color;
+            btn.addEventListener('click', () => this.setPixelColor(color));
+            presetsContainer.appendChild(btn);
+        });
+
+        this.setPixelColor('#ffffff');
+        this.resetPixelCanvas();
+
+        document.getElementById('btn-pixel-editor').addEventListener('click', () => {
+            document.getElementById('pixel-editor-section').style.display = 'block';
+            this.resetPixelCanvas();
+        });
+
+        document.getElementById('btn-pixel-cancel').addEventListener('click', () => {
+            document.getElementById('pixel-editor-section').style.display = 'none';
+        });
+
+        document.getElementById('btn-pixel-resize').addEventListener('click', () => {
+            const size = parseInt(document.getElementById('pixel-canvas-size').value) || 16;
+            pe.size = Math.max(4, Math.min(64, size));
+            document.getElementById('pixel-canvas-size').value = pe.size;
+            this.resetPixelCanvas();
+        });
+
+        document.getElementById('btn-pixel-clear').addEventListener('click', () => {
+            this.resetPixelCanvas();
+        });
+
+        document.getElementById('btn-pixel-grid').addEventListener('click', (e) => {
+            pe.showGrid = !pe.showGrid;
+            e.target.classList.toggle('active', pe.showGrid);
+            this.renderPixelCanvas();
+        });
+        document.getElementById('btn-pixel-grid').classList.add('active');
+
+        document.querySelectorAll('.pixel-tool').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.pixel-tool').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                pe.currentTool = btn.dataset.tool;
+            });
+        });
+
+        document.getElementById('pixel-color-picker').addEventListener('input', (e) => {
+            this.setPixelColor(e.target.value);
+        });
+
+        pe.canvas.addEventListener('mousedown', (e) => this.onPixelMouseDown(e));
+        pe.canvas.addEventListener('mousemove', (e) => this.onPixelMouseMove(e));
+        pe.canvas.addEventListener('mouseup', () => pe.isDrawing = false);
+        pe.canvas.addEventListener('mouseleave', () => pe.isDrawing = false);
+
+        document.getElementById('btn-pixel-add-frame').addEventListener('click', () => {
+            this.addPixelFrameToSprite();
+        });
+
+        document.getElementById('btn-pixel-copy-frame').addEventListener('click', () => {
+            this.copyCurrentFrameToPixelEditor();
+        });
+    }
+
+    setPixelColor(color) {
+        this.pixelEditorState.currentColor = color;
+        document.getElementById('pixel-current-color').style.background = color;
+        document.getElementById('pixel-color-picker').value = color;
+        document.querySelectorAll('.color-preset').forEach(p => {
+            p.classList.toggle('selected', p.dataset.color === color);
+        });
+    }
+
+    resetPixelCanvas() {
+        const pe = this.pixelEditorState;
+        pe.pixels = [];
+        for (let y = 0; y < pe.size; y++) {
+            pe.pixels[y] = [];
+            for (let x = 0; x < pe.size; x++) {
+                pe.pixels[y][x] = null;
+            }
+        }
+        this.renderPixelCanvas();
+    }
+
+    renderPixelCanvas() {
+        const pe = this.pixelEditorState;
+        const cellSize = Math.floor(256 / pe.size);
+        const canvasSize = cellSize * pe.size;
+        pe.canvas.width = canvasSize;
+        pe.canvas.height = canvasSize;
+
+        pe.ctx.fillStyle = '#1a1a1a';
+        pe.ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+        for (let y = 0; y < pe.size; y++) {
+            for (let x = 0; x < pe.size; x++) {
+                if (pe.pixels[y][x]) {
+                    pe.ctx.fillStyle = pe.pixels[y][x];
+                    pe.ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
+        }
+
+        if (pe.showGrid) {
+            pe.ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            pe.ctx.lineWidth = 1;
+            for (let i = 0; i <= pe.size; i++) {
+                pe.ctx.beginPath();
+                pe.ctx.moveTo(i * cellSize, 0);
+                pe.ctx.lineTo(i * cellSize, canvasSize);
+                pe.ctx.stroke();
+                pe.ctx.beginPath();
+                pe.ctx.moveTo(0, i * cellSize);
+                pe.ctx.lineTo(canvasSize, i * cellSize);
+                pe.ctx.stroke();
+            }
+        }
+    }
+
+    getPixelCoords(e) {
+        const pe = this.pixelEditorState;
+        const rect = pe.canvas.getBoundingClientRect();
+        const cellSize = pe.canvas.width / pe.size;
+        const x = Math.floor((e.clientX - rect.left) / cellSize);
+        const y = Math.floor((e.clientY - rect.top) / cellSize);
+        return { x: Math.max(0, Math.min(pe.size - 1, x)), y: Math.max(0, Math.min(pe.size - 1, y)) };
+    }
+
+    onPixelMouseDown(e) {
+        const pe = this.pixelEditorState;
+        pe.isDrawing = true;
+        const { x, y } = this.getPixelCoords(e);
+
+        if (pe.currentTool === 'pick') {
+            if (pe.pixels[y][x]) {
+                this.setPixelColor(pe.pixels[y][x]);
+            }
+        } else if (pe.currentTool === 'fill') {
+            this.floodFill(x, y, pe.pixels[y][x], pe.currentColor);
+            this.renderPixelCanvas();
+        } else {
+            this.applyPixelTool(x, y);
+        }
+    }
+
+    onPixelMouseMove(e) {
+        const pe = this.pixelEditorState;
+        if (!pe.isDrawing) return;
+        if (pe.currentTool === 'draw' || pe.currentTool === 'erase') {
+            const { x, y } = this.getPixelCoords(e);
+            this.applyPixelTool(x, y);
+        }
+    }
+
+    applyPixelTool(x, y) {
+        const pe = this.pixelEditorState;
+        if (pe.currentTool === 'draw') {
+            pe.pixels[y][x] = pe.currentColor;
+        } else if (pe.currentTool === 'erase') {
+            pe.pixels[y][x] = null;
+        }
+        this.renderPixelCanvas();
+    }
+
+    floodFill(x, y, targetColor, fillColor) {
+        const pe = this.pixelEditorState;
+        if (targetColor === fillColor) return;
+        if (x < 0 || x >= pe.size || y < 0 || y >= pe.size) return;
+        if (pe.pixels[y][x] !== targetColor) return;
+
+        const stack = [[x, y]];
+        while (stack.length > 0) {
+            const [cx, cy] = stack.pop();
+            if (cx < 0 || cx >= pe.size || cy < 0 || cy >= pe.size) continue;
+            if (pe.pixels[cy][cx] !== targetColor) continue;
+            pe.pixels[cy][cx] = fillColor;
+            stack.push([cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]);
+        }
+    }
+
+    addPixelFrameToSprite() {
+        const pe = this.pixelEditorState;
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+        if (spriteIndex < 0) return;
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = pe.size;
+        tempCanvas.height = pe.size;
+        const ctx = tempCanvas.getContext('2d');
+
+        for (let y = 0; y < pe.size; y++) {
+            for (let x = 0; x < pe.size; x++) {
+                if (pe.pixels[y][x]) {
+                    ctx.fillStyle = pe.pixels[y][x];
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
+
+        const base64 = tempCanvas.toDataURL('image/png');
+        this.clockface.addFrameToSprite(spriteIndex, base64);
+        this.updateFramesList();
+        this.updateSpriteList();
+        this.loadSpriteFrames();
+
+        document.getElementById('pixel-editor-section').style.display = 'none';
+    }
+
+    async copyCurrentFrameToPixelEditor() {
+        const pe = this.pixelEditorState;
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+        if (spriteIndex < 0) return;
+
+        const sprite = this.clockface.sprites[spriteIndex];
+        if (!sprite || !sprite.frames || sprite.frames.length === 0) {
+            alert('No hay frames para copiar');
+            return;
+        }
+
+        const frameIndex = prompt(`Numero de frame a copiar (0-${sprite.frames.length - 1}):`, '0');
+        if (frameIndex === null) return;
+
+        const idx = parseInt(frameIndex);
+        if (isNaN(idx) || idx < 0 || idx >= sprite.frames.length) {
+            alert('Indice invalido');
+            return;
+        }
+
+        const frame = sprite.frames[idx];
+        const img = new Image();
+        img.onload = () => {
+            pe.size = Math.max(img.width, img.height);
+            document.getElementById('pixel-canvas-size').value = pe.size;
+            this.resetPixelCanvas();
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            const ctx = tempCanvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            for (let y = 0; y < img.height && y < pe.size; y++) {
+                for (let x = 0; x < img.width && x < pe.size; x++) {
+                    const i = (y * img.width + x) * 4;
+                    const r = imageData.data[i];
+                    const g = imageData.data[i + 1];
+                    const b = imageData.data[i + 2];
+                    const a = imageData.data[i + 3];
+                    if (a > 128) {
+                        pe.pixels[y][x] = `rgb(${r},${g},${b})`;
+                    }
+                }
+            }
+            this.renderPixelCanvas();
+            document.getElementById('pixel-editor-section').style.display = 'block';
+        };
+        img.src = frame.image;
     }
 
     openSpriteModal() {
@@ -821,7 +1185,10 @@ class ClockfaceEditor {
         const list = document.getElementById('sprite-list');
         list.innerHTML = '';
 
-        if (this.clockface.sprites.length === 0) {
+        const count = this.clockface.sprites.length;
+        document.getElementById('sprite-count').textContent = count === 1 ? '1 sprite' : `${count} sprites`;
+
+        if (count === 0) {
             list.innerHTML = '<div class="empty-sprites">No hay sprites. Crea uno nuevo.</div>';
             return;
         }
@@ -989,7 +1356,11 @@ class ClockfaceEditor {
         const select = document.getElementById('el-sprite-index');
         select.innerHTML = '';
 
-        if (this.clockface.sprites.length === 0) {
+        const count = this.clockface.sprites.length;
+        const countEl = document.getElementById('sprite-count');
+        if (countEl) countEl.textContent = count === 1 ? '1 sprite' : `${count} sprites`;
+
+        if (count === 0) {
             select.innerHTML = '<option value="0">Sin sprites</option>';
             return;
         }
@@ -1072,6 +1443,60 @@ class ClockfaceEditor {
             }
         });
 
+        document.getElementById('import-file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('import-json').value = event.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        document.getElementById('btn-load-from-folder').addEventListener('click', async () => {
+            if (!('showDirectoryPicker' in window)) {
+                alert('Tu navegador no soporta seleccion de carpetas. Usa Chrome o Edge.');
+                return;
+            }
+
+            try {
+                const dirHandle = await window.showDirectoryPicker();
+                const files = [];
+
+                for await (const entry of dirHandle.values()) {
+                    if (entry.kind === 'file' && entry.name.endsWith('.json')) {
+                        files.push({ name: entry.name, handle: entry });
+                    }
+                }
+
+                if (files.length === 0) {
+                    alert('No se encontraron archivos .json en la carpeta.');
+                    return;
+                }
+
+                files.sort((a, b) => a.name.localeCompare(b.name));
+                const fileNames = files.map(f => f.name);
+                const selected = prompt(`Archivos encontrados:\n${fileNames.join('\n')}\n\nEscribe el nombre del archivo a cargar:`);
+
+                if (selected) {
+                    const file = files.find(f => f.name === selected || f.name === selected + '.json');
+                    if (file) {
+                        const fileData = await file.handle.getFile();
+                        const content = await fileData.text();
+                        document.getElementById('import-json').value = content;
+                    } else {
+                        alert('Archivo no encontrado: ' + selected);
+                    }
+                }
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    console.error('Error:', e);
+                    alert('Error: ' + e.message);
+                }
+            }
+        });
+
         document.getElementById('btn-copy-json').addEventListener('click', async () => {
             const json = document.getElementById('export-json').value;
             try {
@@ -1094,6 +1519,10 @@ class ClockfaceEditor {
             a.download = `${this.clockface.name}.json`;
             a.click();
             URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('btn-save-json-folder').addEventListener('click', () => {
+            this.saveJsonToFolder();
         });
 
         this.bindImageTool();
@@ -1316,7 +1745,7 @@ class ClockfaceEditor {
                 break;
             case 'sprite':
                 if (this.clockface.sprites.length === 0) {
-                    alert('Primero crea un sprite en el editor de sprites (boton Editar)');
+                    alert('Primero crea un sprite usando el boton "Sprites" en la barra lateral izquierda');
                     return;
                 }
                 element = new SpriteElement(coords.x, coords.y);

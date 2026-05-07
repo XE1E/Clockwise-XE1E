@@ -85,6 +85,15 @@
                     </div>
                 </div>
                 <div class="tool-group">
+                    <div class="tool-group-title">Sprites</div>
+                    <div class="tool-buttons">
+                        <button class="tool-btn" id="btn-open-sprites" title="Editor de Sprites">
+                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12,3C10.73,3 9.6,3.8 9.18,5H6V3H4V9H6V7H9.18C9.6,8.2 10.73,9 12,9C13.27,9 14.4,8.2 14.82,7H20V5H14.82C14.4,3.8 13.27,3 12,3M12,5A1,1 0 0,1 13,6A1,1 0 0,1 12,7A1,1 0 0,1 11,6A1,1 0 0,1 12,5M6,11V13H9.18C9.6,14.2 10.73,15 12,15C13.27,15 14.4,14.2 14.82,13H20V11H14.82C14.4,9.8 13.27,9 12,9C10.73,9 9.6,9.8 9.18,11H6M12,11A1,1 0 0,1 13,12A1,1 0 0,1 12,13A1,1 0 0,1 11,12A1,1 0 0,1 12,11M6,17V19H9.18C9.6,20.2 10.73,21 12,21C13.27,21 14.4,20.2 14.82,19H20V17H14.82C14.4,15.8 13.27,15 12,15C10.73,15 9.6,15.8 9.18,17H6M12,17A1,1 0 0,1 13,18A1,1 0 0,1 12,19A1,1 0 0,1 11,18A1,1 0 0,1 12,17Z"/></svg>
+                        </button>
+                    </div>
+                    <div id="sprite-count" style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">0 sprites</div>
+                </div>
+                <div class="tool-group">
                     <div class="tool-group-title">Pantalla</div>
                     <div class="display-controls">
                         <div class="zoom-row">
@@ -390,7 +399,14 @@
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <textarea id="import-json" placeholder="Pega aqui el JSON del clockface..."></textarea>
+                <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <label class="btn btn-primary" style="margin: 0;">
+                        <input type="file" id="import-file-input" accept=".json" hidden>
+                        Seleccionar archivo...
+                    </label>
+                    <button class="btn btn-secondary" id="btn-load-from-folder">Cargar de carpeta...</button>
+                </div>
+                <textarea id="import-json" placeholder="O pega aqui el JSON del clockface..."></textarea>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary modal-close">Cancelar</button>
@@ -413,6 +429,7 @@
                 <button class="btn btn-secondary modal-close">Cerrar</button>
                 <button class="btn btn-primary" id="btn-copy-json">Copiar</button>
                 <button class="btn btn-primary" id="btn-download-json">Descargar</button>
+                <button class="btn btn-success" id="btn-save-json-folder">Guardar en carpeta...</button>
             </div>
         </div>
     </div>
@@ -534,6 +551,25 @@
         </div>
     </div>
 
+    <!-- Single Thumbnail Modal -->
+    <div id="thumb-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Guardar Thumbnail</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <canvas id="thumb-preview" width="64" height="64" style="border: 1px solid var(--border-color); image-rendering: pixelated; width: 128px; height: 128px;"></canvas>
+                <p style="margin-top: 10px; color: var(--text-secondary);" id="thumb-filename">clockface.png</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cerrar</button>
+                <button class="btn btn-primary" id="btn-download-thumb">Descargar</button>
+                <button class="btn btn-success" id="btn-save-thumb-folder">Guardar en carpeta...</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Sprite Editor Modal -->
     <div id="sprite-modal" class="modal">
         <div class="modal-content modal-large">
@@ -556,14 +592,60 @@
                     <div class="frames-section" id="frames-section" style="display:none;">
                         <div class="frames-header">
                             <h4>Frames del Sprite <span id="current-sprite-index">0</span></h4>
-                            <label class="btn btn-small btn-primary">
-                                <input type="file" id="add-frame-file" accept="image/*" multiple hidden>
-                                + Agregar Frames
-                            </label>
+                            <div style="display: flex; gap: 5px;">
+                                <label class="btn btn-small btn-primary">
+                                    <input type="file" id="add-frame-file" accept="image/*" multiple hidden>
+                                    + Importar
+                                </label>
+                                <button class="btn btn-small btn-secondary" id="btn-pixel-editor">+ Dibujar</button>
+                            </div>
                         </div>
                         <div id="frames-list" class="frames-list">
                             <!-- Dynamic frames -->
                         </div>
+
+                        <!-- Pixel Editor -->
+                        <div id="pixel-editor-section" class="pixel-editor-section" style="display:none;">
+                            <h4>Editor de Pixeles</h4>
+                            <div class="pixel-editor-container">
+                                <div class="pixel-tools">
+                                    <div class="pixel-tool-group">
+                                        <label>Tamaño:</label>
+                                        <input type="number" id="pixel-canvas-size" value="16" min="4" max="64" style="width:50px;">
+                                        <button class="btn btn-small" id="btn-pixel-resize">Aplicar</button>
+                                    </div>
+                                    <div class="pixel-tool-group">
+                                        <label>Herramienta:</label>
+                                        <button class="btn btn-small pixel-tool active" data-tool="draw" title="Dibujar">✏️</button>
+                                        <button class="btn btn-small pixel-tool" data-tool="erase" title="Borrar">🧹</button>
+                                        <button class="btn btn-small pixel-tool" data-tool="fill" title="Rellenar">🪣</button>
+                                        <button class="btn btn-small pixel-tool" data-tool="pick" title="Tomar color">💉</button>
+                                    </div>
+                                    <div class="pixel-tool-group">
+                                        <button class="btn btn-small" id="btn-pixel-clear">Limpiar</button>
+                                        <button class="btn btn-small" id="btn-pixel-grid">Grid</button>
+                                    </div>
+                                </div>
+                                <div class="pixel-canvas-wrapper">
+                                    <canvas id="pixel-editor-canvas" width="256" height="256"></canvas>
+                                </div>
+                                <div class="pixel-palette">
+                                    <div class="current-color-display">
+                                        <div id="pixel-current-color" style="width:30px;height:30px;border:2px solid #fff;border-radius:4px;"></div>
+                                        <input type="color" id="pixel-color-picker" value="#ffffff" style="width:30px;height:30px;">
+                                    </div>
+                                    <div class="color-presets" id="color-presets">
+                                        <!-- Colors added by JS -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pixel-editor-actions">
+                                <button class="btn btn-small btn-secondary" id="btn-pixel-cancel">Cancelar</button>
+                                <button class="btn btn-small btn-primary" id="btn-pixel-add-frame">Agregar como Frame</button>
+                                <button class="btn btn-small btn-success" id="btn-pixel-copy-frame">Copiar Frame Actual</button>
+                            </div>
+                        </div>
+
                         <div class="sprite-preview">
                             <h4>Preview</h4>
                             <canvas id="sprite-preview-canvas" width="128" height="128"></canvas>

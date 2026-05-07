@@ -459,7 +459,7 @@ class Clockface {
             bgColor: this.bgColor,
             delay: this.delay,
             setup: setup,
-            sprites: this.sprites,
+            sprites: this.sprites.map(s => s.frames || s),
             loop: loop
         };
     }
@@ -471,7 +471,17 @@ class Clockface {
         cf.author = json.author || '';
         cf.bgColor = json.bgColor || 0;
         cf.delay = json.delay || 250;
-        cf.sprites = json.sprites || [];
+
+        if (json.sprites && Array.isArray(json.sprites)) {
+            cf.sprites = json.sprites.map(sprite => {
+                if (Array.isArray(sprite)) {
+                    return { frames: sprite };
+                }
+                return sprite.frames ? sprite : { frames: [] };
+            });
+        } else {
+            cf.sprites = [];
+        }
 
         if (json.setup) {
             for (const data of json.setup) {
