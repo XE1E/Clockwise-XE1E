@@ -289,21 +289,48 @@ El modo nocturno cambia automaticamente a una caratula especial con brillo reduc
 
 Cambia automaticamente entre diferentes caratulas segun un intervalo de tiempo.
 
+### Como Funciona Internamente
+
+El reloj usa un clockface especial llamado **Canvas** (cw-cf-0x07) que puede mostrar cualquier caratula definida en JSON:
+
+1. El firmware tiene compilado el clockface Canvas
+2. Canvas descarga el archivo JSON de la caratula desde el servidor configurado
+3. La rotacion simplemente cambia **cual JSON se descarga** cada cierto tiempo
+4. El JSON actual se mantiene en memoria RAM
+
+```
+[Reloj] ──descarga──> [Servidor]/nyan-cat.json
+                              │
+        (60 min despues)      │
+                              ▼
+[Reloj] ──descarga──> [Servidor]/pac-man.json
+```
+
+### ¿Que pasa si se pierde el internet?
+
+- La caratula actual **sigue funcionando** (esta en RAM)
+- El reloj no puede descargar nuevas caratulas hasta que vuelva internet
+- Si el reloj se **reinicia** sin internet, no podra cargar ninguna caratula JSON
+- **Solucion futura:** Cache en flash para guardar la ultima caratula usada
+
 ### Activar Rotacion
-1. Marca la casilla "Activar" en la tarjeta "Rotacion de Caratulas"
-2. Guarda la configuracion
+1. Marca la casilla "Activar rotacion automatica"
+2. Configura el intervalo de tiempo
+3. Selecciona las caratulas que quieres incluir
+4. Guarda la configuracion
 
 ### Intervalo de Rotacion
 - Tiempo en **minutos** entre cada cambio de caratula
+- El campo muestra la equivalencia en horas automaticamente
 - **Ejemplos:**
-  - 60 = cada hora
-  - 1440 = cada 24 horas (1 dia)
-  - 10080 = cada semana
+  - 60 min = 1 hora
+  - 120 min = 2 horas
+  - 1440 min = 24 horas (1 dia)
 
 ### Seleccionar Caratulas
 1. Marca las casillas de las caratulas que quieres incluir en la rotacion
 2. El reloj rotara solo entre las caratulas seleccionadas
-3. Guarda la configuracion
+3. Necesitas al menos 2 caratulas para que la rotacion funcione
 
 ### Caratulas Disponibles
 | ID | Nombre |

@@ -876,9 +876,17 @@
                     </div>
                     <div class="card-body">
                         <p class="card-description">Selecciona multiples caratulas para mostrar una diferente cada dia. Haz clic para seleccionar/deseleccionar.</p>
-                        <div class="form-checkbox" style="margin-bottom: 15px;">
-                            <input type="checkbox" id="enable-rotation" onchange="toggleClockfaceRotation()">
-                            <label for="enable-rotation">Activar rotacion automatica</label>
+                        <div class="form-checkbox" style="margin-bottom: 15px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                            <div>
+                                <input type="checkbox" id="enable-rotation" onchange="toggleClockfaceRotation()">
+                                <label for="enable-rotation">Activar rotacion automatica</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label for="rotation-interval">Intervalo:</label>
+                                <input type="number" id="rotation-interval" min="1" max="1440" value="60" style="width: 70px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);" oninput="updateIntervalHint()">
+                                <span>min</span>
+                                <span id="interval-hint" style="color: var(--text-secondary); font-size: 12px;">(1 hora)</span>
+                            </div>
                         </div>
                         <h4 style="margin-bottom:10px; color:var(--text-secondary);">Built-in (compiladas)</h4>
                         <div class="clockface-grid" id="clockface-grid-builtin">
@@ -1329,6 +1337,22 @@
             const enabled = document.getElementById('enable-rotation').checked;
             grid.style.opacity = enabled ? '1' : '0.5';
             grid.style.pointerEvents = enabled ? 'auto' : 'none';
+        }
+
+        function updateIntervalHint() {
+            const mins = parseInt(document.getElementById('rotation-interval').value) || 0;
+            const hint = document.getElementById('interval-hint');
+            if (mins < 60) {
+                hint.textContent = '';
+            } else if (mins < 120) {
+                hint.textContent = '(1 hora)';
+            } else if (mins % 60 === 0) {
+                hint.textContent = `(${mins / 60} horas)`;
+            } else {
+                const h = Math.floor(mins / 60);
+                const m = mins % 60;
+                hint.textContent = `(${h}h ${m}m)`;
+            }
         }
 
         // Night mode

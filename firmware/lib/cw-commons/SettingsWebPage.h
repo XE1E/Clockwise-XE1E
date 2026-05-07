@@ -296,19 +296,11 @@ const char SETTINGS_PAGE[] PROGMEM = R""""(
         },
         {
           title: "Rotacion de Caratulas",
-          description: "Cambia automaticamente entre las caratulas seleccionadas.",
-          formInput: "<input class='w3-check' type='checkbox' id='rotEnabled' " + (settings.rotenabled == '1' ? "checked" : "") + "><label for='rotEnabled'> Activar</label>",
+          description: "Cambia automaticamente entre las caratulas seleccionadas cada X minutos (1-1440).",
+          formInput: "<input class='w3-check' type='checkbox' id='rotEnabled' " + (settings.rotenabled == '1' ? "checked" : "") + "><label for='rotEnabled'> Activar</label> <span style='margin-left:20px;'>Intervalo: <input id='rotInterval' class='w3-input w3-light-grey' style='width:80px;display:inline-block;' type='number' min='1' max='1440' value='" + (settings.rotinterval || 60) + "'> min</span>",
           icon: "fa-refresh",
-          save: "updatePreference('rotEnabled', Number(rotEnabled.checked))",
+          save: "updatePreference('rotEnabled', Number(rotEnabled.checked)); updatePreference('rotInterval', rotInterval.value)",
           property: "rotEnabled"
-        },
-        {
-          title: "Intervalo de Rotacion",
-          description: "Tiempo en minutos entre cada cambio de caratula.",
-          formInput: "<input id='rotInterval' class='w3-input w3-light-grey' type='number' min='1' max='10080' value='" + (settings.rotinterval || 1440) + "'>",
-          icon: "fa-hourglass-half",
-          save: "updatePreference('rotInterval', rotInterval.value)",
-          property: "rotInterval"
         },
         {
           title: "Caratulas en Rotacion",

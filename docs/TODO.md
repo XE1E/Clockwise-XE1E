@@ -19,6 +19,8 @@
 ### Firmware
 - [ ] Compilar firmware universal
 - [ ] Probar instalador web (`clockface-editor/install.html`)
+- [ ] Diseñar caratula simple de respaldo para cuando no hay internet (offline fallback)
+- [ ] Implementar cache de caratula en flash (SPIFFS/LittleFS) para no perderla al reiniciar
 
 ### GitHub Pages
 - [ ] Activar GitHub Pages cuando el repo sea publico
