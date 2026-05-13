@@ -124,11 +124,15 @@ const char SETTINGS_PAGE[] PROGMEM = R""""(
       {id: 'christmassnoopy', name: 'Snoopy Navidad'},
       {id: 'clock-club', name: 'Clock Club'},
       {id: 'donkey-kong', name: 'Donkey Kong'},
+      {id: 'mario-clock', name: 'Mario Bros'},
       {id: 'eletrogate', name: 'Eletrogate'},
       {id: 'pepsi-final-2', name: 'Pepsi'},
       {id: 'retro-computer', name: 'Retro Computer'},
       {id: 'star-wars', name: 'Star Wars'},
-      {id: 'night-clock', name: 'Reloj Nocturno'}
+      {id: 'Star Wars v2', name: 'Star Wars v2'},
+      {id: 'night-clock', name: 'Reloj Nocturno'},
+      {id: 'night-clock v2', name: 'Reloj Nocturno v2'},
+      {id: 'night-clock-xe1e', name: 'Reloj Nocturno XE1E'}
     ];
 
     function buildClockfaceCheckboxes(selectedList) {
@@ -344,7 +348,7 @@ const char SETTINGS_PAGE[] PROGMEM = R""""(
           document.getElementById('status').style.display = 'block';
         }
       };
-      xhr.open('POST', '/set?' + key + '=' + value);
+      xhr.open('POST', '/set?' + key + '=' + encodeURIComponent(value));
       xhr.send();
 
       setTimeout(() => {

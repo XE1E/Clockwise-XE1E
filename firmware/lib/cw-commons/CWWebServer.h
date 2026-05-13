@@ -11,6 +11,22 @@
 
 WiFiServer server(80);
 
+String urlDecode(const String& input) {
+  String decoded = "";
+  for (size_t i = 0; i < input.length(); i++) {
+    if (input[i] == '%' && i + 2 < input.length()) {
+      char hex[3] = { input[i+1], input[i+2], 0 };
+      decoded += (char)strtol(hex, nullptr, 16);
+      i += 2;
+    } else if (input[i] == '+') {
+      decoded += ' ';
+    } else {
+      decoded += input[i];
+    }
+  }
+  return decoded;
+}
+
 struct ClockwiseWebServer
 {
   String httpBuffer;
@@ -66,7 +82,7 @@ struct ClockwiseWebServer
             if (path.indexOf('?') > 0)
             {
               key = path.substring(path.indexOf('?') + 1, path.indexOf('='));
-              value = path.substring(path.indexOf('=') + 1);
+              value = urlDecode(path.substring(path.indexOf('=') + 1));
               path = path.substring(0, path.indexOf('?'));
             }
 
