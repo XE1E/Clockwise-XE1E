@@ -1,0 +1,31 @@
+{
+  "name": "night-clock-xe1e",
+  "version": 1,
+  "author": "xe1e",
+  "bgColor": 0,
+  "delay": 1000,
+  "setup": [],
+  "sprites": [],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 2,
+      "y": 30,
+      "content": "H",
+      "font": "nightdigits",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "hours"
+    },
+    {
+      "type": "datetime",
+      "x": 22,
+      "y": 62,
+      "content": "i",
+      "font": "nightdigits",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "minutes"
+    }
+  ]
+}
