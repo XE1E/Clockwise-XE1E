@@ -1,0 +1,93 @@
+{
+  "name": "night-clock v2",
+  "version": 2,
+  "author": "xe1e",
+  "bgColor": 0,
+  "delay": 1000,
+  "setup": [],
+  "sprites": [
+    []
+  ],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 30,
+      "y": 62,
+      "content": "|  i",
+      "font": "big",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "e85rm3"
+    },
+    {
+      "type": "datetime",
+      "x": 2,
+      "y": 62,
+      "content": "H",
+      "font": "big",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "gdwb2f"
+    },
+    {
+      "type": "datetime",
+      "x": 2,
+      "y": 30,
+      "content": "H",
+      "font": "big",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "zkkdft"
+    },
+    {
+      "type": "datetime",
+      "x": 2,
+      "y": 46,
+      "content": "H",
+      "font": "big",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "kc3zhf"
+    },
+    {
+      "type": "datetime",
+      "x": 28,
+      "y": 30,
+      "content": "- i",
+      "font": "big",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "6xi8ey"
+    },
+    {
+      "type": "datetime",
+      "x": 26,
+      "y": 46,
+      "content": "/ i",
+      "font": "big",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "xa6td8"
+    },
+    {
+      "type": "datetime",
+      "x": 2,
+      "y": 14,
+      "content": "H",
+      "font": "big",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "z2ehk3"
+    },
+    {
+      "type": "datetime",
+      "x": 30,
+      "y": 14,
+      "content": ":  i",
+      "font": "big",
+      "fgColor": 2016,
+      "bgColor": 0,
+      "id": "mnlb9r"
+    }
+  ]
+}

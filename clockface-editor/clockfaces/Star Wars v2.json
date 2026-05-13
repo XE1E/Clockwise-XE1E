@@ -1,0 +1,67 @@
+{
+  "name": "Star Wars v2",
+  "version": 1,
+  "author": "xe1e",
+  "bgColor": 0,
+  "delay": 500,
+  "setup": [
+    {
+      "type": "datetime",
+      "x": 12,
+      "y": 47,
+      "content": "H:i:s",
+      "font": "medium",
+      "fgColor": 65282,
+      "bgColor": 0,
+      "id": "4siupy"
+    },
+    {
+      "type": "line",
+      "x": 6,
+      "y": 35,
+      "x1": 56,
+      "y1": 35,
+      "color": 29582,
+      "id": "6t47x1"
+    },
+    {
+      "type": "line",
+      "x": 6,
+      "y": 50,
+      "x1": 56,
+      "y1": 50,
+      "color": 29582,
+      "id": "enfj0x"
+    }
+  ],
+  "sprites": [
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAADwAAAAaCAIAAABka6gOAAAB7UlEQVRYw7VYUW7DMAgl1NL+sxPs/oequgPsP5Ni78OJg2x4kDSzosZxKGDAj9dOpZTpMZE2ludMV8fH14+lob4iIspE7Fs55InKWr1l/Vpe8/Kat0cyxazv9hpUtUI45MZ+8bGj3Mf42CK/FW+8ciFj6ZiyqR1nOVJFy3OOuCtVmfK5Op39WHYqOkdHA3gnYA8ttKbMVh7sb/p4zGQFAKRCasAhr+5iMVYNq5W0PXJIU2ho+2yXcrpyM5V1w53fAMJwlupcfh7rHNIz4kFaXnP8IMeRu1lSs9xUlbX8fn9atV7FRqPpAgzdOKbHNBZh5/cY/uTUHJ9pkEOHc7FSBXIXH6HT3Nt2csJKeCysBMXWXlnmUvx4Yag+BdLuilXNW1F1B1FFifji2e1Z4XTiKOlIYyfd4khrgpSolIIpUa+BTJIkv8Jjr3LTJw8KpkQW6TXTxeS2Q7OPYdCJ1nE2u7Ss1zFSrsV0ioVJ7f9IifziHpi4WqbjHNc9mLcLCIR/BNhE+caWqVIiyYcw5ylrISKuN4vT6UQvTol2M6HsM+Jq8mSneouToRE3MCXq2EWQEuHenu6idfHhUiKX4SQJT02dGhtQG7dTIq+KNJTAcGFCDZ1AFdz2AHwRUxL/gJiR8ylOFn7fQYn01O1U+Q8sffOJdjixlAAAAABJRU5ErkJggg=="
+      },
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAADwAAAAaCAIAAABka6gOAAAB9ElEQVRYw71XUW7DMAi1XUv7T0+w+x+qSg+w/1Rq2Yc7ygw8SBctslrHIRgeGF4qEdVTLda1XZby7vXx+eVpGI9KKXSneqrhLizPr5TS7LGty7Yuz9viinnvzhpMtUI4ZcbPaNKJCeOXi+1PeOOVNyLWeTYlidSOo5zJou2yZMyVqjx5ulMXibIDs8lQvQH2BPjA0Hoy9VSbxth0mm9lFk0AgFBIDRjyYS4Wa+bGZiaNWy8mYaySfvLQp4vlm3xTbjzZDUoYjtKYy19eD/2cIGf5fruek6bIEOfrhhllVkV3ul3PXq4PMb1pf6MMHXjp5qLt1vB3pPLxK+dDmHWHC2ulWcjD+giNbvPeWBfnHIBKqvJQ4Efedj1/vHCp3lWkwxUvm5/obOsSts384l73PDgDHCUdYXYyLWpak6RERIQp0aSB5fErTfeqMHzyoGBKlGQHrJ/PMT48LQxZsiBqV82GPzJV5qtGKtyx72JhUnt42jyYQ0qUSG7FxM001XOc92DOAwhkPwIAUT6wZZqUSPIhzHmGzIswmZzOXMxTIkBltZ6pN5mQDZk+/vJkSNcNTIl0Y89QItzb+1G0Ln+FlChkOJ1ng6PqAqQX/4ESRVlkVQlcLryDr/sfqCq47YHyVVqZP2xN5MIeOTQAJXspkRk6tvMbjCseYLehOjIAAAAASUVORK5CYII="
+      }
+    ]
+  ],
+  "loop": [
+    {
+      "type": "sprite",
+      "x": 2,
+      "y": 6,
+      "sprite": 0,
+      "frameDelay": 100,
+      "id": "vftcy1"
+    },
+    {
+      "type": "datetime",
+      "x": 10,
+      "y": 60,
+      "content": "l j",
+      "font": "medium",
+      "fgColor": 63141,
+      "bgColor": 0,
+      "id": "wck4q5"
+    }
+  ]
+}
