@@ -147,6 +147,13 @@ struct StatusController
 		printCenter("Connecting WiFi", 61);
 	}
 
+	void wifiScanning()
+	{
+		Locator::getDisplay()->fillRect(0, 24, 64, 52, 0);
+		Locator::getDisplay()->drawBitmap(16, 24, CW_STATUS_WIFI, 32, 32, 0x07FF);
+		printCenter("Scanning...", 61);
+	}
+
 	void wifiConnectionFailed(const char *msg)
 	{
 		Locator::getDisplay()->fillRect(0, 24, 64, 52, 0);
@@ -170,6 +177,17 @@ struct StatusController
 		Locator::getDisplay()->setCursor(32 - (w / 2), y);
 		Locator::getDisplay()->setTextColor(0xffff);
 		Locator::getDisplay()->print(buf);
+	}
+
+	void showIPAddress(const char* ip, int rssi)
+	{
+		Locator::getDisplay()->fillRect(0, 24, 64, 40, 0);
+		Locator::getDisplay()->drawBitmap(16, 24, CW_STATUS_WIFI, 32, 32, 0x07E0);
+
+		char rssiStr[16];
+		snprintf(rssiStr, sizeof(rssiStr), "RSSI: %d dBm", rssi);
+		printCenter(rssiStr, 58);
+		printCenter(ip, 63);
 	}
 
 	void blink_led(int d, int times)

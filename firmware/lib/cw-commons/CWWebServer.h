@@ -114,7 +114,7 @@ struct ClockwiseWebServer
       client.println("HTTP/1.0 204 No Content");
       force_restart = true;
     } else if (method == "POST" && path == "/set") {
-      ClockwiseParams::getInstance()->load();
+      // Note: Don't call load() here - it would overwrite pending changes
       //a baby seal has died due this ifs
       if (key == ClockwiseParams::getInstance()->PREF_DISPLAY_BRIGHT) {
         ClockwiseParams::getInstance()->displayBright = value.toInt();
@@ -122,6 +122,14 @@ struct ClockwiseWebServer
         ClockwiseParams::getInstance()->wifiSsid = value;
       } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_PASSWORD) {
         ClockwiseParams::getInstance()->wifiPwd = value;
+      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_SSID_2) {
+        ClockwiseParams::getInstance()->wifiSsid2 = value;
+      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_PASSWORD_2) {
+        ClockwiseParams::getInstance()->wifiPwd2 = value;
+      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_SSID_3) {
+        ClockwiseParams::getInstance()->wifiSsid3 = value;
+      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_PASSWORD_3) {
+        ClockwiseParams::getInstance()->wifiPwd3 = value;
       } else if (key == "autoBright") {   //autoBright=0010,0800
         ClockwiseParams::getInstance()->autoBrightMin = value.substring(0,4).toInt();
         ClockwiseParams::getInstance()->autoBrightMax = value.substring(5,9).toInt();
@@ -172,8 +180,6 @@ struct ClockwiseWebServer
 
 
   void readPin(WiFiClient client, String key, uint16_t pin) {
-    ClockwiseParams::getInstance()->load();
-
     client.println("HTTP/1.0 204 No Content");
     client.printf(HEADER_TEMPLATE_D, key, analogRead(pin));
     
@@ -182,8 +188,7 @@ struct ClockwiseWebServer
 
 
   void getCurrentSettings(WiFiClient client) {
-    ClockwiseParams::getInstance()->load();
-
+    // Values are already in memory, no need to load from flash
     client.println("HTTP/1.0 204 No Content");
 
     client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_DISPLAY_BRIGHT, ClockwiseParams::getInstance()->displayBright);
@@ -195,6 +200,10 @@ struct ClockwiseWebServer
     client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_LDR_PIN, ClockwiseParams::getInstance()->ldrPin);    
     client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_TIME_ZONE, ClockwiseParams::getInstance()->timeZone.c_str());
     client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_WIFI_SSID, ClockwiseParams::getInstance()->wifiSsid.c_str());
+    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_WIFI_SSID_2, ClockwiseParams::getInstance()->wifiSsid2.c_str());
+    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_WIFI_SSID_3, ClockwiseParams::getInstance()->wifiSsid3.c_str());
+    client.printf(HEADER_TEMPLATE_D, "wifiRssi", WiFi.RSSI());
+    client.printf(HEADER_TEMPLATE_S, "wifiConnected", WiFi.SSID().c_str());
     client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_NTP_SERVER, ClockwiseParams::getInstance()->ntpServer.c_str());
     client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_CANVAS_FILE, ClockwiseParams::getInstance()->canvasFile.c_str());
     client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_CANVAS_SERVER, ClockwiseParams::getInstance()->canvasServer.c_str());

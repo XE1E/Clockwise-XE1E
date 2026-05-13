@@ -110,7 +110,7 @@ void checkClockfaceRotation() {
 
     uint8_t nextIndex = (ClockwiseParams::getInstance()->rotationIndex + 1) % count;
     ClockwiseParams::getInstance()->rotationIndex = nextIndex;
-    ClockwiseParams::getInstance()->save();
+    // Note: Not saving to flash here to avoid slowdown - index resets on restart
 
     int currentPos = 0;
     int commaCount = 0;

@@ -1,32 +1,51 @@
-# TODO - Clockwise XE1E
+# TODO - ClockWise-XE1E
 
-## Pendiente
+> Ver [PLAN-DE-TRABAJO.md](PLAN-DE-TRABAJO.md) para el plan completo.
 
-### Activar GitHub Pages
-Cuando el repo esté listo para hacerse público:
+## En Progreso
 
-1. [ ] Terminar diseño de dígitos del reloj nocturno
-2. [ ] Hacer el repositorio público (Settings > Danger Zone > Change visibility)
-3. [ ] Activar GitHub Pages:
-   - Settings > Pages
-   - Source: Deploy from a branch
-   - Branch: main, carpeta: / (root)
-4. [ ] Esperar que se publique (tarda unos minutos)
-5. [ ] Verificar que funcione: `https://xe1e.github.io/Clockwise-XE1E/`
-6. [ ] Actualizar servidor Canvas en configuración del reloj:
-   - Cambiar de: `https://clockwise.page/canvas/`
-   - A: `https://xe1e.github.io/Clockwise-XE1E/clockface-editor/clockfaces/`
-7. [ ] Probar que las carátulas se carguen correctamente
+### Fase 2: Arquitectura FreeRTOS
+- [x] WiFi multi-red (3 redes, mejor señal)
+- [ ] Migrar a ESPAsyncWebServer
+- [ ] Tasks separados (Network / Display)
+
+### Fase 3: Interfaz Web Nueva
+- [ ] Diseño con pestañas (estilo svitrix)
+- [ ] Tema claro/oscuro
+- [ ] Integrar editores de clockface
+
+## Próximo
+
+### Fase 4: Optimizaciones
+- [ ] Cache JSON en sprites
+- [ ] Guardar solo prefs modificadas
+- [ ] Buffer HTTP completo
+
+### Fase 5: Editores
+- [ ] Revisar digit-designer
+- [ ] Integrar en web principal
 
 ## Completado
 
-- [x] Fork de cw-cf-0x02 (Time in Words en español)
-- [x] Fork de cw-cf-0x03 (World Map con zona horaria México)
-- [x] Fork de cw-cf-0x07 (Canvas con reloj nocturno)
-- [x] Modo nocturno con horario, brillo y color configurables
-- [x] Rotación de carátulas con intervalo configurable
-- [x] Paleta de colores para modo nocturno
-- [x] Soporte de idioma español
-- [x] Manual de usuario
-- [x] Manual de configuración técnica
-- [x] README del proyecto
+### 2026-05-13
+- [x] Aplanar submodulos a repo único
+- [x] Fix: quitar load() innecesarios en web server
+- [x] Fix: quitar save() en rotación
+- [x] WiFi: timeout aumentado a 20s
+- [x] WiFi: 3 reintentos de conexión
+- [x] WiFi: mostrar IP y RSSI en pantalla
+- [x] Crear plan de trabajo
+- [x] Renombrar proyecto a ClockWise-XE1E v1.0.0
+- [x] WiFi multi-red: soporte para 3 redes
+- [x] WiFi multi-red: escaneo y conexión a mejor señal
+- [x] WiFi multi-red: fallback automático
+- [x] Actualizar CWPreferences con redes 2 y 3
+- [x] Actualizar CWWebServer con endpoints para redes 2 y 3
+- [x] StatusController: pantalla de escaneo WiFi
+
+### Anteriores
+- [x] Fork de clockfaces (0x01, 0x02, 0x03, 0x07)
+- [x] Modo nocturno con horario configurable
+- [x] Rotación de carátulas
+- [x] Soporte idioma español
+- [x] Manuales de usuario

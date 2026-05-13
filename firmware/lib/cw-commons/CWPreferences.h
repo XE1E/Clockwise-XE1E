@@ -19,8 +19,13 @@ struct ClockwiseParams
     const char* const PREF_DISPLAY_ABC_MAX = "autoBrightMax";
     const char* const PREF_LDR_PIN = "ldrPin";
     const char* const PREF_TIME_ZONE = "timeZone";
-    const char* const PREF_WIFI_SSID = "wifiSsid";
+    // WiFi multi-red (3 redes)
+    const char* const PREF_WIFI_SSID = "wifiSsid";      // Red 1 (legacy/default)
     const char* const PREF_WIFI_PASSWORD = "wifiPwd";
+    const char* const PREF_WIFI_SSID_2 = "wifiSsid2";   // Red 2
+    const char* const PREF_WIFI_PASSWORD_2 = "wifiPwd2";
+    const char* const PREF_WIFI_SSID_3 = "wifiSsid3";   // Red 3
+    const char* const PREF_WIFI_PASSWORD_3 = "wifiPwd3";
     const char* const PREF_NTP_SERVER = "ntpServer";
     const char* const PREF_CANVAS_FILE = "canvasFile";
     const char* const PREF_CANVAS_SERVER = "canvasServer";
@@ -45,8 +50,13 @@ struct ClockwiseParams
     uint16_t autoBrightMax;
     uint8_t ldrPin;
     String timeZone;
-    String wifiSsid;
+    // WiFi multi-red (3 redes)
+    String wifiSsid;    // Red 1
     String wifiPwd;
+    String wifiSsid2;   // Red 2
+    String wifiPwd2;
+    String wifiSsid3;   // Red 3
+    String wifiPwd3;
     String ntpServer;
     String canvasFile;
     String canvasServer;
@@ -85,8 +95,13 @@ struct ClockwiseParams
         preferences.putUInt(PREF_DISPLAY_ABC_MAX, autoBrightMax);
         preferences.putUInt(PREF_LDR_PIN, ldrPin);
         preferences.putString(PREF_TIME_ZONE, timeZone);
+        // WiFi multi-red
         preferences.putString(PREF_WIFI_SSID, wifiSsid);
         preferences.putString(PREF_WIFI_PASSWORD, wifiPwd);
+        preferences.putString(PREF_WIFI_SSID_2, wifiSsid2);
+        preferences.putString(PREF_WIFI_PASSWORD_2, wifiPwd2);
+        preferences.putString(PREF_WIFI_SSID_3, wifiSsid3);
+        preferences.putString(PREF_WIFI_PASSWORD_3, wifiPwd3);
         preferences.putString(PREF_NTP_SERVER, ntpServer);
         preferences.putString(PREF_CANVAS_FILE, canvasFile);
         preferences.putString(PREF_CANVAS_SERVER, canvasServer);
@@ -113,9 +128,14 @@ struct ClockwiseParams
         autoBrightMin = preferences.getUInt(PREF_DISPLAY_ABC_MIN, 0);
         autoBrightMax = preferences.getUInt(PREF_DISPLAY_ABC_MAX, 0);
         ldrPin = preferences.getUInt(PREF_LDR_PIN, 35);
-        timeZone = preferences.getString(PREF_TIME_ZONE, "America/Sao_Paulo");
+        timeZone = preferences.getString(PREF_TIME_ZONE, "America/Mexico_City");
+        // WiFi multi-red
         wifiSsid = preferences.getString(PREF_WIFI_SSID, "");
         wifiPwd = preferences.getString(PREF_WIFI_PASSWORD, "");
+        wifiSsid2 = preferences.getString(PREF_WIFI_SSID_2, "");
+        wifiPwd2 = preferences.getString(PREF_WIFI_PASSWORD_2, "");
+        wifiSsid3 = preferences.getString(PREF_WIFI_SSID_3, "");
+        wifiPwd3 = preferences.getString(PREF_WIFI_PASSWORD_3, "");
         ntpServer = preferences.getString(PREF_NTP_SERVER, "time.google.com");
         canvasFile = preferences.getString(PREF_CANVAS_FILE, "");
         canvasServer = preferences.getString(PREF_CANVAS_SERVER, "raw.githubusercontent.com");
