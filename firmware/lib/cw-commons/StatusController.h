@@ -184,11 +184,8 @@ struct StatusController
 		Locator::getDisplay()->fillRect(0, 20, 64, 44, 0);
 		Locator::getDisplay()->drawBitmap(16, 20, CW_STATUS_WIFI, 32, 32, 0x07E0);
 
-		char rssiStr[20];
-		snprintf(rssiStr, sizeof(rssiStr), "RSSI: %d dBm", rssi);
-		printCenter(rssiStr, 54);
-		printCenter("clockwise-xe1e.local", 59);
-		printCenter(ip, 64);
+		printCenter("clockwise-xe1e.local", 57);
+		printCenter(ip, 63);
 	}
 
 	void blink_led(int d, int times)
