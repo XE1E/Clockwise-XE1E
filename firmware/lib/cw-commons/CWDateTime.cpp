@@ -8,17 +8,32 @@ const char* DAYS_ES_FULL[] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves
 const char* MONTHS_ES_ABBR[] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
 const char* MONTHS_ES_FULL[] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
 
+bool isPosixTimezone(const char* tz) {
+  // POSIX timezones contain letters followed by numbers (e.g., CST6, MST7MDT)
+  // Olson names use format like America/Mexico_City (contain /)
+  if (strchr(tz, '/') != nullptr) return false;  // Olson format
+  for (int i = 0; tz[i]; i++) {
+    if (isdigit(tz[i])) return true;  // Has numbers = POSIX
+  }
+  return false;
+}
+
 void CWDateTime::begin(const char *timeZone, bool use24format, const char *ntpServer = NTP_SERVER, const char *posixTZ = "")
 {
   Serial.printf("[Time] NTP Server: %s, Timezone: %s\n", ntpServer, timeZone);
   ezt::setServer(String(ntpServer));
 
   if (strlen(posixTZ) > 1) {
-    // An empty value still contains a null character so not empty is a value greater than 1.
-    // Set to defined Posix TZ
+    // Manual POSIX override
+    Serial.printf("[Time] Using manual POSIX: %s\n", posixTZ);
     myTZ.setPosix(posixTZ);
+  } else if (isPosixTimezone(timeZone)) {
+    // TimeZone is in POSIX format (e.g., CST6, MST7)
+    Serial.printf("[Time] Using POSIX timezone: %s\n", timeZone);
+    myTZ.setPosix(timeZone);
   } else {
-    // Use automatic eztime remote lookup
+    // Olson timezone name - remote lookup
+    Serial.printf("[Time] Using Olson timezone: %s\n", timeZone);
     myTZ.setLocation(timeZone);
   }
 
