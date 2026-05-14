@@ -15,10 +15,15 @@ Clockface::Clockface(Adafruit_GFX *display)
 void Clockface::setup(CWDateTime *dateTime)
 {
   this->_dateTime = dateTime;
+  Serial.println("[Canvas] setup() called");
+  Serial.flush();
   drawSplashScreen(0xFFE0, "Downloading");
 
   if (deserializeDefinition()) {
+    Serial.println("[Canvas] deserialize OK, calling clockfaceSetup");
     clockfaceSetup();
+  } else {
+    Serial.println("[Canvas] deserialize FAILED");
   }
 }
 
@@ -134,6 +139,9 @@ void Clockface::clockfaceSetup()
 
 void Clockface::createSprites()
 {
+  // Clear existing sprites to prevent memory leak on reload
+  sprites.clear();
+
   JsonArrayConst elements = doc["loop"].as<JsonArrayConst>();
   uint8_t width = 0;
   uint8_t height = 0;
@@ -317,43 +325,49 @@ void Clockface::renderElements(JsonArrayConst elements)
 
 bool Clockface::deserializeDefinition()
 {
-  WiFiClientSecure client;
-
-  //WiFiClient client;
-  //ClockwiseHttpClient::getInstance()->httpGet(&client, "raw.githubusercontent.com", "/jnthas/clock-club/v1/pac-man.json", 443);
-  //ClockwiseHttpClient::getInstance()->httpGet(&client, "192.168.3.19", "/nyan-cat.json", 4443);
-
   if (ClockwiseParams::getInstance()->canvasServer.isEmpty() || ClockwiseParams::getInstance()->canvasFile.isEmpty()) {
     drawSplashScreen(0xC904, "Params werent set");
     return false;
   }
 
-
   String server = ClockwiseParams::getInstance()->canvasServer;
   String file = String("/" + ClockwiseParams::getInstance()->canvasFile + ".json");
-  uint16_t port = 4443;
+  uint16_t port = 443;
+  bool useSSL = true;
 
   if (server.startsWith("raw.")) {
-    port = 443;
     file = String("/jnthas/clock-club/main/shared" + file);
+  } else if (server.indexOf(":") > 0) {
+    int colonPos = server.indexOf(":");
+    port = server.substring(colonPos + 1).toInt();
+    server = server.substring(0, colonPos);
+    useSSL = (port == 443 || port == 4443);
   }
 
-  ClockwiseHttpClient::getInstance()->httpGet(&client, server.c_str(), file.c_str(), port);
-  
-  DeserializationError error = deserializeJson(doc, client);
-  if (error)
-  {
-    drawSplashScreen(0xC904, "Error! Check logs");
+  Serial.printf("[Canvas] Downloading from %s%s:%d (SSL:%d)\n", server.c_str(), file.c_str(), port, useSSL);
 
+  doc.clear();
+  DeserializationError error;
+
+  if (useSSL) {
+    WiFiClientSecure client;
+    ClockwiseHttpClient::getInstance()->httpGet(&client, server.c_str(), file.c_str(), port);
+    error = deserializeJson(doc, client);
+    client.stop();
+  } else {
+    WiFiClient client;
+    ClockwiseHttpClient::getInstance()->httpGetPlain(&client, server.c_str(), file.c_str(), port);
+    error = deserializeJson(doc, client);
+    client.stop();
+  }
+
+  if (error) {
+    drawSplashScreen(0xC904, "Error! Check logs");
     Serial.print("deserializeJson() failed: ");
     Serial.println(error.c_str());
-    client.stop();
     return false;
   }
 
-  //TODO check if json is valid
-
   Serial.printf("[Canvas] Building clockface '%s' by %s, version %d\n", doc["name"].as<const char *>(), doc["author"].as<const char *>(), doc["version"].as<const uint16_t>());
-  client.stop();
   return true;
 }

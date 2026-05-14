@@ -229,22 +229,27 @@ void loop()
   if (wifi.isConnected())
   {
     ClockwiseWebServer::getInstance()->handleRestart();
-    if (ClockwiseWebServer::getInstance()->needs_reload) {
-      ClockwiseWebServer::getInstance()->needs_reload = false;
-      currentClockface = ClockwiseParams::getInstance()->canvasFile;
-      needsClockfaceReload = true;
-    }
     ezt::events();
   }
 
   if (wifi.connectionSucessfulOnce)
   {
-    checkNightMode();
-    checkClockfaceRotation();
-
-    if (needsClockfaceReload) {
-      needsClockfaceReload = false;
+    // Check for web-triggered reload FIRST, skip night/rotation checks
+    if (ClockwiseWebServer::getInstance()->needs_reload) {
+      ClockwiseWebServer::getInstance()->needs_reload = false;
+      currentClockface = ClockwiseParams::getInstance()->canvasFile;
+      Serial.printf("[Web] Reloading clockface: %s\n", currentClockface.c_str());
+      Serial.flush();
       clockface->setup(&cwDateTime);
+      Serial.println("[Web] Reload complete");
+    } else {
+      checkNightMode();
+      checkClockfaceRotation();
+
+      if (needsClockfaceReload) {
+        needsClockfaceReload = false;
+        clockface->setup(&cwDateTime);
+      }
     }
 
     clockface->update();
