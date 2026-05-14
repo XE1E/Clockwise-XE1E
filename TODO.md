@@ -6,18 +6,22 @@
 
 ### Fase 2: Arquitectura FreeRTOS
 - [x] WiFi multi-red (3 redes, mejor señal)
-- [ ] Migrar a ESPAsyncWebServer
+- [x] Migrar a ESPAsyncWebServer
 - [ ] Tasks separados (Network / Display)
 
 ### Fase 3: Interfaz Web Nueva
-- [ ] Diseño con pestañas (estilo svitrix)
+- [x] Diseño con pestañas
 - [ ] Tema claro/oscuro
 - [ ] Integrar editores de clockface
+
+### Pendientes
+- [ ] Convertir clockfaces 0x01-0x06 a JSON
+- [ ] Listar solo clockfaces disponibles en CDN/GitHub
 
 ## Próximo
 
 ### Fase 4: Optimizaciones
-- [ ] Cache JSON en sprites
+- [x] Cache JSON en sprites
 - [ ] Guardar solo prefs modificadas
 - [ ] Buffer HTTP completo
 
@@ -26,6 +30,16 @@
 - [ ] Integrar en web principal
 
 ## Completado
+
+### 2026-05-14
+- [x] Brillo: aplicación inmediata desde web (sin reiniciar)
+- [x] Rotación: inicia con primera caratula de la lista
+- [x] Modo nocturno: color dinámico configurable (fgColor: -1)
+- [x] Modo nocturno: datetime en setup y loop arrays
+- [x] API: añadir nightColor a GET/POST settings
+- [x] CDN XE1E: servidor alternativo para clockfaces (SSL compatible)
+- [x] Selector de fuente: CDN vs GitHub
+- [x] Fallback clock cuando falla descarga
 
 ### 2026-05-13
 - [x] Aplanar submodulos a repo único
