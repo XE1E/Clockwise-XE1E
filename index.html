@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClockWise XE1E</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --bg: #0f1117; --card: #1a1d2e; --text: #e0e0e8; --accent: #f0b800; --dim: #9090a8; --r: 8px; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+    h1 { color: var(--accent); margin-bottom: 8px; }
+    .subtitle { color: var(--dim); margin-bottom: 32px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; max-width: 900px; width: 100%; }
+    .card { background: var(--card); border-radius: var(--r); padding: 20px; text-decoration: none; color: var(--text); transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .card h2 { color: var(--accent); font-size: 16px; margin-bottom: 8px; }
+    .card p { color: var(--dim); font-size: 14px; }
+    .section { margin-top: 32px; width: 100%; max-width: 900px; }
+    .section h3 { color: var(--dim); font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    footer { margin-top: 48px; color: var(--dim); font-size: 13px; }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>ClockWise XE1E</h1>
+  <p class="subtitle">Reloj LED Matrix 64x64 con ESP32</p>
+
+  <div class="cards">
+    <a href="clockface-editor/" class="card">
+      <h2>Editor de Caratulas</h2>
+      <p>Crea y edita caratulas con elementos visuales, sprites y animaciones.</p>
+    </a>
+    <a href="clockface-editor/digit-designer.html" class="card">
+      <h2>Disenador de Digitos</h2>
+      <p>Disena digitos personalizados pixel por pixel.</p>
+    </a>
+    <a href="clockface-editor/char-designer.html" class="card">
+      <h2>Disenador de Caracteres</h2>
+      <p>Crea caracteres y simbolos para tus fuentes.</p>
+    </a>
+    <a href="clockface-editor/font-converter.html" class="card">
+      <h2>Conversor de Fuentes</h2>
+      <p>Convierte fuentes a formato compatible con ClockWise.</p>
+    </a>
+  </div>
+
+  <div class="section">
+    <h3>Herramientas</h3>
+    <div class="cards">
+      <a href="clockface-editor/generate-thumbs.html" class="card">
+        <h2>Generar Thumbnails</h2>
+        <p>Genera miniaturas PNG de tus caratulas.</p>
+      </a>
+      <a href="clockface-editor/config-page.html" class="card">
+        <h2>Configuracion</h2>
+        <p>Pagina de configuracion del reloj.</p>
+      </a>
+      <a href="clockface-editor/install.html" class="card">
+        <h2>Guia de Instalacion</h2>
+        <p>Instrucciones para instalar el firmware.</p>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <a href="https://github.com/XE1E/Clockwise-XE1E">GitHub</a> · ClockWise XE1E v1.0
+  </footer>
+</body>
+</html>
