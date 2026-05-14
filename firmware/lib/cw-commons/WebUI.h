@@ -200,8 +200,34 @@ button:hover{border-color:var(--accent)}
       </div>
       <label>Brillo nocturno: <span id="nightBrightVal">8</span></label>
       <input type="range" id="nightBright" min="1" max="32" value="8" oninput="$('nightBrightVal').textContent=this.value">
-      <label>Caratula nocturna</label>
-      <input type="text" id="nightClock" placeholder="night-clock">
+    </div>
+    <div class="card">
+      <h2>Caratula Nocturna</h2>
+      <label>Seleccionar caratula</label>
+      <select id="nightClockSelect" onchange="onNightClockSelect()">
+        <option value="night-clock">Night Clock (Rojo)</option>
+        <option value="night-clock-xe1e">Night Clock XE1E</option>
+        <option value="_custom">-- Personalizado --</option>
+      </select>
+      <div id="customNightClock" style="display:none">
+        <label>Nombre caratula</label>
+        <input type="text" id="nightClock" placeholder="night-clock">
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div>
+          <label>Color de digitos</label>
+          <input type="color" id="nightColor" value="#ff0000" style="width:100%;height:40px">
+        </div>
+        <div>
+          <label>Colores rapidos</label>
+          <div style="display:flex;gap:4px;margin-top:4px">
+            <button type="button" onclick="setNightColor('#ff0000')" style="width:32px;height:32px;background:#ff0000;padding:0"></button>
+            <button type="button" onclick="setNightColor('#ff6600')" style="width:32px;height:32px;background:#ff6600;padding:0"></button>
+            <button type="button" onclick="setNightColor('#00ff00')" style="width:32px;height:32px;background:#00ff00;padding:0"></button>
+            <button type="button" onclick="setNightColor('#0088ff')" style="width:32px;height:32px;background:#0088ff;padding:0"></button>
+          </div>
+        </div>
+      </div>
     </div>
     <button class="btn-primary" onclick="saveNight()">Guardar Nocturno</button>
   </div>
@@ -210,10 +236,30 @@ button:hover{border-color:var(--accent)}
   <div id="clock" class="page">
     <div class="card">
       <h2>Caratula</h2>
-      <label>Servidor</label>
-      <input type="text" id="canvasServer" placeholder="raw.githubusercontent.com">
-      <label>Archivo</label>
-      <input type="text" id="canvasFile" placeholder="nombre-caratula">
+      <label>Seleccionar caratula</label>
+      <select id="canvasSelect" onchange="onClockSelect()">
+        <option value="">-- Seleccionar --</option>
+        <option value="pac-man">Pac-Man</option>
+        <option value="nyan-cat">Nyan Cat</option>
+        <option value="donkey-kong">Donkey Kong</option>
+        <option value="star-wars">Star Wars</option>
+        <option value="goomba_move">Goomba</option>
+        <option value="clock-club">Clock Club</option>
+        <option value="retro-computer">Retro Computer</option>
+        <option value="snoopy3">Snoopy</option>
+        <option value="christmassnoopy">Christmas Snoopy</option>
+        <option value="eletrogate">Eletrogate</option>
+        <option value="pepsi-final-2">Pepsi</option>
+        <option value="night-clock">Night Clock</option>
+        <option value="night-clock-xe1e">Night Clock XE1E</option>
+        <option value="_custom">-- Personalizado --</option>
+      </select>
+      <div id="customClock" style="display:none">
+        <label>Servidor</label>
+        <input type="text" id="canvasServer" placeholder="raw.githubusercontent.com">
+        <label>Archivo</label>
+        <input type="text" id="canvasFile" placeholder="nombre-caratula">
+      </div>
     </div>
     <div class="card">
       <h2>Rotacion de caratulas</h2>
@@ -223,8 +269,9 @@ button:hover{border-color:var(--accent)}
       </div>
       <label>Intervalo (minutos)</label>
       <input type="number" id="rotationInterval" min="1" max="1440" value="60">
-      <label>Lista (separadas por coma)</label>
-      <input type="text" id="rotationList" placeholder="clock1,clock2,clock3">
+      <label>Lista de caratulas</label>
+      <div id="rotationCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;max-height:150px;overflow-y:auto;background:var(--input);padding:8px;border-radius:var(--r)"></div>
+      <input type="hidden" id="rotationList">
     </div>
     <button class="btn-primary" onclick="saveClock()">Guardar Caratula</button>
   </div>
@@ -345,6 +392,48 @@ async function api(action,params={}){
   }catch(e){toast('Error');}
 }
 
+const clockfaces=['pac-man','nyan-cat','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','night-clock','night-clock-xe1e'];
+
+function rgb565ToHex(v){
+  const r=((v>>11)&0x1F)*255/31;
+  const g=((v>>5)&0x3F)*255/63;
+  const b=(v&0x1F)*255/31;
+  return '#'+[r,g,b].map(x=>Math.round(x).toString(16).padStart(2,'0')).join('');
+}
+function hexToRgb565(h){
+  const r=parseInt(h.slice(1,3),16);
+  const g=parseInt(h.slice(3,5),16);
+  const b=parseInt(h.slice(5,7),16);
+  return ((r>>3)<<11)|((g>>2)<<5)|(b>>3);
+}
+function setNightColor(c){$('nightColor').value=c;}
+async function onClockSelect(){
+  const v=$('canvasSelect').value;
+  $('customClock').style.display=v==='_custom'?'block':'none';
+  if(v&&v!=='_custom'){
+    $('canvasFile').value=v;
+    $('canvasServer').value='raw.githubusercontent.com';
+    await saveField('canvasServer','raw.githubusercontent.com');
+    await saveField('canvasFile',v);
+    await fetch('/api/reload',{method:'POST'});
+    toast('Cambiando a '+v+'...');
+  }
+}
+function onNightClockSelect(){
+  const v=$('nightClockSelect').value;
+  $('customNightClock').style.display=v==='_custom'?'block':'none';
+  if(v&&v!=='_custom')$('nightClock').value=v;
+}
+function buildRotationCheckboxes(){
+  const cont=$('rotationCheckboxes');
+  const sel=($('rotationList').value||'').split(',').map(s=>s.trim()).filter(s=>s);
+  cont.innerHTML=clockfaces.map(c=>'<label style="font-size:12px"><input type="checkbox" class="rot-cb" value="'+c+'"'+(sel.includes(c)?' checked':'')+' onchange="updateRotationList()">'+c+'</label>').join('');
+}
+function updateRotationList(){
+  const cbs=document.querySelectorAll('.rot-cb:checked');
+  $('rotationList').value=Array.from(cbs).map(c=>c.value).join(',');
+}
+
 async function load(){
   try{
     const r=await fetch('/api/settings');
@@ -384,14 +473,30 @@ async function load(){
     $('nightEnd').value=settings.nightEnd||'07:00';
     $('nightBright').value=settings.nightBright||8;
     $('nightBrightVal').textContent=settings.nightBright||8;
-    $('nightClock').value=settings.nightClock||'';
+    $('nightClock').value=settings.nightClock||'night-clock';
+    $('nightColor').value=rgb565ToHex(settings.nightColor||63488);
+    const nc=settings.nightClock||'night-clock';
+    if(clockfaces.includes(nc)||nc==='night-clock'||nc==='night-clock-xe1e'){
+      $('nightClockSelect').value=nc;
+    }else{
+      $('nightClockSelect').value='_custom';
+      $('customNightClock').style.display='block';
+    }
 
     // Clock
-    $('canvasServer').value=settings.canvasServer||'';
+    $('canvasServer').value=settings.canvasServer||'raw.githubusercontent.com';
     $('canvasFile').value=settings.canvasFile||'';
     $('rotationEnabled').checked=settings.rotationEnabled==1;
     $('rotationInterval').value=settings.rotationInterval||60;
     $('rotationList').value=settings.rotationList||'';
+    const cf=settings.canvasFile||'';
+    if(clockfaces.includes(cf)){
+      $('canvasSelect').value=cf;
+    }else if(cf){
+      $('canvasSelect').value='_custom';
+      $('customClock').style.display='block';
+    }
+    buildRotationCheckboxes();
 
     // System
     $('sys-name').value=settings.name||'ClockWise-XE1E';
@@ -446,7 +551,8 @@ async function saveClock(){
   await saveField('rotationEnabled',$('rotationEnabled').checked?'1':'0');
   await saveField('rotationInterval',$('rotationInterval').value);
   await saveField('rotationList',$('rotationList').value);
-  toast('Caratula guardada');
+  await fetch('/api/reload',{method:'POST'});
+  toast('Caratula aplicada');
 }
 
 load();

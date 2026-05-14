@@ -14,6 +14,7 @@ struct ClockwiseWebServer
 {
   AsyncWebServer server;
   bool force_restart = false;
+  bool needs_reload = false;
 
   ClockwiseWebServer() : server(80) {}
 
@@ -128,6 +129,12 @@ struct ClockwiseWebServer
     server.on("/api/restart", HTTP_POST, [this](AsyncWebServerRequest *request) {
       request->send(200, "text/plain", "Restarting...");
       force_restart = true;
+    });
+
+    // API: recargar caratula sin reiniciar
+    server.on("/api/reload", HTTP_POST, [this](AsyncWebServerRequest *request) {
+      request->send(204);
+      needs_reload = true;
     });
 
     // API: reset de fábrica

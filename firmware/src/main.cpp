@@ -229,6 +229,11 @@ void loop()
   if (wifi.isConnected())
   {
     ClockwiseWebServer::getInstance()->handleRestart();
+    if (ClockwiseWebServer::getInstance()->needs_reload) {
+      ClockwiseWebServer::getInstance()->needs_reload = false;
+      currentClockface = ClockwiseParams::getInstance()->canvasFile;
+      needsClockfaceReload = true;
+    }
     ezt::events();
   }
 
