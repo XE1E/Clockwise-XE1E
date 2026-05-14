@@ -13,15 +13,26 @@ class CustomSprite: public Sprite {
     unsigned long _lastMillisSpriteFrames = 0;
     unsigned long _lastResetTime = 0;
     unsigned long _lastResetMoveTime = 0;
-    bool _moving = false;            // Indicates whether the sprite is currently moving
-    unsigned long _moveStartTime = 1;   // Time when the movement started
-    unsigned long _moveDuration = 0;    // Total duration of the movement in milliseconds
-    int8_t _moveInitialX = 0;  // Initial X position for the movement
-    int8_t _moveInitialY = 0;  // Initial Y position for the movement
-    int8_t _moveTargetX = -1;   // Target X position for the movement
-    int8_t _moveTargetY = -1;   // Target Y position for the movement
-    bool _shouldReturnToOrigin = false;  // Flag to indicate if the sprite should return to its origin
-    bool _isReversing = false;  // Flag to indicate if the sprite is reversing in movement back to point of origin
+    bool _moving = false;
+    unsigned long _moveStartTime = 1;
+    unsigned long _moveDuration = 0;
+    int8_t _moveInitialX = 0;
+    int8_t _moveInitialY = 0;
+    int8_t _moveTargetX = -1;
+    int8_t _moveTargetY = -1;
+    bool _shouldReturnToOrigin = false;
+    bool _isReversing = false;
+
+    // Cached JSON values (populated once at creation)
+    uint32_t _cachedLoopDelay = 0;
+    uint16_t _cachedFrameDelay = 0;
+    uint32_t _cachedMoveStartTime = 1;
+    uint32_t _cachedMoveDuration = 0;
+    int8_t _cachedMoveTargetX = -1;
+    int8_t _cachedMoveTargetY = -1;
+    int8_t _cachedOriginX = 0;
+    int8_t _cachedOriginY = 0;
+    bool _cachedShouldReturn = false;
 
     void setDimensions(uint8_t width, uint8_t height);
     int8_t getX();

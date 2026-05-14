@@ -137,6 +137,7 @@ void Clockface::createSprites()
   JsonArrayConst elements = doc["loop"].as<JsonArrayConst>();
   uint8_t width = 0;
   uint8_t height = 0;
+  uint16_t defaultDelay = delay;
 
   for (JsonVariantConst value : elements)
   {
@@ -145,14 +146,28 @@ void Clockface::createSprites()
     if (strcmp(type, "sprite") == 0)
     {
       uint8_t ref = value["sprite"].as<const uint8_t>();
+      int8_t x = value["x"].as<const int8_t>();
+      int8_t y = value["y"].as<const int8_t>();
 
-      std::shared_ptr<CustomSprite> s = std::make_shared<CustomSprite>(value["x"].as<const int8_t>(), value["y"].as<const int8_t>());
+      std::shared_ptr<CustomSprite> s = std::make_shared<CustomSprite>(x, y);
 
       getImageDimensions(doc["sprites"][ref][0]["image"].as<const char *>(), width, height);
 
-      s.get()->_spriteReference = value["sprite"].as<const uint8_t>();
+      s.get()->_spriteReference = ref;
       s.get()->_totalFrames = doc["sprites"][ref].size();
       s.get()->setDimensions(width, height);
+
+      // Cache JSON values to avoid repeated parsing
+      s.get()->_cachedLoopDelay = value["loopDelay"].as<uint32_t>() ?: defaultDelay;
+      s.get()->_cachedFrameDelay = value["frameDelay"].as<uint16_t>() ?: defaultDelay;
+      s.get()->_cachedMoveStartTime = value["moveStartTime"].as<uint32_t>() ?: 1;
+      s.get()->_cachedMoveDuration = value["moveDuration"].as<uint32_t>() ?: 0;
+      s.get()->_cachedMoveTargetX = value["moveTargetX"].as<int8_t>() ?: -1;
+      s.get()->_cachedMoveTargetY = value["moveTargetY"].as<int8_t>() ?: -1;
+      s.get()->_cachedOriginX = x;
+      s.get()->_cachedOriginY = y;
+      s.get()->_cachedShouldReturn = value["shouldReturnToOrigin"].as<bool>() ?: false;
+
       sprites.push_back(s);
     }
   }
@@ -160,16 +175,14 @@ void Clockface::createSprites()
 
 void Clockface::handleSpriteAnimation(std::shared_ptr<CustomSprite>& sprite) {
     uint8_t totalFrames = sprite->_totalFrames;
-    uint32_t loopDelay = doc["loop"][sprite->_spriteReference]["loopDelay"].as<uint32_t>() ?: delay;
-    uint16_t frameDelay = doc["loop"][sprite->_spriteReference]["frameDelay"].as<uint16_t>() ?: delay;
+    uint32_t loopDelay = sprite->_cachedLoopDelay;
+    uint16_t frameDelay = sprite->_cachedFrameDelay;
 
     if (millis() - sprite->_lastMillisSpriteFrames >= frameDelay && sprite->_currentFrameCount < totalFrames) {
         sprite->incFrame();
 
-        // handle sprite movement
         handleSpriteMovement(sprite);
 
-        // Render the frame of the sprite
         renderImage(doc["sprites"][sprite->_spriteReference][sprite->_currentFrame]["image"].as<const char *>(), sprite->getX(), sprite->getY());
 
         sprite->_currentFrameCount += 1;
@@ -188,13 +201,13 @@ void Clockface::handleSpriteAnimation(std::shared_ptr<CustomSprite>& sprite) {
 }
 
 void Clockface::handleSpriteMovement(std::shared_ptr<CustomSprite>& sprite) {
-    unsigned long moveStartTime = doc["loop"][sprite->_spriteReference]["moveStartTime"].as<unsigned long>() ?: 1;
-    unsigned long moveDuration = doc["loop"][sprite->_spriteReference]["moveDuration"].as<unsigned long>() ?: 0;
-    int8_t moveInitialX = doc["loop"][sprite->_spriteReference]["x"].as<int8_t>() ?:0;
-    int8_t moveInitialY = doc["loop"][sprite->_spriteReference]["y"].as<int8_t>() ?: 0;
-    int8_t moveTargetX = doc["loop"][sprite->_spriteReference]["moveTargetX"].as<int8_t>() ?: -1;
-    int8_t moveTargetY = doc["loop"][sprite->_spriteReference]["moveTargetY"].as<int8_t>() ?: -1;
-    bool shouldReturnToOrigin = doc["loop"][sprite->_spriteReference]["shouldReturnToOrigin"].as<bool>() ?: false;
+    unsigned long moveStartTime = sprite->_cachedMoveStartTime;
+    unsigned long moveDuration = sprite->_cachedMoveDuration;
+    int8_t moveInitialX = sprite->_cachedOriginX;
+    int8_t moveInitialY = sprite->_cachedOriginY;
+    int8_t moveTargetX = sprite->_cachedMoveTargetX;
+    int8_t moveTargetY = sprite->_cachedMoveTargetY;
+    bool shouldReturnToOrigin = sprite->_cachedShouldReturn;
 
     // Check if the sprite is moving
     if (sprite->isMoving()) {
