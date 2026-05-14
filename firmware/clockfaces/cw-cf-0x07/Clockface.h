@@ -49,6 +49,7 @@ private:
   void clockfaceLoop();
   void renderElements(JsonArrayConst elements);
   void renderText(String text, JsonVariantConst value);
+  uint16_t resolveColor(int32_t color);
   void createSprites();
   void refreshDateTime();
   void drawSplashScreen(uint16_t color, const char *msg);

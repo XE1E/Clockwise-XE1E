@@ -103,6 +103,14 @@ void Clockface::setFont(const char *fontName)
   }
 }
 
+uint16_t Clockface::resolveColor(int32_t color)
+{
+  if (color == -1) {
+    return ClockwiseParams::getInstance()->nightColor;
+  }
+  return (uint16_t)color;
+}
+
 void Clockface::renderText(String text, JsonVariantConst value)
 {
   int16_t x1, y1;
@@ -112,27 +120,40 @@ void Clockface::renderText(String text, JsonVariantConst value)
 
   Locator::getDisplay()->getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
 
+  // Use -1 as special value for dynamic night color
+  uint16_t fgColor = resolveColor(value["fgColor"].as<int32_t>());
+  uint16_t bgColor = resolveColor(value["bgColor"].as<int32_t>());
+
   // BG Color
   Locator::getDisplay()->fillRect(
       value["x"].as<const uint16_t>() + x1,
       value["y"].as<const uint16_t>() + y1,
       w,
       h,
-      value["bgColor"].as<const uint16_t>());
+      bgColor);
 
-  Locator::getDisplay()->setTextColor(value["fgColor"].as<const uint16_t>());
+  Locator::getDisplay()->setTextColor(fgColor);
   Locator::getDisplay()->setCursor(value["x"].as<const uint16_t>(), value["y"].as<const uint16_t>());
   Locator::getDisplay()->print(text);
 }
 
 void Clockface::refreshDateTime()
 {
-
-  JsonArrayConst elements = doc["setup"].as<JsonArrayConst>();
-  for (JsonVariantConst value : elements)
+  // Check both "setup" and "loop" arrays for datetime elements
+  JsonArrayConst setupElements = doc["setup"].as<JsonArrayConst>();
+  for (JsonVariantConst value : setupElements)
   {
     const char *type = value["type"].as<const char *>();
+    if (strcmp(type, "datetime") == 0)
+    {
+      renderText(_dateTime->getFormattedTime(value["content"].as<const char *>()), value);
+    }
+  }
 
+  JsonArrayConst loopElements = doc["loop"].as<JsonArrayConst>();
+  for (JsonVariantConst value : loopElements)
+  {
+    const char *type = value["type"].as<const char *>();
     if (strcmp(type, "datetime") == 0)
     {
       renderText(_dateTime->getFormattedTime(value["content"].as<const char *>()), value);
@@ -356,10 +377,17 @@ bool Clockface::deserializeDefinition()
   uint16_t port = 443;
   bool useSSL = true;
 
-  // Redirect GitHub to XE1E CDN (GitHub SSL not compatible)
+  // Handle clockface source selection
   if (server.startsWith("raw.")) {
-    server = "cdn.itaqui.to";
-    file = String("/xe1e/clockfaces" + file);
+    String source = ClockwiseParams::getInstance()->clockfaceSource;
+    if (source == "github") {
+      // Use GitHub directly (may fail on some ESP32)
+      file = String("/jnthas/clock-club/main/shared" + file);
+    } else {
+      // Use XE1E CDN (default, more compatible)
+      server = "cdn.itaqui.to";
+      file = String("/xe1e/clockfaces" + file);
+    }
   }
 
   if (server.indexOf(":") > 0) {

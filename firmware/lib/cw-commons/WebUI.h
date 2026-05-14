@@ -262,6 +262,15 @@ button:hover{border-color:var(--accent)}
       </div>
     </div>
     <div class="card">
+      <h2>Servidor de caratulas</h2>
+      <label>Fuente</label>
+      <select id="clockfaceSource">
+        <option value="cdn">CDN XE1E (Recomendado)</option>
+        <option value="github">GitHub (puede fallar)</option>
+      </select>
+      <p style="color:var(--dim);font-size:12px;margin-top:4px">GitHub puede no funcionar en algunos ESP32 por incompatibilidad SSL</p>
+    </div>
+    <div class="card">
       <h2>Rotacion de caratulas</h2>
       <div class="check-row">
         <input type="checkbox" id="rotationEnabled">
@@ -486,6 +495,7 @@ async function load(){
     // Clock
     $('canvasServer').value=settings.canvasServer||'raw.githubusercontent.com';
     $('canvasFile').value=settings.canvasFile||'';
+    $('clockfaceSource').value=settings.clockfaceSource||'cdn';
     $('rotationEnabled').checked=settings.rotationEnabled==1;
     $('rotationInterval').value=settings.rotationInterval||60;
     $('rotationList').value=settings.rotationList||'';
@@ -541,6 +551,7 @@ async function saveNight(){
   await saveField('nightStart',$('nightStart').value);
   await saveField('nightEnd',$('nightEnd').value);
   await saveField('nightBright',$('nightBright').value);
+  await saveField('nightColor',hexToRgb565($('nightColor').value));
   await saveField('nightClock',$('nightClock').value);
   toast('Modo nocturno guardado');
 }
@@ -548,6 +559,7 @@ async function saveNight(){
 async function saveClock(){
   await saveField('canvasServer',$('canvasServer').value);
   await saveField('canvasFile',$('canvasFile').value);
+  await saveField('clockfaceSource',$('clockfaceSource').value);
   await saveField('rotationEnabled',$('rotationEnabled').checked?'1':'0');
   await saveField('rotationInterval',$('rotationInterval').value);
   await saveField('rotationList',$('rotationList').value);

@@ -15,6 +15,9 @@ struct ClockwiseWebServer
   AsyncWebServer server;
   bool force_restart = false;
   bool needs_reload = false;
+  bool needs_brightness_update = false;
+  uint8_t pending_brightness = 0;
+  bool rotation_changed = false;
 
   ClockwiseWebServer() : server(80) {}
 
@@ -69,6 +72,7 @@ struct ClockwiseWebServer
       json += "\"nightStart\":\"" + ClockwiseParams::getInstance()->nightModeStart + "\",";
       json += "\"nightEnd\":\"" + ClockwiseParams::getInstance()->nightModeEnd + "\",";
       json += "\"nightBright\":" + String(ClockwiseParams::getInstance()->nightBrightness) + ",";
+      json += "\"nightColor\":" + String(ClockwiseParams::getInstance()->nightColor) + ",";
       json += "\"nightClock\":\"" + ClockwiseParams::getInstance()->nightClockface + "\",";
       // Clockface
       json += "\"canvasServer\":\"" + ClockwiseParams::getInstance()->canvasServer + "\",";
@@ -76,6 +80,7 @@ struct ClockwiseWebServer
       json += "\"rotationEnabled\":" + String(ClockwiseParams::getInstance()->rotationEnabled ? 1 : 0) + ",";
       json += "\"rotationInterval\":" + String(ClockwiseParams::getInstance()->rotationInterval) + ",";
       json += "\"rotationList\":\"" + ClockwiseParams::getInstance()->rotationList + "\",";
+      json += "\"clockfaceSource\":\"" + ClockwiseParams::getInstance()->clockfaceSource + "\",";
       // System
       json += "\"version\":\"" CW_FW_VERSION "\",";
       json += "\"name\":\"" CW_FW_NAME "\"";
@@ -84,7 +89,7 @@ struct ClockwiseWebServer
     });
 
     // API: establecer parámetro
-    server.on("/api/set", HTTP_POST, [](AsyncWebServerRequest *request) {
+    server.on("/api/set", HTTP_POST, [this](AsyncWebServerRequest *request) {
       if (request->params() > 0) {
         const AsyncWebParameter* p = request->getParam((size_t)0);
         String key = p->name();
@@ -98,7 +103,11 @@ struct ClockwiseWebServer
         else if (key == "wifiSsid3") ClockwiseParams::getInstance()->wifiSsid3 = value;
         else if (key == "wifiPwd3") ClockwiseParams::getInstance()->wifiPwd3 = value;
         // Display
-        else if (key == "displayBright") ClockwiseParams::getInstance()->displayBright = value.toInt();
+        else if (key == "displayBright") {
+          ClockwiseParams::getInstance()->displayBright = value.toInt();
+          pending_brightness = value.toInt();
+          needs_brightness_update = true;
+        }
         else if (key == "displayRotation") ClockwiseParams::getInstance()->displayRotation = value.toInt();
         else if (key == "swapBlueGreen") ClockwiseParams::getInstance()->swapBlueGreen = (value == "1");
         else if (key == "autoBrightMin") ClockwiseParams::getInstance()->autoBrightMin = value.toInt();
@@ -113,13 +122,18 @@ struct ClockwiseWebServer
         else if (key == "nightStart") ClockwiseParams::getInstance()->nightModeStart = value;
         else if (key == "nightEnd") ClockwiseParams::getInstance()->nightModeEnd = value;
         else if (key == "nightBright") ClockwiseParams::getInstance()->nightBrightness = value.toInt();
+        else if (key == "nightColor") ClockwiseParams::getInstance()->nightColor = value.toInt();
         else if (key == "nightClock") ClockwiseParams::getInstance()->nightClockface = value;
         // Clockface
         else if (key == "canvasServer") ClockwiseParams::getInstance()->canvasServer = value;
         else if (key == "canvasFile") ClockwiseParams::getInstance()->canvasFile = value;
-        else if (key == "rotationEnabled") ClockwiseParams::getInstance()->rotationEnabled = (value == "1");
+        else if (key == "rotationEnabled") {
+          ClockwiseParams::getInstance()->rotationEnabled = (value == "1");
+          rotation_changed = true;
+        }
         else if (key == "rotationInterval") ClockwiseParams::getInstance()->rotationInterval = value.toInt();
         else if (key == "rotationList") ClockwiseParams::getInstance()->rotationList = value;
+        else if (key == "clockfaceSource") ClockwiseParams::getInstance()->clockfaceSource = value;
 
         ClockwiseParams::getInstance()->save();
       }

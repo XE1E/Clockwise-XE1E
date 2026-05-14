@@ -202,6 +202,19 @@ void setup()
   clockface = new Clockface(dma_display);
 
   autoBrightEnabled = (ClockwiseParams::getInstance()->autoBrightMax > 0);
+
+  // If rotation is enabled, start with first item from rotation list
+  if (ClockwiseParams::getInstance()->rotationEnabled) {
+    String rotList = ClockwiseParams::getInstance()->rotationList;
+    if (rotList.length() > 0) {
+      int commaPos = rotList.indexOf(',');
+      String firstClockface = (commaPos > 0) ? rotList.substring(0, commaPos) : rotList;
+      firstClockface.trim();
+      ClockwiseParams::getInstance()->canvasFile = firstClockface;
+      ClockwiseParams::getInstance()->rotationIndex = 0;
+    }
+  }
+
   currentClockface = ClockwiseParams::getInstance()->canvasFile;
   rotationMillis = millis();
 
@@ -229,6 +242,31 @@ void loop()
   if (wifi.isConnected())
   {
     ClockwiseWebServer::getInstance()->handleRestart();
+
+    // Apply brightness change from web UI immediately
+    if (ClockwiseWebServer::getInstance()->needs_brightness_update && !nightModeActive) {
+      ClockwiseWebServer::getInstance()->needs_brightness_update = false;
+      dma_display->setBrightness8(ClockwiseWebServer::getInstance()->pending_brightness);
+    }
+
+    // Handle rotation enable/disable
+    if (ClockwiseWebServer::getInstance()->rotation_changed) {
+      ClockwiseWebServer::getInstance()->rotation_changed = false;
+      if (ClockwiseParams::getInstance()->rotationEnabled) {
+        String rotList = ClockwiseParams::getInstance()->rotationList;
+        if (rotList.length() > 0) {
+          int commaPos = rotList.indexOf(',');
+          String firstClockface = (commaPos > 0) ? rotList.substring(0, commaPos) : rotList;
+          firstClockface.trim();
+          ClockwiseParams::getInstance()->canvasFile = firstClockface;
+          ClockwiseParams::getInstance()->rotationIndex = 0;
+          currentClockface = firstClockface;
+          rotationMillis = millis();
+          needsClockfaceReload = true;
+        }
+      }
+    }
+
     ezt::events();
   }
 
