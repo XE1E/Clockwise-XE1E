@@ -1,16 +1,14 @@
 #pragma once
 
 // Increase WiFi connection timeout for weak signals
-// Default: 20 attempts x 500ms = 10 seconds
-// New: 40 attempts x 500ms = 20 seconds
 #define MAX_ATTEMPTS_WIFI_CONNECTION 40
 
-#include "ImprovWiFiLibrary.h"
 #include <WiFi.h>
 #include <ESPmDNS.h>
+#include <DNSServer.h>
+#include "ImprovWiFiLibrary.h"
 #include "CWWebServer.h"
 #include "StatusController.h"
-#include <WiFiManager.h>
 
 ImprovWiFi improvSerial(&Serial);
 
@@ -25,8 +23,15 @@ struct WiFiNetwork {
 struct WiFiController
 {
   long elapsedTimeOffline = 0;
+  long lastReconnectAttempt = 0;
   bool connectionSucessfulOnce = false;
+  bool apModeActive = false;
+  bool reconnecting = false;
   WiFiNetwork networks[3];
+  DNSServer dnsServer;
+
+  static const unsigned long RECONNECT_INTERVAL = 30000;  // 30 segundos entre intentos
+  static const unsigned long RESTART_TIMEOUT = 300000;    // 5 minutos sin conexión = restart
 
   static void onImprovWiFiErrorCb(ImprovTypes::Error err)
   {
@@ -46,30 +51,86 @@ struct WiFiController
     if (MDNS.begin("clockwise-xe1e"))
     {
       MDNS.addService("http", "tcp", 80);
-      Serial.printf("[WiFi] mDNS: http://clockwise-xe1e.local\n");
+      Serial.println("[WiFi] mDNS: http://clockwise-xe1e.local");
     }
   }
 
   bool isConnected()
   {
-    if (improvSerial.isConnected()) {
+    if (apModeActive) {
+      return true;
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+      if (reconnecting) {
+        reconnecting = false;
+        Serial.println("[WiFi] Reconnected!");
+      }
       elapsedTimeOffline = 0;
       return true;
-    } else {
-      if (elapsedTimeOffline == 0 && !connectionSucessfulOnce)
-        elapsedTimeOffline = millis();
+    }
 
-      // Restart if no clockface shown and offline for 5 minutes
-      if ((millis() - elapsedTimeOffline) > 1000 * 60 * 5)
-        StatusController::getInstance()->forceRestart();
+    // Desconectado
+    if (elapsedTimeOffline == 0) {
+      elapsedTimeOffline = millis();
+      Serial.println("[WiFi] Connection lost");
+    }
 
-      return false;
+    // Si nunca conectó y lleva 5 min offline, reiniciar
+    if (!connectionSucessfulOnce && (millis() - elapsedTimeOffline) > RESTART_TIMEOUT) {
+      StatusController::getInstance()->forceRestart();
+    }
+
+    return false;
+  }
+
+  void checkReconnect()
+  {
+    if (apModeActive || WiFi.status() == WL_CONNECTED) {
+      if (reconnecting) {
+        reconnecting = false;
+        StatusController::getInstance()->clearReconnecting();
+      }
+      return;
+    }
+    if (!connectionSucessfulOnce) return;
+
+    unsigned long now = millis();
+    if (now - lastReconnectAttempt < RECONNECT_INTERVAL) return;
+
+    lastReconnectAttempt = now;
+    reconnecting = true;
+    Serial.println("[WiFi] Attempting reconnect...");
+    StatusController::getInstance()->wifiReconnecting();
+
+    // Intento rápido: reconectar a la misma red
+    WiFi.reconnect();
+    delay(3000);
+
+    if (WiFi.status() == WL_CONNECTED) {
+      reconnecting = false;
+      elapsedTimeOffline = 0;
+      StatusController::getInstance()->clearReconnecting();
+      Serial.printf("[WiFi] Reconnected to %s\n", WiFi.SSID().c_str());
+      return;
+    }
+
+    // Si falla, intentar mejor red disponible
+    Serial.println("[WiFi] Quick reconnect failed, scanning...");
+    if (connectToBestNetwork()) {
+      reconnecting = false;
+      elapsedTimeOffline = 0;
+      StatusController::getInstance()->clearReconnecting();
+      ClockwiseWebServer::getInstance()->startWebServer();
     }
   }
 
-  static void handleImprovWiFi()
+  void handleImprovWiFi()
   {
     improvSerial.handleSerial();
+    if (apModeActive) {
+      dnsServer.processNextRequest();
+    }
   }
 
   // Cargar redes guardadas desde preferencias
@@ -182,7 +243,7 @@ struct WiFiController
       }
     }
 
-    // Si ninguna disponible funcionó, intentar las no detectadas (por si el scan falló)
+    // Si ninguna disponible funcionó, intentar las no detectadas
     Serial.println("[WiFi] Trying networks not found in scan...");
     for (int i = 0; i < 3; i++) {
       if (!networks[i].available && !networks[i].ssid.isEmpty()) {
@@ -196,21 +257,29 @@ struct WiFiController
     return false;
   }
 
-  bool alternativeSetupMethod()
+  // Modo AP propio (sin WiFiManager)
+  bool startAPMode()
   {
-    WiFiManager wifiManager;
-    wifiManager.setConfigPortalTimeout(300); // 5 min timeout
+    Serial.println("[WiFi] Starting AP mode...");
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP("ClockWise-XE1E", "");  // Sin contraseña
 
-    bool success = wifiManager.startConfigPortal("ClockWise-XE1E");
+    delay(100);
+    IPAddress apIP = WiFi.softAPIP();
+    Serial.printf("[WiFi] AP IP: %s\n", apIP.toString().c_str());
 
-    if (success)
-    {
-      onImprovWiFiConnectedCb(WiFi.SSID().c_str(), WiFi.psk().c_str());
-      Serial.printf("[WiFi] Connected via AP config to %s\n", WiFi.SSID().c_str());
-      connectionSucessfulOnce = success;
-    }
+    // DNS captive portal - redirige todo a nuestra IP
+    dnsServer.start(53, "*", apIP);
 
-    return success;
+    // Iniciar servidor web para configuración
+    ClockwiseWebServer::getInstance()->startWebServer();
+
+    apModeActive = true;
+
+    // Mostrar modo AP en pantalla
+    StatusController::getInstance()->showAPMode(apIP.toString().c_str());
+
+    return true;
   }
 
   void onConnected()
@@ -221,7 +290,7 @@ struct WiFiController
     if (MDNS.begin("clockwise-xe1e"))
     {
       MDNS.addService("http", "tcp", 80);
-      Serial.printf("[WiFi] mDNS: http://clockwise-xe1e.local\n");
+      Serial.println("[WiFi] mDNS: http://clockwise-xe1e.local");
     }
 
     int rssi = WiFi.RSSI();
@@ -253,15 +322,10 @@ struct WiFiController
       return true;
     }
 
-    // No se pudo conectar - iniciar modo AP
-    StatusController::getInstance()->wifiConnectionFailed("Config via AP");
-    if (alternativeSetupMethod())
-    {
-      onConnected();
-      return true;
-    }
-
-    StatusController::getInstance()->wifiConnectionFailed("WiFi Failed");
+    // No se pudo conectar - iniciar modo AP propio
+    StatusController::getInstance()->wifiConnectionFailed("Config: 192.168.4.1");
+    delay(2000);
+    startAPMode();
     return false;
   }
 };

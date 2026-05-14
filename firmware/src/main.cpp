@@ -224,10 +224,11 @@ void setup()
 void loop()
 {
   wifi.handleImprovWiFi();
+  wifi.checkReconnect();
 
   if (wifi.isConnected())
   {
-    ClockwiseWebServer::getInstance()->handleHttpRequest();
+    ClockwiseWebServer::getInstance()->handleRestart();
     ezt::events();
   }
 

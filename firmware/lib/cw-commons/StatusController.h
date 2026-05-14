@@ -138,6 +138,7 @@ struct StatusController
 	void clockwiseLogo()
 	{
 		Locator::getDisplay()->drawRGBBitmap(1, 1, epd_bitmap_clockwise64, 63, 21);
+		printCenter("XE1E", 23);
 	}
 
 	void wifiConnecting()
@@ -161,6 +162,26 @@ struct StatusController
 		printCenter(msg, 61);
 	}
 
+	void wifiReconnecting()
+	{
+		Locator::getDisplay()->fillRect(0, 56, 64, 8, 0);
+		Locator::getDisplay()->drawBitmap(2, 56, CW_STATUS_WIFI, 8, 8, 0xFD20);  // Pequeño icono naranja
+		printSmall("Reconectando...", 63);
+	}
+
+	void clearReconnecting()
+	{
+		Locator::getDisplay()->fillRect(0, 56, 64, 8, 0);
+	}
+
+	void printSmall(const char *buf, int y)
+	{
+		Locator::getDisplay()->setFont(&Picopixel);
+		Locator::getDisplay()->setCursor(12, y);
+		Locator::getDisplay()->setTextColor(0xFD20);
+		Locator::getDisplay()->print(buf);
+	}
+
 	void ntpConnecting()
 	{
 		Locator::getDisplay()->fillRect(0, 24, 64, 52, 0);
@@ -181,10 +202,17 @@ struct StatusController
 
 	void showIPAddress(const char* ip, int rssi)
 	{
-		Locator::getDisplay()->fillRect(0, 20, 64, 44, 0);
-		Locator::getDisplay()->drawBitmap(16, 20, CW_STATUS_WIFI, 32, 32, 0x07E0);
+		Locator::getDisplay()->fillRect(0, 24, 64, 40, 0);
+		Locator::getDisplay()->drawBitmap(16, 24, CW_STATUS_WIFI, 32, 32, 0x07E0);
+		printCenter("Conectado", 57);
+		printCenter(ip, 63);
+	}
 
-		printCenter("clockwise-xe1e.local", 57);
+	void showAPMode(const char* ip)
+	{
+		Locator::getDisplay()->fillRect(0, 24, 64, 40, 0);
+		Locator::getDisplay()->drawBitmap(16, 24, CW_STATUS_WIFI, 32, 32, 0xFD20);  // Naranja
+		printCenter("Modo AP", 57);
 		printCenter(ip, 63);
 	}
 

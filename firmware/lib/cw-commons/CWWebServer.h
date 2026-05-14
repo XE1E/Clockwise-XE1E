@@ -1,39 +1,22 @@
 #pragma once
 
 #include <WiFi.h>
+#include <ESPAsyncWebServer.h>
 #include <CWPreferences.h>
 #include "StatusController.h"
-#include "SettingsWebPage.h"
+#include "WebUI.h"
 
 #ifndef CLOCKFACE_NAME
   #define CLOCKFACE_NAME "UNKNOWN"
 #endif
 
-WiFiServer server(80);
-
-String urlDecode(const String& input) {
-  String decoded = "";
-  for (size_t i = 0; i < input.length(); i++) {
-    if (input[i] == '%' && i + 2 < input.length()) {
-      char hex[3] = { input[i+1], input[i+2], 0 };
-      decoded += (char)strtol(hex, nullptr, 16);
-      i += 2;
-    } else if (input[i] == '+') {
-      decoded += ' ';
-    } else {
-      decoded += input[i];
-    }
-  }
-  return decoded;
-}
-
 struct ClockwiseWebServer
 {
-  String httpBuffer;
-  bool force_restart;
-  const char* HEADER_TEMPLATE_D = "X-%s: %d\r\n";
-  const char* HEADER_TEMPLATE_S = "X-%s: %s\r\n";
- 
+  AsyncWebServer server;
+  bool force_restart = false;
+
+  ClockwiseWebServer() : server(80) {}
+
   static ClockwiseWebServer *getInstance()
   {
     static ClockwiseWebServer base;
@@ -42,187 +25,135 @@ struct ClockwiseWebServer
 
   void startWebServer()
   {
+    setupRoutes();
     server.begin();
-    StatusController::getInstance()->blink_led(100, 3);
+    Serial.println("[Web] Async server started on port 80");
   }
 
   void stopWebServer()
   {
-    server.stop();
+    server.end();
   }
 
-  void handleHttpRequest()
+  void setupRoutes()
   {
-    if (force_restart)
-      StatusController::getInstance()->forceRestart();
+    // Página principal
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+      request->send(200, "text/html", WEB_UI_HTML);
+    });
 
+    // API: obtener configuración
+    server.on("/api/settings", HTTP_GET, [](AsyncWebServerRequest *request) {
+      String json = "{";
+      // WiFi
+      json += "\"wifiSsid\":\"" + ClockwiseParams::getInstance()->wifiSsid + "\",";
+      json += "\"wifiSsid2\":\"" + ClockwiseParams::getInstance()->wifiSsid2 + "\",";
+      json += "\"wifiSsid3\":\"" + ClockwiseParams::getInstance()->wifiSsid3 + "\",";
+      json += "\"wifiConnected\":\"" + WiFi.SSID() + "\",";
+      json += "\"wifiRssi\":" + String(WiFi.RSSI()) + ",";
+      // Display
+      json += "\"displayBright\":" + String(ClockwiseParams::getInstance()->displayBright) + ",";
+      json += "\"displayRotation\":" + String(ClockwiseParams::getInstance()->displayRotation) + ",";
+      json += "\"swapBlueGreen\":" + String(ClockwiseParams::getInstance()->swapBlueGreen ? 1 : 0) + ",";
+      json += "\"autoBrightMin\":" + String(ClockwiseParams::getInstance()->autoBrightMin) + ",";
+      json += "\"autoBrightMax\":" + String(ClockwiseParams::getInstance()->autoBrightMax) + ",";
+      // Time
+      json += "\"timeZone\":\"" + ClockwiseParams::getInstance()->timeZone + "\",";
+      json += "\"ntpServer\":\"" + ClockwiseParams::getInstance()->ntpServer + "\",";
+      json += "\"use24hFormat\":" + String(ClockwiseParams::getInstance()->use24hFormat ? 1 : 0) + ",";
+      json += "\"useSpanish\":" + String(ClockwiseParams::getInstance()->useSpanish ? 1 : 0) + ",";
+      // Night mode
+      json += "\"nightEnabled\":" + String(ClockwiseParams::getInstance()->nightModeEnabled ? 1 : 0) + ",";
+      json += "\"nightStart\":\"" + ClockwiseParams::getInstance()->nightModeStart + "\",";
+      json += "\"nightEnd\":\"" + ClockwiseParams::getInstance()->nightModeEnd + "\",";
+      json += "\"nightBright\":" + String(ClockwiseParams::getInstance()->nightBrightness) + ",";
+      json += "\"nightClock\":\"" + ClockwiseParams::getInstance()->nightClockface + "\",";
+      // Clockface
+      json += "\"canvasServer\":\"" + ClockwiseParams::getInstance()->canvasServer + "\",";
+      json += "\"canvasFile\":\"" + ClockwiseParams::getInstance()->canvasFile + "\",";
+      json += "\"rotationEnabled\":" + String(ClockwiseParams::getInstance()->rotationEnabled ? 1 : 0) + ",";
+      json += "\"rotationInterval\":" + String(ClockwiseParams::getInstance()->rotationInterval) + ",";
+      json += "\"rotationList\":\"" + ClockwiseParams::getInstance()->rotationList + "\",";
+      // System
+      json += "\"version\":\"" CW_FW_VERSION "\",";
+      json += "\"name\":\"" CW_FW_NAME "\"";
+      json += "}";
+      request->send(200, "application/json", json);
+    });
 
-    WiFiClient client = server.available();
-    if (client)
-    {
-      StatusController::getInstance()->blink_led(100, 1);
+    // API: establecer parámetro
+    server.on("/api/set", HTTP_POST, [](AsyncWebServerRequest *request) {
+      if (request->params() > 0) {
+        const AsyncWebParameter* p = request->getParam((size_t)0);
+        String key = p->name();
+        String value = p->value();
 
-      while (client.connected())
-      {
-        if (client.available())
-        {
-          char c = client.read();
-          httpBuffer.concat(c);
+        // WiFi
+        if (key == "wifiSsid") ClockwiseParams::getInstance()->wifiSsid = value;
+        else if (key == "wifiPwd") ClockwiseParams::getInstance()->wifiPwd = value;
+        else if (key == "wifiSsid2") ClockwiseParams::getInstance()->wifiSsid2 = value;
+        else if (key == "wifiPwd2") ClockwiseParams::getInstance()->wifiPwd2 = value;
+        else if (key == "wifiSsid3") ClockwiseParams::getInstance()->wifiSsid3 = value;
+        else if (key == "wifiPwd3") ClockwiseParams::getInstance()->wifiPwd3 = value;
+        // Display
+        else if (key == "displayBright") ClockwiseParams::getInstance()->displayBright = value.toInt();
+        else if (key == "displayRotation") ClockwiseParams::getInstance()->displayRotation = value.toInt();
+        else if (key == "swapBlueGreen") ClockwiseParams::getInstance()->swapBlueGreen = (value == "1");
+        else if (key == "autoBrightMin") ClockwiseParams::getInstance()->autoBrightMin = value.toInt();
+        else if (key == "autoBrightMax") ClockwiseParams::getInstance()->autoBrightMax = value.toInt();
+        // Time
+        else if (key == "timeZone") ClockwiseParams::getInstance()->timeZone = value;
+        else if (key == "ntpServer") ClockwiseParams::getInstance()->ntpServer = value;
+        else if (key == "use24hFormat") ClockwiseParams::getInstance()->use24hFormat = (value == "1");
+        else if (key == "useSpanish") ClockwiseParams::getInstance()->useSpanish = (value == "1");
+        // Night mode
+        else if (key == "nightEnabled") ClockwiseParams::getInstance()->nightModeEnabled = (value == "1");
+        else if (key == "nightStart") ClockwiseParams::getInstance()->nightModeStart = value;
+        else if (key == "nightEnd") ClockwiseParams::getInstance()->nightModeEnd = value;
+        else if (key == "nightBright") ClockwiseParams::getInstance()->nightBrightness = value.toInt();
+        else if (key == "nightClock") ClockwiseParams::getInstance()->nightClockface = value;
+        // Clockface
+        else if (key == "canvasServer") ClockwiseParams::getInstance()->canvasServer = value;
+        else if (key == "canvasFile") ClockwiseParams::getInstance()->canvasFile = value;
+        else if (key == "rotationEnabled") ClockwiseParams::getInstance()->rotationEnabled = (value == "1");
+        else if (key == "rotationInterval") ClockwiseParams::getInstance()->rotationInterval = value.toInt();
+        else if (key == "rotationList") ClockwiseParams::getInstance()->rotationList = value;
 
-          if (c == '\n')
-          {
-            uint8_t method_pos = httpBuffer.indexOf(' ');
-            uint8_t path_pos = httpBuffer.indexOf(' ', method_pos + 1);
-
-            String method = httpBuffer.substring(0, method_pos);
-            String path = httpBuffer.substring(method_pos + 1, path_pos);
-            String key = "";
-            String value = "";
-
-            if (path.indexOf('?') > 0)
-            {
-              key = path.substring(path.indexOf('?') + 1, path.indexOf('='));
-              value = urlDecode(path.substring(path.indexOf('=') + 1));
-              path = path.substring(0, path.indexOf('?'));
-            }
-
-            processRequest(client, method, path, key, value);
-            httpBuffer = "";
-            break;
-          }
-        }
+        ClockwiseParams::getInstance()->save();
       }
-      delay(1);
-      client.stop();
-    }
-  }
+      request->send(204);
+    });
 
-  void processRequest(WiFiClient client, String method, String path, String key, String value)
-  {
-    if (method == "GET" && path == "/") {
-      client.println("HTTP/1.0 200 OK");
-      client.println("Content-Type: text/html");
-      client.println();
-      client.println(SETTINGS_PAGE);
-    } else if (method == "GET" && path == "/get") {
-      getCurrentSettings(client);
-    } else if (method == "GET" && path == "/read") {
-      if (key == "pin") {
-        readPin(client, key, value.toInt());
-      }
-    } else if (method == "POST" && path == "/restart") {
-      client.println("HTTP/1.0 204 No Content");
+    // API: reiniciar
+    server.on("/api/restart", HTTP_POST, [this](AsyncWebServerRequest *request) {
+      request->send(200, "text/plain", "Restarting...");
       force_restart = true;
-    } else if (method == "POST" && path == "/set") {
-      // Note: Don't call load() here - it would overwrite pending changes
-      //a baby seal has died due this ifs
-      if (key == ClockwiseParams::getInstance()->PREF_DISPLAY_BRIGHT) {
-        ClockwiseParams::getInstance()->displayBright = value.toInt();
-      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_SSID) {
-        ClockwiseParams::getInstance()->wifiSsid = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_PASSWORD) {
-        ClockwiseParams::getInstance()->wifiPwd = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_SSID_2) {
-        ClockwiseParams::getInstance()->wifiSsid2 = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_PASSWORD_2) {
-        ClockwiseParams::getInstance()->wifiPwd2 = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_SSID_3) {
-        ClockwiseParams::getInstance()->wifiSsid3 = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_WIFI_PASSWORD_3) {
-        ClockwiseParams::getInstance()->wifiPwd3 = value;
-      } else if (key == "autoBright") {   //autoBright=0010,0800
-        ClockwiseParams::getInstance()->autoBrightMin = value.substring(0,4).toInt();
-        ClockwiseParams::getInstance()->autoBrightMax = value.substring(5,9).toInt();
-      } else if (key == ClockwiseParams::getInstance()->PREF_SWAP_BLUE_GREEN) {
-        ClockwiseParams::getInstance()->swapBlueGreen = (value == "1");
-      } else if (key == ClockwiseParams::getInstance()->PREF_USE_24H_FORMAT) {
-        ClockwiseParams::getInstance()->use24hFormat = (value == "1");
-      } else if (key == ClockwiseParams::getInstance()->PREF_USE_SPANISH) {
-        ClockwiseParams::getInstance()->useSpanish = (value == "1");
-      } else if (key == ClockwiseParams::getInstance()->PREF_LDR_PIN) {
-        ClockwiseParams::getInstance()->ldrPin = value.toInt();
-      } else if (key == ClockwiseParams::getInstance()->PREF_TIME_ZONE) {
-        ClockwiseParams::getInstance()->timeZone = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_NTP_SERVER) {
-        ClockwiseParams::getInstance()->ntpServer = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_CANVAS_FILE) {
-        ClockwiseParams::getInstance()->canvasFile = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_CANVAS_SERVER) {
-        ClockwiseParams::getInstance()->canvasServer = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_MANUAL_POSIX) {
-        ClockwiseParams::getInstance()->manualPosix = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_DISPLAY_ROTATION) {
-        ClockwiseParams::getInstance()->displayRotation = value.toInt();
-      } else if (key == ClockwiseParams::getInstance()->PREF_NIGHT_MODE_ENABLED) {
-        ClockwiseParams::getInstance()->nightModeEnabled = (value == "1");
-      } else if (key == ClockwiseParams::getInstance()->PREF_NIGHT_MODE_START) {
-        ClockwiseParams::getInstance()->nightModeStart = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_NIGHT_MODE_END) {
-        ClockwiseParams::getInstance()->nightModeEnd = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_NIGHT_BRIGHTNESS) {
-        ClockwiseParams::getInstance()->nightBrightness = value.toInt();
-      } else if (key == ClockwiseParams::getInstance()->PREF_NIGHT_COLOR) {
-        ClockwiseParams::getInstance()->nightColor = value.toInt();
-      } else if (key == ClockwiseParams::getInstance()->PREF_NIGHT_CLOCKFACE) {
-        ClockwiseParams::getInstance()->nightClockface = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_ROTATION_ENABLED) {
-        ClockwiseParams::getInstance()->rotationEnabled = (value == "1");
-      } else if (key == ClockwiseParams::getInstance()->PREF_ROTATION_LIST) {
-        ClockwiseParams::getInstance()->rotationList = value;
-      } else if (key == ClockwiseParams::getInstance()->PREF_ROTATION_INTERVAL) {
-        ClockwiseParams::getInstance()->rotationInterval = value.toInt();
+    });
+
+    // API: reset de fábrica
+    server.on("/api/reset", HTTP_POST, [this](AsyncWebServerRequest *request) {
+      ClockwiseParams::getInstance()->preferences.clear();
+      request->send(200, "text/plain", "Reset complete, restarting...");
+      force_restart = true;
+    });
+
+    // API: leer pin (para calibración LDR)
+    server.on("/api/pin", HTTP_GET, [](AsyncWebServerRequest *request) {
+      if (request->hasParam("pin")) {
+        int pin = request->getParam("pin")->value().toInt();
+        int value = analogRead(pin);
+        request->send(200, "application/json", "{\"value\":" + String(value) + "}");
+      } else {
+        request->send(400);
       }
-      ClockwiseParams::getInstance()->save();
-      client.println("HTTP/1.0 204 No Content");
+    });
+  }
+
+  void handleRestart()
+  {
+    if (force_restart) {
+      delay(500);
+      ESP.restart();
     }
   }
-
-
-
-  void readPin(WiFiClient client, String key, uint16_t pin) {
-    client.println("HTTP/1.0 204 No Content");
-    client.printf(HEADER_TEMPLATE_D, key, analogRead(pin));
-    
-    client.println();
-  }
-
-
-  void getCurrentSettings(WiFiClient client) {
-    // Values are already in memory, no need to load from flash
-    client.println("HTTP/1.0 204 No Content");
-
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_DISPLAY_BRIGHT, ClockwiseParams::getInstance()->displayBright);
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_DISPLAY_ABC_MIN, ClockwiseParams::getInstance()->autoBrightMin);
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_DISPLAY_ABC_MAX, ClockwiseParams::getInstance()->autoBrightMax);
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_SWAP_BLUE_GREEN, ClockwiseParams::getInstance()->swapBlueGreen);
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_USE_24H_FORMAT, ClockwiseParams::getInstance()->use24hFormat);
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_USE_SPANISH, ClockwiseParams::getInstance()->useSpanish);
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_LDR_PIN, ClockwiseParams::getInstance()->ldrPin);    
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_TIME_ZONE, ClockwiseParams::getInstance()->timeZone.c_str());
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_WIFI_SSID, ClockwiseParams::getInstance()->wifiSsid.c_str());
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_WIFI_SSID_2, ClockwiseParams::getInstance()->wifiSsid2.c_str());
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_WIFI_SSID_3, ClockwiseParams::getInstance()->wifiSsid3.c_str());
-    client.printf(HEADER_TEMPLATE_D, "wifiRssi", WiFi.RSSI());
-    client.printf(HEADER_TEMPLATE_S, "wifiConnected", WiFi.SSID().c_str());
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_NTP_SERVER, ClockwiseParams::getInstance()->ntpServer.c_str());
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_CANVAS_FILE, ClockwiseParams::getInstance()->canvasFile.c_str());
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_CANVAS_SERVER, ClockwiseParams::getInstance()->canvasServer.c_str());
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_MANUAL_POSIX, ClockwiseParams::getInstance()->manualPosix.c_str());
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_DISPLAY_ROTATION, ClockwiseParams::getInstance()->displayRotation);
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_NIGHT_MODE_ENABLED, ClockwiseParams::getInstance()->nightModeEnabled);
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_NIGHT_MODE_START, ClockwiseParams::getInstance()->nightModeStart.c_str());
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_NIGHT_MODE_END, ClockwiseParams::getInstance()->nightModeEnd.c_str());
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_NIGHT_BRIGHTNESS, ClockwiseParams::getInstance()->nightBrightness);
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_NIGHT_COLOR, ClockwiseParams::getInstance()->nightColor);
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_NIGHT_CLOCKFACE, ClockwiseParams::getInstance()->nightClockface.c_str());
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_ROTATION_ENABLED, ClockwiseParams::getInstance()->rotationEnabled);
-    client.printf(HEADER_TEMPLATE_S, ClockwiseParams::getInstance()->PREF_ROTATION_LIST, ClockwiseParams::getInstance()->rotationList.c_str());
-    client.printf(HEADER_TEMPLATE_D, ClockwiseParams::getInstance()->PREF_ROTATION_INTERVAL, ClockwiseParams::getInstance()->rotationInterval);
-
-    client.printf(HEADER_TEMPLATE_S, "CW_FW_VERSION", CW_FW_VERSION);
-    client.printf(HEADER_TEMPLATE_S, "CW_FW_NAME", CW_FW_NAME);
-    client.printf(HEADER_TEMPLATE_S, "CLOCKFACE_NAME", CLOCKFACE_NAME);
-    client.println();
-  }
-  
 };
