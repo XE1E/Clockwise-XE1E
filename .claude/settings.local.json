@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git commit *)",
-      "Bash(platformio run *)"
+      "Bash(platformio run *)",
+      "Bash(python -m platformio run -e esp32dev -t upload)"
     ]
   }
 }

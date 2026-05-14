@@ -41,6 +41,7 @@ private:
   Adafruit_GFX *_display;
   CWDateTime *_dateTime;
   uint16_t delay;
+  bool _clockfaceLoaded = false;
 
   void setFont(const char *fontName);
   bool deserializeDefinition();
@@ -51,6 +52,7 @@ private:
   void createSprites();
   void refreshDateTime();
   void drawSplashScreen(uint16_t color, const char *msg);
+  void drawFallbackClock();
   void handleSpriteAnimation(std::shared_ptr<CustomSprite> &sprite);
   void handleSpriteMovement(std::shared_ptr<CustomSprite> &sprite);
 

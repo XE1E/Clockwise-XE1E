@@ -19,12 +19,24 @@ void Clockface::setup(CWDateTime *dateTime)
   Serial.flush();
   drawSplashScreen(0xFFE0, "Downloading");
 
+  _clockfaceLoaded = false;
   if (deserializeDefinition()) {
     Serial.println("[Canvas] deserialize OK, calling clockfaceSetup");
+    _clockfaceLoaded = true;
     clockfaceSetup();
   } else {
-    Serial.println("[Canvas] deserialize FAILED");
+    Serial.println("[Canvas] deserialize FAILED - showing fallback");
+    drawFallbackClock();
   }
+}
+
+void Clockface::drawFallbackClock()
+{
+  Locator::getDisplay()->fillRect(0, 0, 64, 64, 0);
+  Locator::getDisplay()->setFont(&hour8pt7b);
+  Locator::getDisplay()->setTextColor(0xF800); // Red
+  Locator::getDisplay()->setCursor(8, 38);
+  Locator::getDisplay()->print(_dateTime->getFormattedTime("H:i"));
 }
 
 void Clockface::drawSplashScreen(uint16_t color, const char *msg) {
@@ -38,6 +50,15 @@ void Clockface::drawSplashScreen(uint16_t color, const char *msg) {
 
 void Clockface::update()
 {
+  if (!_clockfaceLoaded) {
+    // Fallback: just update time every second
+    if (millis() - lastMillis >= 1000) {
+      drawFallbackClock();
+      lastMillis = millis();
+    }
+    return;
+  }
+
   // Render animation
   clockfaceLoop();
 
@@ -335,9 +356,13 @@ bool Clockface::deserializeDefinition()
   uint16_t port = 443;
   bool useSSL = true;
 
+  // Skip GitHub - SSL not working with this ESP32 core
   if (server.startsWith("raw.")) {
-    file = String("/jnthas/clock-club/main/shared" + file);
-  } else if (server.indexOf(":") > 0) {
+    Serial.println("[Canvas] GitHub SSL not supported - use custom server");
+    return false;
+  }
+
+  if (server.indexOf(":") > 0) {
     int colonPos = server.indexOf(":");
     port = server.substring(colonPos + 1).toInt();
     server = server.substring(0, colonPos);
