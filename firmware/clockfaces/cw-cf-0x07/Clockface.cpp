@@ -3,8 +3,8 @@
 
 unsigned long lastMillis = 0;
 
-// TODO document size
-static DynamicJsonDocument doc(32768);
+// Reduced size to free memory for SSL
+static DynamicJsonDocument doc(16384);
 
 Clockface::Clockface(Adafruit_GFX *display)
 {
@@ -356,10 +356,10 @@ bool Clockface::deserializeDefinition()
   uint16_t port = 443;
   bool useSSL = true;
 
-  // Skip GitHub - SSL not working with this ESP32 core
+  // Redirect GitHub to XE1E CDN (GitHub SSL not compatible)
   if (server.startsWith("raw.")) {
-    Serial.println("[Canvas] GitHub SSL not supported - use custom server");
-    return false;
+    server = "cdn.itaqui.to";
+    file = String("/xe1e/clockfaces" + file);
   }
 
   if (server.indexOf(":") > 0) {
