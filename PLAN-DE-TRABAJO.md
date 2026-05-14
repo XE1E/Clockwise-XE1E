@@ -10,125 +10,92 @@ interfaz web moderna y soporte multi-WiFi.
 ---
 
 ## Fase 1: Preparación y Renombrado
-**Estado:** Pendiente
+**Estado:** ✅ Completado
 
-- [ ] Renombrar proyecto a ClockWise-XE1E
-- [ ] Actualizar version a 1.0 en firmware
+- [x] Renombrar proyecto a ClockWise-XE1E
+- [x] Actualizar version a 1.0 en firmware
+- [x] Mostrar "XE1E" debajo del logo en todas las pantallas
 - [ ] Actualizar README con nueva identidad
 - [ ] Limpiar referencias a proyecto original donde aplique
 
 ---
 
-## Fase 2: Arquitectura FreeRTOS
-**Estado:** Pendiente  
+## Fase 2: Arquitectura de Red
+**Estado:** ✅ Completado  
 **Prioridad:** Alta
 
-### 2.1 Estructura de Tasks
-```
-Core 0: taskNetwork
-  - WiFi Manager (3 redes, auto-connect mejor señal)
-  - ESPAsyncWebServer
-  - NTP sync
-  - mDNS
+### 2.1 WiFi Multi-Red
+- [x] Estructura para 3 redes WiFi (SSID, password)
+- [x] Escaneo de redes al inicio
+- [x] Conexión automática a mejor señal (RSSI)
+- [x] Fallback a siguiente red si falla
+- [x] AP mode propio si todas fallan (sin WiFiManager)
+- [x] Reconexión automática si se pierde conexión (cada 30s)
+- [x] Mostrar IP en pantalla al conectar (3 segundos)
 
-Core 1: taskDisplay (loop principal)
-  - Rendering clockface
-  - Animaciones
-  - Modo nocturno
-```
-
-### 2.2 WiFi Multi-Red
-- [ ] Estructura para 3 redes WiFi (SSID, password, enabled)
-- [ ] Escaneo de redes al inicio
-- [ ] Conexión automática a mejor señal (RSSI)
-- [ ] Fallback a siguiente red si falla
-- [ ] AP mode si todas fallan
-- [ ] Reconexión automática si se pierde conexión
-- [ ] Mostrar IP y RSSI en pantalla al conectar (3 segundos)
-
-### 2.3 Comunicación entre Tasks
-- [ ] Queue para comandos (reload clockface, cambiar brillo, etc.)
-- [ ] Mutex para acceso a preferencias
-- [ ] Event groups para sincronización
-
-### 2.4 ESPAsyncWebServer
-- [ ] Migrar de WiFiServer a ESPAsyncWebServer
-- [ ] Endpoints async no bloqueantes
+### 2.2 ESPAsyncWebServer
+- [x] Migrar de WiFiServer a ESPAsyncWebServer
+- [x] Endpoints async no bloqueantes
+- [x] Eliminar dependencia de WiFiManager
 - [ ] WebSocket para actualizaciones en tiempo real (opcional)
+
+### 2.3 FreeRTOS Tasks (Diferido)
+> Nota: No implementado porque ESPAsyncWebServer ya maneja requests en segundo plano.
+> El beneficio sería marginal. Se puede reconsiderar si hay problemas de bloqueo.
 
 ---
 
 ## Fase 3: Interfaz Web Nueva
-**Estado:** Pendiente  
+**Estado:** ✅ Completado (Base)  
 **Prioridad:** Alta  
 **Referencia:** svitrix-firmware-XE1E/web/
 
 ### 3.1 Diseño Base
-- [ ] Header fijo con logo ClockWise
-- [ ] Navegación por pestañas
-- [ ] Tema claro/oscuro (toggle)
-- [ ] Diseño responsive (mobile-friendly)
-- [ ] Variables CSS para theming
+- [x] Header fijo con logo ClockWise XE1E
+- [x] Navegación por pestañas (7 tabs)
+- [x] Tema claro/oscuro (toggle)
+- [x] Diseño responsive (mobile-friendly)
+- [x] Variables CSS para theming
 
-### 3.2 Pestañas/Secciones
-1. **Inicio**
+### 3.2 Pestañas Implementadas
+1. **Inicio** ✅
    - Estado del reloj (IP, RSSI, hora, clockface actual)
-   - Acciones rápidas (reiniciar, cambiar clockface)
+   - Acciones rápidas (reiniciar, refrescar)
 
-2. **Carátulas**
-   - Grid de thumbnails
-   - Preview de carátula
-   - Selector de carátula activa
-   - Lista de rotación
-
-3. **WiFi**
+2. **WiFi** ✅
    - 3 redes configurables
-   - Escaneo de redes disponibles
-   - Indicador de señal
-   - Test de conexión
+   - Guardado independiente
 
-4. **Pantalla**
-   - Brillo manual/automático
+3. **Pantalla** ✅
+   - Brillo manual con valor visible
    - Rotación de pantalla
    - Swap Blue/Green
+   - Configuración LDR (brillo automático)
 
-5. **Modo Nocturno**
-   - Horario inicio/fin
-   - Brillo nocturno
-   - Color nocturno
-   - Carátula nocturna
-
-6. **Hora**
-   - Zona horaria
+4. **Hora** ✅
+   - Zona horaria (POSIX, sin DST para México)
    - Formato 24h/12h
-   - Servidor NTP
+   - Servidor NTP (Cloudflare default)
    - Idioma (español/inglés)
 
-7. **Editores** (integrados de clockface-editor)
-   - Editor de carátulas (index.html)
-   - Diseñador de dígitos (digit-designer.html)
-   - Diseñador de caracteres (char-designer.html)
-   - Conversor de fuentes (font-converter.html)
+5. **Nocturno** ✅
+   - Horario inicio/fin
+   - Brillo nocturno con valor visible
+   - Carátula nocturna
 
-8. **Sistema**
-   - Info firmware (versión, memoria libre)
-   - Actualización OTA
-   - Backup/Restore configuración
-   - Reset a defaults
+6. **Carátula** ✅
+   - Servidor y archivo
+   - Rotación de carátulas (enable, intervalo, lista)
 
-### 3.3 Estilos (basado en svitrix)
-```css
-:root {
-  --bg: #0f1117;
-  --bg-card: #1a1d2e;
-  --bg-input: #252940;
-  --border: #363b5c;
-  --text: #e0e0e8;
-  --text-dim: #9090a8;
-  --accent: #f0b800;  /* Color Clockwise */
-  --radius: 8px;
-}
-```
+7. **Sistema** ✅
+   - Info firmware (nombre, versión)
+   - Reiniciar
+   - Reset de fábrica
+
+### 3.3 Pendiente
+- [ ] Integrar editores de carátulas (Fase 5)
+- [ ] Escaneo de redes WiFi disponibles
+- [ ] Preview de carátulas
 
 ---
 
@@ -136,18 +103,19 @@ Core 1: taskDisplay (loop principal)
 **Estado:** En progreso  
 **Prioridad:** Media
 
-### 4.1 Ya Implementado (2026-05-13)
+### 4.1 Ya Implementado
 - [x] Quitar load() innecesarios en web server
 - [x] Quitar save() en rotación de carátulas
 - [x] Aumentar timeout WiFi (20s)
-- [x] Reintentos de conexión WiFi (3x)
-- [x] Mostrar IP y RSSI al conectar
+- [x] Reintentos de conexión WiFi (2x por red)
+- [x] Mostrar IP al conectar
 - [x] Aplanar submodulos a repo único
+- [x] Detección automática POSIX vs Olson timezone
+- [x] Firmware size: 70.4% flash (922KB)
 
 ### 4.2 Pendiente
 - [ ] Cache de valores JSON en sprites (evitar parsing repetido)
 - [ ] Optimizar renderElements (pre-calcular valores)
-- [ ] Buffer de HTTP request completo (no char por char)
 - [ ] Guardar solo preferencias modificadas (no todas)
 
 ---
@@ -165,8 +133,8 @@ Core 1: taskDisplay (loop principal)
 - [ ] Documentar uso de cada editor
 
 ### 5.2 Clockfaces
-- [ ] Verificar funcionamiento de 7 carátulas built-in
-- [ ] Verificar 11 carátulas JSON
+- [ ] Verificar funcionamiento de carátulas built-in
+- [ ] Verificar carátulas JSON
 - [ ] Generar thumbnails faltantes
 - [ ] Documentar formato JSON de carátulas
 
@@ -185,34 +153,31 @@ Core 1: taskDisplay (loop principal)
 ---
 
 ## Fase 7: Testing y Release
-**Estado:** Pendiente
+**Estado:** En progreso
 
-- [ ] Test de conexión WiFi (señal débil, múltiples redes)
-- [ ] Test de interfaz web (todos los parámetros)
+- [x] Test de conexión WiFi (señal débil, múltiples redes)
+- [x] Test de interfaz web (parámetros básicos)
 - [ ] Test de rotación de carátulas
 - [ ] Test de modo nocturno
-- [ ] Test en hardware real
+- [x] Test en hardware real
 - [ ] Compilar firmware release
 - [ ] Tag v1.0 en git
 
 ---
 
-## Archivos Clave a Modificar
+## Archivos Modificados
 
-### Firmware
-- `firmware/src/main.cpp` - Loop principal, tasks
-- `firmware/lib/cw-commons/WiFiController.h` - WiFi multi-red
-- `firmware/lib/cw-commons/CWWebServer.h` - Migrar a async
-- `firmware/lib/cw-commons/CWPreferences.h` - 3 redes WiFi
-- `firmware/lib/cw-commons/StatusController.h` - Display de estado
+### Firmware (actualizados 2026-05-13)
+- `firmware/src/main.cpp` - Loop con checkReconnect()
+- `firmware/lib/cw-commons/WiFiController.h` - WiFi multi-red, AP mode, auto-reconnect
+- `firmware/lib/cw-commons/CWWebServer.h` - ESPAsyncWebServer, API completa
+- `firmware/lib/cw-commons/WebUI.h` - Nueva interfaz web con tabs
+- `firmware/lib/cw-commons/CWPreferences.h` - 3 redes WiFi, rotación
+- `firmware/lib/cw-commons/StatusController.h` - XE1E branding, reconexión
+- `firmware/lib/cw-commons/CWDateTime.cpp` - POSIX timezone detection
+- `firmware/platformio.ini` - ESPAsyncWebServer, sin WiFiManager
 
-### Web (nuevo)
-- `web/index.html` - SPA principal
-- `web/css/styles.css` - Estilos globales
-- `web/js/app.js` - Lógica principal
-- `web/js/api.js` - Comunicación con ESP32
-
-### Editores (existentes)
+### Editores (pendientes de integrar)
 - `clockface-editor/index.html`
 - `clockface-editor/digit-designer.html`
 - `clockface-editor/char-designer.html`
@@ -221,14 +186,15 @@ Core 1: taskDisplay (loop principal)
 
 ## Notas Técnicas
 
-### Dependencias nuevas
-- ESPAsyncWebServer
+### Dependencias
+- ESPAsyncWebServer (reemplaza WiFiServer)
 - AsyncTCP
+- Sin WiFiManager (implementación propia de AP mode)
 
-### Memoria estimada
-- Interfaz web embebida: ~50KB gzip
-- Firmware: ~1.2MB
-- Espacio libre SPIFFS: ~1.5MB
+### Memoria
+- Firmware: 922KB (70.4% de 1.3MB)
+- RAM: 49KB (15% de 320KB)
+- Interfaz web embebida: ~12KB
 
 ### Compatibilidad
 - ESP32 (original Clockwise hardware)
@@ -241,6 +207,12 @@ Core 1: taskDisplay (loop principal)
 ### 2026-05-13
 - Creación del plan de trabajo
 - Submodulos aplanados a repo único
-- Fixes iniciales de WiFi y web server
-- Propuesta de arquitectura FreeRTOS
+- WiFi multi-red con RSSI
+- ESPAsyncWebServer (sin WiFiManager)
+- Nueva interfaz web con 7 pestañas
+- Tema claro/oscuro
+- Reconexión automática WiFi
+- XE1E branding en pantallas
+- POSIX timezone (México sin DST)
+- Reset de fábrica
 

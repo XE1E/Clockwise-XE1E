@@ -57,6 +57,7 @@ button:hover{border-color:var(--accent)}
   <button class="tab" data-page="time">Hora</button>
   <button class="tab" data-page="night">Nocturno</button>
   <button class="tab" data-page="clock">Caratula</button>
+  <button class="tab" data-page="editors">Editores</button>
   <button class="tab" data-page="system">Sistema</button>
   <button class="theme-btn" onclick="toggleTheme()" title="Cambiar tema">&#9728;</button>
 </nav>
@@ -226,6 +227,43 @@ button:hover{border-color:var(--accent)}
       <input type="text" id="rotationList" placeholder="clock1,clock2,clock3">
     </div>
     <button class="btn-primary" onclick="saveClock()">Guardar Caratula</button>
+  </div>
+
+  <!-- EDITORS -->
+  <div id="editors" class="page">
+    <div class="card">
+      <h2>Editores de Caratulas</h2>
+      <p style="color:var(--dim);font-size:13px;margin-bottom:16px">
+        Herramientas web para crear y editar caratulas. Se abren en nueva ventana.
+      </p>
+      <div class="row" style="margin-bottom:12px">
+        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Editor de Caratulas</button>
+        </a>
+        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/digit-designer.html" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Disenador de Digitos</button>
+        </a>
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/char-designer.html" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Disenador de Caracteres</button>
+        </a>
+        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/font-converter.html" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Conversor de Fuentes</button>
+        </a>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Recursos</h2>
+      <div class="row">
+        <a href="https://github.com/XE1E/Clockwise-XE1E/tree/main/clockface-editor/clockfaces" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Caratulas de ejemplo</button>
+        </a>
+        <a href="https://github.com/XE1E/Clockwise-XE1E/tree/main/clockface-editor/fonts" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Fuentes disponibles</button>
+        </a>
+      </div>
+    </div>
   </div>
 
   <!-- SYSTEM -->
