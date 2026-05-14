@@ -252,15 +252,31 @@ button:hover{border-color:var(--accent)}
           <button style="width:100%">Conversor de Fuentes</button>
         </a>
       </div>
+      <div class="row" style="margin-bottom:12px">
+        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/generate-thumbs.html" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Generar Thumbnails</button>
+        </a>
+        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/config-page.html" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Configuracion</button>
+        </a>
+      </div>
     </div>
     <div class="card">
       <h2>Recursos</h2>
-      <div class="row">
+      <div class="row" style="margin-bottom:12px">
+        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/install.html" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Guia de Instalacion</button>
+        </a>
         <a href="https://github.com/XE1E/Clockwise-XE1E/tree/main/clockface-editor/clockfaces" target="_blank" style="text-decoration:none">
           <button style="width:100%">Caratulas de ejemplo</button>
         </a>
+      </div>
+      <div class="row">
         <a href="https://github.com/XE1E/Clockwise-XE1E/tree/main/clockface-editor/fonts" target="_blank" style="text-decoration:none">
           <button style="width:100%">Fuentes disponibles</button>
+        </a>
+        <a href="https://github.com/XE1E/Clockwise-XE1E" target="_blank" style="text-decoration:none">
+          <button style="width:100%">Repositorio GitHub</button>
         </a>
       </div>
     </div>
