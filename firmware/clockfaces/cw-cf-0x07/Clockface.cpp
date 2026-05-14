@@ -1,5 +1,6 @@
 
 #include "Clockface.h"
+#include <CWPreview.h>
 
 unsigned long lastMillis = 0;
 
@@ -124,12 +125,26 @@ void Clockface::renderText(String text, JsonVariantConst value)
   uint16_t fgColor = resolveColor(value["fgColor"].as<int32_t>());
   uint16_t bgColor = resolveColor(value["bgColor"].as<int32_t>());
 
-  // BG Color
+  // Calculate max width using "8" as reference (widest digit)
+  // This ensures the background clears the full area when digits change
+  int16_t ref_x1, ref_y1;
+  uint16_t ref_w, ref_h;
+  String refText = text;
+  for (int i = 0; i < refText.length(); i++) {
+    if (refText[i] >= '0' && refText[i] <= '9') refText[i] = '8';
+  }
+  Locator::getDisplay()->getTextBounds(refText, 0, 0, &ref_x1, &ref_y1, &ref_w, &ref_h);
+
+  // Use the larger of actual or reference dimensions
+  uint16_t clearW = max(w, ref_w);
+  uint16_t clearH = max(h, ref_h);
+
+  // BG Color - clear area based on widest possible text
   Locator::getDisplay()->fillRect(
       value["x"].as<const uint16_t>() + x1,
       value["y"].as<const uint16_t>() + y1,
-      w,
-      h,
+      clearW,
+      clearH,
       bgColor);
 
   Locator::getDisplay()->setTextColor(fgColor);
@@ -367,6 +382,23 @@ void Clockface::renderElements(JsonArrayConst elements)
 
 bool Clockface::deserializeDefinition()
 {
+  // Check for preview mode first (temporary, from editor)
+  // Preview takes priority and is cleared on restart
+  if (CWPreview::getInstance()->hasPreview) {
+    Serial.println("[Canvas] Loading from preview JSON (temporary)");
+    doc.clear();
+    DeserializationError error = deserializeJson(doc, CWPreview::getInstance()->jsonData);
+    if (error) {
+      Serial.print("deserializeJson() failed: ");
+      Serial.println(error.c_str());
+      CWPreview::getInstance()->clearPreview();
+      drawSplashScreen(0xC904, "Preview error");
+      return false;
+    }
+    Serial.printf("[Canvas] Preview clockface '%s' loaded\n", doc["name"].as<const char *>());
+    return true;
+  }
+
   if (ClockwiseParams::getInstance()->canvasServer.isEmpty() || ClockwiseParams::getInstance()->canvasFile.isEmpty()) {
     drawSplashScreen(0xC904, "Params werent set");
     return false;
@@ -378,8 +410,13 @@ bool Clockface::deserializeDefinition()
   bool useSSL = true;
 
   // Handle clockface source selection
-  if (server.startsWith("raw.")) {
-    String source = ClockwiseParams::getInstance()->clockfaceSource;
+  String source = ClockwiseParams::getInstance()->clockfaceSource;
+  if (source == "local") {
+    // Use local development server (HTTP, no SSL)
+    server = ClockwiseParams::getInstance()->localServerHost;
+    port = ClockwiseParams::getInstance()->localServerPort;
+    useSSL = false;
+  } else if (server.startsWith("raw.")) {
     if (source == "github") {
       // Use GitHub directly (may fail on some ESP32)
       file = String("/jnthas/clock-club/main/shared" + file);

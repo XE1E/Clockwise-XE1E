@@ -354,11 +354,9 @@
             </div>
 
             <div class="source-section">
-                <h4>Codigo JS (avanzado)</h4>
-                <button class="btn btn-small btn-primary" onclick="exportToJS()" style="width:100%;">Generar codigo</button>
-                <button class="btn btn-small btn-primary" onclick="copyJS()" style="width:100%;margin-top:5px;">Copiar al portapapeles</button>
-                <textarea id="js-output" readonly placeholder="El codigo aparecera aqui..." style="height:80px;"></textarea>
-                <p class="help-text">Para pegar manualmente en pixel-fonts.js</p>
+                <h4>Agregar a predefinidas</h4>
+                <button class="btn btn-success" onclick="addToPredefined()">Agregar a pixel-fonts.js</button>
+                <p class="help-text">Agrega la fuente directamente a las predefinidas del editor</p>
             </div>
 
             <div class="source-section">
@@ -1023,17 +1021,153 @@
             }
         }
 
-        function copyJS() {
-            const js = document.getElementById('js-output').value;
-            if (!js || js.includes('aparecera')) {
-                alert('Primero genera el codigo JS');
+        // Genera el codigo JS para una fuente
+        function generateFontJS(name) {
+            const all = Object.values(CHAR_GROUPS).join('');
+            const sorted = [...all].sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
+
+            let first = null, last = null;
+            for (const c of sorted) {
+                if (hasData(c)) {
+                    const code = c.charCodeAt(0);
+                    if (first === null) first = code;
+                    last = code;
+                }
+            }
+
+            if (first === null) return null;
+
+            const glyphs = [];
+            const bytes = [];
+
+            for (let code = first; code <= last; code++) {
+                const c = String.fromCharCode(code);
+                if (!hasData(c)) {
+                    glyphs.push([bytes.length, 0, 0, WIDTH, 0, 0]);
+                    continue;
+                }
+
+                let minX = WIDTH, maxX = 0, minY = HEIGHT, maxY = 0;
+                for (let y = 0; y < HEIGHT; y++) {
+                    for (let x = 0; x < WIDTH; x++) {
+                        if (chars[c][y][x]) {
+                            minX = Math.min(minX, x);
+                            maxX = Math.max(maxX, x);
+                            minY = Math.min(minY, y);
+                            maxY = Math.max(maxY, y);
+                        }
+                    }
+                }
+
+                const gW = maxX - minX + 1;
+                const gH = maxY - minY + 1;
+                const offset = bytes.length;
+
+                let curByte = 0, bitCount = 0;
+                for (let y = minY; y <= maxY; y++) {
+                    for (let x = minX; x <= maxX; x++) {
+                        curByte = (curByte << 1) | (chars[c][y][x] ? 1 : 0);
+                        bitCount++;
+                        if (bitCount === 8) {
+                            bytes.push(curByte);
+                            curByte = 0;
+                            bitCount = 0;
+                        }
+                    }
+                }
+                if (bitCount > 0) {
+                    bytes.push(curByte << (8 - bitCount));
+                }
+
+                glyphs.push([offset, gW, gH, gW + 1, minX, minY - HEIGHT]);
+            }
+
+            let js = `    ${name}: {\n`;
+            js += `        bitmaps: [${bytes.map(b => '0x' + b.toString(16).toUpperCase().padStart(2, '0')).join(',')}],\n`;
+            js += `        glyphs: [\n`;
+            for (let i = 0; i < glyphs.length; i++) {
+                js += `            [${glyphs[i].join(',')}]${i < glyphs.length - 1 ? ',' : ''}\n`;
+            }
+            js += `        ],\n`;
+            js += `        first: 0x${first.toString(16).toUpperCase()}, last: 0x${last.toString(16).toUpperCase()}, yAdvance: ${HEIGHT}\n`;
+            js += `    }`;
+
+            return js;
+        }
+
+        async function addToPredefined() {
+            const name = document.getElementById('font-name').value.trim();
+            if (!name) {
+                alert('Escribe un nombre para la fuente');
                 return;
             }
-            navigator.clipboard.writeText(js).then(() => {
-                showStatus('Codigo copiado al portapapeles', 'success');
-            }).catch(() => {
-                showStatus('Error al copiar', 'warning');
-            });
+
+            if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(name)) {
+                alert('El nombre debe empezar con letra y solo contener letras, numeros y guion bajo');
+                return;
+            }
+
+            // Verificar si ya existe
+            if (typeof PixelFonts !== 'undefined' && PixelFonts[name]) {
+                if (!confirm('La fuente "' + name + '" ya existe. ¿Reemplazarla?')) {
+                    return;
+                }
+            }
+
+            const fontCode = generateFontJS(name);
+            if (!fontCode) {
+                alert('No hay caracteres para guardar');
+                return;
+            }
+
+            if (!window.showDirectoryPicker) {
+                // Fallback: copiar al portapapeles con instrucciones
+                const fullCode = fontCode + ',';
+                navigator.clipboard.writeText(fullCode).then(() => {
+                    alert('Codigo copiado al portapapeles.\n\nPara agregarlo:\n1. Abre js/pixel-fonts.js\n2. Busca la linea "drawChar(ctx, fontName..." \n3. Pega el codigo ANTES de esa linea\n4. Guarda el archivo');
+                    showStatus('Codigo copiado - ver instrucciones', 'success');
+                }).catch(() => {
+                    alert('Error al copiar. El codigo es:\n\n' + fullCode);
+                });
+                return;
+            }
+
+            try {
+                alert('Selecciona la carpeta "js" dentro de clockface-editor');
+                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+
+                // Leer pixel-fonts.js actual
+                const fileHandle = await dirHandle.getFileHandle('pixel-fonts.js');
+                const file = await fileHandle.getFile();
+                let content = await file.text();
+
+                // Buscar si la fuente ya existe y reemplazarla
+                const existingPattern = new RegExp(`\\n    ${name}: \\{[\\s\\S]*?\\n    \\},?`, 'g');
+                content = content.replace(existingPattern, '');
+
+                // Insertar nueva fuente antes de drawChar
+                const insertPoint = content.indexOf('\n    drawChar(');
+                if (insertPoint === -1) {
+                    throw new Error('No se encontro el punto de insercion en pixel-fonts.js');
+                }
+
+                const newContent = content.slice(0, insertPoint) + '\n' + fontCode + ',\n' + content.slice(insertPoint);
+
+                // Escribir archivo
+                const writable = await fileHandle.createWritable();
+                await writable.write(newContent);
+                await writable.close();
+
+                // Recargar PixelFonts
+                showStatus('Fuente "' + name + '" agregada a predefinidas', 'success');
+                alert('Fuente agregada!\n\nRecarga la pagina para verla en el selector de fuentes predefinidas.');
+
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    showStatus('Error: ' + e.message, 'error');
+                    alert('Error: ' + e.message);
+                }
+            }
         }
 
         async function saveToGallery() {
@@ -1223,80 +1357,12 @@
             }
         }
 
+        // Mantener por compatibilidad con otros scripts
         function exportToJS() {
-            const all = Object.values(CHAR_GROUPS).join('');
-            const sorted = [...all].sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
-
-            let first = null, last = null;
-            for (const c of sorted) {
-                if (hasData(c)) {
-                    const code = c.charCodeAt(0);
-                    if (first === null) first = code;
-                    last = code;
-                }
-            }
-
-            if (first === null) { alert('No hay caracteres'); return; }
-
-            const glyphs = [];
-            const bytes = [];
-
-            for (let code = first; code <= last; code++) {
-                const c = String.fromCharCode(code);
-                if (!hasData(c)) {
-                    glyphs.push([bytes.length, 0, 0, WIDTH, 0, 0]);
-                    continue;
-                }
-
-                // Find bounding box
-                let minX = WIDTH, maxX = 0, minY = HEIGHT, maxY = 0;
-                for (let y = 0; y < HEIGHT; y++) {
-                    for (let x = 0; x < WIDTH; x++) {
-                        if (chars[c][y][x]) {
-                            minX = Math.min(minX, x);
-                            maxX = Math.max(maxX, x);
-                            minY = Math.min(minY, y);
-                            maxY = Math.max(maxY, y);
-                        }
-                    }
-                }
-
-                const gW = maxX - minX + 1;
-                const gH = maxY - minY + 1;
-                const offset = bytes.length;
-
-                let curByte = 0, bitCount = 0;
-                for (let y = minY; y <= maxY; y++) {
-                    for (let x = minX; x <= maxX; x++) {
-                        curByte = (curByte << 1) | (chars[c][y][x] ? 1 : 0);
-                        bitCount++;
-                        if (bitCount === 8) {
-                            bytes.push(curByte);
-                            curByte = 0;
-                            bitCount = 0;
-                        }
-                    }
-                }
-                if (bitCount > 0) {
-                    bytes.push(curByte << (8 - bitCount));
-                }
-
-                glyphs.push([offset, gW, gH, gW + 1, minX, minY - HEIGHT]);
-            }
-
             const name = document.getElementById('font-name').value || 'custom';
-            let js = `    ${name}: {\n`;
-            js += `        bitmaps: [${bytes.map(b => '0x' + b.toString(16).toUpperCase().padStart(2, '0')).join(',')}],\n`;
-            js += `        glyphs: [\n`;
-            for (let i = 0; i < glyphs.length; i++) {
-                js += `            [${glyphs[i].join(',')}]${i < glyphs.length - 1 ? ',' : ''}\n`;
-            }
-            js += `        ],\n`;
-            js += `        first: 0x${first.toString(16).toUpperCase()}, last: 0x${last.toString(16).toUpperCase()}, yAdvance: ${HEIGHT}\n`;
-            js += `    }`;
-
-            document.getElementById('js-output').value = js;
-            showStatus('Codigo JS generado', 'success');
+            const js = generateFontJS(name);
+            if (!js) { alert('No hay caracteres'); return; }
+            return js;
         }
 
         function downloadAllPNG() {

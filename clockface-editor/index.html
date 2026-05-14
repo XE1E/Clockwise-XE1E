@@ -21,6 +21,7 @@
                 <button id="btn-thumbnail" class="btn btn-secondary" title="Generar thumbnail PNG">Thumbnail</button>
                 <button id="btn-batch-thumbs" class="btn btn-secondary" title="Generar todos los thumbnails">Batch Thumbs</button>
                 <button id="btn-export" class="btn btn-primary" title="Exportar JSON">Exportar JSON</button>
+                <button id="btn-test-clock" class="btn btn-success" title="Enviar al reloj para probar">Probar en Reloj</button>
             </div>
         </header>
 
@@ -662,6 +663,38 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary modal-close">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test on Clock Modal -->
+    <div id="test-clock-modal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Probar en Reloj</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                    Envia la caratula directamente al reloj para verla en tiempo real.
+                </p>
+                <div class="form-group">
+                    <label>IP del reloj</label>
+                    <input type="text" id="clock-ip" placeholder="192.168.1.100 o clockwise.local" value="">
+                    <small style="color: var(--text-secondary);">Busca la IP en la pantalla del reloj o en tu router</small>
+                </div>
+                <div id="test-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+                <div style="margin-top: 15px; padding: 10px; background: var(--bg-light); border-radius: 4px; font-size: 12px; color: var(--text-secondary);">
+                    <strong>Nota:</strong> El preview es temporal. Para volver a la caratula normal:
+                    <ul style="margin: 5px 0 0 15px; padding: 0;">
+                        <li>Reinicia el reloj, o</li>
+                        <li>Selecciona otra caratula en la config web</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cancelar</button>
+                <button class="btn btn-success" id="btn-send-to-clock">Enviar al Reloj</button>
             </div>
         </div>
     </div>

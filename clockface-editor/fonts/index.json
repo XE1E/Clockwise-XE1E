@@ -1,9 +1,4 @@
 {
-  "description": "Indice de fuentes personalizadas para Clockwise",
-  "fonts": [
-    "mi-fuente-1.json",
-    "mi-fuente-0.json",
-    "mi-fuente-2.json",
-    "mi-fuente-4.json"
-  ]
+  "description": "Fuentes personalizadas para Clockwise",
+  "fonts": ["led-display.json"]
 }

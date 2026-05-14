@@ -212,6 +212,7 @@ npx serve .
 | medium | 10px | Tamaño medio, buena legibilidad |
 | big | 14px | Grande, para hora principal |
 | bold | 13px | Gruesa, alto contraste |
+| ledDisplay | 14px | Estilo LED clasico, bordes redondeados |
 
 #### Formatos de DateTime (ezTime)
 
@@ -367,12 +368,13 @@ Clockwise tiene un sistema de fuentes que permite usar fuentes predefinidas o ag
 Las fuentes disponibles se muestran automaticamente en el dropdown del editor de caratulas.
 
 **Fuentes predefinidas** (en `js/pixel-fonts.js`):
-- picopixel (5x6)
-- tomthumb (3x6)
-- square (7x11) - solo numeros
-- medium (8x10)
-- big (12x15)
-- bold (14x18)
+- picopixel (5x6) - muy pequeña
+- tomthumb (3x6) - la mas pequeña
+- square (7x11) - solo numeros, estilo cuadrado
+- medium (8x10) - tamaño medio
+- big (12x15) - grande, para hora principal
+- bold (14x18) - gruesa, alto contraste
+- ledDisplay (8x14) - estilo LED clasico
 
 **Fuentes personalizadas** (en carpeta `fonts/`):
 - Se cargan automaticamente al abrir el editor
@@ -389,6 +391,62 @@ clockface-editor/
 │   ├── mi-fuente.json    # Fuente personalizada
 │   └── otra-fuente.json  # Otra fuente
 └── char-designer.html    # Editor de fuentes
+```
+
+---
+
+## Convertir Fuentes TTF
+
+Las fuentes TTF (TrueType) son vectoriales y deben convertirse a bitmap para el reloj.
+
+### Metodo 1: TTF → BDF → Clockwise (Recomendado)
+
+1. **Convertir TTF a BDF** usando [FontForge](https://fontforge.org):
+   ```
+   Abrir TTF → File → Generate Fonts → BDF
+   Seleccionar tamaño pequeño (8-16px)
+   ```
+
+2. **Importar BDF** en char-designer.html:
+   - Click "Importar archivo .bdf"
+   - Editar caracteres si es necesario
+   - Click "Agregar a predefinidas"
+
+### Metodo 2: Script Python (Automatico)
+
+Para convertir TTF directamente, usar el script en `clockface-editor/tools/`:
+
+```bash
+# Instalar dependencias
+pip install pillow fonttools
+
+# Convertir TTF a JSON (para char-designer)
+python convert_ttf.py "MiFuente.ttf" --size 12
+
+# Convertir TTF a JS (para pixel-fonts.js)
+python convert_to_js.py "MiFuente.ttf" --size 12 --name mifuente
+```
+
+**Parametros:**
+- `--size`: Tamaño en pixels (8-24, recomendado 10-14 para 64x64)
+- `--name`: Nombre de la fuente en JS (sin espacios)
+
+### Ejemplo: LED Display
+
+Se incluye la fuente "ledDisplay" convertida desde TTF:
+
+| Fuente | Tamaño | Estilo |
+|--------|--------|--------|
+| ledDisplay | 8x14 | LED clasico con bordes redondeados |
+
+```javascript
+// En una caratula:
+{
+  "type": "datetime",
+  "font": "ledDisplay",
+  "content": "H:i",
+  ...
+}
 ```
 
 ---
@@ -443,8 +501,8 @@ python -m http.server 8000
               ↓
 2. Editar caracteres si es necesario
               ↓
-3. Click "Guardar en fonts/"
-   (selecciona la carpeta fonts/)
+3. Click "Agregar a predefinidas" (directo a pixel-fonts.js)
+   o "Guardar en fonts/" (para galeria personalizada)
               ↓
 4. Recargar editor de caratulas
    → La fuente aparece en el dropdown
@@ -461,11 +519,11 @@ python -m http.server 8000
 │                 │   [a][b][c]...[z]       │ → Agrega a la   │
 │ 2. Archivo JSON │   [!][@][#]...[?]       │   galeria       │
 │                 │                          │                 │
-│ 3. Archivo BDF  │   ┌─────────────────┐    │ [Guardar JSON]  │
-│                 │   │  Grid de        │    │ → Backup        │
-│ 4. Carpeta      │   │  edicion        │    │                 │
-│    fonts/       │   │  pixel x pixel  │    │ [Exportar PNG]  │
-│                 │   └─────────────────┘    │ → Imagenes      │
+│ 3. Archivo BDF  │   ┌─────────────────┐    │ [Agregar a      │
+│                 │   │  Grid de        │    │  predefinidas]  │
+│ 4. Carpeta      │   │  edicion        │    │ → pixel-fonts.js│
+│    fonts/       │   │  pixel x pixel  │    │                 │
+│                 │   └─────────────────┘    │ [Exportar PNG]  │
 └─────────────────┴──────────────────────────┴─────────────────┘
 ```
 
@@ -482,9 +540,13 @@ python -m http.server 8000
 
 | Opcion | Resultado |
 |--------|-----------|
-| **Guardar en fonts/** | Guarda en galeria, disponible en editor de caratulas |
-| **Guardar JSON** | Backup para sincronizar entre PCs via GitHub |
-| **Guardar PNGs** | Imagenes de cada caracter |
+| **Agregar a predefinidas** | Agrega directamente a pixel-fonts.js (queda permanente) |
+| **Guardar en fonts/** | Guarda en galeria personalizada, disponible en editor |
+| **Exportar PNGs** | Imagenes de cada caracter (para uso externo) |
+
+**Diferencia entre las opciones:**
+- **Predefinidas** (`pixel-fonts.js`): La fuente queda integrada en el codigo, siempre disponible
+- **Galeria** (`fonts/`): Archivo JSON separado, se puede compartir mas facilmente
 
 ### Importar fuentes externas (BDF)
 
@@ -514,39 +576,30 @@ El editor soporta archivos BDF (Bitmap Distribution Format), un formato estandar
 | a-z | Letras minusculas |
 | Simbolos | Espacios, puntuacion, signos |
 
-### Formatos de exportacion
+### Formatos internos
 
-| Formato | Proposito | Donde se guarda |
-|---------|-----------|-----------------|
-| **JSON** | Backup y transferencia entre PCs | `clockface-editor/fonts/` |
-| **JS** | Usar la fuente en el editor de caratulas | Pegar en `js/pixel-fonts.js` |
+El editor maneja dos formatos de fuente internamente:
 
-#### Formato JSON (backup)
+#### Formato JSON (galeria fonts/)
 
-Archivo para guardar, transferir y volver a cargar en el editor:
+Archivo legible que se guarda en la carpeta `fonts/`:
 
 ```json
 {
   "name": "mi-fuente",
-  "version": 1,
-  "width": 8,
-  "height": 12,
-  "characters": {
-    "48": [[0,1,1,0], ...],
-    "65": [[1,1,1,1], ...],
-    ...
-  }
+  "bitmaps": [0xE8, 0xB4, ...],
+  "glyphs": [[0,3,5,4,0,-5], ...],
+  "first": 32, "last": 126,
+  "yAdvance": 12
 }
 ```
 
-**Uso:** Guardalo en `clockface-editor/fonts/` y sincroniza via GitHub para trabajar en varias PCs.
+#### Formato JS (predefinidas)
 
-#### Formato JS (integracion)
-
-Codigo JavaScript listo para agregar a `pixel-fonts.js`:
+El boton "Agregar a predefinidas" escribe directamente en `pixel-fonts.js`:
 
 ```javascript
-custom: {
+mifuente: {
     bitmaps: [0xE8,0xB4,...],
     glyphs: [
         [0,3,5,4,0,-5],  // [offset, width, height, xAdvance, xOffset, yOffset]
@@ -556,33 +609,32 @@ custom: {
 }
 ```
 
-**Uso:** Copia este codigo y pegalo en `clockface-editor/js/pixel-fonts.js` dentro del objeto `fonts`. Despues la fuente aparecera en el dropdown de fuentes del editor principal.
+**Nota:** Ya no es necesario copiar/pegar codigo manualmente. El boton "Agregar a predefinidas" hace todo automaticamente.
 
 ### Flujo de trabajo completo
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │  1. DISEÑAR                                                      │
-│     - Cargar fuente base (sistema, JSON, o repo)                │
+│     - Cargar fuente base (sistema, BDF, JSON, o repo)           │
 │     - Editar caracteres pixel por pixel                         │
 │     - Se guarda automaticamente en localStorage                  │
 ├──────────────────────────────────────────────────────────────────┤
-│  2. EXPORTAR JSON (para backup)                                  │
-│     - Click "Exportar JSON"                                      │
-│     - Guardar archivo en clockface-editor/fonts/                │
-│     - git add, commit, push                                      │
+│  2. GUARDAR (elegir una opcion)                                  │
+│                                                                  │
+│     Opcion A - "Agregar a predefinidas" (Recomendado)           │
+│     - Click "Agregar a pixel-fonts.js"                          │
+│     - Seleccionar carpeta "js"                                   │
+│     - La fuente queda integrada permanentemente                  │
+│                                                                  │
+│     Opcion B - "Guardar en fonts/"                               │
+│     - Click "Guardar en fonts/"                                  │
+│     - Seleccionar carpeta "fonts"                                │
+│     - La fuente queda en la galeria personalizada               │
 ├──────────────────────────────────────────────────────────────────┤
-│  3. EXPORTAR JS (para usar la fuente)                            │
-│     - Click "Exportar JS"                                        │
-│     - Copiar el codigo generado                                  │
-│     - Pegar en js/pixel-fonts.js                                 │
-│     - La fuente aparece en el editor de clockfaces              │
-├──────────────────────────────────────────────────────────────────┤
-│  4. SINCRONIZAR (otra PC)                                        │
-│     - git pull                                                   │
-│     - Iniciar servidor local                                     │
-│     - Abrir char-designer.html                                   │
-│     - Click "Cargar del Repo"                                    │
+│  3. USAR                                                         │
+│     - Recargar el editor de caratulas (F5)                      │
+│     - La fuente aparece en el dropdown de fuentes               │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -592,10 +644,11 @@ custom: {
 clockface-editor/
 ├── char-designer.html      # Editor de fuentes
 ├── js/
-│   └── pixel-fonts.js      # Fuentes usadas por el editor (pegar JS aqui)
+│   └── pixel-fonts.js      # Fuentes predefinidas (modificado por "Agregar a predefinidas")
 └── fonts/
-    ├── mi-fuente.json      # Backup de fuente personalizada
-    └── otra-fuente.json    # Otro backup
+    ├── index.json          # Indice de fuentes personalizadas
+    ├── mi-fuente.json      # Fuente de galeria
+    └── otra-fuente.json    # Otra fuente de galeria
 ```
 
 ---
@@ -970,7 +1023,66 @@ Verde: 64 niveles
    - fgColor: blanco (65535)
    - Marcar "En Loop"
 
-5. **Exportar** y usar en Clockwise
+5. **Exportar** o **Probar en el reloj** directamente
+
+---
+
+## Probar Caratulas en el Reloj
+
+Antes de subir tu caratula a GitHub, puedes probarla directamente en el reloj.
+
+### Metodo Rapido: Boton "Probar en Reloj" (Recomendado)
+
+El editor incluye un boton para enviar la caratula directamente al reloj:
+
+1. Disena tu caratula en el editor
+2. Haz clic en el boton verde **"Probar en Reloj"** (esquina superior derecha)
+3. Ingresa la **IP de tu reloj** (ej: `192.168.1.50`)
+4. Haz clic en **"Enviar al Reloj"**
+5. La caratula aparece inmediatamente en el reloj
+
+**Ventajas de este metodo:**
+- No necesitas guardar archivos
+- No necesitas usar la terminal
+- No necesitas configurar servidores
+- La IP se guarda automaticamente para la proxima vez
+- Cambios instantaneos mientras diseñas
+
+**Como encontrar la IP del reloj:**
+- Aparece en la pantalla del reloj al encender (junto al WiFi)
+- O busca "Clockwise" en la lista de dispositivos de tu router
+- O intenta `clockwise.local` si tu sistema soporta mDNS
+
+### Flujo de desarrollo recomendado
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. Abrir Editor de Caratulas                               │
+│              ↓                                              │
+│  2. Disenar o modificar la caratula                         │
+│              ↓                                              │
+│  3. Click "Probar en Reloj" → ver resultado                │
+│              ↓                                              │
+│  4. Ajustar y repetir hasta quedar satisfecho              │
+│              ↓                                              │
+│  5. Click "Exportar JSON" → guardar archivo                │
+│              ↓                                              │
+│  6. Subir JSON a GitHub cuando este listo                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Metodo Alternativo: Servidor Local
+
+Si prefieres trabajar con archivos JSON guardados:
+
+1. Exporta y guarda el JSON en una carpeta
+2. Abre terminal en esa carpeta: `python -m http.server 8080`
+3. En la config del reloj: Fuente **"Local"**, IP de tu PC, puerto `8080`
+4. Escribe el nombre de la caratula y guarda
+
+**Obtener tu IP:** Windows: `ipconfig` | Mac/Linux: `ifconfig`
+
+---
 
 ### JSON Resultante
 

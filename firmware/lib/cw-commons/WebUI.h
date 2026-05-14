@@ -121,7 +121,7 @@ button:hover{border-color:var(--accent)}
     <div class="card">
       <h2>Pantalla</h2>
       <label>Brillo: <span id="brightVal">32</span></label>
-      <input type="range" id="displayBright" min="1" max="255" value="32" oninput="$('brightVal').textContent=this.value">
+      <input type="range" id="displayBright" min="1" max="255" value="32" oninput="$('brightVal').textContent=this.value;sendBright(this.value)">
       <label>Rotacion</label>
       <select id="displayRotation">
         <option value="0">0° (Normal)</option>
@@ -219,12 +219,19 @@ button:hover{border-color:var(--accent)}
           <input type="color" id="nightColor" value="#ff0000" style="width:100%;height:40px">
         </div>
         <div>
-          <label>Colores rapidos</label>
+          <label>Colores brillantes</label>
           <div style="display:flex;gap:4px;margin-top:4px">
             <button type="button" onclick="setNightColor('#ff0000')" style="width:32px;height:32px;background:#ff0000;padding:0"></button>
             <button type="button" onclick="setNightColor('#ff6600')" style="width:32px;height:32px;background:#ff6600;padding:0"></button>
             <button type="button" onclick="setNightColor('#00ff00')" style="width:32px;height:32px;background:#00ff00;padding:0"></button>
             <button type="button" onclick="setNightColor('#0088ff')" style="width:32px;height:32px;background:#0088ff;padding:0"></button>
+          </div>
+          <label style="margin-top:8px">Colores tenues (para dormir)</label>
+          <div style="display:flex;gap:4px;margin-top:4px">
+            <button type="button" onclick="setNightColor('#200000')" style="width:32px;height:32px;background:#200000;border:1px solid #444;padding:0" title="Rojo tenue"></button>
+            <button type="button" onclick="setNightColor('#201000')" style="width:32px;height:32px;background:#201000;border:1px solid #444;padding:0" title="Ambar tenue"></button>
+            <button type="button" onclick="setNightColor('#002000')" style="width:32px;height:32px;background:#002000;border:1px solid #444;padding:0" title="Verde tenue"></button>
+            <button type="button" onclick="setNightColor('#000820')" style="width:32px;height:32px;background:#000820;border:1px solid #444;padding:0" title="Azul tenue"></button>
           </div>
         </div>
       </div>
@@ -235,51 +242,45 @@ button:hover{border-color:var(--accent)}
   <!-- CLOCKFACE -->
   <div id="clock" class="page">
     <div class="card">
-      <h2>Caratula</h2>
-      <label>Seleccionar caratula</label>
-      <select id="canvasSelect" onchange="onClockSelect()">
-        <option value="">-- Seleccionar --</option>
-        <option value="pac-man">Pac-Man</option>
-        <option value="nyan-cat">Nyan Cat</option>
-        <option value="donkey-kong">Donkey Kong</option>
-        <option value="star-wars">Star Wars</option>
-        <option value="goomba_move">Goomba</option>
-        <option value="clock-club">Clock Club</option>
-        <option value="retro-computer">Retro Computer</option>
-        <option value="snoopy3">Snoopy</option>
-        <option value="christmassnoopy">Christmas Snoopy</option>
-        <option value="eletrogate">Eletrogate</option>
-        <option value="pepsi-final-2">Pepsi</option>
-        <option value="night-clock">Night Clock</option>
-        <option value="night-clock-xe1e">Night Clock XE1E</option>
-        <option value="_custom">-- Personalizado --</option>
-      </select>
-      <div id="customClock" style="display:none">
-        <label>Servidor</label>
-        <input type="text" id="canvasServer" placeholder="raw.githubusercontent.com">
-        <label>Archivo</label>
-        <input type="text" id="canvasFile" placeholder="nombre-caratula">
-      </div>
-    </div>
-    <div class="card">
-      <h2>Servidor de caratulas</h2>
-      <label>Fuente</label>
-      <select id="clockfaceSource">
+      <h2>Fuente de caratulas</h2>
+      <select id="clockfaceSource" onchange="onSourceChange()">
         <option value="cdn">CDN XE1E (Recomendado)</option>
         <option value="github">GitHub (puede fallar)</option>
+        <option value="local">Local (desarrollo)</option>
       </select>
-      <p style="color:var(--dim);font-size:12px;margin-top:4px">GitHub puede no funcionar en algunos ESP32 por incompatibilidad SSL</p>
+      <p id="sourceHint" style="color:var(--dim);font-size:12px;margin-top:4px"></p>
+      <div id="localServerConfig" style="display:none;margin-top:12px">
+        <label>IP/Host del servidor</label>
+        <input type="text" id="localServerHost" placeholder="192.168.1.100">
+        <label>Puerto</label>
+        <input type="number" id="localServerPort" min="1" max="65535" value="8080">
+      </div>
     </div>
     <div class="card">
-      <h2>Rotacion de caratulas</h2>
-      <div class="check-row">
-        <input type="checkbox" id="rotationEnabled">
-        <label>Activar rotacion</label>
+      <h2>Caratula</h2>
+      <div class="check-row" style="margin-bottom:12px">
+        <input type="checkbox" id="rotationEnabled" onchange="onRotationToggle()">
+        <label>Rotar entre varias</label>
       </div>
-      <label>Intervalo (minutos)</label>
-      <input type="number" id="rotationInterval" min="1" max="1440" value="60">
-      <label>Lista de caratulas</label>
-      <div id="rotationCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;max-height:150px;overflow-y:auto;background:var(--input);padding:8px;border-radius:var(--r)"></div>
+      <div id="rotationConfig" style="display:none;margin-bottom:12px">
+        <label>Intervalo (minutos)</label>
+        <input type="number" id="rotationInterval" min="1" max="1440" value="60">
+      </div>
+      <div id="singleSelect">
+        <label>Seleccionar caratula</label>
+        <select id="canvasSelect" onchange="onClockSelect()"></select>
+      </div>
+      <div id="multiSelect" style="display:none">
+        <label>Seleccionar caratulas</label>
+        <div id="clockfaceCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;max-height:200px;overflow-y:auto;background:var(--input);padding:8px;border-radius:var(--r)"></div>
+      </div>
+      <div id="localClockConfig" style="display:none;margin-top:12px">
+        <label>Nombre(s) de caratula</label>
+        <input type="text" id="localClockNames" placeholder="mi-caratula (o varios: cara1,cara2,cara3)">
+        <p style="color:var(--dim);font-size:11px;margin-top:4px">Separar con comas si usas rotacion</p>
+      </div>
+      <input type="hidden" id="canvasFile">
+      <input type="hidden" id="canvasServer" value="raw.githubusercontent.com">
       <input type="hidden" id="rotationList">
     </div>
     <button class="btn-primary" onclick="saveClock()">Guardar Caratula</button>
@@ -401,7 +402,9 @@ async function api(action,params={}){
   }catch(e){toast('Error');}
 }
 
-const clockfaces=['pac-man','nyan-cat','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','night-clock','night-clock-xe1e'];
+const cfCDN=['pac-man','nyan-cat','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','night-clock','night-clock-xe1e'];
+const cfGitHub=['pac-man','nyan-cat','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','night-clock'];
+const clockfaces=cfCDN;
 
 function rgb565ToHex(v){
   const r=((v>>11)&0x1F)*255/31;
@@ -416,31 +419,67 @@ function hexToRgb565(h){
   return ((r>>3)<<11)|((g>>2)<<5)|(b>>3);
 }
 function setNightColor(c){$('nightColor').value=c;}
-async function onClockSelect(){
-  const v=$('canvasSelect').value;
-  $('customClock').style.display=v==='_custom'?'block':'none';
-  if(v&&v!=='_custom'){
-    $('canvasFile').value=v;
-    $('canvasServer').value='raw.githubusercontent.com';
-    await saveField('canvasServer','raw.githubusercontent.com');
-    await saveField('canvasFile',v);
-    await fetch('/api/reload',{method:'POST'});
-    toast('Cambiando a '+v+'...');
+
+function getClockfaceList(){
+  const src=$('clockfaceSource').value;
+  if(src==='cdn')return cfCDN;
+  if(src==='github')return cfGitHub;
+  return [];
+}
+
+function onSourceChange(){
+  const src=$('clockfaceSource').value;
+  const isLocal=src==='local';
+  $('localServerConfig').style.display=isLocal?'block':'none';
+  $('localClockConfig').style.display=isLocal?'block':'none';
+  $('singleSelect').style.display=isLocal?'none':($('rotationEnabled').checked?'none':'block');
+  $('multiSelect').style.display=isLocal?'none':($('rotationEnabled').checked?'block':'none');
+  const hints={cdn:'Servidor rapido y compatible con todos los ESP32',github:'Puede fallar en algunos ESP32 por SSL',local:'Sirve JSONs con: python -m http.server 8080'};
+  $('sourceHint').textContent=hints[src]||'';
+  if(!isLocal)buildClockfaceList();
+}
+
+function onRotationToggle(){
+  const rot=$('rotationEnabled').checked;
+  const isLocal=$('clockfaceSource').value==='local';
+  $('rotationConfig').style.display=rot?'block':'none';
+  if(!isLocal){
+    $('singleSelect').style.display=rot?'none':'block';
+    $('multiSelect').style.display=rot?'block':'none';
+  }
+  buildClockfaceList();
+}
+
+function buildClockfaceList(){
+  const list=getClockfaceList();
+  const rot=$('rotationEnabled').checked;
+  const current=$('canvasFile').value||'';
+  const selected=($('rotationList').value||'').split(',').map(s=>s.trim()).filter(s=>s);
+  if(rot){
+    $('clockfaceCheckboxes').innerHTML=list.map(c=>'<label style="font-size:12px"><input type="checkbox" class="cf-cb" value="'+c+'"'+(selected.includes(c)?' checked':'')+' onchange="updateSelection()">'+c+'</label>').join('');
+  }else{
+    let opts='<option value="">-- Seleccionar --</option>';
+    opts+=list.map(c=>'<option value="'+c+'"'+(c===current?' selected':'')+'>'+c+'</option>').join('');
+    $('canvasSelect').innerHTML=opts;
   }
 }
+
+function updateSelection(){
+  const cbs=document.querySelectorAll('.cf-cb:checked');
+  const vals=Array.from(cbs).map(c=>c.value);
+  $('rotationList').value=vals.join(',');
+  if(vals.length>0)$('canvasFile').value=vals[0];
+}
+
+function onClockSelect(){
+  const v=$('canvasSelect').value;
+  if(v)$('canvasFile').value=v;
+}
+
 function onNightClockSelect(){
   const v=$('nightClockSelect').value;
   $('customNightClock').style.display=v==='_custom'?'block':'none';
   if(v&&v!=='_custom')$('nightClock').value=v;
-}
-function buildRotationCheckboxes(){
-  const cont=$('rotationCheckboxes');
-  const sel=($('rotationList').value||'').split(',').map(s=>s.trim()).filter(s=>s);
-  cont.innerHTML=clockfaces.map(c=>'<label style="font-size:12px"><input type="checkbox" class="rot-cb" value="'+c+'"'+(sel.includes(c)?' checked':'')+' onchange="updateRotationList()">'+c+'</label>').join('');
-}
-function updateRotationList(){
-  const cbs=document.querySelectorAll('.rot-cb:checked');
-  $('rotationList').value=Array.from(cbs).map(c=>c.value).join(',');
 }
 
 async function load(){
@@ -496,23 +535,28 @@ async function load(){
     $('canvasServer').value=settings.canvasServer||'raw.githubusercontent.com';
     $('canvasFile').value=settings.canvasFile||'';
     $('clockfaceSource').value=settings.clockfaceSource||'cdn';
+    $('localServerHost').value=settings.localServerHost||'192.168.1.100';
+    $('localServerPort').value=settings.localServerPort||8080;
     $('rotationEnabled').checked=settings.rotationEnabled==1;
     $('rotationInterval').value=settings.rotationInterval||60;
     $('rotationList').value=settings.rotationList||'';
-    const cf=settings.canvasFile||'';
-    if(clockfaces.includes(cf)){
-      $('canvasSelect').value=cf;
-    }else if(cf){
-      $('canvasSelect').value='_custom';
-      $('customClock').style.display='block';
-    }
-    buildRotationCheckboxes();
+    $('localClockNames').value=settings.clockfaceSource==='local'?(settings.rotationEnabled==1?settings.rotationList:settings.canvasFile):'';
+    onSourceChange();
+    onRotationToggle();
 
     // System
     $('sys-name').value=settings.name||'ClockWise-XE1E';
     $('sys-version').value=settings.version||'1.0.0';
     $('ver').textContent=settings.version||'1.0.0';
   }catch(e){console.error(e);}
+}
+
+let brightTimeout=null;
+function sendBright(val){
+  clearTimeout(brightTimeout);
+  brightTimeout=setTimeout(()=>{
+    fetch('/api/set?displayBright='+val,{method:'POST'});
+  },100);
 }
 
 async function saveField(key,val){
@@ -557,12 +601,35 @@ async function saveNight(){
 }
 
 async function saveClock(){
-  await saveField('canvasServer',$('canvasServer').value);
-  await saveField('canvasFile',$('canvasFile').value);
-  await saveField('clockfaceSource',$('clockfaceSource').value);
-  await saveField('rotationEnabled',$('rotationEnabled').checked?'1':'0');
+  const src=$('clockfaceSource').value;
+  const rot=$('rotationEnabled').checked;
+  const isLocal=src==='local';
+
+  await saveField('clockfaceSource',src);
+  await saveField('localServerHost',$('localServerHost').value);
+  await saveField('localServerPort',$('localServerPort').value);
+  await saveField('rotationEnabled',rot?'1':'0');
   await saveField('rotationInterval',$('rotationInterval').value);
-  await saveField('rotationList',$('rotationList').value);
+
+  if(isLocal){
+    const names=$('localClockNames').value.split(',').map(s=>s.trim()).filter(s=>s);
+    if(names.length===0){toast('Ingresa nombre de caratula');return;}
+    await saveField('canvasFile',names[0]);
+    await saveField('rotationList',rot?names.join(','):'');
+  }else{
+    if(rot){
+      const list=$('rotationList').value;
+      if(!list){toast('Selecciona al menos una caratula');return;}
+      await saveField('canvasFile',list.split(',')[0]);
+      await saveField('rotationList',list);
+    }else{
+      const cf=$('canvasFile').value;
+      if(!cf){toast('Selecciona una caratula');return;}
+      await saveField('canvasFile',cf);
+      await saveField('rotationList','');
+    }
+  }
+  await saveField('canvasServer','raw.githubusercontent.com');
   await fetch('/api/reload',{method:'POST'});
   toast('Caratula aplicada');
 }

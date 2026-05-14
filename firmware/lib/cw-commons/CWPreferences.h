@@ -41,6 +41,9 @@ struct ClockwiseParams
     const char* const PREF_ROTATION_LIST = "rotList";
     const char* const PREF_ROTATION_INDEX = "rotIndex";
     const char* const PREF_ROTATION_INTERVAL = "rotInterval";
+    const char* const PREF_CLOCKFACE_SOURCE = "cfSource";
+    const char* const PREF_LOCAL_SERVER_HOST = "localHost";
+    const char* const PREF_LOCAL_SERVER_PORT = "localPort";
 
     bool swapBlueGreen;
     bool use24hFormat;
@@ -72,6 +75,9 @@ struct ClockwiseParams
     String rotationList;
     uint8_t rotationIndex;
     uint16_t rotationInterval;
+    String clockfaceSource;  // "cdn", "github", or "local"
+    String localServerHost;  // IP/hostname for local dev server
+    uint16_t localServerPort; // Port for local dev server
 
 
     ClockwiseParams() {
@@ -117,6 +123,9 @@ struct ClockwiseParams
         preferences.putString(PREF_ROTATION_LIST, rotationList);
         preferences.putUInt(PREF_ROTATION_INDEX, rotationIndex);
         preferences.putUInt(PREF_ROTATION_INTERVAL, rotationInterval);
+        preferences.putString(PREF_CLOCKFACE_SOURCE, clockfaceSource);
+        preferences.putString(PREF_LOCAL_SERVER_HOST, localServerHost);
+        preferences.putUInt(PREF_LOCAL_SERVER_PORT, localServerPort);
     }
 
     void load()
@@ -151,6 +160,9 @@ struct ClockwiseParams
         rotationList = preferences.getString(PREF_ROTATION_LIST, "");
         rotationIndex = preferences.getUInt(PREF_ROTATION_INDEX, 0);
         rotationInterval = preferences.getUInt(PREF_ROTATION_INTERVAL, 1440);
+        clockfaceSource = preferences.getString(PREF_CLOCKFACE_SOURCE, "cdn");
+        localServerHost = preferences.getString(PREF_LOCAL_SERVER_HOST, "192.168.1.100");
+        localServerPort = preferences.getUInt(PREF_LOCAL_SERVER_PORT, 8080);
     }
 
 };

@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <CWPreferences.h>
+#include <CWPreview.h>
 #include "StatusController.h"
 #include "WebUI.h"
 
@@ -81,6 +82,8 @@ struct ClockwiseWebServer
       json += "\"rotationInterval\":" + String(ClockwiseParams::getInstance()->rotationInterval) + ",";
       json += "\"rotationList\":\"" + ClockwiseParams::getInstance()->rotationList + "\",";
       json += "\"clockfaceSource\":\"" + ClockwiseParams::getInstance()->clockfaceSource + "\",";
+      json += "\"localServerHost\":\"" + ClockwiseParams::getInstance()->localServerHost + "\",";
+      json += "\"localServerPort\":" + String(ClockwiseParams::getInstance()->localServerPort) + ",";
       // System
       json += "\"version\":\"" CW_FW_VERSION "\",";
       json += "\"name\":\"" CW_FW_NAME "\"";
@@ -124,9 +127,12 @@ struct ClockwiseWebServer
         else if (key == "nightBright") ClockwiseParams::getInstance()->nightBrightness = value.toInt();
         else if (key == "nightColor") ClockwiseParams::getInstance()->nightColor = value.toInt();
         else if (key == "nightClock") ClockwiseParams::getInstance()->nightClockface = value;
-        // Clockface
+        // Clockface (clear preview when changing from web UI)
         else if (key == "canvasServer") ClockwiseParams::getInstance()->canvasServer = value;
-        else if (key == "canvasFile") ClockwiseParams::getInstance()->canvasFile = value;
+        else if (key == "canvasFile") {
+          ClockwiseParams::getInstance()->canvasFile = value;
+          CWPreview::getInstance()->clearPreview();
+        }
         else if (key == "rotationEnabled") {
           ClockwiseParams::getInstance()->rotationEnabled = (value == "1");
           rotation_changed = true;
@@ -134,6 +140,8 @@ struct ClockwiseWebServer
         else if (key == "rotationInterval") ClockwiseParams::getInstance()->rotationInterval = value.toInt();
         else if (key == "rotationList") ClockwiseParams::getInstance()->rotationList = value;
         else if (key == "clockfaceSource") ClockwiseParams::getInstance()->clockfaceSource = value;
+        else if (key == "localServerHost") ClockwiseParams::getInstance()->localServerHost = value;
+        else if (key == "localServerPort") ClockwiseParams::getInstance()->localServerPort = value.toInt();
 
         ClockwiseParams::getInstance()->save();
       }
@@ -168,6 +176,45 @@ struct ClockwiseWebServer
       } else {
         request->send(400);
       }
+    });
+
+    // API: limpiar preview y volver a caratula normal
+    server.on("/api/preview/clear", HTTP_POST, [this](AsyncWebServerRequest *request) {
+      CWPreview::getInstance()->clearPreview();
+      request->send(200, "text/plain", "Preview cleared");
+      needs_reload = true;
+    });
+
+    // API: recibir clockface JSON para preview directo
+    server.on("/api/clockface", HTTP_POST,
+      [](AsyncWebServerRequest *request) {
+        request->send(200, "text/plain", "OK");
+      },
+      NULL,
+      [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+        static String bodyBuffer;
+        if (index == 0) {
+          bodyBuffer = "";
+          bodyBuffer.reserve(total);
+        }
+        for (size_t i = 0; i < len; i++) {
+          bodyBuffer += (char)data[i];
+        }
+        if (index + len == total) {
+          CWPreview::getInstance()->setPreview(bodyBuffer);
+          Serial.printf("[Preview] Received clockface JSON (%d bytes)\n", total);
+          bodyBuffer = "";
+        }
+      }
+    );
+
+    // CORS headers for editor
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    server.on("/api/clockface", HTTP_OPTIONS, [](AsyncWebServerRequest *request) {
+      request->send(204);
     });
   }
 

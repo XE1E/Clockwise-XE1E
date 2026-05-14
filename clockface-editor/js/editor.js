@@ -1537,6 +1537,18 @@ class ClockfaceEditor {
             this.saveJsonToFolder();
         });
 
+        // Test on Clock
+        document.getElementById('btn-test-clock').addEventListener('click', () => {
+            const savedIp = localStorage.getItem('clockwise-ip') || '';
+            document.getElementById('clock-ip').value = savedIp;
+            document.getElementById('test-status').style.display = 'none';
+            document.getElementById('test-clock-modal').classList.add('active');
+        });
+
+        document.getElementById('btn-send-to-clock').addEventListener('click', () => {
+            this.sendToClockwise();
+        });
+
         this.bindImageTool();
         this.bindSpriteEditor();
         this.bindThumbnailGenerator();
@@ -2196,6 +2208,68 @@ class ClockfaceEditor {
             }
         }
         this.render();
+    }
+
+    async sendToClockwise() {
+        const ipInput = document.getElementById('clock-ip');
+        const statusDiv = document.getElementById('test-status');
+        let ip = ipInput.value.trim();
+
+        if (!ip) {
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#ff4444';
+            statusDiv.style.color = '#fff';
+            statusDiv.textContent = 'Ingresa la IP del reloj';
+            return;
+        }
+
+        // Add http:// if not present
+        if (!ip.startsWith('http://') && !ip.startsWith('https://')) {
+            ip = 'http://' + ip;
+        }
+
+        // Save IP for next time
+        localStorage.setItem('clockwise-ip', ipInput.value.trim());
+
+        statusDiv.style.display = 'block';
+        statusDiv.style.background = '#2196F3';
+        statusDiv.style.color = '#fff';
+        statusDiv.textContent = 'Enviando...';
+
+        try {
+            // Reset sprite positions before export
+            this.resetSpritePositionsForExport();
+            const clockfaceJson = this.clockface.toJSON();
+            const name = clockfaceJson.name || 'test-clockface';
+
+            // Step 1: Upload JSON to clock's temporary storage
+            const uploadUrl = `${ip}/api/clockface`;
+            const uploadResponse = await fetch(uploadUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(clockfaceJson),
+                mode: 'cors'
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error(`Error al subir: ${uploadResponse.status}`);
+            }
+
+            // Step 2: Reload clockface (preview mode is automatic when JSON is in memory)
+            await fetch(`${ip}/api/reload`, { method: 'POST', mode: 'cors' });
+
+            statusDiv.style.background = '#4CAF50';
+            statusDiv.textContent = `Enviado! Mira tu reloj`;
+
+            setTimeout(() => {
+                document.getElementById('test-clock-modal').classList.remove('active');
+            }, 2000);
+
+        } catch (e) {
+            console.error('Error sending to clock:', e);
+            statusDiv.style.background = '#ff4444';
+            statusDiv.textContent = `Error: ${e.message}. Verifica la IP y que el reloj este encendido.`;
+        }
     }
 }
 
