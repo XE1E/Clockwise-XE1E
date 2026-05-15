@@ -98,6 +98,10 @@ void Clockface::setFont(const char *fontName)
   {
     Locator::getDisplay()->setFont(&FreeSansBold9pt7b);
   }
+  else if (strcmp(fontName, "nocturno") == 0)
+  {
+    Locator::getDisplay()->setFont(&Nocturno);
+  }
   else
   {
     Locator::getDisplay()->setFont();

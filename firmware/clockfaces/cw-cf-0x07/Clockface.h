@@ -18,6 +18,7 @@
 #include "fonts/minute7pt7b.h"
 #include "fonts/TomThumb.h"
 #include "fonts/FreeSansBold9pt7b.h"
+#include "fonts/nocturno.h"
 #include "PNGRender.h"
 #include "CustomSprite.h"
 #include "CWHttpClient.h"
