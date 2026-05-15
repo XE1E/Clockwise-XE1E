@@ -24,6 +24,7 @@ class CustomSprite: public Sprite {
     bool _isReversing = false;
 
     // Cached JSON values (populated once at creation)
+    bool _hourBased = false;  // If true, frame is selected by hour (0-23) instead of animating
     uint32_t _cachedLoopDelay = 0;
     uint16_t _cachedFrameDelay = 0;
     uint32_t _cachedMoveStartTime = 1;

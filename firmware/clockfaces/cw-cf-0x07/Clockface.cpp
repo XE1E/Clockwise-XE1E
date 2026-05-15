@@ -427,6 +427,15 @@ void Clockface::createSprites()
       s.get()->_cachedOriginX = x;
       s.get()->_cachedOriginY = y;
       s.get()->_cachedShouldReturn = value["shouldReturnToOrigin"].as<bool>() ?: false;
+      s.get()->_hourBased = value["hourBased"].as<bool>() ?: false;
+
+      // Render hour-based sprites immediately with current hour
+      if (s.get()->_hourBased && s.get()->_totalFrames > 0) {
+        uint8_t hour = _dateTime->getHour();
+        uint8_t frameIndex = hour % s.get()->_totalFrames;
+        s.get()->_currentFrame = frameIndex;
+        renderImage(doc["sprites"][ref][frameIndex]["image"].as<const char *>(), x, y);
+      }
 
       sprites.push_back(s);
     }
@@ -435,6 +444,27 @@ void Clockface::createSprites()
 
 void Clockface::handleSpriteAnimation(std::shared_ptr<CustomSprite>& sprite) {
     uint8_t totalFrames = sprite->_totalFrames;
+
+    // Hour-based sprites: select frame based on current hour instead of animating
+    if (sprite->_hourBased && totalFrames > 0) {
+        uint8_t hour = _dateTime->getHour();
+        uint8_t frameIndex = hour % totalFrames;
+
+        // Only redraw if hour changed (frame changed)
+        if (sprite->_currentFrame != frameIndex) {
+            // Clear previous frame area
+            Locator::getDisplay()->fillRect(
+                sprite->getX(), sprite->getY(),
+                sprite->getWidth(), sprite->getHeight(),
+                doc["bgColor"].as<const uint16_t>());
+
+            sprite->_currentFrame = frameIndex;
+            renderImage(doc["sprites"][sprite->_spriteReference][frameIndex]["image"].as<const char *>(), sprite->getX(), sprite->getY());
+        }
+        return;
+    }
+
+    // Normal animated sprite
     uint32_t loopDelay = sprite->_cachedLoopDelay;
     uint16_t frameDelay = sprite->_cachedFrameDelay;
 

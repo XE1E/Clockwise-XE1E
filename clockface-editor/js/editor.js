@@ -1046,6 +1046,19 @@ class ClockfaceEditor {
             }
         });
 
+        // Hour-based sprite checkbox
+        const hourBasedCheckbox = document.getElementById('el-hour-based');
+        if (hourBasedCheckbox) {
+            hourBasedCheckbox.addEventListener('change', () => {
+                this.updateSelectedElement();
+                // Hide/show timing controls
+                const timingGroup = document.getElementById('fg-sprite-timing');
+                if (timingGroup) {
+                    timingGroup.style.display = hourBasedCheckbox.checked ? 'none' : 'block';
+                }
+            });
+        }
+
         this.initPixelEditor();
     }
 
@@ -2139,6 +2152,7 @@ class ClockfaceEditor {
             }
             element.frameDelay = parseInt(document.getElementById('el-frame-delay').value) || 100;
             element.loopDelay = parseInt(document.getElementById('el-loop-delay').value) || 0;
+            element.hourBased = document.getElementById('el-hour-based').checked;
         }
 
         element.inLoop = document.getElementById('el-in-loop').checked;
@@ -2179,6 +2193,7 @@ class ClockfaceEditor {
             'fg-image': ['image'],
             'fg-image-size': ['image'],
             'fg-sprite-select': ['sprite'],
+            'fg-sprite-hour-based': ['sprite'],
             'fg-sprite-timing': ['sprite'],
             'fg-sprite-move': ['sprite']
         };
@@ -2233,6 +2248,12 @@ class ClockfaceEditor {
             document.getElementById('el-loop-delay').value = element.loopDelay;
             document.getElementById('el-move-x').value = element.moveX;
             document.getElementById('el-move-y').value = element.moveY;
+            document.getElementById('el-hour-based').checked = element.hourBased || false;
+            // Hide timing controls if hour-based
+            const timingGroup = document.getElementById('fg-sprite-timing');
+            if (timingGroup) {
+                timingGroup.style.display = element.hourBased ? 'none' : 'block';
+            }
         }
     }
 
@@ -2337,6 +2358,19 @@ class ClockfaceEditor {
                 }
 
                 const frameCount = el.frameImages.length;
+
+                // Hour-based sprites: select frame by hour instead of animating
+                if (el.hourBased && frameCount > 0) {
+                    const now = window.testTime || new Date();
+                    const hour = now.getHours();
+                    const frameIndex = hour % frameCount;
+                    if (el.currentFrame !== frameIndex) {
+                        el.currentFrame = frameIndex;
+                        needsRender = true;
+                    }
+                    continue; // Skip normal animation for hour-based sprites
+                }
+
                 const frameDelay = el.frameDelay || 100;
                 const loopDelay = el.loopDelay || 0;
 

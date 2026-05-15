@@ -76,6 +76,7 @@ class ClockfaceElement {
                 element.loopDelay = data.loopDelay || 0;
                 element.moveX = data.moveX || 0;
                 element.moveY = data.moveY || 0;
+                element.hourBased = data.hourBased || false;
                 break;
             default:
                 return null;
@@ -356,6 +357,7 @@ class SpriteElement extends ClockfaceElement {
         this.moveX = 0;
         this.moveY = 0;
         this.inLoop = true;
+        this.hourBased = false;  // If true, frame selected by hour (0-23)
         this.currentFrame = 0;
         this.frameImages = [];
     }
@@ -366,10 +368,14 @@ class SpriteElement extends ClockfaceElement {
             x: this.x,
             y: this.y,
             sprite: this.sprite,
-            frameDelay: this.frameDelay,
             id: this.id
         };
-        if (this.loopDelay > 0) json.loopDelay = this.loopDelay;
+        if (this.hourBased) {
+            json.hourBased = true;
+        } else {
+            json.frameDelay = this.frameDelay;
+            if (this.loopDelay > 0) json.loopDelay = this.loopDelay;
+        }
         if (this.moveX !== 0) json.moveX = this.moveX;
         if (this.moveY !== 0) json.moveY = this.moveY;
         return json;
