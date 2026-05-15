@@ -228,21 +228,21 @@ struct ClockwiseWebServer
         return;
       }
       String json = "[";
-      File root = SPIFFS.open("/clockfaces");
-      if (root && root.isDirectory()) {
-        File file = root.openNextFile();
-        bool first = true;
-        while (file) {
-          if (!file.isDirectory() && String(file.name()).endsWith(".json")) {
-            if (!first) json += ",";
-            first = false;
-            String name = String(file.name());
-            name = name.substring(name.lastIndexOf('/') + 1);
-            name = name.substring(0, name.length() - 5); // remove .json
-            json += "{\"name\":\"" + name + "\",\"size\":" + String(file.size()) + "}";
-          }
-          file = root.openNextFile();
+      File root = SPIFFS.open("/");
+      File file = root.openNextFile();
+      bool first = true;
+      while (file) {
+        String fname = String(file.name());
+        if (!file.isDirectory() && fname.endsWith(".json")) {
+          if (!first) json += ",";
+          first = false;
+          // Remove leading / and .json extension
+          String name = fname;
+          if (name.startsWith("/")) name = name.substring(1);
+          name = name.substring(0, name.length() - 5);
+          json += "{\"name\":\"" + name + "\",\"size\":" + String(file.size()) + "}";
         }
+        file = root.openNextFile();
       }
       json += "]";
       request->send(200, "application/json", json);
@@ -261,7 +261,15 @@ struct ClockwiseWebServer
         if (index == 0) {
           bodyBuffer = "";
           bodyBuffer.reserve(total);
-          fileName = request->hasParam("name") ? request->getParam("name")->value() : "uploaded";
+          // Get name from URL query string (true = isQuery)
+          if (request->hasParam("name", true)) {
+            fileName = request->getParam("name", true)->value();
+          } else if (request->hasParam("name")) {
+            fileName = request->getParam("name")->value();
+          } else {
+            fileName = "uploaded";
+          }
+          Serial.printf("[Storage] Starting upload: %s (%d bytes)\n", fileName.c_str(), total);
         }
 
         for (size_t i = 0; i < len; i++) {
@@ -275,17 +283,13 @@ struct ClockwiseWebServer
             return;
           }
 
-          // Create directory if needed
-          if (!SPIFFS.exists("/clockfaces")) {
-            SPIFFS.mkdir("/clockfaces");
-          }
-
-          String path = "/clockfaces/" + fileName + ".json";
+          // SPIFFS creates directories automatically, just use the path
+          String path = "/" + fileName + ".json";
           File file = SPIFFS.open(path, FILE_WRITE);
           if (file) {
             file.print(bodyBuffer);
             file.close();
-            Serial.printf("[Storage] Saved clockface: %s (%d bytes)\n", path.c_str(), total);
+            Serial.printf("[Storage] Saved clockface: %s (%d bytes)\n", path.c_str(), bodyBuffer.length());
           } else {
             Serial.printf("[Storage] Failed to save: %s\n", path.c_str());
           }
@@ -296,12 +300,16 @@ struct ClockwiseWebServer
 
     // API: eliminar carátula
     server.on("/api/clockfaces/delete", HTTP_POST, [](AsyncWebServerRequest *request) {
-      if (!request->hasParam("name")) {
+      String name;
+      if (request->hasParam("name", true)) {
+        name = request->getParam("name", true)->value();
+      } else if (request->hasParam("name")) {
+        name = request->getParam("name")->value();
+      } else {
         request->send(400, "text/plain", "Missing name parameter");
         return;
       }
-      String name = request->getParam("name")->value();
-      String path = "/clockfaces/" + name + ".json";
+      String path = "/" + name + ".json";
 
       if (!SPIFFS.begin(true)) {
         request->send(500, "text/plain", "SPIFFS failed");
@@ -324,7 +332,7 @@ struct ClockwiseWebServer
         return;
       }
       String name = request->getParam("name")->value();
-      String path = "/clockfaces/" + name + ".json";
+      String path = "/" + name + ".json";
 
       if (!SPIFFS.begin(true)) {
         request->send(500, "text/plain", "SPIFFS failed");

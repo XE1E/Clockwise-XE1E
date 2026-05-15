@@ -609,7 +609,7 @@ bool Clockface::deserializeDefinition()
 
   // Load from internal storage (SPIFFS)
   if (source == "stored") {
-    String path = "/clockfaces/" + ClockwiseParams::getInstance()->canvasFile + ".json";
+    String path = "/" + ClockwiseParams::getInstance()->canvasFile + ".json";
     Serial.printf("[Canvas] Loading from SPIFFS: %s\n", path.c_str());
 
     if (!SPIFFS.begin(true)) {
