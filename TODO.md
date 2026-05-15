@@ -17,6 +17,9 @@
 ### Pendientes
 - [ ] Convertir clockfaces 0x01-0x06 a JSON
 - [ ] Listar solo clockfaces disponibles en CDN/GitHub
+- [ ] Sistema de fuentes dinámicas (cargar desde SPIFFS sin recompilar firmware)
+  - Actualmente las fuentes deben compilarse en el firmware
+  - Opciones: SPIFFS, sprites por dígito, o mantener fuentes predefinidas
 
 ## Próximo
 
@@ -30,6 +33,12 @@
 - [ ] Integrar en web principal
 
 ## Completado
+
+### 2026-05-15
+- [x] Fuente "nocturno" agregada al editor y firmware (dígitos grandes 20x29)
+- [x] Recuperar archivos mi-fuente (dígitos personalizados)
+- [x] Mario clockface convertido a JSON (parcial)
+- [x] Eliminar workflow esp-idf.yml (proyecto usa PlatformIO)
 
 ### 2026-05-14
 - [x] Servidor local: interfaz para probar carátulas sin subir a GitHub
