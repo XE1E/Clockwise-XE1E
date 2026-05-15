@@ -70,30 +70,30 @@ String CWDateTime::translateToSpanish(String text)
 {
   if (!useSpanish) return text;
 
-  // Translate abbreviated day names
-  text.replace("Sun", "Dom"); text.replace("Mon", "Lun"); text.replace("Tue", "Mar");
-  text.replace("Wed", "Mie"); text.replace("Thu", "Jue"); text.replace("Fri", "Vie");
-  text.replace("Sat", "Sab");
-
-  // Translate full day names
+  // Translate full day names FIRST (before abbreviated, to avoid partial matches)
   text.replace("Sunday", "Domingo"); text.replace("Monday", "Lunes");
   text.replace("Tuesday", "Martes"); text.replace("Wednesday", "Miercoles");
   text.replace("Thursday", "Jueves"); text.replace("Friday", "Viernes");
   text.replace("Saturday", "Sabado");
 
-  // Translate abbreviated month names
-  text.replace("Jan", "Ene"); text.replace("Feb", "Feb"); text.replace("Mar", "Mar");
-  text.replace("Apr", "Abr"); text.replace("May", "May"); text.replace("Jun", "Jun");
-  text.replace("Jul", "Jul"); text.replace("Aug", "Ago"); text.replace("Sep", "Sep");
-  text.replace("Oct", "Oct"); text.replace("Nov", "Nov"); text.replace("Dec", "Dic");
+  // Translate abbreviated day names
+  text.replace("Sun", "Dom"); text.replace("Mon", "Lun"); text.replace("Tue", "Mar");
+  text.replace("Wed", "Mie"); text.replace("Thu", "Jue"); text.replace("Fri", "Vie");
+  text.replace("Sat", "Sab");
 
-  // Translate full month names
+  // Translate full month names FIRST (before abbreviated)
   text.replace("January", "Enero"); text.replace("February", "Febrero");
   text.replace("March", "Marzo"); text.replace("April", "Abril");
   text.replace("June", "Junio"); text.replace("July", "Julio");
   text.replace("August", "Agosto"); text.replace("September", "Septiembre");
   text.replace("October", "Octubre"); text.replace("November", "Noviembre");
   text.replace("December", "Diciembre");
+
+  // Translate abbreviated month names
+  text.replace("Jan", "Ene"); text.replace("Feb", "Feb"); text.replace("Mar", "Mar");
+  text.replace("Apr", "Abr"); text.replace("May", "May"); text.replace("Jun", "Jun");
+  text.replace("Jul", "Jul"); text.replace("Aug", "Ago"); text.replace("Sep", "Sep");
+  text.replace("Oct", "Oct"); text.replace("Nov", "Nov"); text.replace("Dec", "Dic");
 
   return text;
 }

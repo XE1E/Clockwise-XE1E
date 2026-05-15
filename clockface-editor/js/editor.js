@@ -86,20 +86,24 @@ class ClockfaceEditor {
     }
 
     updateCanvasSize() {
-        this.canvas.style.width = `${64 * this.zoom}px`;
-        this.canvas.style.height = `${64 * this.zoom}px`;
+        const size = 64 * this.zoom;
+        this.canvas.style.width = `${size}px`;
+        this.canvas.style.height = `${size}px`;
 
         const wrapper = document.querySelector('.canvas-wrapper');
         const grid = document.querySelector('.canvas-grid');
+
+        // Set wrapper dimensions explicitly for absolute positioned children
+        wrapper.style.width = `${size}px`;
+        wrapper.style.height = `${size}px`;
 
         grid.style.backgroundSize = `${this.zoom}px ${this.zoom}px`;
         wrapper.style.setProperty('--pixel-size', `${this.zoom}px`);
 
         document.getElementById('zoom-level').textContent = `${this.zoom}x`;
 
-        if (this.referenceImage && !this.referenceImage.classList.contains('hidden')) {
-            this.referenceImage.style.width = `${64 * this.zoom}px`;
-            this.referenceImage.style.height = `${64 * this.zoom}px`;
+        if (this.referenceImage && !this.referenceImage.classList.contains('hidden') && this.refState) {
+            this.updateReferenceTransform();
         }
     }
 
@@ -109,10 +113,16 @@ class ClockfaceEditor {
         const closeBtn = document.getElementById('btn-close-reference');
         const fileInput = document.getElementById('reference-file');
         const opacitySlider = document.getElementById('reference-opacity');
+        const scaleSlider = document.getElementById('reference-scale');
+        const scaleVal = document.getElementById('reference-scale-val');
+        const posX = document.getElementById('reference-x');
+        const posY = document.getElementById('reference-y');
         const referenceOptions = document.getElementById('reference-options');
         const behindCheckbox = document.getElementById('reference-behind');
         const clearBtn = document.getElementById('btn-clear-reference');
-        const convertBtn = document.getElementById('btn-convert-reference');
+
+        // Store reference state
+        this.refState = { scale: 100, x: 0, y: 0 };
 
         openBtn.addEventListener('click', () => {
             popup.style.display = 'flex';
@@ -137,8 +147,13 @@ class ClockfaceEditor {
             reader.onload = (event) => {
                 this.referenceImage.src = event.target.result;
                 this.referenceImage.classList.remove('hidden');
-                this.referenceImage.style.width = `${64 * this.zoom}px`;
-                this.referenceImage.style.height = `${64 * this.zoom}px`;
+                this.referenceImage.style.opacity = opacitySlider.value / 100;
+                this.refState = { scale: 100, x: 0, y: 0 };
+                scaleSlider.value = 100;
+                scaleVal.textContent = '100%';
+                posX.value = 0;
+                posY.value = 0;
+                this.updateReferenceTransform();
                 referenceOptions.style.display = 'flex';
                 this.updateReferencePosition();
             };
@@ -146,8 +161,23 @@ class ClockfaceEditor {
         });
 
         opacitySlider.addEventListener('input', (e) => {
-            const opacity = e.target.value / 100;
-            this.referenceImage.style.opacity = opacity;
+            this.referenceImage.style.opacity = e.target.value / 100;
+        });
+
+        scaleSlider.addEventListener('input', (e) => {
+            this.refState.scale = parseInt(e.target.value);
+            scaleVal.textContent = this.refState.scale + '%';
+            this.updateReferenceTransform();
+        });
+
+        posX.addEventListener('input', (e) => {
+            this.refState.x = parseInt(e.target.value) || 0;
+            this.updateReferenceTransform();
+        });
+
+        posY.addEventListener('input', (e) => {
+            this.refState.y = parseInt(e.target.value) || 0;
+            this.updateReferenceTransform();
         });
 
         behindCheckbox.addEventListener('change', () => {
@@ -157,11 +187,19 @@ class ClockfaceEditor {
         clearBtn.addEventListener('click', () => {
             this.clearReferenceImage();
         });
+    }
 
-        convertBtn.addEventListener('click', () => {
-            this.convertReferenceToElement();
-            popup.style.display = 'none';
-        });
+    updateReferenceTransform() {
+        const scale = this.refState.scale / 100;
+        const baseSize = 64 * this.zoom;
+        const scaledSize = baseSize * scale;
+        const offsetX = this.refState.x * this.zoom;
+        const offsetY = this.refState.y * this.zoom;
+
+        this.referenceImage.style.width = `${scaledSize}px`;
+        this.referenceImage.style.height = `${scaledSize}px`;
+        this.referenceImage.style.left = `${offsetX}px`;
+        this.referenceImage.style.top = `${offsetY}px`;
     }
 
     clearReferenceImage() {
@@ -169,46 +207,6 @@ class ClockfaceEditor {
         this.referenceImage.classList.add('hidden');
         document.getElementById('reference-options').style.display = 'none';
         document.getElementById('reference-file').value = '';
-    }
-
-    convertReferenceToElement() {
-        if (!this.referenceImage.src) return;
-
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = 64;
-        tempCanvas.height = 64;
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCtx.imageSmoothingEnabled = false;
-
-        const img = new Image();
-        img.onload = async () => {
-            const scale = Math.min(64 / img.width, 64 / img.height);
-            const newWidth = Math.floor(img.width * scale);
-            const newHeight = Math.floor(img.height * scale);
-            const offsetX = Math.floor((64 - newWidth) / 2);
-            const offsetY = Math.floor((64 - newHeight) / 2);
-
-            tempCtx.fillStyle = '#000000';
-            tempCtx.fillRect(0, 0, 64, 64);
-            tempCtx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
-
-            const base64 = tempCanvas.toDataURL('image/png').split(',')[1];
-
-            const element = new ImageElement(0, 0);
-            element.image = base64;
-            await element.loadImage(base64);
-
-            this.clockface.elements.unshift(element);
-            this.selectedId = element.id;
-
-            this.clearReferenceImage();
-            this.updatePropertiesPanel();
-            this.updateLayersList();
-            this.render();
-
-            alert('Imagen convertida a 64x64 y agregada como fondo. Puedes ajustar su posicion.');
-        };
-        img.src = this.referenceImage.src;
     }
 
     updateReferencePosition() {
@@ -1609,6 +1607,45 @@ class ClockfaceEditor {
         });
     }
 
+    getSelectedColor() {
+        const colorInput = document.getElementById('el-color');
+        if (colorInput && colorInput.value) {
+            return ColorUtils.hexToRgb565(colorInput.value);
+        }
+        return 0xFFFF; // White default
+    }
+
+    drawPixelAt(x, y) {
+        // Check if pixel already exists at this position
+        const existing = this.clockface.elements.find(el =>
+            el.type === 'fillrect' && el.width === 1 && el.height === 1 && el.x === x && el.y === y
+        );
+        if (existing) return; // Don't duplicate
+
+        const element = new FillRectElement(x, y);
+        element.width = 1;
+        element.height = 1;
+        element.color = this.getSelectedColor();
+        this.clockface.addElement(element);
+    }
+
+    drawPixelLine(x0, y0, x1, y1) {
+        // Bresenham's line algorithm for smooth pixel drawing
+        const dx = Math.abs(x1 - x0);
+        const dy = Math.abs(y1 - y0);
+        const sx = x0 < x1 ? 1 : -1;
+        const sy = y0 < y1 ? 1 : -1;
+        let err = dx - dy;
+
+        while (true) {
+            this.drawPixelAt(x0, y0);
+            if (x0 === x1 && y0 === y1) break;
+            const e2 = 2 * err;
+            if (e2 > -dy) { err -= dy; x0 += sx; }
+            if (e2 < dx) { err += dx; y0 += sy; }
+        }
+    }
+
     doAction(action) {
         if (!this.selectedId) return;
 
@@ -1702,6 +1739,16 @@ class ClockfaceEditor {
         const coords = this.getCanvasCoords(e);
         document.getElementById('mouse-pos').textContent = `X: ${coords.x}, Y: ${coords.y}`;
 
+        // Continuous pixel drawing while mouse is down
+        if (this.isDrawingPixels && this.currentTool === 'pixel') {
+            const lastCoord = this.lastPixelCoord || coords;
+            // Draw pixels along the path (Bresenham's line for smooth drawing)
+            this.drawPixelLine(lastCoord.x, lastCoord.y, coords.x, coords.y);
+            this.lastPixelCoord = coords;
+            this.render();
+            return;
+        }
+
         if (this.isDragging && this.selectedId) {
             const element = this.clockface.getElementById(this.selectedId);
             if (!element) return;
@@ -1776,6 +1823,13 @@ class ClockfaceEditor {
         }
         this.isDragging = false;
         this.activeHandle = null;
+
+        // End pixel drawing mode
+        if (this.isDrawingPixels) {
+            this.isDrawingPixels = false;
+            this.lastPixelCoord = null;
+            this.updateLayersList();
+        }
     }
 
     onKeyDown(e) {
@@ -1853,6 +1907,13 @@ class ClockfaceEditor {
             case 'fillcircle':
                 element = new FillCircleElement(coords.x, coords.y);
                 break;
+            case 'pixel':
+                // Start continuous pixel drawing mode
+                this.isDrawingPixels = true;
+                this.lastPixelCoord = coords;
+                this.drawPixelAt(coords.x, coords.y);
+                this.render();
+                return; // Don't switch to select tool
             case 'sprite':
                 if (this.clockface.sprites.length === 0) {
                     alert('Primero crea un sprite usando el boton "Sprites" en la barra lateral izquierda');

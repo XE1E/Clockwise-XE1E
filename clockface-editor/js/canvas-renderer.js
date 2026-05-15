@@ -5,15 +5,20 @@ class CanvasRenderer {
         this.ctx.imageSmoothingEnabled = false;
         this.width = 64;
         this.height = 64;
+        this.bgLayer = document.getElementById('canvas-bg');
 
         // Font map is now dynamic - any font in PixelFonts is available
         this.fontMap = { '': 'picopixel' };
     }
 
     clear(bgColor = 0) {
-        const rgb = ColorUtils.rgb565ToRgb(bgColor);
-        this.ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-        this.ctx.fillRect(0, 0, this.width, this.height);
+        // Update background layer (separate div behind canvas)
+        if (this.bgLayer) {
+            const rgb = ColorUtils.rgb565ToRgb(bgColor);
+            this.bgLayer.style.background = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        }
+        // Clear canvas to transparent
+        this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
     render(clockface, selectedId = null) {

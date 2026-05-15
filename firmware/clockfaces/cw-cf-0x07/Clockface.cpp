@@ -135,14 +135,17 @@ void Clockface::renderText(String text, JsonVariantConst value)
   }
   Locator::getDisplay()->getTextBounds(refText, 0, 0, &ref_x1, &ref_y1, &ref_w, &ref_h);
 
-  // Use the larger of actual or reference dimensions
-  uint16_t clearW = max(w, ref_w);
-  uint16_t clearH = max(h, ref_h);
+  // Use the reference dimensions and position for clearing
+  // This covers the maximum possible area regardless of actual text content
+  int16_t clearX = min(x1, ref_x1);
+  int16_t clearY = min(y1, ref_y1);
+  uint16_t clearW = max(w, ref_w) + abs(x1 - ref_x1);
+  uint16_t clearH = max(h, ref_h) + abs(y1 - ref_y1);
 
   // BG Color - clear area based on widest possible text
   Locator::getDisplay()->fillRect(
-      value["x"].as<const uint16_t>() + x1,
-      value["y"].as<const uint16_t>() + y1,
+      value["x"].as<const uint16_t>() + clearX,
+      value["y"].as<const uint16_t>() + clearY,
       clearW,
       clearH,
       bgColor);

@@ -371,6 +371,16 @@ body {
     overflow: hidden;
 }
 
+.canvas-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 0;
+}
+
 .reference-image {
     position: absolute;
     top: 0;
@@ -381,7 +391,7 @@ body {
     image-rendering: pixelated;
     pointer-events: none;
     opacity: 0.5;
-    z-index: 1;
+    z-index: 2;
 }
 
 .reference-image.hidden {
@@ -389,18 +399,20 @@ body {
 }
 
 .reference-image.behind {
-    z-index: 0;
+    z-index: 1;
 }
 
 .reference-image.above {
-    z-index: 10;
+    z-index: 20;
 }
 
 #editor-canvas {
     display: block;
     image-rendering: pixelated;
     cursor: crosshair;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     z-index: 5;
 }
 
@@ -698,6 +710,15 @@ body {
 
 .btn-secondary:hover {
     background: var(--bg-medium);
+}
+
+.btn-success {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #45a049;
 }
 
 .btn-small {

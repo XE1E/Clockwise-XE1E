@@ -4,7 +4,7 @@
 #include "mbedtls/base64.h"
 #include <PNGdec.h>
 
-#define IMAGE_BUFFER_SIZE 1024
+#define IMAGE_BUFFER_SIZE 8192
 
 static PNG png;
 static unsigned char decodedArray[IMAGE_BUFFER_SIZE];
