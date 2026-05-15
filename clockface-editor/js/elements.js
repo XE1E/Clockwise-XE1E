@@ -157,35 +157,37 @@ class DateTimeElement extends ClockfaceElement {
     }
 
     hourToWords(h) {
-        const hours = [
-            'twelve', 'one', 'two', 'three', 'four', 'five',
-            'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'
+        const horas = [
+            'doce', 'una', 'dos', 'tres', 'cuatro', 'cinco',
+            'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce'
         ];
         let hour12 = h % 12;
         if (hour12 === 0) hour12 = 12;
-        if (h === 0) return 'mid\nnight';
-        if (h === 12) return 'noon';
-        return hours[hour12];
+        if (h === 0) return 'media\nnoche';
+        if (h === 12) return 'medio\ndia';
+        return horas[hour12];
     }
 
     minuteToWords(m) {
-        const ones = [
-            '', 'one', 'two', 'three', 'four', 'five',
-            'six', 'seven', 'eight', 'nine', 'ten',
-            'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen',
-            'sixteen', 'seventeen', 'eighteen', 'nineteen'
+        const unidades = [
+            'en punto', 'uno', 'dos', 'tres', 'cuatro', 'cinco',
+            'seis', 'siete', 'ocho', 'nueve', 'diez',
+            'once', 'doce', 'trece', 'catorce', 'quince',
+            'dieciseis', 'diecisiete', 'dieciocho', 'diecinueve'
         ];
-        const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty'];
+        const decenas = ['', '', 'veinte', 'treinta', 'cuarenta', 'cincuenta'];
 
-        if (m === 0) return "o'clock";
-        if (m === 30) return 'thirty';
-        if (m < 10) return 'oh ' + ones[m];
-        if (m < 20) return ones[m];
+        if (m === 0) return 'en punto';
+        if (m === 15) return 'y cuarto';
+        if (m === 30) return 'y media';
+        if (m === 45) return 'menos\ncuarto';
+        if (m < 20) return 'y ' + unidades[m];
 
-        const t = Math.floor(m / 10);
-        const o = m % 10;
-        if (o === 0) return tens[t];
-        return tens[t] + '\n' + ones[o];
+        const d = Math.floor(m / 10);
+        const u = m % 10;
+        if (u === 0) return 'y ' + decenas[d];
+        if (d === 2) return 'veinti\n' + unidades[u];
+        return decenas[d] + '\ny ' + unidades[u];
     }
 }
 

@@ -108,51 +108,53 @@ void Clockface::setFont(const char *fontName)
   }
 }
 
-// Time in words conversion
+// Time in words conversion (Spanish)
 String Clockface::hourToWords(int h)
 {
-  const char* hours[] = {
-    "twelve", "one", "two", "three", "four", "five",
-    "six", "seven", "eight", "nine", "ten", "eleven", "twelve"
+  const char* horas[] = {
+    "doce", "una", "dos", "tres", "cuatro", "cinco",
+    "seis", "siete", "ocho", "nueve", "diez", "once", "doce"
   };
 
   int hour12 = h % 12;
   if (hour12 == 0) hour12 = 12;
 
-  if (h == 0) return "mid\nnight";
-  if (h == 12) return "noon";
+  if (h == 0) return "media\nnoche";
+  if (h == 12) return "medio\ndia";
 
-  return hours[hour12];
+  return horas[hour12];
 }
 
 String Clockface::minuteToWords(int m)
 {
-  const char* ones[] = {
-    "", "one", "two", "three", "four", "five",
-    "six", "seven", "eight", "nine", "ten",
-    "eleven", "twelve", "thirteen", "fourteen", "fifteen",
-    "sixteen", "seventeen", "eighteen", "nineteen"
+  const char* unidades[] = {
+    "en punto", "uno", "dos", "tres", "cuatro", "cinco",
+    "seis", "siete", "ocho", "nueve", "diez",
+    "once", "doce", "trece", "catorce", "quince",
+    "dieciseis", "diecisiete", "dieciocho", "diecinueve"
   };
-  const char* tens[] = {
-    "", "", "twenty", "thirty", "forty", "fifty"
+  const char* decenas[] = {
+    "", "", "veinte", "treinta", "cuarenta", "cincuenta"
   };
 
-  if (m == 0) return "o'clock";
-  if (m == 30) return "thirty";
+  if (m == 0) return "en punto";
+  if (m == 15) return "y cuarto";
+  if (m == 30) return "y media";
+  if (m == 45) return "menos\ncuarto";
 
-  if (m < 10) {
-    return String("oh ") + ones[m];
-  }
   if (m < 20) {
-    return ones[m];
+    return String("y ") + unidades[m];
   }
 
-  int t = m / 10;
-  int o = m % 10;
-  if (o == 0) {
-    return tens[t];
+  int d = m / 10;
+  int u = m % 10;
+  if (u == 0) {
+    return String("y ") + decenas[d];
   }
-  return String(tens[t]) + "\n" + ones[o];
+  if (d == 2) {
+    return String("veinti\n") + unidades[u];
+  }
+  return String(decenas[d]) + "\ny " + unidades[u];
 }
 
 String Clockface::getTimeInWords(const char *content)
