@@ -1,5 +1,5 @@
 {
-  "name": "mi-clockface",
+  "name": "nigth-clock-1",
   "version": 1,
   "author": "XE1E",
   "bgColor": 0,
@@ -9,8 +9,8 @@
   "loop": [
     {
       "type": "datetime",
-      "x": 2,
-      "y": 30,
+      "x": 1,
+      "y": 29,
       "content": "H",
       "font": "nocturno",
       "fgColor": 320,
@@ -19,8 +19,8 @@
     },
     {
       "type": "datetime",
-      "x": 23,
-      "y": 61,
+      "x": 24,
+      "y": 62,
       "content": "i",
       "font": "nocturno",
       "fgColor": 320,

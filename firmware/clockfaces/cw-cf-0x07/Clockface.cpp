@@ -1,6 +1,7 @@
 
 #include "Clockface.h"
 #include <CWPreview.h>
+#include <SPIFFS.h>
 
 unsigned long lastMillis = 0;
 
@@ -605,20 +606,63 @@ bool Clockface::deserializeDefinition()
 
   // Handle clockface source selection
   String source = ClockwiseParams::getInstance()->clockfaceSource;
+
+  // Load from internal storage (SPIFFS)
+  if (source == "stored") {
+    String path = "/clockfaces/" + ClockwiseParams::getInstance()->canvasFile + ".json";
+    Serial.printf("[Canvas] Loading from SPIFFS: %s\n", path.c_str());
+
+    if (!SPIFFS.begin(true)) {
+      drawSplashScreen(0xC904, "SPIFFS error");
+      Serial.println("[Canvas] SPIFFS mount failed");
+      return false;
+    }
+
+    if (!SPIFFS.exists(path)) {
+      drawSplashScreen(0xC904, "File not found");
+      Serial.printf("[Canvas] File not found: %s\n", path.c_str());
+      return false;
+    }
+
+    File clockFile = SPIFFS.open(path, "r");
+    if (!clockFile) {
+      drawSplashScreen(0xC904, "Open failed");
+      return false;
+    }
+
+    doc.clear();
+    DeserializationError error = deserializeJson(doc, clockFile);
+    clockFile.close();
+
+    if (error) {
+      drawSplashScreen(0xC904, "JSON error");
+      Serial.print("deserializeJson() failed: ");
+      Serial.println(error.c_str());
+      return false;
+    }
+
+    Serial.printf("[Canvas] Loaded '%s' by %s from storage\n", doc["name"].as<const char *>(), doc["author"].as<const char *>());
+    return true;
+  }
+
+  // Network sources
   if (source == "local") {
     // Use local development server (HTTP, no SSL)
     server = ClockwiseParams::getInstance()->localServerHost;
     port = ClockwiseParams::getInstance()->localServerPort;
     useSSL = false;
-  } else if (server.startsWith("raw.")) {
-    if (source == "github") {
-      // Use GitHub directly (may fail on some ESP32)
-      file = String("/jnthas/clock-club/main/shared" + file);
-    } else {
-      // Use XE1E CDN (default, more compatible)
-      server = "cdn.itaqui.to";
-      file = String("/xe1e/clockfaces" + file);
-    }
+  } else if (source == "ghpages") {
+    // Use GitHub Pages (XE1E repo) - recommended, stable SSL
+    server = "xe1e.github.io";
+    file = String("/Clockwise-XE1E/clockfaces" + file);
+  } else if (source == "github") {
+    // Use GitHub Raw directly (may fail on some ESP32 due to SSL)
+    server = "raw.githubusercontent.com";
+    file = String("/jnthas/clock-club/main/shared" + file);
+  } else if (source == "cdn") {
+    // Use XE1E CDN
+    server = "cdn.itaqui.to";
+    file = String("/xe1e/clockfaces" + file);
   }
 
   if (server.indexOf(":") > 0) {

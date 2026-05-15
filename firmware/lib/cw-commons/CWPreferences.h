@@ -160,7 +160,7 @@ struct ClockwiseParams
         rotationList = preferences.getString(PREF_ROTATION_LIST, "");
         rotationIndex = preferences.getUInt(PREF_ROTATION_INDEX, 0);
         rotationInterval = preferences.getUInt(PREF_ROTATION_INTERVAL, 1440);
-        clockfaceSource = preferences.getString(PREF_CLOCKFACE_SOURCE, "cdn");
+        clockfaceSource = preferences.getString(PREF_CLOCKFACE_SOURCE, "ghpages");
         localServerHost = preferences.getString(PREF_LOCAL_SERVER_HOST, "192.168.1.100");
         localServerPort = preferences.getUInt(PREF_LOCAL_SERVER_PORT, 8080);
     }

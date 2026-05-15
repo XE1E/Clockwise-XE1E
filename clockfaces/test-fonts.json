@@ -1,0 +1,65 @@
+{
+  "name": "test-fonts",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "delay": 250,
+  "setup": [
+    {
+      "type": "text",
+      "x": 1,
+      "y": 5,
+      "content": "4x6",
+      "font": "4x6",
+      "fgColor": 63488,
+      "bgColor": 0
+    },
+    {
+      "type": "text",
+      "x": 20,
+      "y": 5,
+      "content": "TEST 123",
+      "font": "4x6",
+      "fgColor": 65535,
+      "bgColor": 0
+    },
+    {
+      "type": "text",
+      "x": 1,
+      "y": 18,
+      "content": "knxt",
+      "font": "4x6",
+      "fgColor": 63488,
+      "bgColor": 0
+    },
+    {
+      "type": "text",
+      "x": 20,
+      "y": 30,
+      "content": "AB",
+      "font": "knxt",
+      "fgColor": 2016,
+      "bgColor": 0
+    },
+    {
+      "type": "text",
+      "x": 1,
+      "y": 45,
+      "content": "bold",
+      "font": "4x6",
+      "fgColor": 63488,
+      "bgColor": 0
+    },
+    {
+      "type": "datetime",
+      "x": 1,
+      "y": 60,
+      "content": "H:i",
+      "font": "bold",
+      "fgColor": 65504,
+      "bgColor": 0
+    }
+  ],
+  "sprites": [],
+  "loop": []
+}

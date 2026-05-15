@@ -244,8 +244,10 @@ button:hover{border-color:var(--accent)}
     <div class="card">
       <h2>Fuente de caratulas</h2>
       <select id="clockfaceSource" onchange="onSourceChange()">
-        <option value="cdn">CDN XE1E (Recomendado)</option>
-        <option value="github">GitHub (puede fallar)</option>
+        <option value="stored">Guardadas en reloj</option>
+        <option value="ghpages">GitHub Pages XE1E</option>
+        <option value="cdn">CDN XE1E</option>
+        <option value="github">GitHub Raw (puede fallar)</option>
         <option value="local">Local (desarrollo)</option>
       </select>
       <p id="sourceHint" style="color:var(--dim);font-size:12px;margin-top:4px"></p>
@@ -254,6 +256,24 @@ button:hover{border-color:var(--accent)}
         <input type="text" id="localServerHost" placeholder="192.168.1.100">
         <label>Puerto</label>
         <input type="number" id="localServerPort" min="1" max="65535" value="8080">
+      </div>
+      <div id="storedConfig" style="display:none;margin-top:12px">
+        <div style="background:var(--input);padding:10px;border-radius:var(--r);margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:13px">Almacenamiento:</span>
+            <span id="storageInfo" style="font-size:12px;color:var(--dim)">Cargando...</span>
+          </div>
+          <div style="height:6px;background:#333;border-radius:3px;overflow:hidden">
+            <div id="storageBar" style="height:100%;background:var(--accent);width:0%;transition:width 0.3s"></div>
+          </div>
+        </div>
+        <label>Subir caratula JSON</label>
+        <input type="file" id="clockfaceFile" accept=".json" style="margin-bottom:8px">
+        <button class="btn-primary" onclick="uploadClockface()" style="margin-bottom:12px">Subir al reloj</button>
+        <label>Caratulas guardadas</label>
+        <div id="storedList" style="background:var(--input);padding:8px;border-radius:var(--r);max-height:150px;overflow-y:auto;font-size:12px">
+          <span style="color:var(--dim)">Cargando...</span>
+        </div>
       </div>
     </div>
     <div class="card">
@@ -402,9 +422,10 @@ async function api(action,params={}){
   }catch(e){toast('Error');}
 }
 
+const cfGHPages=['pac-man','nyan-cat','mario-clock','time-in-words','mi-clockface','night-clock','pepsi-final'];
 const cfCDN=['pac-man','nyan-cat','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','night-clock','night-clock-xe1e'];
 const cfGitHub=['pac-man','nyan-cat','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','night-clock'];
-const clockfaces=cfCDN;
+const clockfaces=cfGHPages;
 
 function rgb565ToHex(v){
   const r=((v>>11)&0x1F)*255/31;
@@ -420,8 +441,87 @@ function hexToRgb565(h){
 }
 function setNightColor(c){$('nightColor').value=c;}
 
+let storedClockfaces=[];
+
+async function loadStorageInfo(){
+  try{
+    const r=await fetch('/api/storage');
+    const d=await r.json();
+    const pct=Math.round(d.used/d.total*100);
+    const freeKB=Math.round(d.free/1024);
+    $('storageInfo').textContent=freeKB+'KB libres ('+pct+'% usado)';
+    $('storageBar').style.width=pct+'%';
+    $('storageBar').style.background=pct>90?'#f44':pct>70?'#fa0':'var(--accent)';
+  }catch(e){$('storageInfo').textContent='Error';}
+}
+
+async function loadStoredClockfaces(){
+  try{
+    const r=await fetch('/api/clockfaces/list');
+    storedClockfaces=await r.json();
+    renderStoredList();
+    buildStoredSelect();
+  }catch(e){$('storedList').innerHTML='<span style="color:#f44">Error al cargar</span>';}
+}
+
+function renderStoredList(){
+  if(storedClockfaces.length===0){
+    $('storedList').innerHTML='<span style="color:var(--dim)">No hay caratulas guardadas</span>';
+    return;
+  }
+  $('storedList').innerHTML=storedClockfaces.map(c=>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #333">'+
+    '<span>'+c.name+' <small style="color:var(--dim)">('+Math.round(c.size/1024)+'KB)</small></span>'+
+    '<button onclick="deleteClockface(\''+c.name+'\')" style="background:#f44;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px">X</button>'+
+    '</div>'
+  ).join('');
+}
+
+function buildStoredSelect(){
+  const rot=$('rotationEnabled').checked;
+  if(rot){
+    $('multiSelect').style.display='block';
+    $('singleSelect').style.display='none';
+    const selected=($('rotationList').value||'').split(',').map(s=>s.trim()).filter(s=>s);
+    $('clockfaceCheckboxes').innerHTML=storedClockfaces.map(c=>
+      '<label style="font-size:12px"><input type="checkbox" class="cf-cb" value="'+c.name+'"'+(selected.includes(c.name)?' checked':'')+' onchange="updateSelection()">'+c.name+'</label>'
+    ).join('');
+  }else{
+    $('multiSelect').style.display='none';
+    $('singleSelect').style.display='block';
+    const current=$('canvasFile').value||'';
+    $('canvasSelect').innerHTML=storedClockfaces.map(c=>
+      '<option value="'+c.name+'"'+(c.name===current?' selected':'')+'>'+c.name+'</option>'
+    ).join('');
+  }
+}
+
+async function uploadClockface(){
+  const fileInput=$('clockfaceFile');
+  if(!fileInput.files.length){toast('Selecciona archivo');return;}
+  const file=fileInput.files[0];
+  const name=file.name.replace('.json','');
+  try{
+    const text=await file.text();
+    JSON.parse(text);
+    const r=await fetch('/api/clockfaces/upload?name='+encodeURIComponent(name),{method:'POST',headers:{'Content-Type':'application/json'},body:text});
+    if(r.ok){toast('Subido: '+name);fileInput.value='';loadStorageInfo();loadStoredClockfaces();}
+    else toast('Error al subir');
+  }catch(e){toast('JSON invalido');}
+}
+
+async function deleteClockface(name){
+  if(!confirm('Eliminar '+name+'?'))return;
+  try{
+    await fetch('/api/clockfaces/delete?name='+encodeURIComponent(name),{method:'POST'});
+    toast('Eliminado');loadStorageInfo();loadStoredClockfaces();
+  }catch(e){toast('Error');}
+}
+
 function getClockfaceList(){
   const src=$('clockfaceSource').value;
+  if(src==='stored')return storedClockfaces.map(c=>c.name);
+  if(src==='ghpages')return cfGHPages;
   if(src==='cdn')return cfCDN;
   if(src==='github')return cfGitHub;
   return [];
@@ -430,24 +530,30 @@ function getClockfaceList(){
 function onSourceChange(){
   const src=$('clockfaceSource').value;
   const isLocal=src==='local';
+  const isStored=src==='stored';
   $('localServerConfig').style.display=isLocal?'block':'none';
+  $('storedConfig').style.display=isStored?'block':'none';
   $('localClockConfig').style.display=isLocal?'block':'none';
-  $('singleSelect').style.display=isLocal?'none':($('rotationEnabled').checked?'none':'block');
-  $('multiSelect').style.display=isLocal?'none':($('rotationEnabled').checked?'block':'none');
-  const hints={cdn:'Servidor rapido y compatible con todos los ESP32',github:'Puede fallar en algunos ESP32 por SSL',local:'Sirve JSONs con: python -m http.server 8080'};
+  $('singleSelect').style.display=(isLocal||isStored)?'none':($('rotationEnabled').checked?'none':'block');
+  $('multiSelect').style.display=(isLocal||isStored)?'none':($('rotationEnabled').checked?'block':'none');
+  const hints={stored:'Caratulas guardadas en memoria del reloj',ghpages:'GitHub Pages - estable y recomendado',cdn:'Servidor rapido y compatible',github:'Puede fallar en algunos ESP32 por SSL',local:'Sirve JSONs con: python -m http.server 8080'};
   $('sourceHint').textContent=hints[src]||'';
-  if(!isLocal)buildClockfaceList();
+  if(isStored){loadStorageInfo();loadStoredClockfaces();}
+  else if(!isLocal)buildClockfaceList();
 }
 
 function onRotationToggle(){
   const rot=$('rotationEnabled').checked;
-  const isLocal=$('clockfaceSource').value==='local';
+  const src=$('clockfaceSource').value;
+  const isLocal=src==='local';
+  const isStored=src==='stored';
   $('rotationConfig').style.display=rot?'block':'none';
-  if(!isLocal){
+  if(!isLocal&&!isStored){
     $('singleSelect').style.display=rot?'none':'block';
     $('multiSelect').style.display=rot?'block':'none';
   }
-  buildClockfaceList();
+  if(isStored)buildStoredSelect();
+  else buildClockfaceList();
 }
 
 function buildClockfaceList(){

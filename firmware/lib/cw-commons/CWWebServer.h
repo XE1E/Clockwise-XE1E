@@ -2,6 +2,7 @@
 
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
+#include <SPIFFS.h>
 #include <CWPreferences.h>
 #include <CWPreview.h>
 #include "StatusController.h"
@@ -208,12 +209,145 @@ struct ClockwiseWebServer
       }
     );
 
+    // API: obtener espacio de almacenamiento
+    server.on("/api/storage", HTTP_GET, [](AsyncWebServerRequest *request) {
+      if (!SPIFFS.begin(true)) {
+        request->send(500, "application/json", "{\"error\":\"SPIFFS failed\"}");
+        return;
+      }
+      size_t total = SPIFFS.totalBytes();
+      size_t used = SPIFFS.usedBytes();
+      String json = "{\"total\":" + String(total) + ",\"used\":" + String(used) + ",\"free\":" + String(total - used) + "}";
+      request->send(200, "application/json", json);
+    });
+
+    // API: listar carátulas guardadas
+    server.on("/api/clockfaces/list", HTTP_GET, [](AsyncWebServerRequest *request) {
+      if (!SPIFFS.begin(true)) {
+        request->send(500, "application/json", "{\"error\":\"SPIFFS failed\"}");
+        return;
+      }
+      String json = "[";
+      File root = SPIFFS.open("/clockfaces");
+      if (root && root.isDirectory()) {
+        File file = root.openNextFile();
+        bool first = true;
+        while (file) {
+          if (!file.isDirectory() && String(file.name()).endsWith(".json")) {
+            if (!first) json += ",";
+            first = false;
+            String name = String(file.name());
+            name = name.substring(name.lastIndexOf('/') + 1);
+            name = name.substring(0, name.length() - 5); // remove .json
+            json += "{\"name\":\"" + name + "\",\"size\":" + String(file.size()) + "}";
+          }
+          file = root.openNextFile();
+        }
+      }
+      json += "]";
+      request->send(200, "application/json", json);
+    });
+
+    // API: subir carátula (recibe JSON)
+    server.on("/api/clockfaces/upload", HTTP_POST,
+      [](AsyncWebServerRequest *request) {
+        request->send(200, "text/plain", "OK");
+      },
+      NULL,
+      [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+        static String bodyBuffer;
+        static String fileName;
+
+        if (index == 0) {
+          bodyBuffer = "";
+          bodyBuffer.reserve(total);
+          fileName = request->hasParam("name") ? request->getParam("name")->value() : "uploaded";
+        }
+
+        for (size_t i = 0; i < len; i++) {
+          bodyBuffer += (char)data[i];
+        }
+
+        if (index + len == total) {
+          if (!SPIFFS.begin(true)) {
+            Serial.println("[Storage] SPIFFS mount failed");
+            bodyBuffer = "";
+            return;
+          }
+
+          // Create directory if needed
+          if (!SPIFFS.exists("/clockfaces")) {
+            SPIFFS.mkdir("/clockfaces");
+          }
+
+          String path = "/clockfaces/" + fileName + ".json";
+          File file = SPIFFS.open(path, FILE_WRITE);
+          if (file) {
+            file.print(bodyBuffer);
+            file.close();
+            Serial.printf("[Storage] Saved clockface: %s (%d bytes)\n", path.c_str(), total);
+          } else {
+            Serial.printf("[Storage] Failed to save: %s\n", path.c_str());
+          }
+          bodyBuffer = "";
+        }
+      }
+    );
+
+    // API: eliminar carátula
+    server.on("/api/clockfaces/delete", HTTP_POST, [](AsyncWebServerRequest *request) {
+      if (!request->hasParam("name")) {
+        request->send(400, "text/plain", "Missing name parameter");
+        return;
+      }
+      String name = request->getParam("name")->value();
+      String path = "/clockfaces/" + name + ".json";
+
+      if (!SPIFFS.begin(true)) {
+        request->send(500, "text/plain", "SPIFFS failed");
+        return;
+      }
+
+      if (SPIFFS.exists(path)) {
+        SPIFFS.remove(path);
+        Serial.printf("[Storage] Deleted: %s\n", path.c_str());
+        request->send(200, "text/plain", "Deleted");
+      } else {
+        request->send(404, "text/plain", "Not found");
+      }
+    });
+
+    // API: descargar carátula guardada
+    server.on("/api/clockfaces/get", HTTP_GET, [](AsyncWebServerRequest *request) {
+      if (!request->hasParam("name")) {
+        request->send(400, "text/plain", "Missing name parameter");
+        return;
+      }
+      String name = request->getParam("name")->value();
+      String path = "/clockfaces/" + name + ".json";
+
+      if (!SPIFFS.begin(true)) {
+        request->send(500, "text/plain", "SPIFFS failed");
+        return;
+      }
+
+      if (SPIFFS.exists(path)) {
+        request->send(SPIFFS, path, "application/json");
+      } else {
+        request->send(404, "text/plain", "Not found");
+      }
+    });
+
     // CORS headers for editor
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
-    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type");
 
     server.on("/api/clockface", HTTP_OPTIONS, [](AsyncWebServerRequest *request) {
+      request->send(204);
+    });
+
+    server.on("/api/clockfaces/upload", HTTP_OPTIONS, [](AsyncWebServerRequest *request) {
       request->send(204);
     });
   }

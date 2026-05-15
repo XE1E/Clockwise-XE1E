@@ -1,0 +1,61 @@
+{
+  "name": "Hora en Palabras-1",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "delay": 250,
+  "setup": [
+    {
+      "type": "datetime",
+      "x": 1,
+      "y": 13,
+      "content": "Hw",
+      "font": "bold",
+      "fgColor": 9609,
+      "bgColor": 0,
+      "id": "gywdg9"
+    },
+    {
+      "type": "datetime",
+      "x": 1,
+      "y": 24,
+      "content": "iw",
+      "font": "medium",
+      "fgColor": 65535,
+      "bgColor": 0,
+      "id": "tr6cyf"
+    },
+    {
+      "type": "line",
+      "x": 0,
+      "y": 47,
+      "x1": 60,
+      "y1": 47,
+      "color": 65535,
+      "id": "xvm5uz"
+    },
+    {
+      "type": "datetime",
+      "x": 1,
+      "y": 60,
+      "content": "d/m",
+      "font": "medium",
+      "fgColor": 9609,
+      "bgColor": 0,
+      "id": "8nv013"
+    }
+  ],
+  "sprites": [],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 31,
+      "y": 59,
+      "content": "l",
+      "font": "picopixel",
+      "fgColor": 65535,
+      "bgColor": 0,
+      "id": "i77lup"
+    }
+  ]
+}
