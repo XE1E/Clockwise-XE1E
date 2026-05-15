@@ -109,7 +109,8 @@ class DateTimeElement extends ClockfaceElement {
     }
 
     getDisplayText() {
-        const now = new Date();
+        // Use test time if set, otherwise current time
+        const now = window.testTime || new Date();
         let text = this.content;
 
         // Time in words support
@@ -180,7 +181,6 @@ class DateTimeElement extends ClockfaceElement {
         if (m === 0) return 'en punto';
         if (m === 15) return 'y cuarto';
         if (m === 30) return 'y media';
-        if (m === 45) return 'menos\ncuarto';
         if (m < 20) return 'y ' + unidades[m];
 
         const d = Math.floor(m / 10);

@@ -493,6 +493,20 @@ class ClockfaceEditor {
             document.querySelector('.canvas-wrapper').classList.toggle('rounded-pixels', e.target.checked);
         });
 
+        // Test time controls
+        document.getElementById('btn-set-time').addEventListener('click', () => {
+            const h = parseInt(document.getElementById('test-hour').value) || 0;
+            const m = parseInt(document.getElementById('test-minute').value) || 0;
+            window.testTime = new Date(2024, 0, 1, h, m, 0);
+            this.render();
+        });
+        document.getElementById('btn-clear-time').addEventListener('click', () => {
+            window.testTime = null;
+            document.getElementById('test-hour').value = '';
+            document.getElementById('test-minute').value = '';
+            this.render();
+        });
+
         document.getElementById('theme-name').addEventListener('input', (e) => {
             this.clockface.name = e.target.value;
         });

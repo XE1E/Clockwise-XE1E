@@ -140,7 +140,6 @@ String Clockface::minuteToWords(int m)
   if (m == 0) return "en punto";
   if (m == 15) return "y cuarto";
   if (m == 30) return "y media";
-  if (m == 45) return "menos\ncuarto";
 
   if (m < 20) {
     return String("y ") + unidades[m];
