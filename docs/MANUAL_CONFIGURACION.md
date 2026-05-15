@@ -476,25 +476,49 @@ El reloj usa un clockface especial llamado **Canvas** (cw-cf-0x07) que puede mos
 
 El sistema Canvas permite cargar y mostrar caratulas dinamicas desde archivos JSON. Estas opciones solo aparecen si el firmware esta compilado con el clockface Canvas (cw-cf-0x07).
 
+### Fuentes de Caratulas
+
+| Fuente | Descripcion | Requiere Internet |
+|---|---|---|
+| **Guardadas en reloj** | Caratulas almacenadas en memoria interna (SPIFFS) | No |
+| GitHub Pages XE1E | `xe1e.github.io/Clockwise-XE1E/clockfaces/` - estable | Si |
+| CDN XE1E | `cdn.itaqui.to/xe1e/clockfaces/` - rapido | Si |
+| GitHub Raw | `raw.githubusercontent.com` - puede fallar SSL | Si |
+| Local | Servidor HTTP en tu PC para desarrollo | Red local |
+
+### Caratulas Guardadas en el Reloj (Recomendado)
+
+Esta opcion permite guardar caratulas permanentemente en la memoria del reloj:
+
+**Ventajas:**
+- Funciona sin internet
+- Compatible con rotacion y modo nocturno
+- No depende de servidores externos
+
+**Como usar:**
+1. En "Fuente de caratulas" selecciona **"Guardadas en reloj"**
+2. Veras el espacio disponible (aproximadamente 1.5MB)
+3. Haz clic en "Seleccionar archivo" y elige un JSON
+4. Haz clic en "Subir al reloj"
+5. La caratula aparece en la lista y puedes seleccionarla
+
+**Gestionar caratulas:**
+- La lista muestra nombre y tamano de cada caratula
+- Haz clic en "X" para eliminar una caratula
+- La barra de espacio cambia de color si se llena (verde → amarillo → rojo)
+
 ### Archivo de Descripcion
 - Nombre del archivo JSON que define la caratula (sin extension)
 - **Ejemplos:** `nyan-cat`, `pac-man`, `snoopy3`
 - Los archivos se descargan automaticamente del servidor configurado
 
-### Direccion del Servidor
-- URL del servidor donde estan los archivos de caratulas
-- **Por defecto:** `https://clockwise.page/canvas/`
-- **Para pruebas locales:** `http://192.168.1.XXX:8000/` (cambia la IP por la de tu computadora)
-
-### Como probar caratulas localmente
-1. Inicia el servidor local:
-```bash
-cd C:\Documents\GitHub\Clockwise-XE1E\clockface-editor
-python -m http.server 8000
-```
-2. En la configuracion del reloj, cambia "Server Address" a tu IP local (ej: `http://192.168.1.100:8000/`)
-3. En "Description file" pon el nombre de tu caratula
-4. Reinicia el reloj
+### Como probar caratulas desde el Editor
+1. Abre el editor: https://xe1e.github.io/Clockwise-XE1E/clockface-editor/
+2. Crea o carga una caratula
+3. Haz clic en "Probar en Reloj"
+4. Ingresa la IP de tu reloj
+5. La caratula se muestra temporalmente (se pierde al reiniciar)
+6. Si te gusta, descarga el JSON y subelo con "Guardadas en reloj"
 
 ---
 

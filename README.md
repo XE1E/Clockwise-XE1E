@@ -14,8 +14,12 @@ Este fork incluye las siguientes mejoras:
 
 | Funcionalidad | Descripcion |
 |---|---|
+| Caratulas Locales | Guarda caratulas en la memoria del reloj (SPIFFS) - funciona sin internet |
+| GitHub Pages | Nueva fuente de caratulas estable con SSL |
 | Modo Nocturno | Cambia automaticamente a una caratula minimalista con brillo reducido durante la noche |
 | Rotacion de Caratulas | Cambia entre caratulas seleccionadas en intervalos configurables |
+| Hora en Palabras | Muestra la hora escrita en español (ej: "DIEZ Y CUARTO") |
+| 26+ Fuentes BDF | Fuentes bitmap adicionales para el editor y firmware |
 | Soporte Español | Nombres de dias y meses en español |
 | Paleta de Colores | Selector visual de colores para modo nocturno |
 | Reloj Nocturno | Nueva caratula minimalista con digitos grandes |
@@ -110,17 +114,19 @@ GND       ──>  GND
 
 ## Herramientas Web
 
-Inicia un servidor local para usar las herramientas:
-```bash
-cd clockface-editor
-python -m http.server 8000
-```
+Disponibles en GitHub Pages (sin instalar nada):
 
 | Herramienta | URL |
 |---|---|
-| Editor de Caratulas | http://localhost:8000/index.html |
-| Digit Designer | http://localhost:8000/digit-designer.html |
-| Generador Thumbnails | http://localhost:8000/generate-thumbs.html |
+| Editor de Caratulas | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/ |
+| Digit Designer | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/digit-designer.html |
+
+O ejecuta localmente:
+```bash
+cd clockface-editor
+python -m http.server 8000
+# Abre http://localhost:8000
+```
 
 ---
 
@@ -134,7 +140,12 @@ La pagina de configuracion incluye:
 - **Zona horaria:** Configuracion IANA
 - **Modo Nocturno:** Horario, brillo, color y caratula
 - **Rotacion de Caratulas:** Intervalo y seleccion de caratulas
-- **Canvas:** Servidor y archivo de descripcion
+- **Fuente de Caratulas:**
+  - **Guardadas en reloj:** Caratulas en memoria interna (funciona offline)
+  - **GitHub Pages XE1E:** Fuente recomendada, estable
+  - **CDN XE1E:** Servidor rapido
+  - **GitHub Raw:** Puede fallar en algunos ESP32
+  - **Local:** Para desarrollo con servidor HTTP local
 
 ---
 
