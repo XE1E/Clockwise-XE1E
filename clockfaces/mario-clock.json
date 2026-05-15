@@ -77,12 +77,11 @@
       "type": "sprite",
       "x": 26,
       "y": 40,
-      "spriteIndex": 0,
+      "sprite": 0,
       "frameDelay": 500,
       "loopDelay": 0,
       "moveX": 0,
-      "moveY": 0,
-      "inLoop": true
+      "moveY": 0
     }
   ]
 }
