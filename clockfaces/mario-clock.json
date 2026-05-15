@@ -45,20 +45,20 @@
     },
     {
       "type": "image",
-      "x": 4,
-      "y": 4,
+      "x": 13,
+      "y": 8,
       "image": "iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAXklEQVR4nGNkYGBgmOPB8J+BQpCyg4GRBWSQV6gCpWYxMOx48J8JxpZKfgDGpAApND1ww6gBWGCMZ3NJ9+ozND1UdRnTqGEkAybSteAGo4aRDphGRkZnhNIUl7QgQwCzjxrX5pyI6gAAAABJRU5ErkJggg=="
     },
     {
       "type": "image",
-      "x": 42,
-      "y": 4,
+      "x": 32,
+      "y": 8,
       "image": "iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAXklEQVR4nGNkYGBgmOPB8J+BQpCyg4GRBWSQV6gCpWYxMOx48J8JxpZKfgDGpAApND1ww6gBWGCMZ3NJ9+ozND1UdRnTqGEkAybSteAGo4aRDphGRkZnhNIUl7QgQwCzjxrX5pyI6gAAAABJRU5ErkJggg=="
     },
     {
       "type": "datetime",
-      "x": 7,
-      "y": 11,
+      "x": 16,
+      "y": 15,
       "content": "H",
       "font": "",
       "fgColor": 0,
@@ -66,8 +66,8 @@
     },
     {
       "type": "datetime",
-      "x": 45,
-      "y": 11,
+      "x": 35,
+      "y": 15,
       "content": "i",
       "font": "",
       "fgColor": 0,
@@ -75,7 +75,7 @@
     },
     {
       "type": "sprite",
-      "x": 26,
+      "x": 23,
       "y": 40,
       "sprite": 0,
       "frameDelay": 500,
