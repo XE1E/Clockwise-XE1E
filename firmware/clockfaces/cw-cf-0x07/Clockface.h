@@ -55,6 +55,9 @@ private:
   void refreshDateTime();
   void drawSplashScreen(uint16_t color, const char *msg);
   void drawFallbackClock();
+  String getTimeInWords(const char *content);
+  String hourToWords(int h);
+  String minuteToWords(int m);
   void handleSpriteAnimation(std::shared_ptr<CustomSprite> &sprite);
   void handleSpriteMovement(std::shared_ptr<CustomSprite> &sprite);
 

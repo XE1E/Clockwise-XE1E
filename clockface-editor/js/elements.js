@@ -112,6 +112,14 @@ class DateTimeElement extends ClockfaceElement {
         const now = new Date();
         let text = this.content;
 
+        // Time in words support
+        if (text === 'Hw') {
+            return this.hourToWords(now.getHours());
+        }
+        if (text === 'iw') {
+            return this.minuteToWords(now.getMinutes());
+        }
+
         const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
         const diasCortos = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -146,6 +154,38 @@ class DateTimeElement extends ClockfaceElement {
             }
         }
         return result;
+    }
+
+    hourToWords(h) {
+        const hours = [
+            'twelve', 'one', 'two', 'three', 'four', 'five',
+            'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'
+        ];
+        let hour12 = h % 12;
+        if (hour12 === 0) hour12 = 12;
+        if (h === 0) return 'mid\nnight';
+        if (h === 12) return 'noon';
+        return hours[hour12];
+    }
+
+    minuteToWords(m) {
+        const ones = [
+            '', 'one', 'two', 'three', 'four', 'five',
+            'six', 'seven', 'eight', 'nine', 'ten',
+            'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen',
+            'sixteen', 'seventeen', 'eighteen', 'nineteen'
+        ];
+        const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty'];
+
+        if (m === 0) return "o'clock";
+        if (m === 30) return 'thirty';
+        if (m < 10) return 'oh ' + ones[m];
+        if (m < 20) return ones[m];
+
+        const t = Math.floor(m / 10);
+        const o = m % 10;
+        if (o === 0) return tens[t];
+        return tens[t] + '\n' + ones[o];
     }
 }
 

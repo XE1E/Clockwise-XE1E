@@ -108,6 +108,65 @@ void Clockface::setFont(const char *fontName)
   }
 }
 
+// Time in words conversion
+String Clockface::hourToWords(int h)
+{
+  const char* hours[] = {
+    "twelve", "one", "two", "three", "four", "five",
+    "six", "seven", "eight", "nine", "ten", "eleven", "twelve"
+  };
+
+  int hour12 = h % 12;
+  if (hour12 == 0) hour12 = 12;
+
+  if (h == 0) return "mid\nnight";
+  if (h == 12) return "noon";
+
+  return hours[hour12];
+}
+
+String Clockface::minuteToWords(int m)
+{
+  const char* ones[] = {
+    "", "one", "two", "three", "four", "five",
+    "six", "seven", "eight", "nine", "ten",
+    "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+    "sixteen", "seventeen", "eighteen", "nineteen"
+  };
+  const char* tens[] = {
+    "", "", "twenty", "thirty", "forty", "fifty"
+  };
+
+  if (m == 0) return "o'clock";
+  if (m == 30) return "thirty";
+
+  if (m < 10) {
+    return String("oh ") + ones[m];
+  }
+  if (m < 20) {
+    return ones[m];
+  }
+
+  int t = m / 10;
+  int o = m % 10;
+  if (o == 0) {
+    return tens[t];
+  }
+  return String(tens[t]) + "\n" + ones[o];
+}
+
+String Clockface::getTimeInWords(const char *content)
+{
+  if (strcmp(content, "Hw") == 0) {
+    return hourToWords(_dateTime->getHour());
+  }
+  if (strcmp(content, "iw") == 0) {
+    return minuteToWords(_dateTime->getMinute());
+  }
+  // Not a words format, return empty
+  return "";
+}
+
 uint16_t Clockface::resolveColor(int32_t color)
 {
   if (color == -1) {
@@ -168,7 +227,12 @@ void Clockface::refreshDateTime()
     const char *type = value["type"].as<const char *>();
     if (strcmp(type, "datetime") == 0)
     {
-      renderText(_dateTime->getFormattedTime(value["content"].as<const char *>()), value);
+      const char *content = value["content"].as<const char *>();
+      String text = getTimeInWords(content);
+      if (text.length() == 0) {
+        text = _dateTime->getFormattedTime(content);
+      }
+      renderText(text, value);
     }
   }
 
@@ -178,7 +242,12 @@ void Clockface::refreshDateTime()
     const char *type = value["type"].as<const char *>();
     if (strcmp(type, "datetime") == 0)
     {
-      renderText(_dateTime->getFormattedTime(value["content"].as<const char *>()), value);
+      const char *content = value["content"].as<const char *>();
+      String text = getTimeInWords(content);
+      if (text.length() == 0) {
+        text = _dateTime->getFormattedTime(content);
+      }
+      renderText(text, value);
     }
   }
 }
