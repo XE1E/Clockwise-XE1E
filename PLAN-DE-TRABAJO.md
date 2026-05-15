@@ -111,7 +111,10 @@ interfaz web moderna y soporte multi-WiFi.
 - [x] Mostrar IP al conectar
 - [x] Aplanar submodulos a repo único
 - [x] Detección automática POSIX vs Olson timezone
-- [x] Firmware size: 70.4% flash (922KB)
+- [x] Carátulas guardadas en SPIFFS (funciona offline)
+- [x] GitHub Pages como fuente de carátulas (SSL estable)
+- [x] 26+ fuentes BDF integradas
+- [x] Firmware size: 95% flash (1.2MB) - revisar fuentes para optimizar
 
 ### 4.2 Pendiente
 - [ ] Cache de valores JSON en sprites (evitar parsing repetido)
@@ -192,9 +195,10 @@ interfaz web moderna y soporte multi-WiFi.
 - Sin WiFiManager (implementación propia de AP mode)
 
 ### Memoria
-- Firmware: 922KB (70.4% de 1.3MB)
-- RAM: 49KB (15% de 320KB)
-- Interfaz web embebida: ~12KB
+- Firmware: 1.2MB (95% de 1.3MB) - 26 fuentes BDF agregadas
+- RAM: 103KB (31.7% de 320KB)
+- SPIFFS: ~1.5MB disponible para carátulas
+- Interfaz web embebida: ~15KB
 
 ### Compatibilidad
 - ESP32 (original Clockwise hardware)
@@ -203,6 +207,16 @@ interfaz web moderna y soporte multi-WiFi.
 ---
 
 ## Historial de Cambios
+
+### 2026-05-15
+- Carátulas guardadas en SPIFFS (funciona offline)
+- GitHub Pages XE1E como fuente de carátulas
+- 26+ fuentes BDF convertidas e integradas
+- Hora en palabras (Hw/iw) con fix de superposición
+- API endpoints para gestión de carátulas locales
+- Interfaz web para subir/eliminar carátulas
+- Indicador de espacio de almacenamiento
+- Manuales actualizados
 
 ### 2026-05-13
 - Creación del plan de trabajo

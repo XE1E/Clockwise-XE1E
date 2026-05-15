@@ -16,10 +16,8 @@
 
 ### Pendientes
 - [ ] Convertir clockfaces 0x01-0x06 a JSON
-- [ ] Listar solo clockfaces disponibles en CDN/GitHub
-- [ ] Sistema de fuentes dinámicas (cargar desde SPIFFS sin recompilar firmware)
-  - Actualmente las fuentes deben compilarse en el firmware
-  - Opciones: SPIFFS, sprites por dígito, o mantener fuentes predefinidas
+- [ ] Revisar fuentes del firmware y eliminar las no usadas (Flash al 95%)
+- [ ] Subir carátulas al repo GitHub desde el editor (requiere token)
 
 ## Próximo
 
@@ -39,6 +37,13 @@
 - [x] Recuperar archivos mi-fuente (dígitos personalizados)
 - [x] Mario clockface convertido a JSON (parcial)
 - [x] Eliminar workflow esp-idf.yml (proyecto usa PlatformIO)
+- [x] Carátulas guardadas en reloj (SPIFFS) - funciona offline
+- [x] GitHub Pages XE1E como fuente de carátulas (estable SSL)
+- [x] 26+ fuentes BDF convertidas e integradas (editor y firmware)
+- [x] Hora en palabras (formato Hw/iw) con fix de superposición
+- [x] Conversión de fuentes JSON al formato correcto (bitmaps/glyphs)
+- [x] Endpoints API: /api/storage, /api/clockfaces/list, upload, delete, get
+- [x] Interfaz web para gestionar carátulas locales (subir, listar, eliminar, espacio)
 
 ### 2026-05-14
 - [x] Servidor local: interfaz para probar carátulas sin subir a GitHub
