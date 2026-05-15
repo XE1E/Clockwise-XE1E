@@ -1,0 +1,21 @@
+{
+  "name": "mi-clockface",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "delay": 250,
+  "setup": [
+    {
+      "type": "text",
+      "x": 26,
+      "y": 18,
+      "content": "Text",
+      "font": "picopixel",
+      "fgColor": 65535,
+      "bgColor": 0,
+      "id": "vrzrmh"
+    }
+  ],
+  "sprites": [],
+  "loop": []
+}

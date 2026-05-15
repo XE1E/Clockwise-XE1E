@@ -32,6 +32,9 @@
 ## Completado
 
 ### 2026-05-14
+- [x] Servidor local: interfaz para probar carátulas sin subir a GitHub
+- [x] Editor: botón "Probar en Reloj" para envío directo de carátulas
+- [x] Simplificación: sección de carátulas unificada (fuente + selección + rotación)
 - [x] Brillo: aplicación inmediata desde web (sin reiniciar)
 - [x] Rotación: inicia con primera caratula de la lista
 - [x] Modo nocturno: color dinámico configurable (fgColor: -1)

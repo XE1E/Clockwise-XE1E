@@ -148,6 +148,52 @@ Nombres disponibles: `nyan-cat`, `pac-man`, `goomba_move`, `snoopy3`, `christmas
 
 ---
 
+## Probar Caratulas (Desarrollo)
+
+Si estas creando o editando caratulas, puedes probarlas en el reloj antes de subirlas a GitHub.
+
+### Metodo Rapido: Boton "Probar en Reloj" (Recomendado)
+
+La forma mas facil es usar el boton integrado en el Editor de Caratulas:
+
+1. Abre el **Editor de Caratulas** desde la pagina de configuracion
+2. Disena o importa tu caratula
+3. Haz clic en el boton verde **"Probar en Reloj"**
+4. Ingresa la IP de tu reloj (ej: `192.168.1.50`)
+5. Haz clic en **"Enviar al Reloj"**
+6. La caratula aparece inmediatamente en el reloj
+
+**Ventajas:**
+- No necesitas instalar nada
+- No necesitas usar la terminal
+- La IP se guarda para la proxima vez
+- Cambios instantaneos
+
+**Como encontrar la IP del reloj:**
+- Aparece en la pantalla del reloj al encender
+- O busca "Clockwise" en la lista de dispositivos de tu router
+
+### Metodo Alternativo: Servidor Local
+
+Si prefieres trabajar con archivos JSON guardados localmente:
+
+1. Guarda tu archivo JSON en una carpeta
+2. Abre una terminal en esa carpeta y ejecuta:
+   ```bash
+   python -m http.server 8080
+   ```
+3. En la configuracion del reloj:
+   - Fuente: **"Local (desarrollo)"**
+   - IP: la de tu computadora (ej: `192.168.1.100`)
+   - Puerto: `8080`
+4. Escribe el nombre de la caratula y guarda
+
+**Para obtener la IP de tu computadora:**
+- **Windows:** `ipconfig` en cmd
+- **Mac/Linux:** `ifconfig` o `ip addr`
+
+---
+
 ## Reiniciar el Reloj
 
 Haz clic en el boton "Restart" en la parte superior de la pagina de configuracion.
