@@ -106,6 +106,111 @@ void Clockface::setFont(const char *fontName)
   {
     Locator::getDisplay()->setFont(&ledDisplay);
   }
+  // BDF converted fonts
+  else if (strcmp(fontName, "4x6") == 0)
+  {
+    Locator::getDisplay()->setFont(&font4x6);
+  }
+  else if (strcmp(fontName, "5x7") == 0)
+  {
+    Locator::getDisplay()->setFont(&font5x7);
+  }
+  else if (strcmp(fontName, "5x8") == 0)
+  {
+    Locator::getDisplay()->setFont(&font5x8);
+  }
+  else if (strcmp(fontName, "6x9") == 0)
+  {
+    Locator::getDisplay()->setFont(&font6x9);
+  }
+  else if (strcmp(fontName, "6x10") == 0)
+  {
+    Locator::getDisplay()->setFont(&font6x10);
+  }
+  else if (strcmp(fontName, "6x12") == 0)
+  {
+    Locator::getDisplay()->setFont(&font6x12);
+  }
+  else if (strcmp(fontName, "6x13") == 0)
+  {
+    Locator::getDisplay()->setFont(&font6x13);
+  }
+  else if (strcmp(fontName, "6x13B") == 0)
+  {
+    Locator::getDisplay()->setFont(&font6x13B);
+  }
+  else if (strcmp(fontName, "7x13") == 0)
+  {
+    Locator::getDisplay()->setFont(&font7x13);
+  }
+  else if (strcmp(fontName, "7x13B") == 0)
+  {
+    Locator::getDisplay()->setFont(&font7x13B);
+  }
+  else if (strcmp(fontName, "7x14") == 0)
+  {
+    Locator::getDisplay()->setFont(&font7x14);
+  }
+  else if (strcmp(fontName, "7x14B") == 0)
+  {
+    Locator::getDisplay()->setFont(&font7x14B);
+  }
+  else if (strcmp(fontName, "8x13") == 0)
+  {
+    Locator::getDisplay()->setFont(&font8x13);
+  }
+  else if (strcmp(fontName, "8x13B") == 0)
+  {
+    Locator::getDisplay()->setFont(&font8x13B);
+  }
+  else if (strcmp(fontName, "spleen-5x8") == 0)
+  {
+    Locator::getDisplay()->setFont(&spleen5x8);
+  }
+  else if (strcmp(fontName, "spleen-8x16") == 0)
+  {
+    Locator::getDisplay()->setFont(&spleen8x16);
+  }
+  else if (strcmp(fontName, "creep") == 0)
+  {
+    Locator::getDisplay()->setFont(&creep);
+  }
+  else if (strcmp(fontName, "scientifica") == 0)
+  {
+    Locator::getDisplay()->setFont(&scientifica11);
+  }
+  else if (strcmp(fontName, "scientifica-bold") == 0)
+  {
+    Locator::getDisplay()->setFont(&scientificaBold11);
+  }
+  else if (strcmp(fontName, "haxor-10") == 0)
+  {
+    Locator::getDisplay()->setFont(&haxorMedium10);
+  }
+  else if (strcmp(fontName, "haxor-11") == 0)
+  {
+    Locator::getDisplay()->setFont(&haxorMedium11);
+  }
+  else if (strcmp(fontName, "haxor-12") == 0)
+  {
+    Locator::getDisplay()->setFont(&haxorMedium12);
+  }
+  else if (strcmp(fontName, "haxor-13") == 0)
+  {
+    Locator::getDisplay()->setFont(&haxorMedium13);
+  }
+  else if (strcmp(fontName, "clR6x12") == 0)
+  {
+    Locator::getDisplay()->setFont(&clR6x12);
+  }
+  else if (strcmp(fontName, "helvetica") == 0)
+  {
+    Locator::getDisplay()->setFont(&helvR12);
+  }
+  else if (strcmp(fontName, "knxt") == 0)
+  {
+    Locator::getDisplay()->setFont(&knxt);
+  }
   else
   {
     Locator::getDisplay()->setFont();

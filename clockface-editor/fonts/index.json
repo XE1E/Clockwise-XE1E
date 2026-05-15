@@ -1,4 +1,32 @@
 {
   "description": "Fuentes personalizadas para Clockwise",
-  "fonts": ["led-display.json"]
+  "fonts": [
+    "led-display.json",
+    "4x6.json",
+    "5x7.json",
+    "5x8.json",
+    "6x9.json",
+    "6x10.json",
+    "6x12.json",
+    "6x13.json",
+    "6x13B.json",
+    "7x13.json",
+    "7x13B.json",
+    "7x14.json",
+    "7x14B.json",
+    "8x13.json",
+    "8x13B.json",
+    "spleen-5x8.json",
+    "spleen-8x16.json",
+    "creep.json",
+    "scientifica.json",
+    "scientifica-bold.json",
+    "haxor-10.json",
+    "haxor-11.json",
+    "haxor-12.json",
+    "haxor-13.json",
+    "clR6x12.json",
+    "helvetica.json",
+    "knxt.json"
+  ]
 }
