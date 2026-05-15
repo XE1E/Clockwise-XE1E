@@ -54,6 +54,44 @@ python convert_ttf.py "NEW LED DISPLAY ST.ttf" --size 12 --js --name ledDisplay
 # Copiar el codigo generado a js/pixel-fonts.js
 ```
 
+## convert_json_to_gfx.py
+
+Convierte fuentes JSON del editor a formato Adafruit GFX (.h) para el firmware.
+
+### Uso
+
+```bash
+python convert_json_to_gfx.py "../fonts/led-display.json" --name ledDisplay
+python convert_json_to_gfx.py "../fonts/mi-fuente.json" --name miFuente --output "../../firmware/clockfaces/cw-cf-0x07/fonts/"
+```
+
+### Parametros
+
+| Parametro | Descripcion | Default |
+|-----------|-------------|---------|
+| `json_file` | Archivo JSON de fuente | (requerido) |
+| `--name` | Nombre de la fuente en C | (requerido) |
+| `--output` | Carpeta de salida | misma que entrada |
+
+### Despues de convertir
+
+1. Agregar include en `Clockface.h`:
+   ```cpp
+   #include "fonts/miFuente.h"
+   ```
+
+2. Agregar mapeo en `Clockface.cpp` setFont():
+   ```cpp
+   else if (strcmp(fontName, "mi-fuente") == 0)
+   {
+     Locator::getDisplay()->setFont(&miFuente);
+   }
+   ```
+
+3. Compilar y subir el firmware
+
+---
+
 ## Donde encontrar fuentes
 
 - [dafont.com](https://www.dafont.com) - Seccion "Bitmap" o "LED"

@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Time in words format (Hw, iw) for Spanish hour display
+- led-display font now available in firmware (converted from editor JSON)
+- Export JSON: remembers last folder used (IndexedDB)
+- Export JSON: warns before overwriting existing files
+- Export JSON: button to change destination folder
+- Tool to convert JSON fonts to Adafruit GFX format (convert_json_to_gfx.py)
+
+### Fixed
+
+- Text overlap issue with time-in-words (Hw, iw) formats - now clears area properly when text length changes
+
 ### Changed
 
 - Avoid use extensive of String in CWWebServer.cpp

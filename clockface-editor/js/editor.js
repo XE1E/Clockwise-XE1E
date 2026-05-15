@@ -692,21 +692,151 @@ class ClockfaceEditor {
         }
 
         try {
-            const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-            const fileHandle = await dirHandle.getFileHandle(`${this.clockface.name}.json`, { create: true });
+            // Try to use saved directory handle, or ask user to select
+            let dirHandle = await this.getSavedDirectoryHandle();
+
+            if (!dirHandle) {
+                dirHandle = await window.showDirectoryPicker({
+                    mode: 'readwrite',
+                    startIn: 'documents'
+                });
+                await this.saveDirectoryHandle(dirHandle);
+            }
+
+            // Verify we still have permission
+            const permission = await dirHandle.queryPermission({ mode: 'readwrite' });
+            if (permission !== 'granted') {
+                const requestResult = await dirHandle.requestPermission({ mode: 'readwrite' });
+                if (requestResult !== 'granted') {
+                    // Permission denied, ask for new folder
+                    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    await this.saveDirectoryHandle(dirHandle);
+                }
+            }
+
+            const fileName = `${this.clockface.name}.json`;
+
+            // Check if file already exists
+            let fileExists = false;
+            try {
+                await dirHandle.getFileHandle(fileName, { create: false });
+                fileExists = true;
+            } catch (e) {
+                // File doesn't exist, that's fine
+            }
+
+            if (fileExists) {
+                const overwrite = confirm(`El archivo "${fileName}" ya existe.\n\n¿Deseas sobreescribirlo?`);
+                if (!overwrite) {
+                    return;
+                }
+            }
+
+            const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
             const writable = await fileHandle.createWritable();
 
             const json = document.getElementById('export-json').value;
             await writable.write(json);
             await writable.close();
 
-            alert(`JSON guardado: ${this.clockface.name}.json`);
+            alert(`JSON guardado: ${fileName}`);
             document.getElementById('export-modal').classList.remove('active');
         } catch (e) {
             if (e.name !== 'AbortError') {
                 console.error('Error saving JSON:', e);
                 alert('Error al guardar: ' + e.message);
             }
+        }
+    }
+
+    async getSavedDirectoryHandle() {
+        return new Promise((resolve) => {
+            const request = indexedDB.open('ClockwiseEditor', 1);
+
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('settings')) {
+                    db.createObjectStore('settings');
+                }
+            };
+
+            request.onsuccess = (e) => {
+                const db = e.target.result;
+                const tx = db.transaction('settings', 'readonly');
+                const store = tx.objectStore('settings');
+                const getRequest = store.get('clockfacesDir');
+
+                getRequest.onsuccess = () => {
+                    resolve(getRequest.result || null);
+                };
+
+                getRequest.onerror = () => {
+                    resolve(null);
+                };
+            };
+
+            request.onerror = () => {
+                resolve(null);
+            };
+        });
+    }
+
+    async saveDirectoryHandle(dirHandle) {
+        return new Promise((resolve) => {
+            const request = indexedDB.open('ClockwiseEditor', 1);
+
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('settings')) {
+                    db.createObjectStore('settings');
+                }
+            };
+
+            request.onsuccess = (e) => {
+                const db = e.target.result;
+                const tx = db.transaction('settings', 'readwrite');
+                const store = tx.objectStore('settings');
+                store.put(dirHandle, 'clockfacesDir');
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            };
+
+            request.onerror = () => {
+                resolve();
+            };
+        });
+    }
+
+    async changeJsonFolder() {
+        if (!('showDirectoryPicker' in window)) {
+            alert('Tu navegador no soporta esta funcion. Usa Chrome o Edge.');
+            return;
+        }
+
+        try {
+            const dirHandle = await window.showDirectoryPicker({
+                mode: 'readwrite',
+                startIn: 'documents'
+            });
+            await this.saveDirectoryHandle(dirHandle);
+            this.updateFolderInfo();
+            alert(`Carpeta cambiada a: ${dirHandle.name}`);
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                console.error('Error changing folder:', e);
+            }
+        }
+    }
+
+    async updateFolderInfo() {
+        const infoDiv = document.getElementById('export-folder-info');
+        if (!infoDiv) return;
+
+        const dirHandle = await this.getSavedDirectoryHandle();
+        if (dirHandle) {
+            infoDiv.textContent = `Carpeta: ${dirHandle.name}/`;
+        } else {
+            infoDiv.textContent = 'Carpeta: (no seleccionada - se pedira al guardar)';
         }
     }
 
@@ -1451,6 +1581,7 @@ class ClockfaceEditor {
             const json = JSON.stringify(this.clockface.toJSON(), null, 2);
             document.getElementById('export-json').value = json;
             document.getElementById('export-modal').classList.add('active');
+            this.updateFolderInfo();
         });
 
         document.getElementById('btn-do-import').addEventListener('click', () => {
@@ -1547,6 +1678,10 @@ class ClockfaceEditor {
 
         document.getElementById('btn-save-json-folder').addEventListener('click', () => {
             this.saveJsonToFolder();
+        });
+
+        document.getElementById('btn-change-json-folder').addEventListener('click', () => {
+            this.changeJsonFolder();
         });
 
         // Test on Clock

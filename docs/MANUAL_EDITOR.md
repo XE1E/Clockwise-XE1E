@@ -195,7 +195,7 @@ npx serve .
 |-----------|-------------|
 | X, Y | Posicion en pixeles (0-63) |
 | Content | Texto o formato de fecha |
-| Font | picopixel, tomthumb, square, medium, big, bold |
+| Font | picopixel, tomthumb, square, medium, big, bold, led-display, nocturno |
 | fgColor | Color del texto (RGB565) |
 | bgColor | Color de fondo del texto (RGB565) |
 | En Loop | Si debe redibujarse cada ciclo |
@@ -226,12 +226,41 @@ npx serve .
 | d | Dia | 29 |
 | m | Mes | 04 |
 | Y | Año | 2026 |
+| Hw | Hora en palabras | DIEZ |
+| iw | Minutos en palabras | y media |
 
 **Ejemplos:**
 - `H:i` = 14:30
 - `H:i:s` = 14:30:45
 - `h:i A` = 02:30 PM
 - `d/m` = 29/04
+
+#### Hora en Palabras (Español)
+
+Los formatos `Hw` y `iw` muestran la hora en texto español:
+
+| Formato | Descripcion | Ejemplos |
+|---------|-------------|----------|
+| `Hw` | Hora en palabras (mayusculas) | UNA, DOS, TRES... DOCE |
+| `iw` | Minutos en palabras | en punto, y cuarto, y media, veinte, treinta y cinco... |
+
+**Ejemplo de uso:**
+```json
+{
+  "type": "datetime",
+  "content": "Hw",
+  "font": "bold",
+  "y": 13
+},
+{
+  "type": "datetime", 
+  "content": "iw",
+  "font": "medium",
+  "y": 24
+}
+```
+
+Resultado a las 10:30: "DIEZ" + "y media"
 
 ### Rect y FillRect
 
@@ -810,9 +839,25 @@ clockface-editor/
 ### Exportar
 
 1. Click en "Exportar JSON"
-2. El JSON aparece en un modal
-3. Click "Copiar" para copiar al portapapeles
-4. Click "Descargar" para guardar como archivo .json
+2. El JSON aparece en un modal con opciones:
+
+| Boton | Descripcion |
+|-------|-------------|
+| **Copiar** | Copia el JSON al portapapeles |
+| **Descargar** | Descarga como archivo .json (va a Descargas del navegador) |
+| **Guardar** | Guarda en la carpeta seleccionada (recuerda la ultima carpeta) |
+| **📁** | Cambiar la carpeta de destino |
+
+#### Guardar en Carpeta (Recomendado)
+
+El boton "Guardar" usa la carpeta `clockfaces/` por defecto:
+
+- **Primera vez:** Se pide seleccionar la carpeta (elegir `clockfaces/`)
+- **Siguientes veces:** Usa la carpeta guardada automaticamente
+- **Archivo existente:** Pregunta antes de sobreescribir
+- **Cambiar carpeta:** Click en el boton 📁
+
+La carpeta actual se muestra debajo del JSON en el modal.
 
 ### Importar
 

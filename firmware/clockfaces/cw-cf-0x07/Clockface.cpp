@@ -102,6 +102,10 @@ void Clockface::setFont(const char *fontName)
   {
     Locator::getDisplay()->setFont(&Nocturno);
   }
+  else if (strcmp(fontName, "led-display") == 0)
+  {
+    Locator::getDisplay()->setFont(&ledDisplay);
+  }
   else
   {
     Locator::getDisplay()->setFont();
@@ -182,14 +186,29 @@ void Clockface::renderText(String text, JsonVariantConst value)
   uint16_t fgColor = resolveColor(value["fgColor"].as<int32_t>());
   uint16_t bgColor = resolveColor(value["bgColor"].as<int32_t>());
 
-  // Calculate max width using "8" as reference (widest digit)
-  // This ensures the background clears the full area when digits change
+  // Calculate reference text for clearing area
   int16_t ref_x1, ref_y1;
   uint16_t ref_w, ref_h;
-  String refText = text;
-  for (int i = 0; i < refText.length(); i++) {
-    if (refText[i] >= '0' && refText[i] <= '9') refText[i] = '8';
+  String refText;
+
+  const char *content = value["content"].as<const char *>();
+  if (content && strcmp(content, "Hw") == 0) {
+    // Hour in words: max is "CUATRO" (7 chars uppercase)
+    refText = "CUATRO";
+  } else if (content && strcmp(content, "iw") == 0) {
+    // Minutes in words: always use max possible area (2 lines)
+    // This ensures proper clearing when switching from multiline to single line
+    // "diecisiete" is longest single word, but we always need 2-line height
+    // to clear previous multiline text like "treinta\ny cinco"
+    refText = "diecisiete\ny nueve";
+  } else {
+    // Numeric text: use "8" as widest digit reference
+    refText = text;
+    for (int i = 0; i < refText.length(); i++) {
+      if (refText[i] >= '0' && refText[i] <= '9') refText[i] = '8';
+    }
   }
+
   Locator::getDisplay()->getTextBounds(refText, 0, 0, &ref_x1, &ref_y1, &ref_w, &ref_h);
 
   // Use the reference dimensions and position for clearing
