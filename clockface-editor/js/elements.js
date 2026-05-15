@@ -158,19 +158,19 @@ class DateTimeElement extends ClockfaceElement {
 
     hourToWords(h) {
         const horas = [
-            'doce', 'una', 'dos', 'tres', 'cuatro', 'cinco',
-            'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce'
+            'DOCE', 'UNA', 'DOS', 'TRES', 'CUATRO', 'CINCO',
+            'SEIS', 'SIETE', 'OCHO', 'NUEVE', 'DIEZ', 'ONCE', 'DOCE'
         ];
         let hour12 = h % 12;
         if (hour12 === 0) hour12 = 12;
-        if (h === 0) return 'media\nnoche';
-        if (h === 12) return 'medio\ndia';
+        if (h === 0) return 'MEDIA\nNOCHE';
+        if (h === 12) return 'MEDIO\nDIA';
         return horas[hour12];
     }
 
     minuteToWords(m) {
         const unidades = [
-            'en punto', 'uno', 'dos', 'tres', 'cuatro', 'cinco',
+            '', 'uno', 'dos', 'tres', 'cuatro', 'cinco',
             'seis', 'siete', 'ocho', 'nueve', 'diez',
             'once', 'doce', 'trece', 'catorce', 'quince',
             'dieciseis', 'diecisiete', 'dieciocho', 'diecinueve'
@@ -186,7 +186,10 @@ class DateTimeElement extends ClockfaceElement {
         const d = Math.floor(m / 10);
         const u = m % 10;
         if (u === 0) return 'y ' + decenas[d];
-        if (d === 2) return 'veinti\n' + unidades[u];
+        if (d === 2) {
+            if (u === 0) return 'y veinte';
+            return 'veinti\n' + unidades[u];
+        }
         return decenas[d] + '\ny ' + unidades[u];
     }
 }
