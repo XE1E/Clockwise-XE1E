@@ -242,42 +242,46 @@ button:hover{border-color:var(--accent)}
   <!-- CLOCKFACE -->
   <div id="clock" class="page">
     <div class="card">
-      <h2>Fuente de caratulas</h2>
-      <select id="clockfaceSource" onchange="onSourceChange()">
-        <option value="stored">Guardadas en reloj</option>
-        <option value="ghpages">GitHub Pages XE1E</option>
-        <option value="cdn">CDN XE1E</option>
-        <option value="github">GitHub Raw (puede fallar)</option>
-        <option value="local">Local (desarrollo)</option>
+      <h2>Caratulas Guardadas</h2>
+      <div style="background:var(--input);padding:10px;border-radius:var(--r);margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:13px">Almacenamiento:</span>
+          <span id="storageInfo" style="font-size:12px;color:var(--dim)">Cargando...</span>
+        </div>
+        <div style="height:6px;background:#333;border-radius:3px;overflow:hidden">
+          <div id="storageBar" style="height:100%;background:var(--accent);width:0%;transition:width 0.3s"></div>
+        </div>
+      </div>
+      <div id="storedList" style="background:var(--input);padding:8px;border-radius:var(--r);max-height:180px;overflow-y:auto;font-size:12px;margin-bottom:12px">
+        <span style="color:var(--dim)">Cargando...</span>
+      </div>
+      <h3>Subir archivo JSON</h3>
+      <input type="file" id="clockfaceFile" accept=".json" style="margin-bottom:8px">
+      <button onclick="uploadClockface()" style="width:100%">Subir al reloj</button>
+    </div>
+    <div class="card">
+      <h2>Descargar del Repositorio</h2>
+      <p style="color:var(--dim);font-size:12px;margin-bottom:12px">Descarga caratulas y guardalas en el reloj</p>
+      <label>Fuente</label>
+      <select id="repoSource" style="margin-bottom:8px">
+        <option value="github">GitHub XE1E</option>
+        <option value="local">Servidor Local</option>
       </select>
-      <p id="sourceHint" style="color:var(--dim);font-size:12px;margin-top:4px"></p>
-      <div id="localServerConfig" style="display:none;margin-top:12px">
-        <label>IP/Host del servidor</label>
-        <input type="text" id="localServerHost" placeholder="192.168.1.100">
+      <div id="localConfig" style="display:none;margin-bottom:8px">
+        <label>IP del servidor</label>
+        <input type="text" id="localServerHost" placeholder="192.168.1.100" style="margin-bottom:4px">
         <label>Puerto</label>
         <input type="number" id="localServerPort" min="1" max="65535" value="8080">
       </div>
-      <div id="storedConfig" style="display:none;margin-top:12px">
-        <div style="background:var(--input);padding:10px;border-radius:var(--r);margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-size:13px">Almacenamiento:</span>
-            <span id="storageInfo" style="font-size:12px;color:var(--dim)">Cargando...</span>
-          </div>
-          <div style="height:6px;background:#333;border-radius:3px;overflow:hidden">
-            <div id="storageBar" style="height:100%;background:var(--accent);width:0%;transition:width 0.3s"></div>
-          </div>
-        </div>
-        <label>Subir caratula JSON</label>
-        <input type="file" id="clockfaceFile" accept=".json" style="margin-bottom:8px">
-        <button class="btn-primary" onclick="uploadClockface()" style="margin-bottom:12px">Subir al reloj</button>
-        <label>Caratulas guardadas</label>
-        <div id="storedList" style="background:var(--input);padding:8px;border-radius:var(--r);max-height:150px;overflow-y:auto;font-size:12px">
-          <span style="color:var(--dim)">Cargando...</span>
-        </div>
+      <label>Caratula</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <select id="repoClockface" style="flex:1"></select>
+        <input type="text" id="customClockface" placeholder="nombre" style="flex:1;display:none">
       </div>
+      <button onclick="downloadFromRepo()" style="width:100%">Descargar y Guardar</button>
     </div>
     <div class="card">
-      <h2>Caratula</h2>
+      <h2>Seleccion Activa</h2>
       <div class="check-row" style="margin-bottom:12px">
         <input type="checkbox" id="rotationEnabled" onchange="onRotationToggle()">
         <label>Rotar entre varias</label>
@@ -287,23 +291,17 @@ button:hover{border-color:var(--accent)}
         <input type="number" id="rotationInterval" min="1" max="1440" value="60">
       </div>
       <div id="singleSelect">
-        <label>Seleccionar caratula</label>
+        <label>Caratula a mostrar</label>
         <select id="canvasSelect" onchange="onClockSelect()"></select>
       </div>
       <div id="multiSelect" style="display:none">
-        <label>Seleccionar caratulas</label>
+        <label>Caratulas para rotacion</label>
         <div id="clockfaceCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;max-height:200px;overflow-y:auto;background:var(--input);padding:8px;border-radius:var(--r)"></div>
       </div>
-      <div id="localClockConfig" style="display:none;margin-top:12px">
-        <label>Nombre(s) de caratula</label>
-        <input type="text" id="localClockNames" placeholder="mi-caratula (o varios: cara1,cara2,cara3)">
-        <p style="color:var(--dim);font-size:11px;margin-top:4px">Separar con comas si usas rotacion</p>
-      </div>
       <input type="hidden" id="canvasFile">
-      <input type="hidden" id="canvasServer" value="raw.githubusercontent.com">
       <input type="hidden" id="rotationList">
     </div>
-    <button class="btn-primary" onclick="saveClock()">Guardar Caratula</button>
+    <button class="btn-primary" onclick="saveClock()">Aplicar Seleccion</button>
   </div>
 
   <!-- EDITORS -->
@@ -422,9 +420,7 @@ async function api(action,params={}){
   }catch(e){toast('Error');}
 }
 
-const cfGHPages=['pac-man','nyan-cat','mario-clock','time-in-words','mi-clockface','night-clock','pepsi-final'];
-const cfCDN=['pac-man','nyan-cat','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','night-clock','night-clock-xe1e'];
-const cfGitHub=['pac-man','nyan-cat','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','night-clock'];
+const cfGHPages=['pac-man','nyan-cat','night-clock','night-clock-xe1e','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2'];
 const clockfaces=cfGHPages;
 
 function rgb565ToHex(v){
@@ -479,6 +475,11 @@ function renderStoredList(){
 
 function buildStoredSelect(){
   const rot=$('rotationEnabled').checked;
+  if(storedClockfaces.length===0){
+    $('canvasSelect').innerHTML='<option value="">-- Sin caratulas --</option>';
+    $('clockfaceCheckboxes').innerHTML='<span style="color:var(--dim)">Descarga o sube caratulas primero</span>';
+    return;
+  }
   if(rot){
     $('multiSelect').style.display='block';
     $('singleSelect').style.display='none';
@@ -494,6 +495,42 @@ function buildStoredSelect(){
       '<option value="'+c.name+'"'+(c.name===current?' selected':'')+'>'+c.name+'</option>'
     ).join('');
   }
+}
+
+function buildRepoSelect(){
+  const src=$('repoSource').value;
+  const isLocal=src==='local';
+  $('localConfig').style.display=isLocal?'block':'none';
+  $('repoClockface').style.display=isLocal?'none':'block';
+  $('customClockface').style.display=isLocal?'block':'none';
+  if(!isLocal){
+    $('repoClockface').innerHTML=cfGHPages.map(c=>'<option value="'+c+'">'+c+'</option>').join('');
+  }
+}
+
+async function downloadFromRepo(){
+  const src=$('repoSource').value;
+  const isLocal=src==='local';
+  const name=isLocal?$('customClockface').value.trim():$('repoClockface').value;
+  if(!name){toast('Ingresa nombre de caratula');return;}
+  let url;
+  if(isLocal){
+    const host=$('localServerHost').value||'192.168.1.100';
+    const port=$('localServerPort').value||8080;
+    url='http://'+host+':'+port+'/'+name+'.json';
+  }else{
+    url='https://xe1e.github.io/Clockwise-XE1E/clockface-editor/clockfaces/'+name+'.json';
+  }
+  toast('Descargando...');
+  try{
+    const r=await fetch(url);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const json=await r.text();
+    JSON.parse(json);
+    const up=await fetch('/api/clockfaces/upload?name='+encodeURIComponent(name),{method:'POST',headers:{'Content-Type':'application/json'},body:json});
+    if(up.ok){toast('Guardado: '+name);loadStorageInfo();loadStoredClockfaces();}
+    else toast('Error al guardar');
+  }catch(e){toast('Error: '+e.message);}
 }
 
 async function uploadClockface(){
@@ -518,56 +555,10 @@ async function deleteClockface(name){
   }catch(e){toast('Error');}
 }
 
-function getClockfaceList(){
-  const src=$('clockfaceSource').value;
-  if(src==='stored')return storedClockfaces.map(c=>c.name);
-  if(src==='ghpages')return cfGHPages;
-  if(src==='cdn')return cfCDN;
-  if(src==='github')return cfGitHub;
-  return [];
-}
-
-function onSourceChange(){
-  const src=$('clockfaceSource').value;
-  const isLocal=src==='local';
-  const isStored=src==='stored';
-  $('localServerConfig').style.display=isLocal?'block':'none';
-  $('storedConfig').style.display=isStored?'block':'none';
-  $('localClockConfig').style.display=isLocal?'block':'none';
-  $('singleSelect').style.display=(isLocal||isStored)?'none':($('rotationEnabled').checked?'none':'block');
-  $('multiSelect').style.display=(isLocal||isStored)?'none':($('rotationEnabled').checked?'block':'none');
-  const hints={stored:'Caratulas guardadas en memoria del reloj',ghpages:'GitHub Pages - estable y recomendado',cdn:'Servidor rapido y compatible',github:'Puede fallar en algunos ESP32 por SSL',local:'Sirve JSONs con: python -m http.server 8080'};
-  $('sourceHint').textContent=hints[src]||'';
-  if(isStored){loadStorageInfo();loadStoredClockfaces();}
-  else if(!isLocal)buildClockfaceList();
-}
-
 function onRotationToggle(){
   const rot=$('rotationEnabled').checked;
-  const src=$('clockfaceSource').value;
-  const isLocal=src==='local';
-  const isStored=src==='stored';
   $('rotationConfig').style.display=rot?'block':'none';
-  if(!isLocal&&!isStored){
-    $('singleSelect').style.display=rot?'none':'block';
-    $('multiSelect').style.display=rot?'block':'none';
-  }
-  if(isStored)buildStoredSelect();
-  else buildClockfaceList();
-}
-
-function buildClockfaceList(){
-  const list=getClockfaceList();
-  const rot=$('rotationEnabled').checked;
-  const current=$('canvasFile').value||'';
-  const selected=($('rotationList').value||'').split(',').map(s=>s.trim()).filter(s=>s);
-  if(rot){
-    $('clockfaceCheckboxes').innerHTML=list.map(c=>'<label style="font-size:12px"><input type="checkbox" class="cf-cb" value="'+c+'"'+(selected.includes(c)?' checked':'')+' onchange="updateSelection()">'+c+'</label>').join('');
-  }else{
-    let opts='<option value="">-- Seleccionar --</option>';
-    opts+=list.map(c=>'<option value="'+c+'"'+(c===current?' selected':'')+'>'+c+'</option>').join('');
-    $('canvasSelect').innerHTML=opts;
-  }
+  buildStoredSelect();
 }
 
 function updateSelection(){
@@ -638,17 +629,17 @@ async function load(){
     }
 
     // Clock
-    $('canvasServer').value=settings.canvasServer||'raw.githubusercontent.com';
     $('canvasFile').value=settings.canvasFile||'';
-    $('clockfaceSource').value=settings.clockfaceSource||'cdn';
-    $('localServerHost').value=settings.localServerHost||'192.168.1.100';
-    $('localServerPort').value=settings.localServerPort||8080;
     $('rotationEnabled').checked=settings.rotationEnabled==1;
     $('rotationInterval').value=settings.rotationInterval||60;
     $('rotationList').value=settings.rotationList||'';
-    $('localClockNames').value=settings.clockfaceSource==='local'?(settings.rotationEnabled==1?settings.rotationList:settings.canvasFile):'';
-    onSourceChange();
-    onRotationToggle();
+    $('rotationConfig').style.display=settings.rotationEnabled==1?'block':'none';
+    $('localServerHost').value=settings.localServerHost||'192.168.1.100';
+    $('localServerPort').value=settings.localServerPort||8080;
+    loadStorageInfo();
+    loadStoredClockfaces();
+    buildRepoSelect();
+    $('repoSource').onchange=buildRepoSelect;
 
     // System
     $('sys-name').value=settings.name||'ClockWise-XE1E';
@@ -707,35 +698,23 @@ async function saveNight(){
 }
 
 async function saveClock(){
-  const src=$('clockfaceSource').value;
   const rot=$('rotationEnabled').checked;
-  const isLocal=src==='local';
 
-  await saveField('clockfaceSource',src);
-  await saveField('localServerHost',$('localServerHost').value);
-  await saveField('localServerPort',$('localServerPort').value);
+  await saveField('clockfaceSource','stored');
   await saveField('rotationEnabled',rot?'1':'0');
   await saveField('rotationInterval',$('rotationInterval').value);
 
-  if(isLocal){
-    const names=$('localClockNames').value.split(',').map(s=>s.trim()).filter(s=>s);
-    if(names.length===0){toast('Ingresa nombre de caratula');return;}
-    await saveField('canvasFile',names[0]);
-    await saveField('rotationList',rot?names.join(','):'');
+  if(rot){
+    const list=$('rotationList').value;
+    if(!list){toast('Selecciona al menos una caratula');return;}
+    await saveField('canvasFile',list.split(',')[0]);
+    await saveField('rotationList',list);
   }else{
-    if(rot){
-      const list=$('rotationList').value;
-      if(!list){toast('Selecciona al menos una caratula');return;}
-      await saveField('canvasFile',list.split(',')[0]);
-      await saveField('rotationList',list);
-    }else{
-      const cf=$('canvasFile').value;
-      if(!cf){toast('Selecciona una caratula');return;}
-      await saveField('canvasFile',cf);
-      await saveField('rotationList','');
-    }
+    const cf=$('canvasFile').value;
+    if(!cf){toast('Selecciona una caratula');return;}
+    await saveField('canvasFile',cf);
+    await saveField('rotationList','');
   }
-  await saveField('canvasServer','raw.githubusercontent.com');
   await fetch('/api/reload',{method:'POST'});
   toast('Caratula aplicada');
 }

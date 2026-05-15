@@ -195,8 +195,8 @@ interfaz web moderna y soporte multi-WiFi.
 - Sin WiFiManager (implementación propia de AP mode)
 
 ### Memoria
-- Firmware: 1.2MB (95% de 1.3MB) - 26 fuentes BDF agregadas
-- RAM: 103KB (31.7% de 320KB)
+- Firmware: 1.1MB (83.8% de 1.3MB) - simplificado, sin descarga directa
+- RAM: 103KB (31.4% de 320KB)
 - SPIFFS: ~1.5MB disponible para carátulas
 - Interfaz web embebida: ~15KB
 
@@ -209,6 +209,10 @@ interfaz web moderna y soporte multi-WiFi.
 ## Historial de Cambios
 
 ### 2026-05-15
+- **SIMPLIFICACIÓN**: Carátulas SIEMPRE cargan desde SPIFFS local
+- Repositorios (GitHub, Local) solo para descargar y guardar nuevas
+- Flash reducido de 95% a 83.8% (eliminado código de descarga directa)
+- Interfaz web simplificada: Guardadas + Descargar de repo + Selección
 - Carátulas guardadas en SPIFFS (funciona offline)
 - GitHub Pages XE1E como fuente de carátulas
 - 26+ fuentes BDF convertidas e integradas

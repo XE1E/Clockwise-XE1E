@@ -594,108 +594,45 @@ bool Clockface::deserializeDefinition()
     return true;
   }
 
-  if (ClockwiseParams::getInstance()->canvasServer.isEmpty() || ClockwiseParams::getInstance()->canvasFile.isEmpty()) {
-    drawSplashScreen(0xC904, "Params werent set");
+  // Load clockface from internal storage (SPIFFS)
+  if (ClockwiseParams::getInstance()->canvasFile.isEmpty()) {
+    drawSplashScreen(0xC904, "No clockface");
+    Serial.println("[Canvas] No clockface selected");
     return false;
   }
 
-  String server = ClockwiseParams::getInstance()->canvasServer;
-  String file = String("/" + ClockwiseParams::getInstance()->canvasFile + ".json");
-  uint16_t port = 443;
-  bool useSSL = true;
+  String path = "/" + ClockwiseParams::getInstance()->canvasFile + ".json";
+  Serial.printf("[Canvas] Loading from SPIFFS: %s\n", path.c_str());
 
-  // Handle clockface source selection
-  String source = ClockwiseParams::getInstance()->clockfaceSource;
-
-  // Load from internal storage (SPIFFS)
-  if (source == "stored") {
-    String path = "/" + ClockwiseParams::getInstance()->canvasFile + ".json";
-    Serial.printf("[Canvas] Loading from SPIFFS: %s\n", path.c_str());
-
-    if (!SPIFFS.begin(true)) {
-      drawSplashScreen(0xC904, "SPIFFS error");
-      Serial.println("[Canvas] SPIFFS mount failed");
-      return false;
-    }
-
-    if (!SPIFFS.exists(path)) {
-      drawSplashScreen(0xC904, "File not found");
-      Serial.printf("[Canvas] File not found: %s\n", path.c_str());
-      return false;
-    }
-
-    File clockFile = SPIFFS.open(path, "r");
-    if (!clockFile) {
-      drawSplashScreen(0xC904, "Open failed");
-      return false;
-    }
-
-    doc.clear();
-    DeserializationError error = deserializeJson(doc, clockFile);
-    clockFile.close();
-
-    if (error) {
-      drawSplashScreen(0xC904, "JSON error");
-      Serial.print("deserializeJson() failed: ");
-      Serial.println(error.c_str());
-      return false;
-    }
-
-    Serial.printf("[Canvas] Loaded '%s' by %s from storage\n", doc["name"].as<const char *>(), doc["author"].as<const char *>());
-    return true;
+  if (!SPIFFS.begin(true)) {
+    drawSplashScreen(0xC904, "SPIFFS error");
+    Serial.println("[Canvas] SPIFFS mount failed");
+    return false;
   }
 
-  // Network sources
-  if (source == "local") {
-    // Use local development server (HTTP, no SSL)
-    server = ClockwiseParams::getInstance()->localServerHost;
-    port = ClockwiseParams::getInstance()->localServerPort;
-    useSSL = false;
-  } else if (source == "ghpages") {
-    // Use GitHub Pages (XE1E repo) - recommended, stable SSL
-    server = "xe1e.github.io";
-    file = String("/Clockwise-XE1E/clockfaces" + file);
-  } else if (source == "github") {
-    // Use GitHub Raw directly (may fail on some ESP32 due to SSL)
-    server = "raw.githubusercontent.com";
-    file = String("/jnthas/clock-club/main/shared" + file);
-  } else if (source == "cdn") {
-    // Use XE1E CDN
-    server = "cdn.itaqui.to";
-    file = String("/xe1e/clockfaces" + file);
+  if (!SPIFFS.exists(path)) {
+    drawSplashScreen(0xC904, "Download first");
+    Serial.printf("[Canvas] File not found: %s - use web UI to download\n", path.c_str());
+    return false;
   }
 
-  if (server.indexOf(":") > 0) {
-    int colonPos = server.indexOf(":");
-    port = server.substring(colonPos + 1).toInt();
-    server = server.substring(0, colonPos);
-    useSSL = (port == 443 || port == 4443);
+  File clockFile = SPIFFS.open(path, "r");
+  if (!clockFile) {
+    drawSplashScreen(0xC904, "Open failed");
+    return false;
   }
-
-  Serial.printf("[Canvas] Downloading from %s%s:%d (SSL:%d)\n", server.c_str(), file.c_str(), port, useSSL);
 
   doc.clear();
-  DeserializationError error;
-
-  if (useSSL) {
-    WiFiClientSecure client;
-    ClockwiseHttpClient::getInstance()->httpGet(&client, server.c_str(), file.c_str(), port);
-    error = deserializeJson(doc, client);
-    client.stop();
-  } else {
-    WiFiClient client;
-    ClockwiseHttpClient::getInstance()->httpGetPlain(&client, server.c_str(), file.c_str(), port);
-    error = deserializeJson(doc, client);
-    client.stop();
-  }
+  DeserializationError error = deserializeJson(doc, clockFile);
+  clockFile.close();
 
   if (error) {
-    drawSplashScreen(0xC904, "Error! Check logs");
+    drawSplashScreen(0xC904, "JSON error");
     Serial.print("deserializeJson() failed: ");
     Serial.println(error.c_str());
     return false;
   }
 
-  Serial.printf("[Canvas] Building clockface '%s' by %s, version %d\n", doc["name"].as<const char *>(), doc["author"].as<const char *>(), doc["version"].as<const uint16_t>());
+  Serial.printf("[Canvas] Loaded '%s' by %s from storage\n", doc["name"].as<const char *>(), doc["author"].as<const char *>());
   return true;
 }

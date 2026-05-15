@@ -16,7 +16,7 @@
 
 ### Pendientes
 - [ ] Convertir clockfaces 0x01-0x06 a JSON
-- [ ] Revisar fuentes del firmware y eliminar las no usadas (Flash al 95%)
+- [ ] Revisar fuentes del firmware y eliminar las no usadas (Flash 83.8%)
 - [ ] Subir carátulas al repo GitHub desde el editor (requiere token)
 
 ## Próximo
@@ -33,6 +33,10 @@
 ## Completado
 
 ### 2026-05-15
+- [x] Simplificación: carátulas SIEMPRE desde SPIFFS local
+- [x] Repos (GitHub, local) solo para descargar y guardar nuevas carátulas
+- [x] Flash reducido de 95% a 83.8% (eliminado código de descarga directa)
+- [x] Interfaz web simplificada: guardadas + descarga de repo + selección
 - [x] Fuente "nocturno" agregada al editor y firmware (dígitos grandes 20x29)
 - [x] Recuperar archivos mi-fuente (dígitos personalizados)
 - [x] Mario clockface convertido a JSON (parcial)
