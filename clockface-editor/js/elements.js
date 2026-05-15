@@ -181,13 +181,12 @@ class DateTimeElement extends ClockfaceElement {
         if (m === 0) return 'en punto';
         if (m === 15) return 'y cuarto';
         if (m === 30) return 'y media';
-        if (m < 20) return 'y ' + unidades[m];
+        if (m < 20) return unidades[m];
 
         const d = Math.floor(m / 10);
         const u = m % 10;
-        if (u === 0) return 'y ' + decenas[d];
+        if (u === 0) return decenas[d];
         if (d === 2) {
-            if (u === 0) return 'y veinte';
             return 'veinti\n' + unidades[u];
         }
         return decenas[d] + '\ny ' + unidades[u];

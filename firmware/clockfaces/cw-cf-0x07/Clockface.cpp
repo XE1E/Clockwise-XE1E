@@ -142,16 +142,15 @@ String Clockface::minuteToWords(int m)
   if (m == 30) return "y media";
 
   if (m < 20) {
-    return String("y ") + unidades[m];
+    return String(unidades[m]);
   }
 
   int d = m / 10;
   int u = m % 10;
   if (u == 0) {
-    return String("y ") + decenas[d];
+    return String(decenas[d]);
   }
   if (d == 2) {
-    if (u == 0) return "y veinte";
     return String("veinti\n") + unidades[u];
   }
   return String(decenas[d]) + "\ny " + unidades[u];
