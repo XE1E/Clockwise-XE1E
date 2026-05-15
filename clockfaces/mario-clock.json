@@ -1,5 +1,5 @@
 {
-  "name": "mario-clock",
+  "name": "Mario Clock",
   "version": 1,
   "author": "XE1E",
   "delay": 250,
@@ -12,7 +12,7 @@
       ]
     }
   ],
-  "elements": [
+  "setup": [
     {
       "type": "image",
       "x": 0,
@@ -58,18 +58,18 @@
     {
       "type": "datetime",
       "x": 7,
-      "y": 8,
-      "format": "H",
-      "font": "ledDisplay",
+      "y": 11,
+      "content": "H",
+      "font": "",
       "fgColor": 0,
       "bgColor": 14
     },
     {
       "type": "datetime",
-      "x": 44,
-      "y": 8,
-      "format": "i",
-      "font": "ledDisplay",
+      "x": 45,
+      "y": 11,
+      "content": "i",
+      "font": "",
       "fgColor": 0,
       "bgColor": 14
     },
