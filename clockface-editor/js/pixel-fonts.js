@@ -193,24 +193,35 @@ const PixelFonts = {
     drawText(ctx, fontName, text, x, y, fgColor, bgColor) {
         const actualFontName = fontName || 'picopixel';
         const font = this[actualFontName] || this.picopixel;
-        let cursorX = x;
-        const metrics = this.measureText(actualFontName, text);
 
         const minYOffset = Math.min(...font.glyphs.filter(g => g[2] > 0).map(g => g[5]));
         const isDefaultFont = !fontName || fontName === '';
         const baselineOffset = isDefaultFont ? -minYOffset : 0;
 
-        if (bgColor && bgColor !== 'transparent') {
-            const bgY = isDefaultFont ? y : y + minYOffset;
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(x, bgY, metrics.width, metrics.height);
+        // Handle multiline text
+        const lines = text.split('\n');
+        let cursorY = y;
+        let maxWidth = 0;
+
+        for (const line of lines) {
+            let cursorX = x;
+            const metrics = this.measureText(actualFontName, line);
+
+            if (bgColor && bgColor !== 'transparent') {
+                const bgY = isDefaultFont ? cursorY : cursorY + minYOffset;
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(x, bgY, metrics.width, metrics.height);
+            }
+
+            for (const char of line) {
+                cursorX += this.drawChar(ctx, actualFontName, char, cursorX, cursorY, fgColor, baselineOffset);
+            }
+
+            maxWidth = Math.max(maxWidth, cursorX - x);
+            cursorY += font.yAdvance;
         }
 
-        for (const char of text) {
-            cursorX += this.drawChar(ctx, actualFontName, char, cursorX, y, fgColor, baselineOffset);
-        }
-
-        return cursorX - x;
+        return maxWidth;
     },
 
     measureText(fontName, text) {
