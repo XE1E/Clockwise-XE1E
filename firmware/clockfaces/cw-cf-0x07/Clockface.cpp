@@ -115,14 +115,7 @@ String Clockface::hourToWords(int h)
     "DOCE", "UNA", "DOS", "TRES", "CUATRO", "CINCO",
     "SEIS", "SIETE", "OCHO", "NUEVE", "DIEZ", "ONCE", "DOCE"
   };
-
-  int hour12 = h % 12;
-  if (hour12 == 0) hour12 = 12;
-
-  if (h == 0) return "MEDIA\nNOCHE";
-  if (h == 12) return "MEDIO\nDIA";
-
-  return horas[hour12];
+  return horas[h % 12];
 }
 
 String Clockface::minuteToWords(int m)
