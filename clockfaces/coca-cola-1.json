@@ -1,0 +1,52 @@
+{
+  "name": "coca-cola-1",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "delay": 250,
+  "setup": [
+    {
+      "type": "image",
+      "x": 0,
+      "y": 0,
+      "image": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFB0lEQVR4Aeya22sdVRTGT05rchKNWGhSNYml2AveHgTR/8EnH30qRRDsiyh4QwQfFEHUJx9aL0gtCP4Fgn+BeHlWbFXQtCk2NcZW01ab2P1bM990zc7MSac9LeTMhvPttdb3rb32nrV3zpmK3U6n83+bQQPC87f3kxrQ3rPPnjzdgKwP7R3TDWjv2WdPnm5A1of2jukGtPfssydPNyDrQ3vHdAPadvbx86YbEHekbXG6AW078fh50w2IO9K2uNENeO/OXZ2jc/sMN7tR949N2Lq9kWzLh+/ebTH7uZ69ZNU2qMAiYOqW0c7++R8NL0zNbjBrMDLrglem52zdD2f3dPbfMd15ZuGnYgF08M5duwrOO2jEsviHQgOxfRvABECiHhwf7t3FE7g3DKwBWEBrE+MfXT4NbQ0hPngya8aOraN2K0wMA/mAnBBaPhbuYN7A2gaQRDJQAXzPE98IaA3WBazxyPikPcAIQYR/1lZN87SvAU8sqCZ8ZQNIRAQ+WXHMwQ8KWtuvAffd+XO2xKfhO8icioE5gHzJ+ID4y7NL6xq1rgFKZgLFsB7ogufxxWOJBeIYaOLwATHWrwun2PvkVYEceObE+OyvRaQSSg3QZDKYjBXQADwQj4UH8Afmj0EZ4AABGhbgiycGir/NTxrO47Wpe9adntfxVYP6xPflvxz4dSga8NHMniJHBUSosGLshbU1TPGlozlH5vbaRl+f3mk6A9pDvVtxTcOBE3z9988sIJeA/ubibyUuDsiBoyYW/HBxpViPuApFA8a6hVuVZxzFWQj0Qj7WBDeQQ3jvWA9TbODFmp9NX0NzbWI+wIE8HLixp67bxAPh1KRpE9jlS5dKG4HzRDwnjpUrnriuBprHg25P4lUnroEuDb8K1oAqAe7lmlN79tTPyNeEV6fmNpzXb9Mv1exJRf1c+VhBebJ9G6Akbynk47jr0sXH8VuL8zb9k9m9Zv3w/PYZ+05hLtBccvABPIADcFg4fCwxPlZx7BOD7mj+bk3gk4mFX/+9YC5F63JIQMcKcey/aLeOXHmlUc2Hx2/TVLPi4zomhsHz+HG+4pBa++l+HN6ta9Vc2DnaK04mpwrDwmBLZ6T4wkOEwwq8ez998rjCdVb52vST4X0/TkLj5ihXOjwgllYXk+NxVX8CFAN+ov+9Rlu1/9UoyyAGWdSxxujdG06bxPfwcx6f3NbhxihX2lMnjlk98X6+OOUqVs6jE+UbBt+3ARQCJMbg9xoNeM3H+MDrsS9dFp2NE+un+fjF89AGNHPy4fPl7O1uorslZzLzQfRew7xvVv7ORDd2WcjFjdx9Y+P2p0HxKjQqlidTJ97TG6ezl6Aq7YtzSzbz8Mxus5o7Ht5TIBTLwnmUbgALeDH20T2emNwep5Ri5ZbIEPjNkBMo++BLwzcyDPhA2mMTtwf2ygdNET7wsfwqaw1QYRKYHOPAth1I9rdHrvD2mfkSZ0lheG7hlxKvekGq/EinrhL8vyngvPb1ylkoA3O99pXTSPAacQxrACSJdTjy5++kbAjNX1r9r5Qrnv+sJUGct9Kwa+FLtU5DjzXFh/44VWo+uf1QNKBf0qC078M/TgZVa1B1bmoDBrXpQdZJDRhkNzdjrXQDNuOp9dtzUy3dgKYdG7b8dAOG7USbPk+6AU07Nmz56QYM24k2fZ50A5p2bNjy0w0YthNt+jzpBjTt2LDlpxuw2U/0evd/GQAA//8WvDHUAAAABklEQVQDADQ2ol+OKA+0AAAAAElFTkSuQmCC",
+      "id": "7ynw6e"
+    }
+  ],
+  "sprites": [
+    [],
+    []
+  ],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 0,
+      "y": 59,
+      "content": "H:i:s",
+      "font": "haxor-12",
+      "fgColor": 27469,
+      "bgColor": 0,
+      "id": "sf4bhe"
+    },
+    {
+      "type": "datetime",
+      "x": 12,
+      "y": 8,
+      "content": "d-M-y",
+      "font": "picopixel",
+      "fgColor": 12849,
+      "bgColor": 0,
+      "id": "wa5gvx"
+    },
+    {
+      "type": "datetime",
+      "x": 18,
+      "y": 17,
+      "content": "l",
+      "font": "picopixel",
+      "fgColor": 12849,
+      "bgColor": 0,
+      "id": "ntw1xc"
+    }
+  ]
+}
