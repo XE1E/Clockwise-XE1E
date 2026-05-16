@@ -205,8 +205,7 @@ button:hover{border-color:var(--accent)}
       <h2>Caratula Nocturna</h2>
       <label>Seleccionar caratula</label>
       <select id="nightClockSelect" onchange="onNightClockSelect()">
-        <option value="night-clock">Night Clock (Rojo)</option>
-        <option value="night-clock-xe1e">Night Clock XE1E</option>
+        <option value="nigth-clock-1">Reloj Nocturno</option>
         <option value="_custom">-- Personalizado --</option>
       </select>
       <div id="customNightClock" style="display:none">
@@ -690,10 +689,10 @@ async function load(){
     $('nightEnd').value=settings.nightEnd||'07:00';
     $('nightBright').value=settings.nightBright||8;
     $('nightBrightVal').textContent=settings.nightBright||8;
-    $('nightClock').value=settings.nightClock||'night-clock';
+    $('nightClock').value=settings.nightClock||'nigth-clock-1';
     $('nightColor').value=rgb565ToHex(settings.nightColor||63488);
-    const nc=settings.nightClock||'night-clock';
-    if(clockfaces.includes(nc)||nc==='night-clock'||nc==='night-clock-xe1e'){
+    const nc=settings.nightClock||'nigth-clock-1';
+    if(nc==='nigth-clock-1'){
       $('nightClockSelect').value=nc;
     }else{
       $('nightClockSelect').value='_custom';

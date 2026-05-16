@@ -155,7 +155,7 @@ struct ClockwiseParams
         nightModeEnd = preferences.getString(PREF_NIGHT_MODE_END, "07:00");
         nightBrightness = preferences.getUInt(PREF_NIGHT_BRIGHTNESS, 8);
         nightColor = preferences.getUInt(PREF_NIGHT_COLOR, 63488);
-        nightClockface = preferences.getString(PREF_NIGHT_CLOCKFACE, "night-clock");
+        nightClockface = preferences.getString(PREF_NIGHT_CLOCKFACE, "nigth-clock-1");
         rotationEnabled = preferences.getBool(PREF_ROTATION_ENABLED, false);
         rotationList = preferences.getString(PREF_ROTATION_LIST, "");
         rotationIndex = preferences.getUInt(PREF_ROTATION_INDEX, 0);
