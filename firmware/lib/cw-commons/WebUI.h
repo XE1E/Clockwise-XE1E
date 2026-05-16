@@ -484,8 +484,9 @@ function buildStoredSelect(){
     $('multiSelect').style.display='block';
     $('singleSelect').style.display='none';
     const selected=($('rotationList').value||'').split(',').map(s=>s.trim()).filter(s=>s);
-    // Sort: selected first (in order), then unselected
-    const sorted=[...selected.filter(n=>storedClockfaces.some(c=>c.name===n)),...storedClockfaces.map(c=>c.name).filter(n=>!selected.includes(n))];
+    // Sort: selected first (in order), then unselected - keep full objects for bg color
+    const getItem=n=>storedClockfaces.find(c=>c.name===n)||{name:n,bg:0};
+    const sorted=[...selected.filter(n=>storedClockfaces.some(c=>c.name===n)).map(getItem),...storedClockfaces.filter(c=>!selected.includes(c.name))];
     renderClockfaceList(sorted,selected);
   }else{
     $('multiSelect').style.display='none';
@@ -562,17 +563,52 @@ function onRotationToggle(){
 }
 
 let dragItem=null;
-function renderClockfaceList(allNames,selected){
+let thumbCache={};
+function rgb565ToHex(c){
+  const r=((c>>11)&0x1F)*255/31|0;
+  const g=((c>>5)&0x3F)*255/63|0;
+  const b=(c&0x1F)*255/31|0;
+  return '#'+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1);
+}
+async function loadThumb(name,canvas){
+  if(thumbCache[name]){drawThumb(canvas,thumbCache[name]);return;}
+  try{
+    const r=await fetch('/api/clockfaces/get?name='+encodeURIComponent(name));
+    const cf=await r.json();
+    const bg=cf.bgColor||0;
+    let img=null;
+    if(cf.setup)for(const el of cf.setup){if(el.image){img=el.image;break;}}
+    if(!img&&cf.loop)for(const el of cf.loop){if(el.image){img=el.image;break;}}
+    thumbCache[name]={bg,img};
+    drawThumb(canvas,thumbCache[name]);
+  }catch(e){canvas.style.background='#333';}
+}
+function drawThumb(canvas,data){
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle=rgb565ToHex(data.bg);
+  ctx.fillRect(0,0,48,48);
+  if(data.img){
+    const img=new Image();
+    img.onload=()=>{ctx.imageSmoothingEnabled=false;ctx.drawImage(img,0,0,48,48);};
+    img.src='data:image/png;base64,'+data.img;
+  }
+}
+function renderClockfaceList(allItems,selected){
   const cont=$('clockfaceList');
-  cont.innerHTML=allNames.map(n=>{
+  cont.innerHTML=allItems.map(item=>{
+    const n=typeof item==='string'?item:item.name;
     const checked=selected.includes(n);
     const idx=checked?selected.indexOf(n)+1:0;
-    return '<div draggable="true" data-name="'+n+'" style="padding:6px 10px;margin:2px 0;background:var(--bg);border-radius:4px;cursor:grab;font-size:13px;display:flex;align-items:center;gap:8px">'
+    return '<div draggable="true" data-name="'+n+'" style="padding:6px 8px;margin:3px 0;background:var(--bg);border-radius:6px;cursor:grab;font-size:13px;display:flex;align-items:center;gap:10px">'
       +'<input type="checkbox" class="cf-cb" '+(checked?'checked':'')+' onchange="updateFromList()">'
-      +'<span style="color:var(--dim);min-width:18px">'+(idx?idx+'.':'')+'</span>'
-      +'<span>'+n+'</span></div>';
+      +'<canvas width="48" height="48" style="width:48px;height:48px;border-radius:4px;border:1px solid #444;image-rendering:pixelated;flex-shrink:0"></canvas>'
+      +'<span style="color:var(--dim);min-width:20px;font-weight:bold">'+(idx?idx+'.':'')+'</span>'
+      +'<span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+n+'</span></div>';
   }).join('');
   cont.querySelectorAll('[draggable]').forEach(el=>{
+    const name=el.dataset.name;
+    const canvas=el.querySelector('canvas');
+    loadThumb(name,canvas);
     el.ondragstart=e=>{dragItem=el;el.style.opacity='0.5';};
     el.ondragend=e=>{el.style.opacity='1';dragItem=null;};
     el.ondragover=e=>{e.preventDefault();};
@@ -592,9 +628,13 @@ function updateFromList(){
   const checked=items.filter(el=>el.querySelector('.cf-cb').checked).map(el=>el.dataset.name);
   $('rotationList').value=checked.join(',');
   if(checked.length>0)$('canvasFile').value=checked[0];
-  // Re-render to update numbers
-  const allNames=items.map(el=>el.dataset.name);
-  renderClockfaceList(allNames,checked);
+  // Just update numbers without full re-render
+  items.forEach(el=>{
+    const n=el.dataset.name;
+    const idx=checked.includes(n)?checked.indexOf(n)+1:0;
+    const numSpan=el.querySelectorAll('span')[0];
+    if(numSpan)numSpan.textContent=idx?idx+'.':'';
+  });
 }
 
 function onClockSelect(){

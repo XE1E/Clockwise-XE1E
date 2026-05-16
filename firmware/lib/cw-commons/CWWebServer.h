@@ -224,7 +224,7 @@ struct ClockwiseWebServer
       request->send(200, "application/json", json);
     });
 
-    // API: listar carátulas guardadas
+    // API: listar carátulas guardadas (con bgColor para preview)
     server.on("/api/clockfaces/list", HTTP_GET, [](AsyncWebServerRequest *request) {
       if (!SPIFFS.begin(true)) {
         request->send(500, "application/json", "{\"error\":\"SPIFFS failed\"}");
@@ -239,11 +239,19 @@ struct ClockwiseWebServer
         if (!file.isDirectory() && fname.endsWith(".json")) {
           if (!first) json += ",";
           first = false;
-          // Remove leading / and .json extension
           String name = fname;
           if (name.startsWith("/")) name = name.substring(1);
           name = name.substring(0, name.length() - 5);
-          json += "{\"name\":\"" + name + "\",\"size\":" + String(file.size()) + "}";
+          // Extract bgColor from first 200 bytes
+          int bgColor = 0;
+          char buf[201];
+          size_t bytesRead = file.readBytes(buf, 200);
+          buf[bytesRead] = '\0';
+          char* bgPos = strstr(buf, "\"bgColor\":");
+          if (bgPos) {
+            bgColor = atoi(bgPos + 10);
+          }
+          json += "{\"name\":\"" + name + "\",\"size\":" + String(file.size()) + ",\"bg\":" + String(bgColor) + "}";
         }
         file = root.openNextFile();
       }
