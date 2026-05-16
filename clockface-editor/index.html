@@ -17,172 +17,64 @@
             <div class="header-actions">
                 <button id="btn-new" class="btn btn-secondary" title="Nuevo">Nuevo</button>
                 <button id="btn-import" class="btn btn-secondary" title="Importar JSON">Importar</button>
-                <button id="btn-image-tool" class="btn btn-secondary" title="Adaptar imagen a 64x64">Adaptar Imagen</button>
-                <button id="btn-thumbnail" class="btn btn-secondary" title="Generar thumbnail PNG">Thumbnail</button>
-                <button id="btn-batch-thumbs" class="btn btn-secondary" title="Generar todos los thumbnails">Batch Thumbs</button>
-                <button id="btn-export" class="btn btn-primary" title="Exportar JSON">Exportar JSON</button>
-                <button id="btn-test-clock" class="btn btn-success" title="Enviar al reloj para probar">Probar en Reloj</button>
+                <button id="btn-export" class="btn btn-primary" title="Exportar JSON">Exportar</button>
+                <button id="btn-test-clock" class="btn btn-success" title="Enviar al reloj">Probar</button>
             </div>
         </header>
 
         <main class="app-main">
-            <!-- Toolbar -->
-            <aside class="toolbar">
-                <div class="tool-group">
-                    <div class="tool-group-title">Elementos</div>
-                    <div class="tool-buttons">
-                        <button class="tool-btn" data-tool="select" title="Seleccionar">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M13.64,21.97C13.14,22.21 12.54,22 12.31,21.5L10.13,16.76L7.62,18.78C7.45,18.92 7.24,19 7,19A1,1 0 0,1 6,18V3A1,1 0 0,1 7,2C7.24,2 7.47,2.09 7.64,2.23L7.65,2.22L19.14,11.86C19.57,12.22 19.62,12.85 19.27,13.27C19.12,13.45 18.91,13.57 18.7,13.61L15.54,14.23L17.74,18.96C17.97,19.46 17.76,20.06 17.26,20.28L13.64,21.97Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="datetime" title="Fecha/Hora">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="text" title="Texto">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M18.5,4L19.66,8.35L18.7,8.61C18.25,7.74 17.79,6.87 17.26,6.43C16.73,6 16.11,6 15.5,6H13V16.5C13,17 13,17.5 13.33,17.75C13.67,18 14.33,18 15,18V19H9V18C9.67,18 10.33,18 10.67,17.75C11,17.5 11,17 11,16.5V6H8.5C7.89,6 7.27,6 6.74,6.43C6.21,6.87 5.75,7.74 5.3,8.61L4.34,8.35L5.5,4H18.5Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="image" title="Imagen">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="sprite" title="Sprite">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M13,2.05V4.05C17.39,4.59 20.5,8.58 19.96,12.97C19.5,16.61 16.64,19.5 13,19.93V21.93C18.5,21.38 22.5,16.5 21.95,11C21.5,6.25 17.73,2.5 13,2.05M5.67,19.74C7.18,21 9.04,21.79 11,22V20C9.58,19.82 8.23,19.25 7.1,18.37L5.67,19.74M7.1,5.74C8.22,4.84 9.57,4.26 11,4.06V2.06C9.05,2.25 7.19,3 5.67,4.26L7.1,5.74M5.69,7.1L4.26,5.67C3,7.19 2.25,9.04 2.05,11H4.05C4.24,9.58 4.8,8.23 5.69,7.1M4.06,13H2.06C2.26,14.96 3.03,16.81 4.27,18.33L5.69,16.9C4.81,15.77 4.24,14.42 4.06,13M10,16.5L16,12L10,7.5V16.5Z"/></svg>
-                        </button>
-                    </div>
+            <!-- Left Toolbar - Icons only -->
+            <aside class="toolbar-left">
+                <div class="tool-section">
+                    <button class="tool-btn" data-tool="select" title="Seleccionar (V)">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13.64,21.97C13.14,22.21 12.54,22 12.31,21.5L10.13,16.76L7.62,18.78C7.45,18.92 7.24,19 7,19A1,1 0 0,1 6,18V3A1,1 0 0,1 7,2C7.24,2 7.47,2.09 7.64,2.23L7.65,2.22L19.14,11.86C19.57,12.22 19.62,12.85 19.27,13.27C19.12,13.45 18.91,13.57 18.7,13.61L15.54,14.23L17.74,18.96C17.97,19.46 17.76,20.06 17.26,20.28L13.64,21.97Z"/></svg>
+                    </button>
+                    <div class="tool-separator"></div>
+                    <button class="tool-btn" data-tool="datetime" title="Fecha/Hora">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="text" title="Texto">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.5,4L19.66,8.35L18.7,8.61C18.25,7.74 17.79,6.87 17.26,6.43C16.73,6 16.11,6 15.5,6H13V16.5C13,17 13,17.5 13.33,17.75C13.67,18 14.33,18 15,18V19H9V18C9.67,18 10.33,18 10.67,17.75C11,17.5 11,17 11,16.5V6H8.5C7.89,6 7.27,6 6.74,6.43C6.21,6.87 5.75,7.74 5.3,8.61L4.34,8.35L5.5,4H18.5Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="image" title="Imagen">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="sprite" title="Sprite animado">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13,2.05V4.05C17.39,4.59 20.5,8.58 19.96,12.97C19.5,16.61 16.64,19.5 13,19.93V21.93C18.5,21.38 22.5,16.5 21.95,11C21.5,6.25 17.73,2.5 13,2.05M5.67,19.74C7.18,21 9.04,21.79 11,22V20C9.58,19.82 8.23,19.25 7.1,18.37L5.67,19.74M7.1,5.74C8.22,4.84 9.57,4.26 11,4.06V2.06C9.05,2.25 7.19,3 5.67,4.26L7.1,5.74M5.69,7.1L4.26,5.67C3,7.19 2.25,9.04 2.05,11H4.05C4.24,9.58 4.8,8.23 5.69,7.1M4.06,13H2.06C2.26,14.96 3.03,16.81 4.27,18.33L5.69,16.9C4.81,15.77 4.24,14.42 4.06,13M10,16.5L16,12L10,7.5V16.5Z"/></svg>
+                    </button>
+                    <div class="tool-separator"></div>
+                    <button class="tool-btn" data-tool="rect" title="Rectangulo">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4,6V19H20V6H4M18,17H6V8H18V17Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="fillrect" title="Rectangulo relleno">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4,6H20V19H4V6Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="circle" title="Circulo">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="fillcircle" title="Circulo relleno">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="line" title="Linea">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,13H5V11H19V13Z" transform="rotate(-45 12 12)"/></svg>
+                    </button>
+                    <button class="tool-btn" data-tool="pixel" title="Pixel individual">
+                        <svg viewBox="0 0 24 24"><rect x="8" y="8" width="8" height="8" fill="currentColor"/></svg>
+                    </button>
+                    <div class="tool-separator"></div>
+                    <button class="tool-btn" data-action="delete" title="Eliminar elemento">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-action="duplicate" title="Duplicar elemento">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-action="move-up" title="Subir capa">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7,15L12,10L17,15H7Z"/></svg>
+                    </button>
+                    <button class="tool-btn" data-action="move-down" title="Bajar capa">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7,10L12,15L17,10H7Z"/></svg>
+                    </button>
                 </div>
-                <div class="tool-group">
-                    <div class="tool-group-title">Formas</div>
-                    <div class="tool-buttons">
-                        <button class="tool-btn" data-tool="rect" title="Rectangulo">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M4,6V19H20V6H4M18,17H6V8H18V17Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="fillrect" title="Rect Relleno">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M4,6H20V19H4V6Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="circle" title="Circulo">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="fillcircle" title="Circ Relleno">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="line" title="Linea">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19,13H5V11H19V13Z" transform="rotate(-45 12 12)"/></svg>
-                        </button>
-                        <button class="tool-btn" data-tool="pixel" title="Pixel (dibujar puntos 1x1)">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><rect x="8" y="8" width="8" height="8" fill="currentColor"/><rect x="4" y="4" width="3" height="3" fill="currentColor" opacity="0.4"/><rect x="17" y="17" width="3" height="3" fill="currentColor" opacity="0.4"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="tool-group">
-                    <div class="tool-group-title">Acciones</div>
-                    <div class="tool-buttons">
-                        <button class="tool-btn" data-action="delete" title="Eliminar">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-action="duplicate" title="Duplicar">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-action="move-up" title="Subir capa">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M7,15L12,10L17,15H7Z"/></svg>
-                        </button>
-                        <button class="tool-btn" data-action="move-down" title="Bajar capa">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M7,10L12,15L17,10H7Z"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="tool-group">
-                    <div class="tool-group-title">Sprites</div>
-                    <div class="tool-buttons">
-                        <button class="tool-btn" id="btn-open-sprites" title="Editor de Sprites">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12,3C10.73,3 9.6,3.8 9.18,5H6V3H4V9H6V7H9.18C9.6,8.2 10.73,9 12,9C13.27,9 14.4,8.2 14.82,7H20V5H14.82C14.4,3.8 13.27,3 12,3M12,5A1,1 0 0,1 13,6A1,1 0 0,1 12,7A1,1 0 0,1 11,6A1,1 0 0,1 12,5M6,11V13H9.18C9.6,14.2 10.73,15 12,15C13.27,15 14.4,14.2 14.82,13H20V11H14.82C14.4,9.8 13.27,9 12,9C10.73,9 9.6,9.8 9.18,11H6M12,11A1,1 0 0,1 13,12A1,1 0 0,1 12,13A1,1 0 0,1 11,12A1,1 0 0,1 12,11M6,17V19H9.18C9.6,20.2 10.73,21 12,21C13.27,21 14.4,20.2 14.82,19H20V17H14.82C14.4,15.8 13.27,15 12,15C10.73,15 9.6,15.8 9.18,17H6M12,17A1,1 0 0,1 13,18A1,1 0 0,1 12,19A1,1 0 0,1 11,18A1,1 0 0,1 12,17Z"/></svg>
-                        </button>
-                        <button class="tool-btn" id="btn-reset-sprites" title="Resetear animaciones">
-                            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg>
-                        </button>
-                    </div>
-                    <div id="sprite-count" style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">0 sprites</div>
-                </div>
-                <div class="tool-group">
-                    <div class="tool-group-title">Pantalla</div>
-                    <div class="display-controls">
-                        <div class="zoom-row">
-                            <button id="zoom-out" class="btn-zoom">-</button>
-                            <span id="zoom-level">8x</span>
-                            <button id="zoom-in" class="btn-zoom">+</button>
-                        </div>
-                        <label class="toolbar-checkbox">
-                            <input type="checkbox" id="show-grid" checked>
-                            <span>Grid</span>
-                        </label>
-                        <label class="toolbar-checkbox">
-                            <input type="checkbox" id="rounded-pixels">
-                            <span>Redondo</span>
-                        </label>
-                        <button id="btn-open-reference" class="toolbar-file-btn" title="Imagen de referencia">
-                            <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19,19H5V5H19M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29Z"/></svg>
-                            Referencia
-                        </button>
-                    </div>
-                </div>
-                <div class="tool-group">
-                    <div class="tool-group-title">Probar Hora/Fecha</div>
-                    <div class="test-time-controls">
-                        <input type="number" id="test-hour" min="0" max="23" placeholder="H" style="width:40px">
-                        <span>:</span>
-                        <input type="number" id="test-minute" min="0" max="59" placeholder="M" style="width:40px">
-                        <button id="btn-set-time" class="btn-small">Set</button>
-                    </div>
-                    <div class="test-time-controls" style="margin-top:4px">
-                        <input type="number" id="test-day" min="1" max="31" placeholder="D" style="width:40px">
-                        <span>/</span>
-                        <input type="number" id="test-month" min="1" max="12" placeholder="M" style="width:40px">
-                        <span>/</span>
-                        <input type="number" id="test-year" min="2020" max="2099" placeholder="AAAA" style="width:60px">
-                        <button id="btn-set-date" class="btn-small">Set</button>
-                    </div>
-                    <div class="test-time-controls" style="margin-top:4px">
-                        <button id="btn-clear-time" class="btn-small" style="width:100%">Live</button>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Reference Image Popup -->
-            <div id="reference-popup" class="ref-popup" style="display:none;">
-                <div class="ref-popup-content">
-                    <div class="ref-popup-header">
-                        <span>Imagen Guia</span>
-                        <button id="btn-close-reference" class="ref-popup-close">&times;</button>
-                    </div>
-                    <div class="ref-popup-body">
-                        <p style="font-size:11px;color:#888;margin:0 0 8px 0">Carga una imagen como guia para diseñar. No se exporta.</p>
-                        <label class="ref-load-btn">
-                            <input type="file" id="reference-file" accept="image/*" hidden>
-                            Cargar Imagen
-                        </label>
-                        <div id="reference-options" class="ref-options" style="display:none;">
-                            <div class="ref-option-row">
-                                <label>Opacidad</label>
-                                <input type="range" id="reference-opacity" min="10" max="90" value="50">
-                            </div>
-                            <div class="ref-option-row">
-                                <label>Escala</label>
-                                <input type="range" id="reference-scale" min="50" max="200" value="100">
-                                <span id="reference-scale-val">100%</span>
-                            </div>
-                            <div class="ref-option-row">
-                                <label>Posicion</label>
-                                <input type="number" id="reference-x" value="0" style="width:50px"> X
-                                <input type="number" id="reference-y" value="0" style="width:50px"> Y
-                            </div>
-                            <label class="toolbar-checkbox">
-                                <input type="checkbox" id="reference-behind" checked>
-                                <span>Mostrar detras del diseño</span>
-                            </label>
-                            <div class="ref-buttons">
-                                <button id="btn-clear-reference" class="btn-ref-clear">Quitar Imagen</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             </aside>
 
             <!-- Canvas Area -->
@@ -194,254 +86,302 @@
                         <canvas id="editor-canvas" width="64" height="64"></canvas>
                         <div class="canvas-grid"></div>
                     </div>
-                    <div class="canvas-info">
-                        <span id="mouse-pos">X: 0, Y: 0</span>
-                        <span id="canvas-zoom">Zoom: 8x</span>
-                    </div>
                 </div>
             </section>
 
-            <!-- Properties Panel -->
-            <aside class="properties-panel">
-                <!-- Theme Properties -->
-                <div class="panel-section">
-                    <div class="panel-section-title">Tema</div>
-                    <div class="form-grid">
-                        <div class="form-group">
+            <!-- Right Panel -->
+            <aside class="panel-right">
+                <!-- Collapsible: Properties -->
+                <div class="panel-section" id="section-props">
+                    <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span>Propiedades</span>
+                        <span class="collapse-icon">&#9660;</span>
+                    </div>
+                    <div class="panel-content">
+                        <div class="prop-row">
                             <label>Nombre</label>
                             <input type="text" id="theme-name" value="mi-clockface">
                         </div>
-                        <div class="form-group">
-                            <label>Version</label>
-                            <input type="number" id="theme-version" value="1" min="1">
+                        <div class="prop-row-half">
+                            <div>
+                                <label>Version</label>
+                                <input type="number" id="theme-version" value="1" min="1">
+                            </div>
+                            <div>
+                                <label>Delay</label>
+                                <input type="number" id="theme-delay" value="250" min="50">
+                            </div>
                         </div>
-                        <div class="form-group">
+                        <div class="prop-row">
                             <label>Autor</label>
                             <input type="text" id="theme-author" value="XE1E">
                         </div>
-                        <div class="form-group">
-                            <label>Delay (ms)</label>
-                            <input type="number" id="theme-delay" value="250" min="50" max="5000">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Color Fondo</label>
-                        <div class="color-input">
-                            <input type="color" id="bg-color" value="#000000">
-                            <span class="color-value" id="bg-color-value">0</span>
+                        <div class="prop-row">
+                            <label>Fondo</label>
+                            <div class="color-row">
+                                <input type="color" id="bg-color" value="#000000">
+                                <span class="color-value" id="bg-color-value">0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Element Properties -->
+                <!-- Collapsible: Element -->
                 <div class="panel-section" id="element-properties" style="display:none;">
-                    <div class="panel-section-title">Elemento: <span id="element-type"></span></div>
-
-                    <div class="form-group">
-                        <label>Posicion</label>
-                        <div class="input-row">
-                            <label class="small">X</label>
-                            <input type="number" id="el-x" min="0" max="63" value="0">
-                            <label class="small">Y</label>
-                            <input type="number" id="el-y" min="0" max="63" value="0">
-                        </div>
+                    <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span>Elemento: <span id="element-type"></span></span>
+                        <span class="collapse-icon">&#9660;</span>
                     </div>
-
-                    <!-- DateTime/Text specific -->
-                    <div class="form-group" id="fg-content">
-                        <label>Contenido</label>
-                        <input type="text" id="el-content" value="">
-                    </div>
-
-                    <!-- DateTime format presets -->
-                    <div class="form-group" id="fg-format-presets" style="display:none;">
-                        <label>Formatos rapidos</label>
-                        <div class="format-presets">
-                            <div class="preset-group">
-                                <span class="preset-label">24H:</span>
-                                <button type="button" class="btn-preset" data-format="H:i">14:30</button>
-                                <button type="button" class="btn-preset" data-format="H:i:s">14:30:45</button>
+                    <div class="panel-content">
+                        <div class="prop-row-half">
+                            <div>
+                                <label>X</label>
+                                <input type="number" id="el-x" min="0" max="63" value="0">
                             </div>
-                            <div class="preset-group">
-                                <span class="preset-label">12H:</span>
-                                <button type="button" class="btn-preset" data-format="h:i A">2:30 PM</button>
-                                <button type="button" class="btn-preset" data-format="h:i:s A">2:30:45 PM</button>
-                            </div>
-                            <div class="preset-group">
-                                <span class="preset-label">Fecha:</span>
-                                <button type="button" class="btn-preset" data-format="D">Dom</button>
-                                <button type="button" class="btn-preset" data-format="l">Jueves</button>
-                                <button type="button" class="btn-preset" data-format="D j">Dom 30</button>
-                                <button type="button" class="btn-preset" data-format="l j">Jueves 30</button>
-                                <button type="button" class="btn-preset" data-format="d-M-y">30-Abr-26</button>
-                                <button type="button" class="btn-preset" data-format="j F">30 Abril</button>
-                            </div>
-                            <div class="preset-group">
-                                <span class="preset-label">Palabras:</span>
-                                <button type="button" class="btn-preset" data-format="Hw">Hora</button>
-                                <button type="button" class="btn-preset" data-format="iw">Minuto</button>
+                            <div>
+                                <label>Y</label>
+                                <input type="number" id="el-y" min="0" max="63" value="0">
                             </div>
                         </div>
-                    </div>
 
-                    <div class="form-group" id="fg-font">
-                        <label>Fuente</label>
-                        <select id="el-font">
-                            <!-- Opciones generadas dinamicamente desde pixel-fonts.js -->
-                        </select>
-                        <canvas id="font-preview" width="100" height="28"></canvas>
-                    </div>
+                        <div class="prop-row" id="fg-content">
+                            <label>Contenido</label>
+                            <input type="text" id="el-content" value="">
+                        </div>
 
-                    <!-- Colors -->
-                    <div class="form-grid" id="fg-colors-grid">
-                        <div class="form-group" id="fg-fgcolor">
-                            <label>Color Texto</label>
-                            <div class="color-input">
-                                <input type="color" id="el-fgcolor" value="#ffffff">
-                                <span class="color-value" id="el-fgcolor-value">65535</span>
+                        <div class="prop-row" id="fg-format-presets" style="display:none;">
+                            <label>Formato</label>
+                            <div class="format-buttons">
+                                <button type="button" class="btn-preset" data-format="H:i">HH:MM</button>
+                                <button type="button" class="btn-preset" data-format="H:i:s">HH:MM:SS</button>
+                                <button type="button" class="btn-preset" data-format="h:i A">12H</button>
+                                <button type="button" class="btn-preset" data-format="D j">Dia</button>
+                                <button type="button" class="btn-preset" data-format="d/m">Fecha</button>
                             </div>
                         </div>
-                        <div class="form-group" id="fg-bgcolor">
-                            <label>Color Fondo</label>
-                            <div class="color-input">
-                                <input type="color" id="el-bgcolor" value="#000000">
-                                <span class="color-value" id="el-bgcolor-value">0</span>
+
+                        <div class="prop-row" id="fg-font">
+                            <label>Fuente</label>
+                            <select id="el-font"></select>
+                            <canvas id="font-preview" width="180" height="24"></canvas>
+                        </div>
+
+                        <div class="prop-row-half" id="fg-colors-grid">
+                            <div id="fg-fgcolor">
+                                <label>Texto</label>
+                                <div class="color-row">
+                                    <input type="color" id="el-fgcolor" value="#ffffff">
+                                    <span class="color-value" id="el-fgcolor-value">65535</span>
+                                </div>
+                            </div>
+                            <div id="fg-bgcolor">
+                                <label>Fondo</label>
+                                <div class="color-row">
+                                    <input type="color" id="el-bgcolor" value="#000000">
+                                    <span class="color-value" id="el-bgcolor-value">0</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Rect/Line specific -->
-                    <div class="form-group" id="fg-size">
-                        <label>Tamano</label>
-                        <div class="input-row">
-                            <label class="small">W</label>
-                            <input type="number" id="el-width" min="1" max="64" value="10">
-                            <label class="small">H</label>
-                            <input type="number" id="el-height" min="1" max="64" value="10">
+                        <div class="prop-row-half" id="fg-size">
+                            <div>
+                                <label>Ancho</label>
+                                <input type="number" id="el-width" min="1" max="64" value="10">
+                            </div>
+                            <div>
+                                <label>Alto</label>
+                                <input type="number" id="el-height" min="1" max="64" value="10">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Circle specific -->
-                    <div class="form-group" id="fg-radius" style="display:none;">
-                        <label>Radio</label>
-                        <input type="number" id="el-radius" min="1" max="32" value="5">
-                    </div>
-
-                    <div class="form-group" id="fg-endpoint">
-                        <label>Punto Final</label>
-                        <div class="input-row">
-                            <label class="small">X1</label>
-                            <input type="number" id="el-x1" min="0" max="63" value="10">
-                            <label class="small">Y1</label>
-                            <input type="number" id="el-y1" min="0" max="63" value="10">
+                        <div class="prop-row" id="fg-radius" style="display:none;">
+                            <label>Radio</label>
+                            <input type="number" id="el-radius" min="1" max="32" value="5">
                         </div>
-                    </div>
 
-                    <div class="form-group" id="fg-color">
-                        <label>Color</label>
-                        <div class="color-input">
-                            <input type="color" id="el-color" value="#ffffff">
-                            <span class="color-value" id="el-color-value">65535</span>
+                        <div class="prop-row-half" id="fg-endpoint">
+                            <div>
+                                <label>X1</label>
+                                <input type="number" id="el-x1" min="0" max="63" value="10">
+                            </div>
+                            <div>
+                                <label>Y1</label>
+                                <input type="number" id="el-y1" min="0" max="63" value="10">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Image specific -->
-                    <div class="form-group" id="fg-image">
-                        <label>Imagen</label>
-                        <input type="file" id="el-image-file" accept="image/*">
-                        <small>PNG recomendado</small>
-                    </div>
-
-                    <div class="form-group" id="fg-image-size">
-                        <label>Tamano Imagen</label>
-                        <div class="input-row">
-                            <label class="small">W</label>
-                            <input type="number" id="el-img-width" min="1" max="64" value="64">
-                            <label class="small">H</label>
-                            <input type="number" id="el-img-height" min="1" max="64" value="64">
+                        <div class="prop-row" id="fg-color">
+                            <label>Color</label>
+                            <div class="color-row">
+                                <input type="color" id="el-color" value="#ffffff">
+                                <span class="color-value" id="el-color-value">65535</span>
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-small" id="btn-apply-img-size">Aplicar Escala</button>
-                        <small>Escala y guarda la imagen al nuevo tamano</small>
-                    </div>
 
-                    <!-- Sprite specific -->
-                    <div class="form-group" id="fg-sprite-select">
-                        <label>Sprite</label>
-                        <div class="input-row">
-                            <select id="el-sprite-index">
-                                <option value="0">Sprite 0</option>
-                            </select>
-                            <button type="button" class="btn btn-small" id="btn-edit-sprites">Editar</button>
+                        <div class="prop-row" id="fg-image">
+                            <label>Imagen</label>
+                            <input type="file" id="el-image-file" accept="image/*">
                         </div>
-                    </div>
 
-                    <div class="form-group" id="fg-sprite-hour-based">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="el-hour-based">
-                            Por Hora (24 frames = 24 horas)
-                        </label>
-                        <small>Frame 0 = hora 0, Frame 1 = hora 1, etc. Ideal para mapamundi.</small>
-                    </div>
-
-                    <div class="form-group" id="fg-sprite-timing">
-                        <label>Timing (ms)</label>
-                        <div class="input-row">
-                            <label class="small">Frame</label>
-                            <input type="number" id="el-frame-delay" min="16" max="5000" value="100">
-                            <label class="small">Loop</label>
-                            <input type="number" id="el-loop-delay" min="0" max="10000" value="0">
+                        <div class="prop-row-half" id="fg-image-size">
+                            <div>
+                                <label>W</label>
+                                <input type="number" id="el-img-width" min="1" max="64" value="64">
+                            </div>
+                            <div>
+                                <label>H</label>
+                                <input type="number" id="el-img-height" min="1" max="64" value="64">
+                            </div>
                         </div>
-                        <small>Frame: delay entre frames. Loop: pausa al terminar ciclo.</small>
-                    </div>
+                        <button type="button" class="btn btn-small" id="btn-apply-img-size" style="width:100%;margin-top:4px;display:none;">Aplicar Escala</button>
 
-                    <div class="form-group" id="fg-sprite-move">
-                        <label>Movimiento (px/ciclo)</label>
-                        <div class="input-row">
-                            <label class="small">X</label>
-                            <input type="number" id="el-move-x" min="-64" max="64" value="0">
-                            <label class="small">Y</label>
-                            <input type="number" id="el-move-y" min="-64" max="64" value="0">
+                        <div class="prop-row" id="fg-sprite-select">
+                            <label>Sprite</label>
+                            <div class="sprite-row">
+                                <select id="el-sprite-index"><option value="0">Sprite 0</option></select>
+                                <button type="button" class="btn btn-small" id="btn-edit-sprites">Editar</button>
+                            </div>
                         </div>
-                        <small>Desplazamiento despues de cada ciclo de animacion.</small>
-                    </div>
 
-                    <div class="form-group" id="fg-in-loop">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="el-in-loop">
-                            En Loop (redibujar cada ciclo)
-                        </label>
+                        <div class="prop-row" id="fg-sprite-hour-based">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="el-hour-based">
+                                Por Hora (24 frames)
+                            </label>
+                        </div>
+
+                        <div class="prop-row-half" id="fg-sprite-timing">
+                            <div>
+                                <label>Frame ms</label>
+                                <input type="number" id="el-frame-delay" min="16" max="5000" value="100">
+                            </div>
+                            <div>
+                                <label>Loop ms</label>
+                                <input type="number" id="el-loop-delay" min="0" max="10000" value="0">
+                            </div>
+                        </div>
+
+                        <div class="prop-row-half" id="fg-sprite-move">
+                            <div>
+                                <label>Mov X</label>
+                                <input type="number" id="el-move-x" min="-64" max="64" value="0">
+                            </div>
+                            <div>
+                                <label>Mov Y</label>
+                                <input type="number" id="el-move-y" min="-64" max="64" value="0">
+                            </div>
+                        </div>
+
+                        <div class="prop-row" id="fg-in-loop">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="el-in-loop">
+                                En Loop (redibujar)
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Elements List -->
-                <div class="panel-section">
-                    <div class="panel-section-title">Capas</div>
-                    <div id="layers-list" class="layers-list">
-                        <!-- Dynamic content -->
+                <!-- Collapsible: Layers -->
+                <div class="panel-section" id="section-layers">
+                    <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span>Capas</span>
+                        <span class="collapse-icon">&#9660;</span>
+                    </div>
+                    <div class="panel-content">
+                        <div id="layers-list" class="layers-list"></div>
                     </div>
                 </div>
 
-                <!-- DateTime Format Help -->
-                <div class="panel-section collapsed" id="format-help">
-                    <div class="panel-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
-                        Formatos DateTime <span class="collapse-icon">&#9660;</span>
+                <!-- Collapsible: Tools -->
+                <div class="panel-section" id="section-tools">
+                    <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span>Herramientas</span>
+                        <span class="collapse-icon">&#9660;</span>
                     </div>
-                    <div class="panel-section-content">
-                        <table class="format-table">
-                            <tr><td>H</td><td>Hora 24h (00-23)</td></tr>
-                            <tr><td>h</td><td>Hora 12h (01-12)</td></tr>
-                            <tr><td>i</td><td>Minutos (00-59)</td></tr>
-                            <tr><td>s</td><td>Segundos (00-59)</td></tr>
-                            <tr><td>A</td><td>AM/PM</td></tr>
-                            <tr><td>d</td><td>Dia (01-31)</td></tr>
-                            <tr><td>m</td><td>Mes (01-12)</td></tr>
-                            <tr><td>Y</td><td>Ano (2024)</td></tr>
-                        </table>
-                        <p><strong>Ejemplo:</strong> H:i:s = 14:30:45</p>
+                    <div class="panel-content">
+                        <div class="tools-grid">
+                            <button id="btn-image-tool" class="btn btn-small" title="Adaptar imagen">Imagen</button>
+                            <button id="btn-thumbnail" class="btn btn-small" title="Generar thumbnail">Thumb</button>
+                            <button id="btn-open-sprites" class="btn btn-small" title="Editor de sprites">Sprites</button>
+                            <button id="btn-reset-sprites" class="btn btn-small" title="Resetear animaciones">Reset</button>
+                        </div>
+                        <div id="sprite-count" style="font-size:0.75em;color:var(--text-secondary);margin:4px 0;">0 sprites</div>
+                        <div class="tools-grid" style="margin-top:4px;">
+                            <button id="btn-open-reference" class="btn btn-small" title="Imagen guia">Referencia</button>
+                            <button id="btn-batch-thumbs" class="btn btn-small" title="Batch thumbnails">Batch</button>
+                        </div>
                     </div>
                 </div>
             </aside>
         </main>
+
+        <!-- Footer / Status Bar -->
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span id="mouse-pos">X: 0, Y: 0</span>
+                <span class="footer-sep">|</span>
+                <label class="footer-check"><input type="checkbox" id="show-grid" checked> Grid</label>
+                <label class="footer-check"><input type="checkbox" id="rounded-pixels"> Redondo</label>
+            </div>
+            <div class="footer-center">
+                <span>Test:</span>
+                <input type="number" id="test-hour" min="0" max="23" placeholder="HH" title="Hora">
+                <span>:</span>
+                <input type="number" id="test-minute" min="0" max="59" placeholder="MM" title="Minuto">
+                <span class="footer-sep">|</span>
+                <input type="number" id="test-day" min="1" max="31" placeholder="DD" title="Dia">
+                <span>/</span>
+                <input type="number" id="test-month" min="1" max="12" placeholder="MM" title="Mes">
+                <span>/</span>
+                <input type="number" id="test-year" min="2020" max="2099" placeholder="AAAA" title="Ano">
+                <button id="btn-set-time" class="btn-footer">Set</button>
+                <button id="btn-set-date" class="btn-footer">Set</button>
+                <button id="btn-clear-time" class="btn-footer btn-live">Live</button>
+            </div>
+            <div class="footer-right">
+                <button id="zoom-out" class="btn-zoom">-</button>
+                <span id="zoom-level">8x</span>
+                <button id="zoom-in" class="btn-zoom">+</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Reference Image Popup -->
+    <div id="reference-popup" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:320px;">
+            <div class="modal-header">
+                <h3>Imagen Guia</h3>
+                <button class="modal-close" id="btn-close-reference">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:11px;color:#888;margin-bottom:10px;">Carga una imagen como referencia. No se exporta.</p>
+                <label class="ref-load-btn">
+                    <input type="file" id="reference-file" accept="image/*" hidden>
+                    Cargar Imagen
+                </label>
+                <div id="reference-options" class="ref-options" style="display:none;">
+                    <div class="ref-option-row">
+                        <label>Opacidad</label>
+                        <input type="range" id="reference-opacity" min="10" max="90" value="50">
+                    </div>
+                    <div class="ref-option-row">
+                        <label>Escala</label>
+                        <input type="range" id="reference-scale" min="50" max="200" value="100">
+                        <span id="reference-scale-val">100%</span>
+                    </div>
+                    <div class="ref-option-row">
+                        <label>Posicion</label>
+                        <input type="number" id="reference-x" value="0" style="width:50px"> X
+                        <input type="number" id="reference-y" value="0" style="width:50px"> Y
+                    </div>
+                    <label class="checkbox-label" style="margin-top:8px;">
+                        <input type="checkbox" id="reference-behind" checked>
+                        Mostrar detras
+                    </label>
+                    <button id="btn-clear-reference" class="btn btn-small" style="width:100%;margin-top:10px;color:var(--danger);">Quitar Imagen</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Import Modal -->
@@ -452,8 +392,8 @@
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                    <label class="btn btn-primary" style="margin: 0;">
+                <div style="margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <label class="btn btn-primary" style="margin:0;">
                         <input type="file" id="import-file-input" accept=".json" hidden>
                         Seleccionar archivo...
                     </label>
@@ -477,14 +417,14 @@
             </div>
             <div class="modal-body">
                 <textarea id="export-json" readonly></textarea>
-                <div id="export-folder-info" style="margin-top: 8px; font-size: 12px; color: #888;"></div>
+                <div id="export-folder-info" style="margin-top:8px;font-size:12px;color:#888;"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary modal-close">Cerrar</button>
                 <button class="btn btn-primary" id="btn-copy-json">Copiar</button>
                 <button class="btn btn-primary" id="btn-download-json">Descargar</button>
                 <button class="btn btn-success" id="btn-save-json-folder">Guardar</button>
-                <button class="btn btn-secondary" id="btn-change-json-folder" title="Cambiar carpeta de destino">📁</button>
+                <button class="btn btn-secondary" id="btn-change-json-folder" title="Cambiar carpeta">&#128193;</button>
             </div>
         </div>
     </div>
@@ -503,47 +443,40 @@
                             <input type="file" id="image-tool-file" accept="image/*" hidden>
                             Cargar Imagen
                         </label>
-                        <p class="help-text">Sube cualquier imagen (foto, logo, dibujo)</p>
                     </div>
-
                     <div class="image-tool-preview" id="image-preview-section" style="display:none;">
-                        <!-- Crop Section -->
                         <div class="crop-section">
-                            <h4>1. Seleccionar area (arrastra sobre la imagen)</h4>
+                            <h4>1. Seleccionar area</h4>
                             <div class="crop-container">
                                 <canvas id="crop-canvas" width="400" height="300"></canvas>
                                 <div id="crop-selection" class="crop-selection"></div>
                             </div>
                             <div class="crop-controls">
-                                <button id="btn-reset-crop" class="btn btn-small btn-secondary">Reset Seleccion</button>
-                                <span id="crop-info">Sin seleccion (usa imagen completa)</span>
+                                <button id="btn-reset-crop" class="btn btn-small btn-secondary">Reset</button>
+                                <span id="crop-info">Sin seleccion</span>
                             </div>
                         </div>
-
                         <div class="preview-row">
                             <div class="preview-box">
-                                <h4>2. Vista Previa 64x64</h4>
+                                <h4>2. Preview 64x64</h4>
                                 <canvas id="preview-64" width="128" height="128"></canvas>
-                                <span>64x64 px</span>
                             </div>
                         </div>
-
                         <div class="image-tool-options">
                             <div class="form-group">
-                                <label>Modo de escala:</label>
+                                <label>Escala:</label>
                                 <select id="scale-mode">
-                                    <option value="contain">Ajustar (mantener proporcion)</option>
-                                    <option value="cover">Recortar (llenar todo)</option>
-                                    <option value="stretch">Estirar (deformar)</option>
+                                    <option value="contain">Ajustar</option>
+                                    <option value="cover">Recortar</option>
+                                    <option value="stretch">Estirar</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Colores:</label>
                                 <select id="color-mode">
-                                    <option value="full">Todos (RGB565)</option>
-                                    <option value="16">16 colores</option>
-                                    <option value="8">8 colores</option>
-                                    <option value="4">4 colores</option>
+                                    <option value="full">Todos</option>
+                                    <option value="16">16</option>
+                                    <option value="8">8</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -562,8 +495,7 @@
                                 <span id="saturation-value">100%</span>
                             </div>
                         </div>
-
-                        <button class="btn btn-secondary" id="btn-preview-update">Actualizar Preview</button>
+                        <button class="btn btn-secondary" id="btn-preview-update">Actualizar</button>
                     </div>
                 </div>
             </div>
@@ -588,12 +520,11 @@
                             <input type="file" id="batch-file-input" accept=".json" multiple hidden>
                             Seleccionar JSONs
                         </label>
-                        <button id="btn-select-folder" class="btn btn-secondary">Seleccionar Carpeta</button>
+                        <button id="btn-select-folder" class="btn btn-secondary">Carpeta</button>
                     </div>
-                    <p class="help-text">Selecciona archivos .json o una carpeta con clockfaces</p>
                 </div>
                 <div id="batch-results" class="batch-results">
-                    <p>Selecciona archivos JSON de clockfaces para generar thumbnails.</p>
+                    <p>Selecciona archivos JSON de clockfaces.</p>
                 </div>
                 <div id="batch-actions" class="batch-actions" style="display:none;">
                     <button id="btn-download-all-thumbs" class="btn btn-primary">Descargar Todos</button>
@@ -608,19 +539,19 @@
 
     <!-- Single Thumbnail Modal -->
     <div id="thumb-modal" class="modal">
-        <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-content" style="max-width:400px;">
             <div class="modal-header">
                 <h3>Guardar Thumbnail</h3>
                 <button class="modal-close">&times;</button>
             </div>
-            <div class="modal-body" style="text-align: center;">
-                <canvas id="thumb-preview" width="64" height="64" style="border: 1px solid var(--border-color); image-rendering: pixelated; width: 128px; height: 128px;"></canvas>
-                <p style="margin-top: 10px; color: var(--text-secondary);" id="thumb-filename">clockface.png</p>
+            <div class="modal-body" style="text-align:center;">
+                <canvas id="thumb-preview" width="64" height="64" style="border:1px solid var(--border-color);image-rendering:pixelated;width:128px;height:128px;"></canvas>
+                <p style="margin-top:10px;color:var(--text-secondary);" id="thumb-filename">clockface.png</p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary modal-close">Cerrar</button>
                 <button class="btn btn-primary" id="btn-download-thumb">Descargar</button>
-                <button class="btn btn-success" id="btn-save-thumb-folder">Guardar en carpeta...</button>
+                <button class="btn btn-success" id="btn-save-thumb-folder">Guardar</button>
             </div>
         </div>
     </div>
@@ -639,15 +570,12 @@
                             <h4>Sprites</h4>
                             <button class="btn btn-small btn-primary" id="btn-add-sprite">+ Nuevo</button>
                         </div>
-                        <div id="sprite-list" class="sprite-list">
-                            <!-- Dynamic sprite list -->
-                        </div>
+                        <div id="sprite-list" class="sprite-list"></div>
                     </div>
-
                     <div class="frames-section" id="frames-section" style="display:none;">
                         <div class="frames-header">
-                            <h4>Frames del Sprite <span id="current-sprite-index">0</span></h4>
-                            <div style="display: flex; gap: 5px;">
+                            <h4>Frames <span id="current-sprite-index">0</span></h4>
+                            <div style="display:flex;gap:5px;">
                                 <label class="btn btn-small btn-primary">
                                     <input type="file" id="add-frame-file" accept="image/*" multiple hidden>
                                     + Importar
@@ -655,26 +583,21 @@
                                 <button class="btn btn-small btn-secondary" id="btn-pixel-editor">+ Dibujar</button>
                             </div>
                         </div>
-                        <div id="frames-list" class="frames-list">
-                            <!-- Dynamic frames -->
-                        </div>
-
-                        <!-- Pixel Editor -->
+                        <div id="frames-list" class="frames-list"></div>
                         <div id="pixel-editor-section" class="pixel-editor-section" style="display:none;">
                             <h4>Editor de Pixeles</h4>
                             <div class="pixel-editor-container">
                                 <div class="pixel-tools">
                                     <div class="pixel-tool-group">
-                                        <label>Tamaño:</label>
+                                        <label>Tam:</label>
                                         <input type="number" id="pixel-canvas-size" value="16" min="4" max="64" style="width:50px;">
-                                        <button class="btn btn-small" id="btn-pixel-resize">Aplicar</button>
+                                        <button class="btn btn-small" id="btn-pixel-resize">OK</button>
                                     </div>
                                     <div class="pixel-tool-group">
-                                        <label>Herramienta:</label>
-                                        <button class="btn btn-small pixel-tool active" data-tool="draw" title="Dibujar">✏️</button>
-                                        <button class="btn btn-small pixel-tool" data-tool="erase" title="Borrar">🧹</button>
-                                        <button class="btn btn-small pixel-tool" data-tool="fill" title="Rellenar">🪣</button>
-                                        <button class="btn btn-small pixel-tool" data-tool="pick" title="Tomar color">💉</button>
+                                        <button class="btn btn-small pixel-tool active" data-tool="draw">&#9998;</button>
+                                        <button class="btn btn-small pixel-tool" data-tool="erase">&#9003;</button>
+                                        <button class="btn btn-small pixel-tool" data-tool="fill">&#9638;</button>
+                                        <button class="btn btn-small pixel-tool" data-tool="pick">&#128167;</button>
                                     </div>
                                     <div class="pixel-tool-group">
                                         <button class="btn btn-small" id="btn-pixel-clear">Limpiar</button>
@@ -689,24 +612,21 @@
                                         <div id="pixel-current-color" style="width:30px;height:30px;border:2px solid #fff;border-radius:4px;"></div>
                                         <input type="color" id="pixel-color-picker" value="#ffffff" style="width:30px;height:30px;">
                                     </div>
-                                    <div class="color-presets" id="color-presets">
-                                        <!-- Colors added by JS -->
-                                    </div>
+                                    <div class="color-presets" id="color-presets"></div>
                                 </div>
                             </div>
                             <div class="pixel-editor-actions">
                                 <button class="btn btn-small btn-secondary" id="btn-pixel-cancel">Cancelar</button>
-                                <button class="btn btn-small btn-primary" id="btn-pixel-add-frame">Agregar como Frame</button>
-                                <button class="btn btn-small btn-success" id="btn-pixel-copy-frame">Copiar Frame Actual</button>
+                                <button class="btn btn-small btn-primary" id="btn-pixel-add-frame">Agregar</button>
+                                <button class="btn btn-small btn-success" id="btn-pixel-copy-frame">Copiar Frame</button>
                             </div>
                         </div>
-
                         <div class="sprite-preview">
                             <h4>Preview</h4>
                             <canvas id="sprite-preview-canvas" width="128" height="128"></canvas>
                             <div class="preview-controls">
                                 <button class="btn btn-small" id="btn-play-sprite">Play</button>
-                                <span id="sprite-frame-info">Frame: 0/0</span>
+                                <span id="sprite-frame-info">0/0</span>
                             </div>
                         </div>
                     </div>
@@ -720,32 +640,22 @@
 
     <!-- Test on Clock Modal -->
     <div id="test-clock-modal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-content" style="max-width:450px;">
             <div class="modal-header">
                 <h3>Probar en Reloj</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="color: var(--text-secondary); margin-bottom: 15px;">
-                    Envia la caratula directamente al reloj para verla en tiempo real.
-                </p>
+                <p style="color:var(--text-secondary);margin-bottom:15px;">Envia la caratula al reloj para verla en tiempo real.</p>
                 <div class="form-group">
                     <label>IP del reloj</label>
-                    <input type="text" id="clock-ip" placeholder="192.168.1.100 o clockwise.local" value="">
-                    <small style="color: var(--text-secondary);">Busca la IP en la pantalla del reloj o en tu router</small>
+                    <input type="text" id="clock-ip" placeholder="192.168.1.100" value="">
                 </div>
-                <div id="test-status" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
-                <div style="margin-top: 15px; padding: 10px; background: var(--bg-light); border-radius: 4px; font-size: 12px; color: var(--text-secondary);">
-                    <strong>Nota:</strong> El preview es temporal. Para volver a la caratula normal:
-                    <ul style="margin: 5px 0 0 15px; padding: 0;">
-                        <li>Reinicia el reloj, o</li>
-                        <li>Selecciona otra caratula en la config web</li>
-                    </ul>
-                </div>
+                <div id="test-status" style="margin-top:15px;padding:10px;border-radius:4px;display:none;"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary modal-close">Cancelar</button>
-                <button class="btn btn-success" id="btn-send-to-clock">Enviar al Reloj</button>
+                <button class="btn btn-success" id="btn-send-to-clock">Enviar</button>
             </div>
         </div>
     </div>
