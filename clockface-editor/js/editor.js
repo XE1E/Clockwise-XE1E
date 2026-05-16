@@ -1597,12 +1597,12 @@ class ClockfaceEditor {
             this.updateFolderInfo();
         });
 
-        document.getElementById('btn-do-import').addEventListener('click', () => {
+        document.getElementById('btn-do-import').addEventListener('click', async () => {
             try {
                 const json = JSON.parse(document.getElementById('import-json').value);
                 this.clockface = Clockface.fromJSON(json);
                 this.selectedId = null;
-                this.loadImagesAsync();
+                await this.loadImagesAsync();
                 this.updateUI();
                 this.render();
                 document.getElementById('import-modal').classList.remove('active');

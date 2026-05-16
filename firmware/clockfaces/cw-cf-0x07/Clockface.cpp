@@ -5,8 +5,8 @@
 
 unsigned long lastMillis = 0;
 
-// Reduced size to free memory for SSL
-static DynamicJsonDocument doc(16384);
+// Buffer size for JSON clockface (32KB for larger clockfaces)
+static DynamicJsonDocument doc(32768);
 
 Clockface::Clockface(Adafruit_GFX *display)
 {
@@ -552,12 +552,44 @@ void Clockface::handleSpriteMovement(std::shared_ptr<CustomSprite>& sprite) {
 }
 
 void Clockface::clockfaceLoop() {
-    if (sprites.empty()) {
-        return;
-    }
-
+    // Render sprites
     for (auto& sprite : sprites) {
         handleSpriteAnimation(sprite);
+    }
+
+    // Render overlay elements from loop (lines, rects, etc. that should be on top of sprites)
+    JsonArrayConst loopElements = doc["loop"].as<JsonArrayConst>();
+    for (JsonVariantConst value : loopElements) {
+        const char *type = value["type"].as<const char *>();
+        // Skip sprite and datetime - they're handled separately
+        if (strcmp(type, "sprite") == 0 || strcmp(type, "datetime") == 0) {
+            continue;
+        }
+        // Render other elements (line, rect, fillrect, text, image)
+        if (strcmp(type, "line") == 0) {
+            Locator::getDisplay()->drawLine(
+                value["x"].as<const uint16_t>(),
+                value["y"].as<const uint16_t>(),
+                value["x1"].as<const uint16_t>(),
+                value["y1"].as<const uint16_t>(),
+                value["color"].as<const uint16_t>());
+        }
+        else if (strcmp(type, "fillrect") == 0) {
+            Locator::getDisplay()->fillRect(
+                value["x"].as<const uint16_t>(),
+                value["y"].as<const uint16_t>(),
+                value["width"].as<const uint16_t>(),
+                value["height"].as<const uint16_t>(),
+                value["color"].as<const uint16_t>());
+        }
+        else if (strcmp(type, "rect") == 0) {
+            Locator::getDisplay()->drawRect(
+                value["x"].as<const uint16_t>(),
+                value["y"].as<const uint16_t>(),
+                value["width"].as<const uint16_t>(),
+                value["height"].as<const uint16_t>(),
+                value["color"].as<const uint16_t>());
+        }
     }
 }
 

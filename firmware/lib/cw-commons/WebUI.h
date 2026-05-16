@@ -420,7 +420,7 @@ async function api(action,params={}){
   }catch(e){toast('Error');}
 }
 
-const cfGHPages=['pac-man','nyan-cat','night-clock','night-clock-xe1e','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2'];
+const cfGHPages=['pac-man','nyan-cat','night-clock','night-clock-xe1e','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','eletrogate','pepsi-final-2','world-clock'];
 const clockfaces=cfGHPages;
 
 function rgb565ToHex(v){

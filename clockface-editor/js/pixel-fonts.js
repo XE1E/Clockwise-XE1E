@@ -195,8 +195,8 @@ const PixelFonts = {
         const font = this[actualFontName] || this.picopixel;
 
         const minYOffset = Math.min(...font.glyphs.filter(g => g[2] > 0).map(g => g[5]));
-        const isDefaultFont = !fontName || fontName === '';
-        const baselineOffset = isDefaultFont ? -minYOffset : 0;
+        // Apply baseline offset for all fonts to match GFX library behavior
+        const baselineOffset = -minYOffset;
 
         // Handle multiline text
         const lines = text.split('\n');
@@ -208,9 +208,8 @@ const PixelFonts = {
             const metrics = this.measureText(actualFontName, line);
 
             if (bgColor && bgColor !== 'transparent') {
-                const bgY = isDefaultFont ? cursorY : cursorY + minYOffset;
                 ctx.fillStyle = bgColor;
-                ctx.fillRect(x, bgY, metrics.width, metrics.height);
+                ctx.fillRect(x, cursorY, metrics.width, metrics.height);
             }
 
             for (const char of line) {

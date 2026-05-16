@@ -248,20 +248,19 @@ struct ClockwiseWebServer
       request->send(200, "application/json", json);
     });
 
-    // API: subir carátula (recibe JSON)
+    // API: subir carátula (recibe JSON) - escribe directamente a SPIFFS sin buffering
     server.on("/api/clockfaces/upload", HTTP_POST,
       [](AsyncWebServerRequest *request) {
         request->send(200, "text/plain", "OK");
       },
       NULL,
       [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-        static String bodyBuffer;
+        static File uploadFile;
         static String fileName;
+        static String filePath;
 
         if (index == 0) {
-          bodyBuffer = "";
-          bodyBuffer.reserve(total);
-          // Get name from URL query string (true = isQuery)
+          // Get name from URL query string
           if (request->hasParam("name", true)) {
             fileName = request->getParam("name", true)->value();
           } else if (request->hasParam("name")) {
@@ -269,31 +268,32 @@ struct ClockwiseWebServer
           } else {
             fileName = "uploaded";
           }
-          Serial.printf("[Storage] Starting upload: %s (%d bytes)\n", fileName.c_str(), total);
-        }
 
-        for (size_t i = 0; i < len; i++) {
-          bodyBuffer += (char)data[i];
-        }
-
-        if (index + len == total) {
           if (!SPIFFS.begin(true)) {
             Serial.println("[Storage] SPIFFS mount failed");
-            bodyBuffer = "";
             return;
           }
 
-          // SPIFFS creates directories automatically, just use the path
-          String path = "/" + fileName + ".json";
-          File file = SPIFFS.open(path, FILE_WRITE);
-          if (file) {
-            file.print(bodyBuffer);
-            file.close();
-            Serial.printf("[Storage] Saved clockface: %s (%d bytes)\n", path.c_str(), bodyBuffer.length());
-          } else {
-            Serial.printf("[Storage] Failed to save: %s\n", path.c_str());
+          filePath = "/" + fileName + ".json";
+          uploadFile = SPIFFS.open(filePath, FILE_WRITE);
+          if (!uploadFile) {
+            Serial.printf("[Storage] Failed to create: %s\n", filePath.c_str());
+            return;
           }
-          bodyBuffer = "";
+          Serial.printf("[Storage] Starting upload: %s (%d bytes)\n", filePath.c_str(), total);
+        }
+
+        // Write chunk directly to file
+        if (uploadFile) {
+          uploadFile.write(data, len);
+        }
+
+        // Close file when done
+        if (index + len == total) {
+          if (uploadFile) {
+            uploadFile.close();
+            Serial.printf("[Storage] Saved clockface: %s (%d bytes)\n", filePath.c_str(), total);
+          }
         }
       }
     );
