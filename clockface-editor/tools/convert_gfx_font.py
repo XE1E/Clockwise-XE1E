@@ -47,13 +47,15 @@ def parse_gfx_font(h_file_path):
         yOffset = int(match.group(6))
         glyphs.append([offset, width, height, xAdvance, xOffset, yOffset])
 
-    # Extract font metadata (first, last, yAdvance)
-    font_match = re.search(r'const GFXfont \w+\s*PROGMEM\s*=\s*\{[^,]+,\s*[^,]+,\s*0x([0-9A-Fa-f]+)\s*,\s*0x([0-9A-Fa-f]+)\s*,\s*(\d+)\s*\}', content)
+    # Extract font metadata (first, last, yAdvance) - handles both hex and decimal
+    font_match = re.search(r'const GFXfont \w+\s*PROGMEM\s*=\s*\{[^,]+,\s*[^,]+,\s*(0x[0-9A-Fa-f]+|\d+)\s*,\s*(0x[0-9A-Fa-f]+|\d+)\s*,\s*(\d+)\s*\}', content)
     if not font_match:
         raise ValueError("Could not find font metadata")
 
-    first = int(font_match.group(1), 16)
-    last = int(font_match.group(2), 16)
+    first_str = font_match.group(1)
+    last_str = font_match.group(2)
+    first = int(first_str, 16) if first_str.startswith('0x') else int(first_str)
+    last = int(last_str, 16) if last_str.startswith('0x') else int(last_str)
     yAdvance = int(font_match.group(3))
 
     return {
