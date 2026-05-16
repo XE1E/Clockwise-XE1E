@@ -295,8 +295,10 @@ button:hover{border-color:var(--accent)}
         <select id="canvasSelect" onchange="onClockSelect()"></select>
       </div>
       <div id="multiSelect" style="display:none">
-        <label>Caratulas para rotacion</label>
-        <div id="clockfaceCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;max-height:200px;overflow-y:auto;background:var(--input);padding:8px;border-radius:var(--r)"></div>
+        <label>Seleccionar caratulas</label>
+        <div id="clockfaceCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;max-height:150px;overflow-y:auto;background:var(--input);padding:8px;border-radius:var(--r)"></div>
+        <label>Orden de rotacion <small style="color:var(--dim)">(arrastra para ordenar)</small></label>
+        <div id="rotationOrder" style="background:var(--input);padding:8px;border-radius:var(--r);min-height:32px;margin-bottom:10px"></div>
       </div>
       <input type="hidden" id="canvasFile">
       <input type="hidden" id="rotationList">
@@ -487,6 +489,7 @@ function buildStoredSelect(){
     $('clockfaceCheckboxes').innerHTML=storedClockfaces.map(c=>
       '<label style="font-size:12px"><input type="checkbox" class="cf-cb" value="'+c.name+'"'+(selected.includes(c.name)?' checked':'')+' onchange="updateSelection()">'+c.name+'</label>'
     ).join('');
+    renderRotationOrder(selected);
   }else{
     $('multiSelect').style.display='none';
     $('singleSelect').style.display='block';
@@ -563,9 +566,43 @@ function onRotationToggle(){
 
 function updateSelection(){
   const cbs=document.querySelectorAll('.cf-cb:checked');
-  const vals=Array.from(cbs).map(c=>c.value);
-  $('rotationList').value=vals.join(',');
-  if(vals.length>0)$('canvasFile').value=vals[0];
+  const newVals=Array.from(cbs).map(c=>c.value);
+  const current=($('rotationList').value||'').split(',').filter(s=>s);
+  // Keep existing order, add new at end, remove unchecked
+  const ordered=current.filter(v=>newVals.includes(v));
+  newVals.forEach(v=>{if(!ordered.includes(v))ordered.push(v);});
+  $('rotationList').value=ordered.join(',');
+  if(ordered.length>0)$('canvasFile').value=ordered[0];
+  renderRotationOrder(ordered);
+}
+
+let dragItem=null;
+function renderRotationOrder(items){
+  const cont=$('rotationOrder');
+  if(!items.length){cont.innerHTML='<span style="color:var(--dim);font-size:12px">Selecciona caratulas arriba</span>';return;}
+  cont.innerHTML=items.map((n,i)=>
+    '<div draggable="true" data-idx="'+i+'" style="padding:6px 10px;margin:2px 0;background:var(--bg);border-radius:4px;cursor:grab;font-size:13px;display:flex;align-items:center;gap:6px"><span style="color:var(--dim)">'+(i+1)+'.</span>'+n+'</div>'
+  ).join('');
+  cont.querySelectorAll('[draggable]').forEach(el=>{
+    el.ondragstart=e=>{dragItem=el;el.style.opacity='0.5';};
+    el.ondragend=e=>{el.style.opacity='1';dragItem=null;};
+    el.ondragover=e=>{e.preventDefault();};
+    el.ondrop=e=>{
+      e.preventDefault();
+      if(!dragItem||dragItem===el)return;
+      const list=Array.from(cont.children);
+      const fromIdx=list.indexOf(dragItem),toIdx=list.indexOf(el);
+      if(fromIdx<toIdx)el.after(dragItem);else el.before(dragItem);
+      updateRotationList();
+    };
+  });
+}
+
+function updateRotationList(){
+  const items=Array.from($('rotationOrder').children).map(el=>el.textContent.replace(/^\d+\./,'').trim());
+  $('rotationList').value=items.join(',');
+  if(items.length>0)$('canvasFile').value=items[0];
+  renderRotationOrder(items);
 }
 
 function onClockSelect(){
