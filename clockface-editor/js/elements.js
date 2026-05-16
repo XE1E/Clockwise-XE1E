@@ -498,6 +498,11 @@ class Clockface {
             }
         }
 
+        // Filter out empty sprite arrays
+        const validSprites = this.sprites
+            .map(s => s.frames || s)
+            .filter(frames => Array.isArray(frames) && frames.length > 0);
+
         return {
             name: this.name,
             version: this.version,
@@ -505,9 +510,43 @@ class Clockface {
             bgColor: this.bgColor,
             delay: this.delay,
             setup: setup,
-            sprites: this.sprites.map(s => s.frames || s),
+            sprites: validSprites,
             loop: loop
         };
+    }
+
+    // Validate clockface and return warnings
+    validate() {
+        const warnings = [];
+
+        // Check for elements outside display bounds
+        for (const el of this.elements) {
+            if (el.x < 0 || el.x > 63 || el.y < 0 || el.y > 63) {
+                warnings.push(`Elemento "${el.type}" en posición fuera de pantalla (${el.x}, ${el.y})`);
+            }
+        }
+
+        // Check for sprite elements referencing non-existent sprites
+        const validSpriteIndices = this.sprites
+            .map((s, i) => ({ index: i, frames: s.frames || s }))
+            .filter(s => Array.isArray(s.frames) && s.frames.length > 0)
+            .map(s => s.index);
+
+        for (const el of this.elements) {
+            if (el.type === 'sprite') {
+                if (!validSpriteIndices.includes(el.sprite)) {
+                    warnings.push(`Sprite referencia índice ${el.sprite} que no existe o está vacío`);
+                }
+            }
+        }
+
+        // Check for many overlapping elements in same area
+        const spriteElements = this.elements.filter(el => el.type === 'sprite');
+        if (spriteElements.length > 5) {
+            warnings.push(`Muchos sprites (${spriteElements.length}) pueden causar problemas de rendimiento`);
+        }
+
+        return warnings;
     }
 
     static fromJSON(json) {

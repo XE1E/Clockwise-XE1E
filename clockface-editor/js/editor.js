@@ -1591,6 +1591,16 @@ class ClockfaceEditor {
 
         document.getElementById('btn-export').addEventListener('click', () => {
             this.resetSpritePositionsForExport();
+
+            // Validate and show warnings
+            const warnings = this.clockface.validate();
+            if (warnings.length > 0) {
+                const msg = 'Advertencias:\n\n' + warnings.join('\n') + '\n\n¿Continuar con la exportación?';
+                if (!confirm(msg)) {
+                    return;
+                }
+            }
+
             const json = JSON.stringify(this.clockface.toJSON(), null, 2);
             document.getElementById('export-json').value = json;
             document.getElementById('export-modal').classList.add('active');
@@ -2099,11 +2109,14 @@ class ClockfaceEditor {
         const element = this.clockface.getElementById(this.selectedId);
         if (!element) return;
 
-        const newX = parseInt(document.getElementById('el-x').value) || 0;
-        const newY = parseInt(document.getElementById('el-y').value) || 0;
+        const newX = Math.max(0, Math.min(63, parseInt(document.getElementById('el-x').value) || 0));
+        const newY = Math.max(0, Math.min(63, parseInt(document.getElementById('el-y').value) || 0));
         const posChanged = element.x !== newX || element.y !== newY;
         element.x = newX;
         element.y = newY;
+        // Update input fields if values were clamped
+        document.getElementById('el-x').value = newX;
+        document.getElementById('el-y').value = newY;
 
         if (element.type === 'sprite' && posChanged) {
             this.updateSpriteBasePosition(element);
@@ -2123,9 +2136,11 @@ class ClockfaceEditor {
         }
 
         if (element.type === 'line') {
-            element.x1 = parseInt(document.getElementById('el-x1').value) || 0;
-            element.y1 = parseInt(document.getElementById('el-y1').value) || 0;
+            element.x1 = Math.max(0, Math.min(63, parseInt(document.getElementById('el-x1').value) || 0));
+            element.y1 = Math.max(0, Math.min(63, parseInt(document.getElementById('el-y1').value) || 0));
             element.color = ColorUtils.hexToRgb565(document.getElementById('el-color').value);
+            document.getElementById('el-x1').value = element.x1;
+            document.getElementById('el-y1').value = element.y1;
         }
 
         if (element.type === 'circle' || element.type === 'fillcircle') {
@@ -2474,6 +2489,15 @@ class ClockfaceEditor {
 
         // Save IP for next time
         localStorage.setItem('clockwise-ip', ipInput.value.trim());
+
+        // Validate before sending
+        const warnings = this.clockface.validate();
+        if (warnings.length > 0) {
+            const msg = 'Advertencias:\n\n' + warnings.join('\n') + '\n\n¿Enviar de todos modos?';
+            if (!confirm(msg)) {
+                return;
+            }
+        }
 
         statusDiv.style.display = 'block';
         statusDiv.style.background = '#2196F3';
