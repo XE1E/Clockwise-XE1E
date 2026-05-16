@@ -71,6 +71,7 @@ void checkNightMode() {
   if (!ClockwiseParams::getInstance()->nightModeEnabled) {
     if (nightModeActive) {
       nightModeActive = false;
+      clockface->setBuiltinNightMode(false);
       dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
       ClockwiseParams::getInstance()->canvasFile = currentClockface;
       needsClockfaceReload = true;
@@ -84,10 +85,17 @@ void checkNightMode() {
     nightModeActive = true;
     currentClockface = ClockwiseParams::getInstance()->canvasFile;
     dma_display->setBrightness8(ClockwiseParams::getInstance()->nightBrightness);
-    ClockwiseParams::getInstance()->canvasFile = ClockwiseParams::getInstance()->nightClockface;
-    needsClockfaceReload = true;
+
+    String nightClock = ClockwiseParams::getInstance()->nightClockface;
+    if (nightClock == "_builtin") {
+      clockface->setBuiltinNightMode(true, ClockwiseParams::getInstance()->nightColor);
+    } else {
+      ClockwiseParams::getInstance()->canvasFile = nightClock;
+      needsClockfaceReload = true;
+    }
   } else if (!shouldBeNight && nightModeActive) {
     nightModeActive = false;
+    clockface->setBuiltinNightMode(false);
     dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
     ClockwiseParams::getInstance()->canvasFile = currentClockface;
     needsClockfaceReload = true;

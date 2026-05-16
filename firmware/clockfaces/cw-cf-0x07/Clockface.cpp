@@ -41,6 +41,29 @@ void Clockface::drawFallbackClock()
   Locator::getDisplay()->print(_dateTime->getFormattedTime("H:i"));
 }
 
+void Clockface::drawNightClock()
+{
+  Locator::getDisplay()->fillRect(0, 0, 64, 64, 0);
+  Locator::getDisplay()->setFont(&Nocturno);
+  Locator::getDisplay()->setTextColor(_nightColor);
+  // Hours at top-left (similar to nigth-clock-1.json layout)
+  Locator::getDisplay()->setCursor(1, 29);
+  Locator::getDisplay()->print(_dateTime->getFormattedTime("H"));
+  // Minutes at bottom-right
+  Locator::getDisplay()->setCursor(24, 62);
+  Locator::getDisplay()->print(_dateTime->getFormattedTime("i"));
+}
+
+void Clockface::setBuiltinNightMode(bool enabled, uint16_t color)
+{
+  _builtinNightMode = enabled;
+  _nightColor = color;
+  if (enabled) {
+    _clockfaceLoaded = false;
+    drawNightClock();
+  }
+}
+
 void Clockface::drawSplashScreen(uint16_t color, const char *msg) {
   
   Locator::getDisplay()->fillRect(0, 0, 64, 64, 0);
@@ -52,6 +75,15 @@ void Clockface::drawSplashScreen(uint16_t color, const char *msg) {
 
 void Clockface::update()
 {
+  // Built-in night mode clock
+  if (_builtinNightMode) {
+    if (millis() - lastMillis >= 1000) {
+      drawNightClock();
+      lastMillis = millis();
+    }
+    return;
+  }
+
   if (!_clockfaceLoaded) {
     // Fallback: just update time every second
     if (millis() - lastMillis >= 1000) {

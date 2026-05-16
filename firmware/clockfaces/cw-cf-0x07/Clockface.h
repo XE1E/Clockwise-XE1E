@@ -71,6 +71,8 @@ private:
   CWDateTime *_dateTime;
   uint16_t delay;
   bool _clockfaceLoaded = false;
+  bool _builtinNightMode = false;
+  uint16_t _nightColor = 0xF800;
 
   void setFont(const char *fontName);
   bool deserializeDefinition();
@@ -83,6 +85,7 @@ private:
   void refreshDateTime();
   void drawSplashScreen(uint16_t color, const char *msg);
   void drawFallbackClock();
+  void drawNightClock();
   String getTimeInWords(const char *content);
   String hourToWords(int h);
   String minuteToWords(int m);
@@ -95,4 +98,5 @@ public:
   Clockface(Adafruit_GFX *display);
   void setup(CWDateTime *dateTime);
   void update();
+  void setBuiltinNightMode(bool enabled, uint16_t color = 0xF800);
 };
