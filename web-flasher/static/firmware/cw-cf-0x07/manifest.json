@@ -1,6 +1,6 @@
 {
-    "name": "Clockwise Canvas",
-    "version": "1.4.2",
+    "name": "ClockWise XE1E",
+    "version": "1.0.0",
     "builds": [
         {
             "chipFamily": "ESP32",
