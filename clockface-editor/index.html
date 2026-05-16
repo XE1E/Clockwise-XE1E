@@ -123,27 +123,23 @@
                     </div>
                 </div>
                 <div class="tool-group">
-                    <div class="tool-group-title">Probar Hora</div>
+                    <div class="tool-group-title">Probar Hora/Fecha</div>
                     <div class="test-time-controls">
                         <input type="number" id="test-hour" min="0" max="23" placeholder="H" style="width:40px">
                         <span>:</span>
                         <input type="number" id="test-minute" min="0" max="59" placeholder="M" style="width:40px">
                         <button id="btn-set-time" class="btn-small">Set</button>
-                        <button id="btn-clear-time" class="btn-small">Live</button>
                     </div>
-                </div>
-                <div class="tool-group">
-                    <div class="tool-group-title">Probar Fecha</div>
-                    <div class="test-time-controls">
+                    <div class="test-time-controls" style="margin-top:4px">
                         <input type="number" id="test-day" min="1" max="31" placeholder="D" style="width:40px">
                         <span>/</span>
                         <input type="number" id="test-month" min="1" max="12" placeholder="M" style="width:40px">
                         <span>/</span>
-                        <input type="number" id="test-year" min="2020" max="2099" placeholder="A" style="width:50px">
+                        <input type="number" id="test-year" min="2020" max="2099" placeholder="AAAA" style="width:60px">
+                        <button id="btn-set-date" class="btn-small">Set</button>
                     </div>
                     <div class="test-time-controls" style="margin-top:4px">
-                        <button id="btn-set-date" class="btn-small">Set</button>
-                        <button id="btn-clear-date" class="btn-small">Live</button>
+                        <button id="btn-clear-time" class="btn-small" style="width:100%">Live</button>
                     </div>
                 </div>
             </aside>

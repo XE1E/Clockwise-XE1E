@@ -520,15 +520,6 @@ class ClockfaceEditor {
             window.testTime = new Date(y, mo - 1, d, current.getHours(), current.getMinutes(), 0);
             this.render();
         });
-        document.getElementById('btn-clear-date').addEventListener('click', () => {
-            window.testTime = null;
-            document.getElementById('test-hour').value = '';
-            document.getElementById('test-minute').value = '';
-            document.getElementById('test-day').value = '';
-            document.getElementById('test-month').value = '';
-            document.getElementById('test-year').value = '';
-            this.render();
-        });
 
         document.getElementById('theme-name').addEventListener('input', (e) => {
             this.clockface.name = e.target.value;
