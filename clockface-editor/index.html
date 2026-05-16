@@ -300,15 +300,30 @@
                     </div>
                     <div class="panel-content">
                         <div class="tools-grid">
-                            <button id="btn-image-tool" class="btn btn-small" title="Adaptar imagen">Imagen</button>
-                            <button id="btn-thumbnail" class="btn btn-small" title="Generar thumbnail">Thumb</button>
-                            <button id="btn-open-sprites" class="btn btn-small" title="Editor de sprites">Sprites</button>
-                            <button id="btn-reset-sprites" class="btn btn-small" title="Resetear animaciones">Reset</button>
+                            <button id="btn-image-tool" class="btn btn-tool" title="Adaptar imagen">Imagen</button>
+                            <button id="btn-thumbnail" class="btn btn-tool" title="Generar thumbnail">Thumb</button>
+                            <button id="btn-open-sprites" class="btn btn-tool" title="Editor de sprites">Sprites</button>
+                            <button id="btn-reset-sprites" class="btn btn-tool" title="Resetear animaciones">Reset</button>
+                            <button id="btn-open-reference" class="btn btn-tool" title="Imagen guia">Referencia</button>
+                            <button id="btn-batch-thumbs" class="btn btn-tool" title="Batch thumbnails">Batch</button>
                         </div>
-                        <div id="sprite-count" style="font-size:0.75em;color:var(--text-secondary);margin:4px 0;">0 sprites</div>
-                        <div class="tools-grid" style="margin-top:4px;">
-                            <button id="btn-open-reference" class="btn btn-small" title="Imagen guia">Referencia</button>
-                            <button id="btn-batch-thumbs" class="btn btn-small" title="Batch thumbnails">Batch</button>
+                        <div id="sprite-count" style="font-size:0.75em;color:var(--text-secondary);margin-top:6px;">0 sprites</div>
+                    </div>
+                </div>
+
+                <!-- Display Settings -->
+                <div class="panel-section" id="section-display">
+                    <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span>Pantalla</span>
+                        <span class="collapse-icon">&#9660;</span>
+                    </div>
+                    <div class="panel-content">
+                        <div class="display-info">
+                            <span id="mouse-pos">X: 0, Y: 0</span>
+                        </div>
+                        <div class="display-checks">
+                            <label class="check-option"><input type="checkbox" id="show-grid" checked> Grid</label>
+                            <label class="check-option"><input type="checkbox" id="rounded-pixels"> Redondo</label>
                         </div>
                     </div>
                 </div>
@@ -318,19 +333,6 @@
         <!-- Footer / Status Bar -->
         <footer class="app-footer">
             <div class="footer-left">
-                <span id="mouse-pos">X: 0, Y: 0</span>
-                <span class="footer-sep">|</span>
-                <label class="footer-check"><input type="checkbox" id="show-grid" checked> Grid</label>
-                <label class="footer-check"><input type="checkbox" id="rounded-pixels"> Redondo</label>
-            </div>
-            <div class="footer-center">
-                <div class="zoom-control">
-                    <button id="zoom-out" class="btn-zoom">-</button>
-                    <span id="zoom-level">8x</span>
-                    <button id="zoom-in" class="btn-zoom">+</button>
-                </div>
-            </div>
-            <div class="footer-right">
                 <span class="test-label">Test:</span>
                 <input type="number" id="test-hour" min="0" max="23" placeholder="HH" title="Hora">
                 <span>:</span>
@@ -344,6 +346,14 @@
                 <button id="btn-set-time" class="btn-footer">Set</button>
                 <button id="btn-clear-time" class="btn-footer btn-live">Live</button>
             </div>
+            <div class="footer-center">
+                <div class="zoom-control">
+                    <button id="zoom-out" class="btn-zoom">-</button>
+                    <span id="zoom-level">8x</span>
+                    <button id="zoom-in" class="btn-zoom">+</button>
+                </div>
+            </div>
+            <div class="footer-right"></div>
         </footer>
     </div>
 
