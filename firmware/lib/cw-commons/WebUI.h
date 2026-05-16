@@ -295,10 +295,8 @@ button:hover{border-color:var(--accent)}
         <select id="canvasSelect" onchange="onClockSelect()"></select>
       </div>
       <div id="multiSelect" style="display:none">
-        <label>Seleccionar caratulas</label>
-        <div id="clockfaceCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;max-height:150px;overflow-y:auto;background:var(--input);padding:8px;border-radius:var(--r)"></div>
-        <label>Orden de rotacion <small style="color:var(--dim)">(arrastra para ordenar)</small></label>
-        <div id="rotationOrder" style="background:var(--input);padding:8px;border-radius:var(--r);min-height:32px;margin-bottom:10px"></div>
+        <label>Caratulas <small style="color:var(--dim)">(arrastra para ordenar)</small></label>
+        <div id="clockfaceList" style="background:var(--input);padding:8px;border-radius:var(--r);max-height:250px;overflow-y:auto;margin-bottom:10px"></div>
       </div>
       <input type="hidden" id="canvasFile">
       <input type="hidden" id="rotationList">
@@ -486,10 +484,9 @@ function buildStoredSelect(){
     $('multiSelect').style.display='block';
     $('singleSelect').style.display='none';
     const selected=($('rotationList').value||'').split(',').map(s=>s.trim()).filter(s=>s);
-    $('clockfaceCheckboxes').innerHTML=storedClockfaces.map(c=>
-      '<label style="font-size:12px"><input type="checkbox" class="cf-cb" value="'+c.name+'"'+(selected.includes(c.name)?' checked':'')+' onchange="updateSelection()">'+c.name+'</label>'
-    ).join('');
-    renderRotationOrder(selected);
+    // Sort: selected first (in order), then unselected
+    const sorted=[...selected.filter(n=>storedClockfaces.some(c=>c.name===n)),...storedClockfaces.map(c=>c.name).filter(n=>!selected.includes(n))];
+    renderClockfaceList(sorted,selected);
   }else{
     $('multiSelect').style.display='none';
     $('singleSelect').style.display='block';
@@ -564,25 +561,17 @@ function onRotationToggle(){
   buildStoredSelect();
 }
 
-function updateSelection(){
-  const cbs=document.querySelectorAll('.cf-cb:checked');
-  const newVals=Array.from(cbs).map(c=>c.value);
-  const current=($('rotationList').value||'').split(',').filter(s=>s);
-  // Keep existing order, add new at end, remove unchecked
-  const ordered=current.filter(v=>newVals.includes(v));
-  newVals.forEach(v=>{if(!ordered.includes(v))ordered.push(v);});
-  $('rotationList').value=ordered.join(',');
-  if(ordered.length>0)$('canvasFile').value=ordered[0];
-  renderRotationOrder(ordered);
-}
-
 let dragItem=null;
-function renderRotationOrder(items){
-  const cont=$('rotationOrder');
-  if(!items.length){cont.innerHTML='<span style="color:var(--dim);font-size:12px">Selecciona caratulas arriba</span>';return;}
-  cont.innerHTML=items.map((n,i)=>
-    '<div draggable="true" data-idx="'+i+'" style="padding:6px 10px;margin:2px 0;background:var(--bg);border-radius:4px;cursor:grab;font-size:13px;display:flex;align-items:center;gap:6px"><span style="color:var(--dim)">'+(i+1)+'.</span>'+n+'</div>'
-  ).join('');
+function renderClockfaceList(allNames,selected){
+  const cont=$('clockfaceList');
+  cont.innerHTML=allNames.map(n=>{
+    const checked=selected.includes(n);
+    const idx=checked?selected.indexOf(n)+1:0;
+    return '<div draggable="true" data-name="'+n+'" style="padding:6px 10px;margin:2px 0;background:var(--bg);border-radius:4px;cursor:grab;font-size:13px;display:flex;align-items:center;gap:8px">'
+      +'<input type="checkbox" class="cf-cb" '+(checked?'checked':'')+' onchange="updateFromList()">'
+      +'<span style="color:var(--dim);min-width:18px">'+(idx?idx+'.':'')+'</span>'
+      +'<span>'+n+'</span></div>';
+  }).join('');
   cont.querySelectorAll('[draggable]').forEach(el=>{
     el.ondragstart=e=>{dragItem=el;el.style.opacity='0.5';};
     el.ondragend=e=>{el.style.opacity='1';dragItem=null;};
@@ -593,16 +582,19 @@ function renderRotationOrder(items){
       const list=Array.from(cont.children);
       const fromIdx=list.indexOf(dragItem),toIdx=list.indexOf(el);
       if(fromIdx<toIdx)el.after(dragItem);else el.before(dragItem);
-      updateRotationList();
+      updateFromList();
     };
   });
 }
 
-function updateRotationList(){
-  const items=Array.from($('rotationOrder').children).map(el=>el.textContent.replace(/^\d+\./,'').trim());
-  $('rotationList').value=items.join(',');
-  if(items.length>0)$('canvasFile').value=items[0];
-  renderRotationOrder(items);
+function updateFromList(){
+  const items=Array.from($('clockfaceList').querySelectorAll('[data-name]'));
+  const checked=items.filter(el=>el.querySelector('.cf-cb').checked).map(el=>el.dataset.name);
+  $('rotationList').value=checked.join(',');
+  if(checked.length>0)$('canvasFile').value=checked[0];
+  // Re-render to update numbers
+  const allNames=items.map(el=>el.dataset.name);
+  renderClockfaceList(allNames,checked);
 }
 
 function onClockSelect(){
@@ -632,8 +624,11 @@ async function load(){
 
     // WiFi
     $('wifiSsid').value=settings.wifiSsid||'';
+    $('wifiPwd').placeholder=settings.wifiHasPwd?'(guardado)':'';
     $('wifiSsid2').value=settings.wifiSsid2||'';
+    $('wifiPwd2').placeholder=settings.wifiHasPwd2?'(guardado)':'';
     $('wifiSsid3').value=settings.wifiSsid3||'';
+    $('wifiPwd3').placeholder=settings.wifiHasPwd3?'(guardado)':'';
 
     // Display
     $('displayBright').value=settings.displayBright||32;
@@ -699,12 +694,12 @@ async function saveField(key,val){
 
 async function saveWifi(){
   await saveField('wifiSsid',$('wifiSsid').value);
-  await saveField('wifiPwd',$('wifiPwd').value);
+  if($('wifiPwd').value)await saveField('wifiPwd',$('wifiPwd').value);
   await saveField('wifiSsid2',$('wifiSsid2').value);
-  await saveField('wifiPwd2',$('wifiPwd2').value);
+  if($('wifiPwd2').value)await saveField('wifiPwd2',$('wifiPwd2').value);
   await saveField('wifiSsid3',$('wifiSsid3').value);
-  await saveField('wifiPwd3',$('wifiPwd3').value);
-  toast('WiFi guardado');
+  if($('wifiPwd3').value)await saveField('wifiPwd3',$('wifiPwd3').value);
+  toast('WiFi guardado. Reinicia para conectar.');
 }
 
 async function saveDisplay(){

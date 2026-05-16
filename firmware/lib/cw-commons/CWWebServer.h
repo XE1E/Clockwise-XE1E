@@ -54,8 +54,11 @@ struct ClockwiseWebServer
       String json = "{";
       // WiFi
       json += "\"wifiSsid\":\"" + ClockwiseParams::getInstance()->wifiSsid + "\",";
+      json += "\"wifiHasPwd\":" + String(ClockwiseParams::getInstance()->wifiPwd.length() > 0 ? 1 : 0) + ",";
       json += "\"wifiSsid2\":\"" + ClockwiseParams::getInstance()->wifiSsid2 + "\",";
+      json += "\"wifiHasPwd2\":" + String(ClockwiseParams::getInstance()->wifiPwd2.length() > 0 ? 1 : 0) + ",";
       json += "\"wifiSsid3\":\"" + ClockwiseParams::getInstance()->wifiSsid3 + "\",";
+      json += "\"wifiHasPwd3\":" + String(ClockwiseParams::getInstance()->wifiPwd3.length() > 0 ? 1 : 0) + ",";
       json += "\"wifiConnected\":\"" + WiFi.SSID() + "\",";
       json += "\"wifiRssi\":" + String(WiFi.RSSI()) + ",";
       // Display
