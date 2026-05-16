@@ -497,13 +497,36 @@ class ClockfaceEditor {
         document.getElementById('btn-set-time').addEventListener('click', () => {
             const h = parseInt(document.getElementById('test-hour').value) || 0;
             const m = parseInt(document.getElementById('test-minute').value) || 0;
-            window.testTime = new Date(2024, 0, 1, h, m, 0);
+            const current = window.testTime || new Date();
+            window.testTime = new Date(current.getFullYear(), current.getMonth(), current.getDate(), h, m, 0);
             this.render();
         });
         document.getElementById('btn-clear-time').addEventListener('click', () => {
             window.testTime = null;
             document.getElementById('test-hour').value = '';
             document.getElementById('test-minute').value = '';
+            document.getElementById('test-day').value = '';
+            document.getElementById('test-month').value = '';
+            document.getElementById('test-year').value = '';
+            this.render();
+        });
+
+        // Test date controls
+        document.getElementById('btn-set-date').addEventListener('click', () => {
+            const d = parseInt(document.getElementById('test-day').value) || 1;
+            const mo = parseInt(document.getElementById('test-month').value) || 1;
+            const y = parseInt(document.getElementById('test-year').value) || new Date().getFullYear();
+            const current = window.testTime || new Date();
+            window.testTime = new Date(y, mo - 1, d, current.getHours(), current.getMinutes(), 0);
+            this.render();
+        });
+        document.getElementById('btn-clear-date').addEventListener('click', () => {
+            window.testTime = null;
+            document.getElementById('test-hour').value = '';
+            document.getElementById('test-minute').value = '';
+            document.getElementById('test-day').value = '';
+            document.getElementById('test-month').value = '';
+            document.getElementById('test-year').value = '';
             this.render();
         });
 

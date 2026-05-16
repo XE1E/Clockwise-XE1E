@@ -14,15 +14,16 @@ Este fork incluye las siguientes mejoras:
 
 | Funcionalidad | Descripcion |
 |---|---|
+| Editor de Caratulas | Diseña caratulas con vista previa en tiempo real y prueba directo en el reloj |
+| Editor de Caracteres | Crea y edita fuentes pixel art para usar en las caratulas |
 | Caratulas Locales | Guarda caratulas en la memoria del reloj (SPIFFS) - funciona sin internet |
 | GitHub Pages | Nueva fuente de caratulas estable con SSL |
 | Modo Nocturno | Cambia automaticamente a una caratula minimalista con brillo reducido durante la noche |
 | Rotacion de Caratulas | Cambia entre caratulas seleccionadas en intervalos configurables |
-| Hora en Palabras | Muestra la hora escrita en español (ej: "DIEZ Y CUARTO") |
 | 26+ Fuentes BDF | Fuentes bitmap adicionales para el editor y firmware |
 | Soporte Español | Nombres de dias y meses en español |
 | Paleta de Colores | Selector visual de colores para modo nocturno |
-| Reloj Nocturno | Nueva caratula minimalista con digitos grandes |
+| Herramientas Dev | Scripts para conversion de fuentes, generacion de thumbnails y mas |
 
 ---
 
@@ -108,7 +109,6 @@ GND       ──>  GND
 | Pepsi | Logo retro |
 | Retro Computer | Estilo computadora antigua |
 | Star Wars | Tematica espacial |
-| Reloj Nocturno | Minimalista para dormir |
 
 ---
 
@@ -119,7 +119,8 @@ Disponibles en GitHub Pages (sin instalar nada):
 | Herramienta | URL |
 |---|---|
 | Editor de Caratulas | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/ |
-| Digit Designer | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/digit-designer.html |
+| Character Designer | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/digit-designer.html |
+| Web Flasher | https://xe1e.github.io/Clockwise-XE1E/web-flasher/ |
 
 O ejecuta localmente:
 ```bash
@@ -134,18 +135,11 @@ python -m http.server 8000
 
 La pagina de configuracion incluye:
 
-- **Brillo:** Manual o automatico con sensor LDR
-- **Formato de hora:** 12h o 24h
-- **Idioma:** Español o Ingles
-- **Zona horaria:** Configuracion IANA
-- **Modo Nocturno:** Horario, brillo, color y caratula
-- **Rotacion de Caratulas:** Intervalo y seleccion de caratulas
-- **Fuente de Caratulas:**
-  - **Guardadas en reloj:** Caratulas en memoria interna (funciona offline)
-  - **GitHub Pages XE1E:** Fuente recomendada, estable
-  - **CDN XE1E:** Servidor rapido
-  - **GitHub Raw:** Puede fallar en algunos ESP32
-  - **Local:** Para desarrollo con servidor HTTP local
+- **WiFi:** Configuracion de red inalambrica
+- **Pantalla:** Brillo manual/automatico, rotacion, tipo de panel RGB/RBG, pin LDR
+- **Hora y Fecha:** Zona horaria, servidor NTP, formato 12h/24h, idioma
+- **Caratulas:** Rotacion de caratulas, modo nocturno, fuente de caratulas
+- **Avanzado:** Info del dispositivo, reinicio, actualizacion OTA
 
 ---
 
