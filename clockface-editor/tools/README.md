@@ -54,6 +54,33 @@ python convert_ttf.py "NEW LED DISPLAY ST.ttf" --size 12 --js --name ledDisplay
 # Copiar el codigo generado a js/pixel-fonts.js
 ```
 
+## convert_gfx_font.py
+
+Convierte fuentes GFX (.h) del firmware a formato JSON para el editor.
+
+### Uso
+
+```bash
+python convert_gfx_font.py "../../firmware/clockfaces/cw-cf-0x07/fonts/font8x13.h"
+python convert_gfx_font.py "../../firmware/clockfaces/cw-cf-0x07/fonts/font8x13.h" "../fonts/8x13.json"
+```
+
+### Convertir todas las fuentes del firmware
+
+```bash
+for f in ../../firmware/clockfaces/cw-cf-0x07/fonts/font*.h; do
+  python convert_gfx_font.py "$f" "../fonts/$(basename "$f" .h | sed 's/font//').json"
+done
+```
+
+### Notas
+
+- Extrae bitmaps, glyphs con yOffset correcto, y metadatos
+- Los yOffset son importantes para alineación correcta con el firmware
+- Después de convertir, limpiar caché del navegador para ver cambios
+
+---
+
 ## convert_json_to_gfx.py
 
 Convierte fuentes JSON del editor a formato Adafruit GFX (.h) para el firmware.
