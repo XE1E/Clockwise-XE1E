@@ -493,12 +493,15 @@ class ClockfaceEditor {
             document.querySelector('.canvas-wrapper').classList.toggle('rounded-pixels', e.target.checked);
         });
 
-        // Test time controls
+        // Test time/date controls - single Set button for both
         document.getElementById('btn-set-time').addEventListener('click', () => {
-            const h = parseInt(document.getElementById('test-hour').value) || 0;
-            const m = parseInt(document.getElementById('test-minute').value) || 0;
-            const current = window.testTime || new Date();
-            window.testTime = new Date(current.getFullYear(), current.getMonth(), current.getDate(), h, m, 0);
+            const now = new Date();
+            const h = document.getElementById('test-hour').value !== '' ? parseInt(document.getElementById('test-hour').value) : now.getHours();
+            const m = document.getElementById('test-minute').value !== '' ? parseInt(document.getElementById('test-minute').value) : now.getMinutes();
+            const d = document.getElementById('test-day').value !== '' ? parseInt(document.getElementById('test-day').value) : now.getDate();
+            const mo = document.getElementById('test-month').value !== '' ? parseInt(document.getElementById('test-month').value) : now.getMonth() + 1;
+            const y = document.getElementById('test-year').value !== '' ? parseInt(document.getElementById('test-year').value) : now.getFullYear();
+            window.testTime = new Date(y, mo - 1, d, h, m, 0);
             this.render();
         });
         document.getElementById('btn-clear-time').addEventListener('click', () => {
@@ -508,16 +511,6 @@ class ClockfaceEditor {
             document.getElementById('test-day').value = '';
             document.getElementById('test-month').value = '';
             document.getElementById('test-year').value = '';
-            this.render();
-        });
-
-        // Test date controls
-        document.getElementById('btn-set-date').addEventListener('click', () => {
-            const d = parseInt(document.getElementById('test-day').value) || 1;
-            const mo = parseInt(document.getElementById('test-month').value) || 1;
-            const y = parseInt(document.getElementById('test-year').value) || new Date().getFullYear();
-            const current = window.testTime || new Date();
-            window.testTime = new Date(y, mo - 1, d, current.getHours(), current.getMinutes(), 0);
             this.render();
         });
 

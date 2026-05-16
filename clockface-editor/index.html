@@ -324,7 +324,14 @@
                 <label class="footer-check"><input type="checkbox" id="rounded-pixels"> Redondo</label>
             </div>
             <div class="footer-center">
-                <span>Test:</span>
+                <div class="zoom-control">
+                    <button id="zoom-out" class="btn-zoom">-</button>
+                    <span id="zoom-level">8x</span>
+                    <button id="zoom-in" class="btn-zoom">+</button>
+                </div>
+            </div>
+            <div class="footer-right">
+                <span class="test-label">Test:</span>
                 <input type="number" id="test-hour" min="0" max="23" placeholder="HH" title="Hora">
                 <span>:</span>
                 <input type="number" id="test-minute" min="0" max="59" placeholder="MM" title="Minuto">
@@ -335,13 +342,7 @@
                 <span>/</span>
                 <input type="number" id="test-year" min="2020" max="2099" placeholder="AAAA" title="Ano">
                 <button id="btn-set-time" class="btn-footer">Set</button>
-                <button id="btn-set-date" class="btn-footer">Set</button>
                 <button id="btn-clear-time" class="btn-footer btn-live">Live</button>
-            </div>
-            <div class="footer-right">
-                <button id="zoom-out" class="btn-zoom">-</button>
-                <span id="zoom-level">8x</span>
-                <button id="zoom-in" class="btn-zoom">+</button>
             </div>
         </footer>
     </div>
