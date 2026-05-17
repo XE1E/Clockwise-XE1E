@@ -11,6 +11,7 @@ Editor visual principal para crear y modificar caratulas JSON.
 - Crear/editar elementos: imágenes, texto, datetime, líneas, rectángulos, sprites
 - Vista previa en tiempo real con simulación de hora
 - Importar/exportar JSON
+- **Auto-generación de thumbnail** al exportar (para preview en interfaz web)
 - Enviar directamente al reloj via WiFi
 - Paleta de colores RGB565
 - Múltiples fuentes pixel disponibles
@@ -19,7 +20,11 @@ Editor visual principal para crear y modificar caratulas JSON.
 1. Abrir en navegador (local o desde GitHub Pages)
 2. Agregar elementos con los botones del panel izquierdo
 3. Configurar propiedades en el panel derecho
-4. Exportar JSON o enviar al reloj
+4. Exportar JSON (incluye thumbnail automáticamente) o enviar al reloj
+
+**Opciones de exportación:**
+- Checkbox "Incluir thumbnail" - activo por defecto
+- Muestra tamaño del JSON resultante
 
 ### Diseñador de Dígitos (`digit-designer.html`)
 Crea sprites personalizados para dígitos 0-9 y separador.
@@ -47,13 +52,23 @@ Convierte fuentes a formato JSON para el editor.
 - Exportar como JSON compatible
 
 ### Generador de Thumbnails (`generate-thumbs.html`)
-Genera imágenes de preview para las caratulas.
+Genera y embebe thumbnails en las caratulas para mostrar previews en la interfaz web del reloj.
 
-**Uso:**
-1. Ejecutar servidor local: `python -m http.server 8000`
-2. Abrir `http://localhost:8000/generate-thumbs.html`
-3. Los thumbnails se generan automáticamente
-4. Descargar individualmente o todos
+**Tab 1 - Generar desde carpeta (dinámico):**
+1. Abrir `generate-thumbs.html` en Chrome o Edge
+2. Click en "Seleccionar Carpeta"
+3. Elegir cualquier carpeta con archivos .json
+4. Se detectan y procesan automáticamente todos los JSONs
+5. Opciones:
+   - **Descargar PNGs**: Imágenes sueltas para uso externo
+   - **Descargar JSONs**: Carátulas con thumbnail embebido (listas para subir al reloj)
+
+**Tab 2 - Inyectar en JSON individual:**
+1. Click en "Seleccionar JSON"
+2. El thumbnail se genera automáticamente
+3. Descargar el JSON actualizado con thumbnail embebido
+
+**Nota:** El thumbnail se guarda en el campo `thumbnail` del JSON y la interfaz web del reloj lo usa para mostrar la preview de cada carátula. No requiere servidor local.
 
 ### Página de Configuración (`config-page.html`)
 Interfaz alternativa de configuración del reloj con previews visuales.
@@ -180,6 +195,7 @@ clockface-editor/
   "author": "Tu Nombre",
   "bgColor": 0,
   "delay": 100,
+  "thumbnail": "iVBORw0KGgoAAAANS...",
   "setup": [
     { "type": "image", "x": 0, "y": 0, "image": "base64..." }
   ],
@@ -191,6 +207,13 @@ clockface-editor/
     { "type": "sprite", "x": 10, "y": 10, "sprite": 0, "frameDelay": 100 }
   ]
 }
+```
+
+### Campo `thumbnail`
+PNG 64x64 codificado en base64. Se genera automáticamente al exportar desde el editor.
+- La interfaz web del reloj lo usa para mostrar previews
+- Opcional pero recomendado (~1-4 KB adicionales)
+- Si no existe, la interfaz intenta extraer la primera imagen de `setup`, `loop` o `sprites`
 ```
 
 ### Tipos de Elementos
@@ -221,6 +244,12 @@ clockface-editor/
 | `m` | Mes numérico | 01 |
 | `y` | Año 2 dígitos | 26 |
 | `Y` | Año 4 dígitos | 2026 |
+| `Hw` | Hora en palabras | OCHO |
+| `iw` | Minutos en palabras | y media |
+
+**Hora en palabras (español):**
+- `Hw`: UNA, DOS, TRES... DOCE (mayúsculas)
+- `iw`: en punto, y cuarto, y media, treinta\ny uno, etc.
 
 ---
 

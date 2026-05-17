@@ -660,6 +660,29 @@ class ClockfaceEditor {
         link.click();
     }
 
+    generateThumbnail() {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 64;
+        tempCanvas.height = 64;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.imageSmoothingEnabled = false;
+        tempCtx.drawImage(this.canvas, 0, 0);
+
+        // Get base64 without the data:image/png;base64, prefix
+        const dataUrl = tempCanvas.toDataURL('image/png');
+        this.clockface.thumbnail = dataUrl.replace(/^data:image\/png;base64,/, '');
+    }
+
+    updateExportSize() {
+        const json = document.getElementById('export-json').value;
+        const sizeKB = (new Blob([json]).size / 1024).toFixed(1);
+        const sizeEl = document.getElementById('export-size');
+        if (sizeEl) {
+            sizeEl.textContent = `Tamaño: ${sizeKB} KB`;
+            sizeEl.style.color = sizeKB > 25 ? '#ff6b6b' : '#888';
+        }
+    }
+
     async saveThumbnailToFolder() {
         if (!('showDirectoryPicker' in window)) {
             alert('Tu navegador no soporta guardar en carpeta. Usa Chrome o Edge.');
@@ -1608,10 +1631,15 @@ class ClockfaceEditor {
                 }
             }
 
-            const json = JSON.stringify(this.clockface.toJSON(), null, 2);
+            // Auto-generate thumbnail from current canvas
+            this.generateThumbnail();
+
+            const includeThumbnail = document.getElementById('export-include-thumb')?.checked ?? true;
+            const json = JSON.stringify(this.clockface.toJSON(includeThumbnail), null, 2);
             document.getElementById('export-json').value = json;
             document.getElementById('export-modal').classList.add('active');
             this.updateFolderInfo();
+            this.updateExportSize();
         });
 
         document.getElementById('btn-do-import').addEventListener('click', async () => {
@@ -1693,6 +1721,13 @@ class ClockfaceEditor {
                 document.execCommand('copy');
                 alert('JSON copiado al portapapeles');
             }
+        });
+
+        document.getElementById('export-include-thumb').addEventListener('change', () => {
+            const includeThumbnail = document.getElementById('export-include-thumb').checked;
+            const json = JSON.stringify(this.clockface.toJSON(includeThumbnail), null, 2);
+            document.getElementById('export-json').value = json;
+            this.updateExportSize();
         });
 
         document.getElementById('btn-download-json').addEventListener('click', () => {

@@ -17,9 +17,11 @@ Este fork incluye las siguientes mejoras:
 | Editor de Caratulas | Diseña caratulas con vista previa en tiempo real y prueba directo en el reloj |
 | Editor de Caracteres | Crea y edita fuentes pixel art para usar en las caratulas |
 | Caratulas Locales | Guarda caratulas en la memoria del reloj (SPIFFS) - funciona sin internet |
+| Thumbnails | Preview de caratulas en la interfaz web del reloj |
 | GitHub Pages | Nueva fuente de caratulas estable con SSL |
 | Modo Nocturno | Cambia automaticamente a una caratula minimalista con brillo reducido durante la noche |
 | Rotacion de Caratulas | Cambia entre caratulas seleccionadas en intervalos configurables |
+| Hora en Palabras | Muestra la hora en texto: "OCHO y media", "TRES y cuarto" |
 | 26+ Fuentes BDF | Fuentes bitmap adicionales para el editor y firmware |
 | Soporte Español | Nombres de dias y meses en español |
 | Paleta de Colores | Selector visual de colores para modo nocturno |
@@ -116,13 +118,14 @@ GND       ──>  GND
 
 Disponibles en GitHub Pages (sin instalar nada):
 
-| Herramienta | URL |
-|---|---|
-| Editor de Caratulas | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/ |
-| Character Designer | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/digit-designer.html |
-| Web Flasher | https://xe1e.github.io/Clockwise-XE1E/web-flasher/ |
+| Herramienta | Descripcion | URL |
+|---|---|---|
+| Editor de Caratulas | Diseña caratulas con preview en tiempo real | [Abrir](https://xe1e.github.io/Clockwise-XE1E/clockface-editor/) |
+| Generador Thumbnails | Agrega thumbnails a caratulas existentes | [Abrir](https://xe1e.github.io/Clockwise-XE1E/clockface-editor/generate-thumbs.html) |
+| Digit Designer | Crea sets de digitos personalizados | [Abrir](https://xe1e.github.io/Clockwise-XE1E/clockface-editor/digit-designer.html) |
+| Web Flasher | Instala firmware desde el navegador | [Abrir](https://xe1e.github.io/Clockwise-XE1E/web-flasher/) |
 
-O ejecuta localmente:
+**Servidor local** (necesario para generar thumbnails desde carpeta):
 ```bash
 cd clockface-editor
 python -m http.server 8000
@@ -133,13 +136,36 @@ python -m http.server 8000
 
 ## Pagina de Configuracion
 
-La pagina de configuracion incluye:
+Accede desde cualquier navegador a la IP del reloj.
 
-- **WiFi:** Configuracion de red inalambrica
-- **Pantalla:** Brillo manual/automatico, rotacion, tipo de panel RGB/RBG, pin LDR
-- **Hora y Fecha:** Zona horaria, servidor NTP, formato 12h/24h, idioma
-- **Caratulas:** Rotacion de caratulas, modo nocturno, fuente de caratulas
-- **Avanzado:** Info del dispositivo, reinicio, actualizacion OTA
+### Tabs disponibles:
+
+| Tab | Funciones |
+|-----|-----------|
+| **WiFi** | Hasta 3 redes WiFi con prioridad |
+| **Pantalla** | Brillo manual/automatico (LDR), rotacion fisica, panel RGB/RBG |
+| **Hora** | Zona horaria, servidor NTP, formato 12h/24h, idioma |
+| **Canvas** | Gestion de caratulas (ver abajo) |
+| **Sistema** | Info del firmware, reinicio, reset de fabrica |
+
+### Tab Canvas - Gestion de Caratulas
+
+- **Almacenamiento:** Barra de uso de memoria SPIFFS
+- **Thumbnails:** Vista previa de cada caratula guardada
+- **Seleccion:** Click para seleccionar caratula activa
+- **Rotacion:** Activa rotacion automatica, arrastra para ordenar
+- **Subir:** Carga caratulas JSON desde tu computadora
+- **Descargar:** Obtiene caratulas del repositorio GitHub o servidor local
+- **Modo Nocturno:** Horario, brillo, color, caratula personalizada o integrada
+
+### Thumbnails en Caratulas
+
+Para que aparezca la preview de una caratula en la interfaz web:
+
+1. **Automatico:** El editor genera thumbnail al exportar
+2. **Manual:** Usa `generate-thumbs.html` para agregar thumbnail a JSONs existentes
+
+El thumbnail se guarda en el campo `thumbnail` del JSON (~1-4 KB adicionales).
 
 ---
 

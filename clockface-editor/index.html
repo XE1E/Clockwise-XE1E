@@ -427,6 +427,13 @@
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="export-include-thumb" checked>
+                        Incluir thumbnail (para preview en interfaz web)
+                    </label>
+                    <span id="export-size" style="font-size:12px;color:#888;">Tamaño: -- KB</span>
+                </div>
                 <textarea id="export-json" readonly></textarea>
                 <div id="export-folder-info" style="margin-top:8px;font-size:12px;color:#888;"></div>
             </div>

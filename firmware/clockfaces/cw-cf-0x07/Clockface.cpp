@@ -331,14 +331,11 @@ void Clockface::renderText(String text, JsonVariantConst value)
 
   const char *content = value["content"].as<const char *>();
   if (content && strcmp(content, "Hw") == 0) {
-    // Hour in words: max is "CUATRO" (7 chars uppercase)
-    refText = "CUATRO";
+    // Hour in words: widest + padding
+    refText = "CUATRO  ";
   } else if (content && strcmp(content, "iw") == 0) {
-    // Minutes in words: always use max possible area (2 lines)
-    // This ensures proper clearing when switching from multiline to single line
-    // "diecisiete" is longest single word, but we always need 2-line height
-    // to clear previous multiline text like "treinta\ny cinco"
-    refText = "diecisiete\ny nueve";
+    // Minutes in words: widest 2-line + padding
+    refText = "cincuenta  \ny cuatro  ";
   } else {
     // Numeric text: use "8" as widest digit reference
     refText = text;
@@ -349,14 +346,15 @@ void Clockface::renderText(String text, JsonVariantConst value)
 
   Locator::getDisplay()->getTextBounds(refText, 0, 0, &ref_x1, &ref_y1, &ref_w, &ref_h);
 
-  // Use the reference dimensions and position for clearing
-  // This covers the maximum possible area regardless of actual text content
-  int16_t clearX = min(x1, ref_x1);
-  int16_t clearY = min(y1, ref_y1);
-  uint16_t clearW = max(w, ref_w) + abs(x1 - ref_x1);
-  uint16_t clearH = max(h, ref_h) + abs(y1 - ref_y1);
+  // Always use reference dimensions for clearing (covers maximum area)
+  // Add padding to ensure complete clearing, especially on the left side
+  // Some fonts have characters that extend left of their cursor position
+  int16_t clearX = ref_x1 - 2;  // Extra left padding to catch edge pixels
+  int16_t clearY = ref_y1;
+  uint16_t clearW = ref_w + 6;  // Extra right padding (was 4)
+  uint16_t clearH = ref_h + 4;  // Extra vertical padding (was 2)
 
-  // BG Color - clear area based on widest possible text
+  // BG Color - clear area based on reference text
   Locator::getDisplay()->fillRect(
       value["x"].as<const uint16_t>() + clearX,
       value["y"].as<const uint16_t>() + clearY,

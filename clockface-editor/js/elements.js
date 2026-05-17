@@ -409,6 +409,7 @@ class Clockface {
         this.delay = 250;
         this.elements = [];
         this.sprites = [];
+        this.thumbnail = null;  // Base64 PNG thumbnail
     }
 
     addElement(element) {
@@ -485,7 +486,7 @@ class Clockface {
         return false;
     }
 
-    toJSON() {
+    toJSON(includeThumbnail = true) {
         const setup = [];
         const loop = [];
 
@@ -503,7 +504,7 @@ class Clockface {
             .map(s => s.frames || s)
             .filter(frames => Array.isArray(frames) && frames.length > 0);
 
-        return {
+        const result = {
             name: this.name,
             version: this.version,
             author: this.author,
@@ -513,6 +514,13 @@ class Clockface {
             sprites: validSprites,
             loop: loop
         };
+
+        // Include thumbnail if available and requested
+        if (includeThumbnail && this.thumbnail) {
+            result.thumbnail = this.thumbnail;
+        }
+
+        return result;
     }
 
     // Validate clockface and return warnings
@@ -586,6 +594,11 @@ class Clockface {
                     cf.elements.push(el);
                 }
             }
+        }
+
+        // Load thumbnail if present
+        if (json.thumbnail) {
+            cf.thumbnail = json.thumbnail;
         }
 
         return cf;

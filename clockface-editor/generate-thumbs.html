@@ -23,6 +23,7 @@
             background: #16213e;
             padding: 15px;
             border-radius: 8px;
+            position: relative;
         }
         .thumb-item canvas {
             display: block;
@@ -35,17 +36,50 @@
             margin-top: 10px;
             font-size: 14px;
         }
-        .thumb-item a {
-            display: inline-block;
+        .thumb-item .size {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .thumb-item .has-thumb {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #34a853;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .thumb-item .no-thumb {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ea4335;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .thumb-item .buttons {
             margin-top: 8px;
-            padding: 5px 12px;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+        .thumb-item a, .thumb-item button {
+            padding: 5px 10px;
             background: #0f4c75;
             color: white;
             text-decoration: none;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
+            border: none;
+            cursor: pointer;
         }
-        .thumb-item a:hover { background: #3282b8; }
+        .thumb-item a:hover, .thumb-item button:hover { background: #3282b8; }
+        .thumb-item button.json-btn { background: #e94560; }
+        .thumb-item button.json-btn:hover { background: #ff6b6b; }
         .status { color: #888; margin: 20px 0; }
         .btn {
             padding: 12px 24px;
@@ -58,11 +92,13 @@
             margin: 10px;
         }
         .btn:hover { background: #ff6b6b; }
+        .btn-success { background: #34a853; }
+        .btn-success:hover { background: #46c766; }
         .instructions {
             background: #16213e;
             padding: 20px;
             border-radius: 8px;
-            max-width: 600px;
+            max-width: 700px;
             margin: 20px auto;
             text-align: left;
         }
@@ -73,136 +109,357 @@
             padding: 2px 6px;
             border-radius: 3px;
         }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #16213e;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .tab.active {
+            background: #0f4c75;
+            color: white;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
     <h1>Generador de Thumbnails</h1>
 
-    <div class="instructions">
-        <h3>Instrucciones:</h3>
-        <ol>
-            <li>Abre una terminal en <code>clockface-editor/</code></li>
-            <li>Ejecuta: <code>python -m http.server 8000</code></li>
-            <li>Abre <code>http://localhost:8000/generate-thumbs.html</code></li>
-            <li>Los thumbnails se generan automáticamente</li>
-            <li>Descarga cada PNG o usa "Descargar Todos"</li>
-        </ol>
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('generate')">Generar desde carpeta</button>
+        <button class="tab" onclick="showTab('inject')">Inyectar en JSON</button>
     </div>
 
-    <button class="btn" onclick="generateAll()">Generar Thumbnails</button>
-    <button class="btn" onclick="downloadAll()">Descargar Todos</button>
+    <div id="tab-generate" class="tab-content active">
+        <div class="instructions">
+            <h3>Generar thumbnails desde carpeta</h3>
+            <ol>
+                <li>Click en "Seleccionar Carpeta"</li>
+                <li>Elige la carpeta con archivos .json de carátulas</li>
+                <li>Se generan thumbnails automáticamente</li>
+                <li>Descarga PNGs o JSONs con thumbnail embebido</li>
+            </ol>
+        </div>
 
-    <p class="status" id="status">Listo para generar...</p>
+        <button class="btn" onclick="loadFromFolder()">Seleccionar Carpeta</button>
+        <button class="btn" onclick="reloadLastFolder()" id="btn-reload" style="display:none">Recargar Última</button>
+        <button class="btn" onclick="downloadAllPNG()">Descargar PNGs</button>
+        <button class="btn btn-success" onclick="downloadAllJSON()">Descargar JSONs con Thumbnail</button>
 
-    <div class="thumbs-grid" id="thumbs-grid"></div>
+        <p class="status" id="status">Selecciona una carpeta para comenzar...</p>
+        <div class="thumbs-grid" id="thumbs-grid"></div>
+    </div>
+
+    <div id="tab-inject" class="tab-content">
+        <div class="instructions">
+            <h3>Inyectar thumbnail en un JSON existente</h3>
+            <ol>
+                <li>Selecciona un archivo JSON de carátula</li>
+                <li>Se generará el thumbnail automáticamente</li>
+                <li>Descarga el JSON actualizado con el thumbnail embebido</li>
+            </ol>
+        </div>
+
+        <input type="file" id="json-file-input" accept=".json" style="display:none" onchange="handleFileSelect(event)">
+        <button class="btn" onclick="document.getElementById('json-file-input').click()">Seleccionar JSON</button>
+
+        <div id="inject-preview" style="display:none;margin-top:20px;">
+            <div class="thumb-item" style="display:inline-block;">
+                <canvas id="inject-canvas" width="64" height="64"></canvas>
+                <div class="name" id="inject-name">-</div>
+                <div class="size" id="inject-size">-</div>
+                <div class="buttons">
+                    <a id="inject-png-link" download="thumbnail.png">PNG</a>
+                    <button class="json-btn" onclick="downloadInjectedJSON()">JSON + Thumb</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="js/color-utils.js"></script>
     <script src="js/pixel-fonts.js"></script>
     <script src="js/elements.js"></script>
     <script src="js/canvas-renderer.js"></script>
     <script>
-        const clockfaces = [
-            'nyan-cat',
-            'pac-man',
-            'goomba_move',
-            'snoopy3',
-            'christmassnoopy',
-            'clock-club',
-            'donkey-kong',
-            'eletrogate',
-            'pepsi-final-2',
-            'retro-computer',
-            'star-wars',
-            'night-clock',
-            'Prueba_reloj'
-        ];
+        const generatedData = [];
+        let injectedData = null;
+        let lastDirHandle = null;
 
-        const generatedThumbs = [];
+        // Mostrar última carpeta usada
+        const lastFolderName = localStorage.getItem('thumbgen-lastfolder');
+        if (lastFolderName) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('status').innerHTML =
+                    `Última carpeta: <strong>${lastFolderName}</strong> - Click "Seleccionar Carpeta" para continuar`;
+            });
+        }
 
-        async function generateAll() {
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[onclick="showTab('${tab}')"]`).classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        // Cargar carpeta dinámicamente usando File System Access API
+        async function loadFromFolder() {
+            if (!('showDirectoryPicker' in window)) {
+                alert('Tu navegador no soporta selección de carpetas. Usa Chrome o Edge.');
+                return;
+            }
+
+            try {
+                const dirHandle = await window.showDirectoryPicker({ id: 'clockface-thumbs', mode: 'read' });
+                await processFolder(dirHandle);
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    alert('Error: ' + e.message);
+                }
+            }
+        }
+
+        // Recargar última carpeta
+        async function reloadLastFolder() {
+            if (!lastDirHandle) {
+                alert('No hay carpeta guardada. Selecciona una primero.');
+                return;
+            }
+
+            try {
+                // Verificar que aún tenemos permiso
+                const permission = await lastDirHandle.queryPermission({ mode: 'read' });
+                if (permission === 'granted') {
+                    await processFolder(lastDirHandle);
+                } else {
+                    const request = await lastDirHandle.requestPermission({ mode: 'read' });
+                    if (request === 'granted') {
+                        await processFolder(lastDirHandle);
+                    } else {
+                        alert('Permiso denegado. Selecciona la carpeta de nuevo.');
+                    }
+                }
+            } catch (e) {
+                alert('Error al reabrir carpeta. Selecciona de nuevo.');
+                lastDirHandle = null;
+                document.getElementById('btn-reload').style.display = 'none';
+            }
+        }
+
+        // Procesar carpeta
+        async function processFolder(dirHandle) {
             const grid = document.getElementById('thumbs-grid');
             const status = document.getElementById('status');
             grid.innerHTML = '';
-            generatedThumbs.length = 0;
+            generatedData.length = 0;
 
-            // Check if running from file:// protocol
-            if (window.location.protocol === 'file:') {
-                status.innerHTML = `<span style="color:#ff6b6b;">Error: Abre esta página desde un servidor local.</span><br>
-                    <small style="color:#888;">Ejecuta: <code>python -m http.server 8000</code> en clockface-editor/</small>`;
-                return;
-            }
+            // Guardar referencia
+            lastDirHandle = dirHandle;
+            localStorage.setItem('thumbgen-lastfolder', dirHandle.name);
+            document.getElementById('btn-reload').style.display = 'inline-block';
 
-            for (const name of clockfaces) {
-                status.textContent = `Generando ${name}...`;
+            try {
+                const jsonFiles = [];
 
-                try {
-                    const response = await fetch(`clockfaces/${name}.json`);
-                    const json = await response.json();
-                    const clockface = Clockface.fromJSON(json);
-
-                    // Load images
-                    for (const el of clockface.elements) {
-                        if (el.type === 'image' && el.image) {
-                            await el.loadImage(el.image);
-                        }
-                        if (el.type === 'sprite') {
-                            await el.loadFrames(clockface.sprites);
-                        }
+                for await (const entry of dirHandle.values()) {
+                    if (entry.kind === 'file' && entry.name.endsWith('.json')) {
+                        jsonFiles.push(entry);
                     }
+                }
 
-                    // Create canvas and render
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 64;
-                    canvas.height = 64;
-                    const renderer = new CanvasRenderer(canvas);
-                    renderer.render(clockface, null);
+                if (jsonFiles.length === 0) {
+                    status.textContent = 'No se encontraron archivos .json en la carpeta';
+                    return;
+                }
 
-                    const dataUrl = canvas.toDataURL('image/png');
-                    generatedThumbs.push({ name, dataUrl });
+                status.textContent = `Encontrados ${jsonFiles.length} archivos...`;
 
-                    // Display
-                    const item = document.createElement('div');
-                    item.className = 'thumb-item';
-                    item.innerHTML = `
-                        <canvas width="64" height="64"></canvas>
-                        <div class="name">${name}</div>
-                        <a href="${dataUrl}" download="${name}.png">Descargar</a>
-                    `;
-                    const displayCanvas = item.querySelector('canvas');
-                    displayCanvas.getContext('2d').drawImage(canvas, 0, 0);
-                    grid.appendChild(item);
+                for (const fileHandle of jsonFiles) {
+                    const name = fileHandle.name.replace('.json', '');
+                    status.textContent = `Generando ${name}...`;
 
-                } catch (e) {
-                    console.error(`Error with ${name}:`, e);
-                    const item = document.createElement('div');
-                    item.className = 'thumb-item';
-                    item.innerHTML = `<div class="name">${name}</div><div style="color:red;">Error</div>`;
-                    grid.appendChild(item);
+                    try {
+                        const file = await fileHandle.getFile();
+                        const text = await file.text();
+                        const json = JSON.parse(text);
+                        const clockface = Clockface.fromJSON(json);
+
+                        for (const el of clockface.elements) {
+                            if (el.type === 'image' && el.image) {
+                                await el.loadImage(el.image);
+                            }
+                            if (el.type === 'sprite') {
+                                await el.loadFrames(clockface.sprites);
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 64;
+                        canvas.height = 64;
+                        const renderer = new CanvasRenderer(canvas);
+                        renderer.render(clockface, null);
+
+                        const dataUrl = canvas.toDataURL('image/png');
+                        const thumbBase64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+                        const updatedJson = { ...json, thumbnail: thumbBase64 };
+                        const jsonStr = JSON.stringify(updatedJson, null, 2);
+                        const jsonSize = (new Blob([jsonStr]).size / 1024).toFixed(1);
+
+                        generatedData.push({
+                            name,
+                            dataUrl,
+                            thumbBase64,
+                            originalJson: json,
+                            updatedJson,
+                            jsonSize,
+                            hasThumbnail: !!json.thumbnail
+                        });
+
+                        const item = document.createElement('div');
+                        item.className = 'thumb-item';
+                        item.innerHTML = `
+                            ${json.thumbnail ? '<span class="has-thumb">✓ Thumb</span>' : '<span class="no-thumb">Sin thumb</span>'}
+                            <canvas width="64" height="64"></canvas>
+                            <div class="name">${name}</div>
+                            <div class="size">JSON: ${jsonSize} KB</div>
+                            <div class="buttons">
+                                <a href="${dataUrl}" download="${name}.png">PNG</a>
+                                <button class="json-btn" onclick="downloadSingleJSON('${name}')">JSON</button>
+                            </div>
+                        `;
+                        item.querySelector('canvas').getContext('2d').drawImage(canvas, 0, 0);
+                        grid.appendChild(item);
+
+                    } catch (e) {
+                        console.error(`Error with ${name}:`, e);
+                        const item = document.createElement('div');
+                        item.className = 'thumb-item';
+                        item.innerHTML = `<div class="name">${name}</div><div style="color:red;">Error: ${e.message}</div>`;
+                        grid.appendChild(item);
+                    }
+                }
+
+                const withThumb = generatedData.filter(d => d.hasThumbnail).length;
+                status.innerHTML = `<strong>${dirHandle.name}/</strong> - Generados: ${generatedData.length} | Con thumb: ${withThumb} | Sin thumb: ${generatedData.length - withThumb}`;
+
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    alert('Error: ' + e.message);
                 }
             }
-
-            status.textContent = `Generados: ${generatedThumbs.length} thumbnails`;
         }
 
-        async function downloadAll() {
-            if (generatedThumbs.length === 0) {
+        function downloadSingleJSON(name) {
+            const data = generatedData.find(d => d.name === name);
+            if (!data) return;
+
+            const blob = new Blob([JSON.stringify(data.updatedJson, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${name}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function downloadAllPNG() {
+            if (generatedData.length === 0) {
                 alert('Primero genera los thumbnails');
                 return;
             }
-
-            for (const thumb of generatedThumbs) {
+            for (const data of generatedData) {
                 const link = document.createElement('a');
-                link.href = thumb.dataUrl;
-                link.download = `${thumb.name}.png`;
+                link.href = data.dataUrl;
+                link.download = `${data.name}.png`;
                 link.click();
                 await new Promise(r => setTimeout(r, 300));
             }
         }
 
-        // Auto-generate on load
-        window.onload = () => {
-            setTimeout(generateAll, 500);
-        };
+        async function downloadAllJSON() {
+            if (generatedData.length === 0) {
+                alert('Primero genera los thumbnails');
+                return;
+            }
+            for (const data of generatedData) {
+                const blob = new Blob([JSON.stringify(data.updatedJson, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${data.name}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                await new Promise(r => setTimeout(r, 300));
+            }
+        }
+
+        // Handle single file injection
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const json = JSON.parse(text);
+                const clockface = Clockface.fromJSON(json);
+
+                for (const el of clockface.elements) {
+                    if (el.type === 'image' && el.image) {
+                        await el.loadImage(el.image);
+                    }
+                    if (el.type === 'sprite') {
+                        await el.loadFrames(clockface.sprites);
+                    }
+                }
+
+                const canvas = document.getElementById('inject-canvas');
+                const renderer = new CanvasRenderer(canvas);
+                renderer.render(clockface, null);
+
+                const dataUrl = canvas.toDataURL('image/png');
+                const thumbBase64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+
+                const updatedJson = { ...json, thumbnail: thumbBase64 };
+                const jsonStr = JSON.stringify(updatedJson, null, 2);
+                const jsonSize = (new Blob([jsonStr]).size / 1024).toFixed(1);
+
+                const name = file.name.replace('.json', '');
+                injectedData = { name, updatedJson, dataUrl };
+
+                document.getElementById('inject-name').textContent = name;
+                document.getElementById('inject-size').textContent = `JSON: ${jsonSize} KB`;
+                document.getElementById('inject-png-link').href = dataUrl;
+                document.getElementById('inject-png-link').download = `${name}.png`;
+                document.getElementById('inject-preview').style.display = 'block';
+
+            } catch (e) {
+                alert('Error al procesar JSON: ' + e.message);
+            }
+
+            event.target.value = '';
+        }
+
+        function downloadInjectedJSON() {
+            if (!injectedData) return;
+
+            const blob = new Blob([JSON.stringify(injectedData.updatedJson, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${injectedData.name}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
     </script>
 </body>
 </html>
