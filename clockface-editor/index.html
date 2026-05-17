@@ -360,11 +360,11 @@
     </div>
 
     <!-- Reference Image Popup -->
-    <div id="reference-popup" class="modal" style="display:none;">
+    <div id="reference-popup" class="modal" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-content" style="max-width:320px;">
             <div class="modal-header">
                 <h3>Imagen Guia</h3>
-                <button class="modal-close" id="btn-close-reference">&times;</button>
+                <button class="modal-close" id="btn-close-reference" onclick="document.getElementById('reference-popup').style.display='none'">&times;</button>
             </div>
             <div class="modal-body">
                 <p style="font-size:11px;color:#888;margin-bottom:10px;">Carga una imagen como referencia. No se exporta.</p>
@@ -398,11 +398,11 @@
     </div>
 
     <!-- Import Modal -->
-    <div id="import-modal" class="modal">
+    <div id="import-modal" class="modal" onclick="if(event.target===this)this.classList.remove('active')">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Importar JSON</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close" onclick="document.getElementById('import-modal').classList.remove('active')">&times;</button>
             </div>
             <div class="modal-body">
                 <div style="margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
@@ -415,18 +415,18 @@
                 <textarea id="import-json" placeholder="O pega aqui el JSON del clockface..."></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">Cancelar</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('import-modal').classList.remove('active')">Cancelar</button>
                 <button class="btn btn-primary" id="btn-do-import">Importar</button>
             </div>
         </div>
     </div>
 
     <!-- Export Modal -->
-    <div id="export-modal" class="modal">
+    <div id="export-modal" class="modal" onclick="if(event.target===this)this.classList.remove('active')">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Exportar JSON</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close" onclick="document.getElementById('export-modal').classList.remove('active')">&times;</button>
             </div>
             <div class="modal-body">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
@@ -440,7 +440,7 @@
                 <div id="export-folder-info" style="margin-top:8px;font-size:12px;color:#888;"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">Cerrar</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('export-modal').classList.remove('active')">Cerrar</button>
                 <button class="btn btn-primary" id="btn-copy-json">Copiar</button>
                 <button class="btn btn-primary" id="btn-download-json">Descargar</button>
                 <button class="btn btn-success" id="btn-save-json-folder">Guardar</button>
@@ -450,11 +450,11 @@
     </div>
 
     <!-- Image Preparation Modal -->
-    <div id="image-modal" class="modal">
+    <div id="image-modal" class="modal" onclick="if(event.target===this)this.classList.remove('active')">
         <div class="modal-content modal-large">
             <div class="modal-header">
                 <h3>Adaptar Imagen para 64x64</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close" onclick="document.getElementById('image-modal').classList.remove('active')">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="image-tool-container">
@@ -520,25 +520,25 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">Cancelar</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('image-modal').classList.remove('active')">Cancelar</button>
                 <button class="btn btn-primary" id="btn-add-image" style="display:none;">Agregar al Canvas</button>
             </div>
         </div>
     </div>
 
     <!-- Single Thumbnail Modal -->
-    <div id="thumb-modal" class="modal">
+    <div id="thumb-modal" class="modal" onclick="if(event.target===this)this.classList.remove('active')">
         <div class="modal-content" style="max-width:400px;">
             <div class="modal-header">
                 <h3>Guardar Thumbnail</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close" onclick="document.getElementById('thumb-modal').classList.remove('active')">&times;</button>
             </div>
             <div class="modal-body" style="text-align:center;">
                 <canvas id="thumb-preview" width="64" height="64" style="border:1px solid var(--border-color);image-rendering:pixelated;width:128px;height:128px;"></canvas>
                 <p style="margin-top:10px;color:var(--text-secondary);" id="thumb-filename">clockface.png</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">Cerrar</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('thumb-modal').classList.remove('active')">Cerrar</button>
                 <button class="btn btn-primary" id="btn-download-thumb">Descargar</button>
                 <button class="btn btn-success" id="btn-save-thumb-folder">Guardar</button>
             </div>
@@ -546,11 +546,11 @@
     </div>
 
     <!-- Sprite Editor Modal -->
-    <div id="sprite-modal" class="modal">
+    <div id="sprite-modal" class="modal" onclick="if(event.target===this)this.classList.remove('active')">
         <div class="modal-content modal-large">
             <div class="modal-header">
                 <h3>Editor de Sprites</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close" onclick="document.getElementById('sprite-modal').classList.remove('active')">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="sprite-editor-container">
@@ -622,17 +622,17 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">Cerrar</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('sprite-modal').classList.remove('active')">Cerrar</button>
             </div>
         </div>
     </div>
 
     <!-- Test on Clock Modal -->
-    <div id="test-clock-modal" class="modal">
+    <div id="test-clock-modal" class="modal" onclick="if(event.target===this)this.classList.remove('active')">
         <div class="modal-content" style="max-width:450px;">
             <div class="modal-header">
                 <h3>Probar en Reloj</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close" onclick="document.getElementById('test-clock-modal').classList.remove('active')">&times;</button>
             </div>
             <div class="modal-body">
                 <p style="color:var(--text-secondary);margin-bottom:15px;">Envia la caratula al reloj para verla en tiempo real.</p>
@@ -643,7 +643,7 @@
                 <div id="test-status" style="margin-top:15px;padding:10px;border-radius:4px;display:none;"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">Cancelar</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('test-clock-modal').classList.remove('active')">Cancelar</button>
                 <button class="btn btn-success" id="btn-send-to-clock">Enviar</button>
             </div>
         </div>
