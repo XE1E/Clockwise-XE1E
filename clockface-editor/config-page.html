@@ -533,8 +533,11 @@
 
     <div class="toolbar">
         <div class="toolbar-info">
-            <span id="wifi-status">WiFi: <strong id="current-ssid">MiRed</strong></span>
+            <span id="wifi-status">WiFi: <strong id="current-ssid">MiRed</strong> <small id="wifi-rssi">(-65 dBm)</small></span>
             <span>IP: <strong id="ip-address">192.168.1.100</strong></span>
+            <span>RAM: <strong id="free-heap">--</strong> KB</span>
+            <span>SPIFFS: <strong id="spiffs-used">--</strong>/<strong id="spiffs-total">--</strong> KB</span>
+            <span>Uptime: <strong id="uptime">--</strong></span>
         </div>
         <div style="display: flex; gap: 10px;">
             <button class="btn btn-save" onclick="saveAll()">Guardar Todo</button>
@@ -662,12 +665,17 @@
                     <div class="card-body">
                         <p class="card-description">Orientacion de la pantalla</p>
                         <div class="form-group">
-                            <select class="form-select" id="rotation">
+                            <select class="form-select" id="rotation" onchange="updateRotationPreview()">
                                 <option value="0">0 grados (normal)</option>
                                 <option value="1">90 grados</option>
                                 <option value="2">180 grados</option>
                                 <option value="3">270 grados</option>
                             </select>
+                        </div>
+                        <div style="display: flex; justify-content: center; margin-top: 15px;">
+                            <div id="rotation-preview" style="width: 64px; height: 64px; background: #000; border: 2px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease;">
+                                <span style="color: #0f0; font-family: monospace; font-size: 14px;">12:00</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -680,8 +688,22 @@
                     <div class="card-body">
                         <p class="card-description">Intercambia pines Blue/Green si los colores se ven mal</p>
                         <div class="form-checkbox">
-                            <input type="checkbox" id="swap-bg">
+                            <input type="checkbox" id="swap-bg" onchange="updateColorSwapPreview()">
                             <label for="swap-bg">Intercambiar Blue/Green</label>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 15px; justify-content: center;">
+                            <div style="text-align: center;">
+                                <div style="width: 30px; height: 30px; background: #ff0000; border-radius: 4px;"></div>
+                                <small>R</small>
+                            </div>
+                            <div style="text-align: center;">
+                                <div id="color-g" style="width: 30px; height: 30px; background: #00ff00; border-radius: 4px; transition: background 0.3s;"></div>
+                                <small id="label-g">G</small>
+                            </div>
+                            <div style="text-align: center;">
+                                <div id="color-b" style="width: 30px; height: 30px; background: #0000ff; border-radius: 4px; transition: background 0.3s;"></div>
+                                <small id="label-b">B</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1165,6 +1187,7 @@
             cw_fw_name: 'clockwise',
             clockface_name: 'cw-cf-0x07',
             wifissid: 'MiRed',
+            wifirssi: -65,
             wifi1ssid: 'MiRed',
             wifi1pass: '',
             wifi2ssid: '',
@@ -1173,12 +1196,52 @@
             wifi3pass: ''
         };
 
+        const mockSystem = {
+            freeHeap: 142536,
+            totalHeap: 327680,
+            spiffsUsed: 45056,
+            spiffsTotal: 1441792,
+            uptimeSeconds: 3661
+        };
+
+        let startTime = Date.now() - (mockSystem.uptimeSeconds * 1000);
+
         // Load settings
         function loadSettings() {
-            // In real device, this would fetch from /get
+            // In real device, this would fetch from /api/settings
             // For local testing, use mock data
             applySettings(mockSettings);
+            loadSystemInfo();
         }
+
+        // Load system info (RAM, SPIFFS, uptime)
+        function loadSystemInfo() {
+            // In real device, fetch from /api/system and /api/storage
+            // For local testing, use mock data
+            updateSystemDisplay(mockSystem);
+        }
+
+        function updateSystemDisplay(sys) {
+            document.getElementById('free-heap').textContent = Math.round(sys.freeHeap / 1024);
+            document.getElementById('spiffs-used').textContent = Math.round(sys.spiffsUsed / 1024);
+            document.getElementById('spiffs-total').textContent = Math.round(sys.spiffsTotal / 1024);
+            updateUptime();
+        }
+
+        function updateUptime() {
+            const seconds = Math.floor((Date.now() - startTime) / 1000);
+            const hours = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            let str = '';
+            if (hours > 0) str += hours + 'h ';
+            if (mins > 0 || hours > 0) str += mins + 'm ';
+            str += secs + 's';
+            document.getElementById('uptime').textContent = str;
+        }
+
+        // Update uptime every second
+        setInterval(updateUptime, 1000);
 
         function applySettings(s) {
             document.getElementById('brightness').value = s.displaybright;
@@ -1199,6 +1262,7 @@
             document.getElementById('fw-version').textContent = s.cw_fw_version;
             document.getElementById('clockface-name').textContent = s.clockface_name;
             document.getElementById('current-ssid').textContent = s.wifissid;
+            document.getElementById('wifi-rssi').textContent = '(' + s.wifirssi + ' dBm)';
             document.getElementById('info-firmware').textContent = 'v' + s.cw_fw_version;
             document.getElementById('info-clockface').textContent = s.clockface_name;
             document.getElementById('info-ssid').textContent = s.wifissid;
@@ -1393,11 +1457,42 @@
             }
         }, 60000);
 
+        // Display rotation preview
+        function updateRotationPreview() {
+            const rotation = document.getElementById('rotation').value;
+            const preview = document.getElementById('rotation-preview');
+            const degrees = rotation * 90;
+            preview.style.transform = 'rotate(' + degrees + 'deg)';
+        }
+
+        // Color swap preview
+        function updateColorSwapPreview() {
+            const swapped = document.getElementById('swap-bg').checked;
+            const colorG = document.getElementById('color-g');
+            const colorB = document.getElementById('color-b');
+            const labelG = document.getElementById('label-g');
+            const labelB = document.getElementById('label-b');
+
+            if (swapped) {
+                colorG.style.background = '#0000ff';
+                colorB.style.background = '#00ff00';
+                labelG.textContent = 'B';
+                labelB.textContent = 'G';
+            } else {
+                colorG.style.background = '#00ff00';
+                colorB.style.background = '#0000ff';
+                labelG.textContent = 'G';
+                labelB.textContent = 'B';
+            }
+        }
+
         // Initialize clockface rotation state
         toggleClockfaceRotation();
 
         // Initialize
         loadSettings();
+        updateRotationPreview();
+        updateColorSwapPreview();
     </script>
 </body>
 </html>

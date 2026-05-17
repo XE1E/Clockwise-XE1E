@@ -212,6 +212,20 @@ struct ClockwiseWebServer
       }
     );
 
+    // API: obtener info del sistema (RAM, uptime, etc)
+    server.on("/api/system", HTTP_GET, [](AsyncWebServerRequest *request) {
+      String json = "{";
+      json += "\"freeHeap\":" + String(ESP.getFreeHeap()) + ",";
+      json += "\"totalHeap\":" + String(ESP.getHeapSize()) + ",";
+      json += "\"minFreeHeap\":" + String(ESP.getMinFreeHeap()) + ",";
+      json += "\"chipModel\":\"" + String(ESP.getChipModel()) + "\",";
+      json += "\"chipCores\":" + String(ESP.getChipCores()) + ",";
+      json += "\"cpuFreqMHz\":" + String(ESP.getCpuFreqMHz()) + ",";
+      json += "\"uptimeMs\":" + String(millis());
+      json += "}";
+      request->send(200, "application/json", json);
+    });
+
     // API: obtener espacio de almacenamiento
     server.on("/api/storage", HTTP_GET, [](AsyncWebServerRequest *request) {
       if (!SPIFFS.begin(true)) {
