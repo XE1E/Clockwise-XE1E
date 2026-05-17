@@ -476,23 +476,27 @@ async function loadSystemInfo(){
     }catch(e){console.error(e);}
 }
 function updateUptime(){
+    var el=$('uptime');if(!el)return;
     const s=Math.floor((Date.now()-uptimeStart)/1000);
     const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);
-    $('uptime').textContent=(h?h+'h ':'')+(m?m+'m ':'')+s%60+'s';
+    el.textContent=(h?h+'h ':'')+(m?m+'m ':'')+s%60+'s';
 }
 setInterval(updateUptime,1000);
 
 // Preview functions
 function updateRotationPreview(){
-    const r=$('displayRotation').value;
-    $('rotation-preview').style.transform='rotate('+r*90+'deg)';
+    var el=$('displayRotation'),prev=$('rotation-preview');
+    if(el&&prev){var r=parseInt(el.value)||0;prev.style.transform='rotate('+r*90+'deg)';}
 }
 function updateColorSwapPreview(){
-    const sw=$('swapBlueGreen').checked;
-    $('color-g').style.background=sw?'#00f':'#0f0';
-    $('color-b').style.background=sw?'#0f0':'#00f';
-    $('label-g').textContent=sw?'B':'G';
-    $('label-b').textContent=sw?'G':'B';
+    var chk=$('swapBlueGreen'),cg=$('color-g'),cb=$('color-b'),lg=$('label-g'),lb=$('label-b');
+    if(chk&&cg&&cb&&lg&&lb){
+        var sw=chk.checked;
+        cg.style.background=sw?'#00f':'#0f0';
+        cb.style.background=sw?'#0f0':'#00f';
+        lg.textContent=sw?'B':'G';
+        lb.textContent=sw?'G':'B';
+    }
 }
 function resetDevice(){api('reset');toast('Restaurando...');}
 
@@ -941,13 +945,14 @@ async function load(){
         loadStoredClockfaces();
         loadSystemInfo();
         onRepoSourceChange();
-        updateRotationPreview();
-        updateColorSwapPreview();
     }catch(e){console.error(e);}
+    // Always update previews even if settings load fails
+    updateRotationPreview();
+    updateColorSwapPreview();
 }
 
 load();
-setInterval(()=>{$('nightPreviewTime').textContent=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});},1000);
+setInterval(()=>{var el=$('nightPreviewTime');if(el)el.textContent=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});},1000);
 </script>
 </body>
 </html>
