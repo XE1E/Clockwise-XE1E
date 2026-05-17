@@ -273,6 +273,30 @@ struct ClockwiseWebServer
       request->send(200, "application/json", json);
     });
 
+    // API: verificar si carátula existe (para confirmar antes de sobrescribir)
+    server.on("/api/clockfaces/exists", HTTP_GET, [](AsyncWebServerRequest *request) {
+      if (!request->hasParam("name")) {
+        request->send(400, "application/json", "{\"error\":\"Missing name\"}");
+        return;
+      }
+      String name = request->getParam("name")->value();
+      String path = "/" + name + ".json";
+
+      if (!SPIFFS.begin(true)) {
+        request->send(500, "application/json", "{\"error\":\"SPIFFS failed\"}");
+        return;
+      }
+
+      if (SPIFFS.exists(path)) {
+        File f = SPIFFS.open(path, FILE_READ);
+        size_t size = f.size();
+        f.close();
+        request->send(200, "application/json", "{\"exists\":true,\"size\":" + String(size) + "}");
+      } else {
+        request->send(200, "application/json", "{\"exists\":false}");
+      }
+    });
+
     // API: subir carátula (recibe JSON) - escribe directamente a SPIFFS sin buffering
     server.on("/api/clockfaces/upload", HTTP_POST,
       [](AsyncWebServerRequest *request) {

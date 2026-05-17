@@ -102,8 +102,11 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
 
 <div class="toolbar">
     <div class="toolbar-info">
-        <span>WiFi: <strong id="current-ssid">-</strong></span>
+        <span>WiFi: <strong id="current-ssid">-</strong> <small id="wifi-rssi"></small></span>
         <span>IP: <strong id="ip-address">-</strong></span>
+        <span>RAM: <strong id="free-heap">-</strong></span>
+        <span>SPIFFS: <strong id="spiffs-info">-</strong></span>
+        <span>Uptime: <strong id="uptime">-</strong></span>
     </div>
     <div style="display: flex; gap: 10px;">
         <button class="btn btn-restart" onclick="restartDevice()">Reiniciar</button>
@@ -177,20 +180,30 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             <div class="card">
                 <div class="card-header"><h3>Rotacion</h3></div>
                 <div class="card-body">
-                    <select class="form-select" id="displayRotation">
+                    <select class="form-select" id="displayRotation" onchange="updateRotationPreview()">
                         <option value="0">0 grados (normal)</option>
                         <option value="1">90 grados</option>
                         <option value="2">180 grados</option>
                         <option value="3">270 grados</option>
                     </select>
+                    <div style="display:flex;justify-content:center;margin-top:12px">
+                        <div id="rotation-preview" style="width:48px;height:48px;background:#000;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:transform 0.3s">
+                            <span style="color:#0f0;font-family:monospace;font-size:12px">12:00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card">
                 <div class="card-header"><h3>Panel RGB/RBG</h3></div>
                 <div class="card-body">
                     <div class="form-checkbox">
-                        <input type="checkbox" id="swapBlueGreen">
+                        <input type="checkbox" id="swapBlueGreen" onchange="updateColorSwapPreview()">
                         <label for="swapBlueGreen">Intercambiar Blue/Green</label>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
+                        <div style="text-align:center"><div style="width:24px;height:24px;background:#f00;border-radius:4px"></div><small>R</small></div>
+                        <div style="text-align:center"><div id="color-g" style="width:24px;height:24px;background:#0f0;border-radius:4px;transition:background 0.3s"></div><small id="label-g">G</small></div>
+                        <div style="text-align:center"><div id="color-b" style="width:24px;height:24px;background:#00f;border-radius:4px;transition:background 0.3s"></div><small id="label-b">B</small></div>
                     </div>
                 </div>
             </div>
@@ -450,6 +463,37 @@ async function api(action,params={}){
     return fetch('/api/'+action+(q?'?'+q:''),{method:'POST'});
 }
 function restartDevice(){api('restart');toast('Reiniciando...');}
+
+// System info
+let uptimeStart=0;
+async function loadSystemInfo(){
+    try{
+        const r=await fetch('/api/system');
+        const d=await r.json();
+        $('free-heap').textContent=Math.round(d.freeHeap/1024)+'KB';
+        uptimeStart=Date.now()-d.uptimeMs;
+        updateUptime();
+    }catch(e){console.error(e);}
+}
+function updateUptime(){
+    const s=Math.floor((Date.now()-uptimeStart)/1000);
+    const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);
+    $('uptime').textContent=(h?h+'h ':'')+(m?m+'m ':'')+s%60+'s';
+}
+setInterval(updateUptime,1000);
+
+// Preview functions
+function updateRotationPreview(){
+    const r=$('displayRotation').value;
+    $('rotation-preview').style.transform='rotate('+r*90+'deg)';
+}
+function updateColorSwapPreview(){
+    const sw=$('swapBlueGreen').checked;
+    $('color-g').style.background=sw?'#00f':'#0f0';
+    $('color-b').style.background=sw?'#0f0':'#00f';
+    $('label-g').textContent=sw?'B':'G';
+    $('label-b').textContent=sw?'G':'B';
+}
 function resetDevice(){api('reset');toast('Restaurando...');}
 
 // Color helpers
@@ -474,9 +518,12 @@ async function loadStorageInfo(){
         const d=await r.json();
         const pct=Math.round(d.used/d.total*100);
         const freeKB=Math.round(d.free/1024);
+        const usedKB=Math.round(d.used/1024);
+        const totalKB=Math.round(d.total/1024);
         $('storageInfo').textContent=freeKB+'KB libres ('+pct+'% usado)';
         $('storageBar').style.width=pct+'%';
         $('storageBar').style.background=pct>90?'#ea4335':pct>70?'#fbbc04':'#34a853';
+        $('spiffs-info').textContent=usedKB+'/'+totalKB+'KB';
     }catch(e){$('storageInfo').textContent='Error';console.error(e);}
 }
 
@@ -637,6 +684,10 @@ async function uploadClockface(){
     try{
         const text=await file.text();
         JSON.parse(text);
+        // Check if exists
+        const chk=await fetch('/api/clockfaces/exists?name='+encodeURIComponent(name));
+        const exists=await chk.json();
+        if(exists.exists&&!confirm(name+' ya existe ('+Math.round(exists.size/1024)+'KB). Sobrescribir?'))return;
         const r=await fetch('/api/clockfaces/upload?name='+encodeURIComponent(name),{method:'POST',headers:{'Content-Type':'application/json'},body:text});
         if(r.ok){toast('Subido: '+name);fileInput.value='';loadStorageInfo();loadStoredClockfaces();}
         else toast('Error al subir');
@@ -657,6 +708,12 @@ async function downloadFromRepo(){
     const isLocal=$('repoSource').value==='local';
     const name=isLocal?$('customClockface').value.trim():$('repoClockface').value;
     if(!name){toast('Selecciona caratula');return;}
+    // Check if exists first
+    try{
+        const chk=await fetch('/api/clockfaces/exists?name='+encodeURIComponent(name));
+        const exists=await chk.json();
+        if(exists.exists&&!confirm(name+' ya existe ('+Math.round(exists.size/1024)+'KB). Sobrescribir?'))return;
+    }catch(e){}
     let url;
     if(isLocal){
         const host=$('localServerHost').value||'192.168.1.100';
@@ -838,6 +895,7 @@ async function load(){
         settings=await r.json();
 
         $('current-ssid').textContent=settings.wifiConnected||'-';
+        $('wifi-rssi').textContent=settings.wifiRssi?'('+settings.wifiRssi+' dBm)':'';
         $('ip-address').textContent=location.hostname;
         $('fw-version').textContent=settings.version||'1.0.0';
 
@@ -881,7 +939,10 @@ async function load(){
 
         loadStorageInfo();
         loadStoredClockfaces();
+        loadSystemInfo();
         onRepoSourceChange();
+        updateRotationPreview();
+        updateColorSwapPreview();
     }catch(e){console.error(e);}
 }
 
