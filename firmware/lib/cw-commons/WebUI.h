@@ -22,6 +22,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+        .sticky-top { position: sticky; top: 0; z-index: 100; }
         .header { background: linear-gradient(135deg, #1a73e8, #34a853); color: white; padding: 20px; text-align: center; }
         .header h1 { font-size: 24px; font-weight: 500; margin-bottom: 5px; }
         .header .version { font-size: 12px; opacity: 0.8; }
@@ -31,13 +32,14 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
         .btn-restart { background: var(--danger); color: white; }
         .btn-restart:hover { background: #c5221f; }
-        .btn-save { background: var(--primary); color: white; }
-        .btn-save:hover { background: var(--primary-dark); }
+        .btn-save, .btn-primary { background: var(--primary); color: white; }
+        .btn-save:hover, .btn-primary:hover { background: var(--primary-dark); }
         .btn-warning { background: #ff9800 !important; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
         .btn-secondary { background: #e8e8e8; color: var(--text); }
         .btn-secondary:hover { background: #d0d0d0; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .tabs-container { background: var(--bg); padding-top: 10px; }
         .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 0; flex-wrap: wrap; }
         .tab { padding: 12px 24px; background: none; border: none; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-secondary); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
         .tab:hover { color: var(--primary); }
@@ -95,32 +97,35 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
     </style>
 </head>
 <body>
-<div class="header">
-    <h1>Clockwise XE1E</h1>
-    <div class="version">Firmware v<span id="fw-version">1.0.0</span></div>
-</div>
-
-<div class="toolbar">
-    <div class="toolbar-info">
-        <span>WiFi: <strong id="current-ssid">-</strong> <small id="wifi-rssi"></small></span>
-        <span>IP: <strong id="ip-address">-</strong></span>
-        <span>RAM: <strong id="ram-info">-</strong></span>
-        <span>SPIFFS: <strong id="spiffs-info">-</strong></span>
-        <span>Uptime: <strong id="uptime">-</strong></span>
+<div class="sticky-top">
+    <div class="header">
+        <h1>Clockwise XE1E</h1>
+        <div class="version">Firmware v<span id="fw-version">1.0.0</span></div>
     </div>
-    <div style="display: flex; gap: 10px;">
-        <button class="btn btn-restart" onclick="restartDevice()">Reiniciar</button>
+    <div class="toolbar">
+        <div class="toolbar-info">
+            <span>WiFi: <strong id="current-ssid">-</strong> <small id="wifi-rssi"></small></span>
+            <span>IP: <strong id="ip-address">-</strong></span>
+            <span>RAM: <strong id="ram-info">-</strong></span>
+            <span>SPIFFS: <strong id="spiffs-info">-</strong></span>
+            <span>Uptime: <strong id="uptime">-</strong></span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-restart" onclick="restartDevice()">Reiniciar</button>
+        </div>
+    </div>
+    <div class="tabs-container">
+        <div class="tabs" style="max-width:1200px;margin:0 auto;padding:0 20px">
+            <button class="tab active" data-tab="wifi">WiFi</button>
+            <button class="tab" data-tab="display">Pantalla</button>
+            <button class="tab" data-tab="time">Hora y Fecha</button>
+            <button class="tab" data-tab="canvas">Canvas</button>
+            <button class="tab" data-tab="system">Sistema</button>
+        </div>
     </div>
 </div>
 
 <div class="container">
-    <div class="tabs">
-        <button class="tab active" data-tab="wifi">WiFi</button>
-        <button class="tab" data-tab="display">Pantalla</button>
-        <button class="tab" data-tab="time">Hora y Fecha</button>
-        <button class="tab" data-tab="canvas">Canvas</button>
-        <button class="tab" data-tab="system">Sistema</button>
-    </div>
 
     <!-- WiFi Tab -->
     <div class="tab-content active" id="tab-wifi">
@@ -495,8 +500,10 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             <div class="card">
                 <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg><h3>Enlaces</h3></div>
                 <div class="card-body">
-                    <p><a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/" target="_blank" style="color:var(--primary)">Editor de Caratulas</a></p>
-                    <p><a href="https://github.com/XE1E/Clockwise-XE1E" target="_blank" style="color:var(--primary)">Repositorio GitHub</a></p>
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/" target="_blank" class="btn btn-primary" style="text-decoration:none;text-align:center">Editor de Caratulas</a>
+                        <a href="https://github.com/XE1E/Clockwise-XE1E" target="_blank" class="btn btn-primary" style="text-decoration:none;text-align:center">Repositorio GitHub</a>
+                    </div>
                 </div>
             </div>
         </div>
