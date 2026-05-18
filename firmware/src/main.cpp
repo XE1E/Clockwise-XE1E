@@ -280,10 +280,12 @@ void loop()
       dma_display->setBrightness8(ClockwiseWebServer::getInstance()->pending_brightness);
     }
 
-    // Apply night brightness change from web UI immediately
+    // Apply night brightness change from web UI immediately (only if night mode is active)
     if (ClockwiseWebServer::getInstance()->needs_night_brightness_update) {
       ClockwiseWebServer::getInstance()->needs_night_brightness_update = false;
-      dma_display->setBrightness8(ClockwiseWebServer::getInstance()->pending_night_brightness);
+      if (nightModeActive) {
+        dma_display->setBrightness8(ClockwiseWebServer::getInstance()->pending_night_brightness);
+      }
     }
 
     // Apply display rotation change from web UI immediately
@@ -325,25 +327,31 @@ void loop()
 
       // Check if we should be in night mode
       bool shouldBeNight = ClockwiseParams::getInstance()->nightModeEnabled && isNightTime();
+      bool nightModeChanged = (shouldBeNight != nightModeActive);
 
       if (shouldBeNight) {
-        // Apply night mode settings directly without loading normal clockface first
+        // Apply night mode settings
         nightModeActive = true;
-        dma_display->setBrightness8(ClockwiseParams::getInstance()->nightBrightness);
+        // Only set brightness if night mode state changed
+        if (nightModeChanged) {
+          dma_display->setBrightness8(ClockwiseParams::getInstance()->nightBrightness);
+        }
         String nightClock = ClockwiseParams::getInstance()->nightClockface;
         if (nightClock == "_builtin") {
-          // Use setupNightMode to avoid loading any clockface
           clockface->setupNightMode(&cwDateTime, ClockwiseParams::getInstance()->nightColor);
         } else {
           ClockwiseParams::getInstance()->canvasFile = nightClock;
-          clockface->setup(&cwDateTime, false);  // No splash on reload
+          clockface->setup(&cwDateTime, false);
         }
       } else {
         // Not in night mode - load normal clockface
+        // Only set brightness if night mode state changed
+        if (nightModeChanged) {
+          dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
+        }
         nightModeActive = false;
         clockface->setBuiltinNightMode(false);
-        dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
-        clockface->setup(&cwDateTime, false);  // No splash on reload
+        clockface->setup(&cwDateTime, false);
       }
       needsClockfaceReload = false;
       Serial.println("[Web] Reload complete");
