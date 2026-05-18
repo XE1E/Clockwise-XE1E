@@ -12,11 +12,10 @@
 ### Fase 3: Interfaz Web Nueva
 - [x] Diseño con pestañas
 - [ ] Tema claro/oscuro
-- [ ] Integrar editores de clockface
+- [x] Integrar editores de clockface
 
 ### Pendientes
 - [ ] Actualizacion OTA (subir firmware desde web)
-- [ ] Convertir clockfaces 0x01-0x06 a JSON
 - [ ] Revisar fuentes del firmware y eliminar las no usadas (Flash 83.8%)
 - [ ] Subir carátulas al repo GitHub desde el editor (requiere token)
 
@@ -26,10 +25,6 @@
 - [x] Cache JSON en sprites
 - [ ] Guardar solo prefs modificadas
 - [ ] Buffer HTTP completo
-
-### Fase 5: Editores
-- [ ] Revisar digit-designer
-- [ ] Integrar en web principal
 
 ## Completado
 
