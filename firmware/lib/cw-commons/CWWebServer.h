@@ -34,6 +34,7 @@ struct ClockwiseWebServer
   void startWebServer()
   {
     Serial.printf("[Web] Starting server, free heap: %d\n", ESP.getFreeHeap());
+    SPIFFS.begin(true);
     setupRoutes();
     server.begin();
     Serial.printf("[Web] Server started on port 80, free heap: %d\n", ESP.getFreeHeap());
@@ -257,10 +258,6 @@ struct ClockwiseWebServer
 
     // API: obtener espacio de almacenamiento
     server.on("/api/storage", HTTP_GET, [](AsyncWebServerRequest *request) {
-      if (!SPIFFS.begin(true)) {
-        request->send(500, "application/json", "{\"error\":\"SPIFFS failed\"}");
-        return;
-      }
       size_t total = SPIFFS.totalBytes();
       size_t used = SPIFFS.usedBytes();
       String json = "{\"total\":" + String(total) + ",\"used\":" + String(used) + ",\"free\":" + String(total - used) + "}";
@@ -269,10 +266,6 @@ struct ClockwiseWebServer
 
     // API: listar carátulas guardadas (con bgColor para preview)
     server.on("/api/clockfaces/list", HTTP_GET, [](AsyncWebServerRequest *request) {
-      if (!SPIFFS.begin(true)) {
-        request->send(500, "application/json", "{\"error\":\"SPIFFS failed\"}");
-        return;
-      }
       String json = "[";
       File root = SPIFFS.open("/");
       File file = root.openNextFile();
@@ -311,11 +304,6 @@ struct ClockwiseWebServer
       String name = request->getParam("name")->value();
       String path = "/" + name + ".json";
 
-      if (!SPIFFS.begin(true)) {
-        request->send(500, "application/json", "{\"error\":\"SPIFFS failed\"}");
-        return;
-      }
-
       if (SPIFFS.exists(path)) {
         File f = SPIFFS.open(path, FILE_READ);
         size_t size = f.size();
@@ -347,11 +335,6 @@ struct ClockwiseWebServer
             fileName = "uploaded";
           }
 
-          if (!SPIFFS.begin(true)) {
-            Serial.println("[Storage] SPIFFS mount failed");
-            return;
-          }
-
           filePath = "/" + fileName + ".json";
           uploadFile = SPIFFS.open(filePath, FILE_WRITE);
           if (!uploadFile) {
@@ -380,7 +363,6 @@ struct ClockwiseWebServer
     server.on("/api/clockfaces/thumb", HTTP_GET, [](AsyncWebServerRequest *request) {
       if (!request->hasParam("name")) { request->send(400); return; }
       String name = request->getParam("name")->value();
-      if (!SPIFFS.begin(true)) { request->send(500); return; }
       String path = "/" + name + ".json";
       if (!SPIFFS.exists(path)) { request->send(404); return; }
 
@@ -425,11 +407,6 @@ struct ClockwiseWebServer
       }
       String path = "/" + name + ".json";
 
-      if (!SPIFFS.begin(true)) {
-        request->send(500, "text/plain", "SPIFFS failed");
-        return;
-      }
-
       if (SPIFFS.exists(path)) {
         SPIFFS.remove(path);
         Serial.printf("[Storage] Deleted: %s\n", path.c_str());
@@ -447,11 +424,6 @@ struct ClockwiseWebServer
       }
       String name = request->getParam("name")->value();
       String path = "/" + name + ".json";
-
-      if (!SPIFFS.begin(true)) {
-        request->send(500, "text/plain", "SPIFFS failed");
-        return;
-      }
 
       if (SPIFFS.exists(path)) {
         request->send(SPIFFS, path, "application/json");
