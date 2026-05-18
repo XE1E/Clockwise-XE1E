@@ -14,12 +14,14 @@ Clockface::Clockface(Adafruit_GFX *display)
   Locator::provide(display);
 }
 
-void Clockface::setup(CWDateTime *dateTime)
+void Clockface::setup(CWDateTime *dateTime, bool showSplash)
 {
   this->_dateTime = dateTime;
   Serial.println("[Canvas] setup() called");
-  Serial.flush();
-  drawSplashScreen(0xFFE0, "Downloading");
+
+  if (showSplash) {
+    drawSplashScreen(0xFFE0, "Downloading");
+  }
 
   _clockfaceLoaded = false;
   if (deserializeDefinition()) {

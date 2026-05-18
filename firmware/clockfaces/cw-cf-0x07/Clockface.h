@@ -96,7 +96,7 @@ private:
 
 public:
   Clockface(Adafruit_GFX *display);
-  void setup(CWDateTime *dateTime);
+  void setup(CWDateTime *dateTime, bool showSplash = true);
   void setupNightMode(CWDateTime *dateTime, uint16_t color);
   void update();
   void setBuiltinNightMode(bool enabled, uint16_t color = 0xF800);

@@ -336,14 +336,14 @@ void loop()
           clockface->setupNightMode(&cwDateTime, ClockwiseParams::getInstance()->nightColor);
         } else {
           ClockwiseParams::getInstance()->canvasFile = nightClock;
-          clockface->setup(&cwDateTime);
+          clockface->setup(&cwDateTime, false);  // No splash on reload
         }
       } else {
         // Not in night mode - load normal clockface
         nightModeActive = false;
         clockface->setBuiltinNightMode(false);
         dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
-        clockface->setup(&cwDateTime);
+        clockface->setup(&cwDateTime, false);  // No splash on reload
       }
       needsClockfaceReload = false;
       Serial.println("[Web] Reload complete");
@@ -353,7 +353,7 @@ void loop()
 
       if (needsClockfaceReload) {
         needsClockfaceReload = false;
-        clockface->setup(&cwDateTime);
+        clockface->setup(&cwDateTime, false);  // No splash on rotation
       }
     }
 
