@@ -54,6 +54,15 @@ void Clockface::drawNightClock()
   Locator::getDisplay()->print(_dateTime->getFormattedTime("i"));
 }
 
+void Clockface::setupNightMode(CWDateTime *dateTime, uint16_t color)
+{
+  this->_dateTime = dateTime;
+  _builtinNightMode = true;
+  _nightColor = color;
+  _clockfaceLoaded = false;
+  drawNightClock();
+}
+
 void Clockface::setBuiltinNightMode(bool enabled, uint16_t color)
 {
   _builtinNightMode = enabled;

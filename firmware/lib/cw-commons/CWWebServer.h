@@ -19,6 +19,8 @@ struct ClockwiseWebServer
   bool needs_reload = false;
   bool needs_brightness_update = false;
   uint8_t pending_brightness = 0;
+  bool needs_night_brightness_update = false;
+  uint8_t pending_night_brightness = 0;
   bool needs_display_rotation_update = false;
   uint8_t pending_display_rotation = 0;
   bool rotation_changed = false;
@@ -149,7 +151,11 @@ struct ClockwiseWebServer
         else if (key == "nightEnabled") ClockwiseParams::getInstance()->nightModeEnabled = (value == "1");
         else if (key == "nightStart") ClockwiseParams::getInstance()->nightModeStart = value;
         else if (key == "nightEnd") ClockwiseParams::getInstance()->nightModeEnd = value;
-        else if (key == "nightBright") ClockwiseParams::getInstance()->nightBrightness = value.toInt();
+        else if (key == "nightBright") {
+          ClockwiseParams::getInstance()->nightBrightness = value.toInt();
+          pending_night_brightness = value.toInt();
+          needs_night_brightness_update = true;
+        }
         else if (key == "nightColor") ClockwiseParams::getInstance()->nightColor = value.toInt();
         else if (key == "nightClock") ClockwiseParams::getInstance()->nightClockface = value;
         // Clockface (clear preview when changing from web UI)
@@ -274,10 +280,14 @@ struct ClockwiseWebServer
       request->send(200, "application/json", json);
     });
 
-    // API: listar carátulas guardadas (con bgColor para preview)
+    // API: listar carátulas guardadas (solo nombre y tamaño - rápido)
     server.on("/api/clockfaces/list", HTTP_GET, [](AsyncWebServerRequest *request) {
       String json = "[";
       File root = SPIFFS.open("/");
+      if (!root) {
+        request->send(200, "application/json", "[]");
+        return;
+      }
       File file = root.openNextFile();
       bool first = true;
       while (file) {
@@ -288,19 +298,12 @@ struct ClockwiseWebServer
           String name = fname;
           if (name.startsWith("/")) name = name.substring(1);
           name = name.substring(0, name.length() - 5);
-          // Extract bgColor from first 200 bytes
-          int bgColor = 0;
-          char buf[201];
-          size_t bytesRead = file.readBytes(buf, 200);
-          buf[bytesRead] = '\0';
-          char* bgPos = strstr(buf, "\"bgColor\":");
-          if (bgPos) {
-            bgColor = atoi(bgPos + 10);
-          }
-          json += "{\"name\":\"" + name + "\",\"size\":" + String(file.size()) + ",\"bg\":" + String(bgColor) + "}";
+          json += "{\"name\":\"" + name + "\",\"size\":" + String(file.size()) + "}";
         }
+        file.close();
         file = root.openNextFile();
       }
+      root.close();
       json += "]";
       request->send(200, "application/json", json);
     });

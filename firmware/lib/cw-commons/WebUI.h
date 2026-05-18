@@ -89,9 +89,9 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         .night-preview { width: 100%; min-width: 180px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
         .night-preview .time { font-family: 'Segoe UI', sans-serif; font-weight: 300; letter-spacing: 3px; }
         .color-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-        .color-btn { width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; padding: 0; }
+        .color-btn { width: 32px; height: 32px; border: 3px solid transparent; border-radius: 4px; cursor: pointer; padding: 0; box-sizing: border-box; }
         .color-btn:hover { border-color: var(--primary); }
-        .color-btn.active { border-color: var(--text); }
+        .color-btn.active { border-color: #fff; box-shadow: 0 0 0 2px var(--primary), inset 0 0 0 1px rgba(0,0,0,0.3); }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 500; z-index: 1000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } .tabs { overflow-x: auto; } .tab { padding: 10px 15px; white-space: nowrap; } }
     </style>
@@ -395,7 +395,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                                 </div>
                                 <div class="form-group" style="margin-bottom:15px">
                                     <label class="form-label">Brillo: <span id="nightBrightVal">8</span></label>
-                                    <input type="range" class="form-input" id="nightBright" min="1" max="32" value="8" oninput="$('nightBrightVal').textContent=this.value;updateNightPreview();markCanvasChanged()">
+                                    <input type="range" class="form-input" id="nightBright" min="1" max="32" value="8" oninput="$('nightBrightVal').textContent=this.value;sendNightBright(this.value);markCanvasChanged()">
                                 </div>
                                 <div class="form-group" style="margin-bottom:15px">
                                     <label class="form-label">Caratula nocturna</label>
@@ -404,39 +404,33 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                                     </select>
                                     <input type="hidden" id="nightClock" value="_builtin">
                                 </div>
-                                <div class="form-group" style="margin-bottom:15px">
-                                    <label class="form-label">Color de digitos</label>
-                                    <input type="color" id="nightColor" value="#ff0000" onchange="updateNightPreview()" style="width:60px;height:36px;border:none;cursor:pointer;vertical-align:middle">
-                                </div>
-                                <div class="form-group" style="margin-bottom:10px">
-                                    <label class="form-label">Colores brillantes</label>
-                                    <div class="color-grid">
-                                        <button type="button" class="color-btn" style="background:#ff0000" onclick="setNightColor('#ff0000')"></button>
-                                        <button type="button" class="color-btn" style="background:#ff6600" onclick="setNightColor('#ff6600')"></button>
-                                        <button type="button" class="color-btn" style="background:#00ff00" onclick="setNightColor('#00ff00')"></button>
-                                        <button type="button" class="color-btn" style="background:#0088ff" onclick="setNightColor('#0088ff')"></button>
-                                        <button type="button" class="color-btn" style="background:#ff00ff" onclick="setNightColor('#ff00ff')"></button>
-                                        <button type="button" class="color-btn" style="background:#ffffff;border:1px solid #ccc" onclick="setNightColor('#ffffff')"></button>
+                                <div id="nightColorSettings">
+                                    <div class="form-group" style="margin-bottom:15px">
+                                        <label class="form-label">Color de digitos <span style="font-weight:normal;color:var(--text-secondary)">(solo reloj integrado)</span></label>
+                                        <input type="color" id="nightColor" value="#ff0000" onchange="updateNightPreview();markCanvasChanged()" style="width:60px;height:36px;border:none;cursor:pointer;vertical-align:middle">
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Colores tenues (para dormir)</label>
-                                    <div class="color-grid">
-                                        <button type="button" class="color-btn" style="background:#300000;border:1px solid #555" onclick="setNightColor('#300000')" title="Rojo tenue"></button>
-                                        <button type="button" class="color-btn" style="background:#301500;border:1px solid #555" onclick="setNightColor('#301500')" title="Ambar tenue"></button>
-                                        <button type="button" class="color-btn" style="background:#003000;border:1px solid #555" onclick="setNightColor('#003000')" title="Verde tenue"></button>
-                                        <button type="button" class="color-btn" style="background:#000830;border:1px solid #555" onclick="setNightColor('#000830')" title="Azul tenue"></button>
+                                    <div class="form-group" style="margin-bottom:10px">
+                                        <label class="form-label">Colores brillantes</label>
+                                        <div class="color-grid">
+                                            <button type="button" class="color-btn" style="background:#ff0000" onclick="setNightColor('#ff0000')"></button>
+                                            <button type="button" class="color-btn" style="background:#ff6600" onclick="setNightColor('#ff6600')"></button>
+                                            <button type="button" class="color-btn" style="background:#00ff00" onclick="setNightColor('#00ff00')"></button>
+                                            <button type="button" class="color-btn" style="background:#0088ff" onclick="setNightColor('#0088ff')"></button>
+                                            <button type="button" class="color-btn" style="background:#ff00ff" onclick="setNightColor('#ff00ff')"></button>
+                                            <button type="button" class="color-btn" style="background:#ffffff;border:1px solid #ccc" onclick="setNightColor('#ffffff')"></button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Colores tenues (para dormir)</label>
+                                        <div class="color-grid">
+                                            <button type="button" class="color-btn" style="background:#300000;border:1px solid #555" onclick="setNightColor('#300000')" title="Rojo tenue"></button>
+                                            <button type="button" class="color-btn" style="background:#301500;border:1px solid #555" onclick="setNightColor('#301500')" title="Ambar tenue"></button>
+                                            <button type="button" class="color-btn" style="background:#003000;border:1px solid #555" onclick="setNightColor('#003000')" title="Verde tenue"></button>
+                                            <button type="button" class="color-btn" style="background:#000830;border:1px solid #555" onclick="setNightColor('#000830')" title="Azul tenue"></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div style="flex:0 0 200px">
-                            <label class="form-label">Vista previa</label>
-                            <div class="night-preview" style="height:120px">
-                                <span class="time" id="nightPreviewTime" style="color:#ff0000;font-size:42px">23:45</span>
-                                <canvas id="nightThumb" width="64" height="64" style="display:none;image-rendering:pixelated;width:80px;height:80px"></canvas>
-                            </div>
-                            <p id="nightPreviewStatus" style="text-align:center;font-size:12px;color:var(--text-secondary);margin-top:8px">Desactivado</p>
                         </div>
                     </div>
                 </div>
@@ -538,7 +532,10 @@ function restartDevice(){api('restart');toast('Reiniciando...');}
 let uptimeStart=0;
 async function loadSystemInfo(){
     try{
-        const r=await fetch('/api/system');
+        const controller=new AbortController();
+        const tid=setTimeout(()=>controller.abort(),5000);
+        const r=await fetch('/api/system',{signal:controller.signal});
+        clearTimeout(tid);
         const d=await r.json();
         const usedRAM=d.totalHeap-d.freeHeap;
         const pctRAM=Math.round(usedRAM/d.totalHeap*100);
@@ -546,7 +543,7 @@ async function loadSystemInfo(){
         if(d.mac&&$('sysMac'))$('sysMac').textContent=d.mac;
         uptimeStart=Date.now()-d.uptimeMs;
         updateUptime();
-    }catch(e){console.error(e);}
+    }catch(e){console.error('loadSystemInfo:',e);}
 }
 function updateUptime(){
     var el=$('uptime');if(!el)return;
@@ -592,7 +589,10 @@ function hexToRgb565(h){
 // Storage & Clockfaces
 async function loadStorageInfo(){
     try{
-        const r=await fetch('/api/storage');
+        const controller=new AbortController();
+        const tid=setTimeout(()=>controller.abort(),5000);
+        const r=await fetch('/api/storage',{signal:controller.signal});
+        clearTimeout(tid);
         if(!r.ok)throw new Error('HTTP '+r.status);
         const d=await r.json();
         const pct=Math.round(d.used/d.total*100);
@@ -603,18 +603,24 @@ async function loadStorageInfo(){
         $('storageBar').style.width=pct+'%';
         $('storageBar').style.background=pct>90?'#ea4335':pct>70?'#fbbc04':'#34a853';
         $('spiffs-info').textContent=pct+'% ('+usedKB+'/'+totalKB+'KB)';
-    }catch(e){$('storageInfo').textContent='Error';console.error(e);}
+    }catch(e){$('storageInfo').textContent='Error';console.error('loadStorageInfo:',e);}
 }
 
 async function loadStoredClockfaces(){
     try{
-        const r=await fetch('/api/clockfaces/list');
+        const controller=new AbortController();
+        const tid=setTimeout(()=>controller.abort(),8000);
+        const r=await fetch('/api/clockfaces/list',{signal:controller.signal});
+        clearTimeout(tid);
         if(!r.ok)throw new Error('HTTP '+r.status);
         storedClockfaces=await r.json();
         renderClockfaceGrid();
         buildNightClockSelect();
         loadThumbsSequential();
-    }catch(e){$('clockfaceList').innerHTML='<span style="color:#ea4335">Error al cargar</span>';console.error(e);}
+    }catch(e){
+        $('clockfaceList').innerHTML='<span style="color:#ea4335">Error al cargar - <a href="#" onclick="loadStoredClockfaces();return false">reintentar</a></span>';
+        console.error('loadStoredClockfaces:',e);
+    }
 }
 
 let thumbQueue=[];
@@ -823,52 +829,95 @@ function clearCanvasChanged(){
 
 // Night mode
 function toggleNightSettings(){
-    const enabled=$('nightEnabled').checked;
-    $('nightSettings').style.display=enabled?'block':'none';
+    const enabledEl=$('nightEnabled');
+    const enabled=enabledEl?enabledEl.checked:false;
+    const settingsEl=$('nightSettings');
+    if(settingsEl)settingsEl.style.display=enabled?'block':'none';
     updateNightPreview();
     markCanvasChanged();
 }
 
 function setNightColor(c){
-    $('nightColor').value=c;
+    const el=$('nightColor');
+    if(el)el.value=c;
     updateNightPreview();
     markCanvasChanged();
+    updateColorBtnActive(c);
+}
+function updateColorBtnActive(c){
+    document.querySelectorAll('.color-btn').forEach(btn=>{
+        btn.classList.remove('active');
+        const bg=btn.style.background||btn.style.backgroundColor;
+        if(bg&&colorsMatch(bg,c))btn.classList.add('active');
+    });
+}
+function colorsMatch(a,b){
+    const ca=document.createElement('canvas').getContext('2d');
+    ca.fillStyle=a;const na=ca.fillStyle;
+    ca.fillStyle=b;const nb=ca.fillStyle;
+    return na===nb;
 }
 
 function updateNightPreview(){
-    const enabled=$('nightEnabled').checked;
-    const color=enabled?$('nightColor').value:'#333333';
-    const brightness=enabled?$('nightBright').value:8;
-    const preview=$('nightPreviewTime');
-    preview.style.color=color;
-    // Minimum opacity 0.15 so it's always visible even at lowest brightness
+    const enabled=$('nightEnabled')?$('nightEnabled').checked:false;
+    const color=enabled?($('nightColor')?$('nightColor').value:'#333333'):'#333333';
+    const brightness=enabled?($('nightBright')?$('nightBright').value:8):8;
     const opacity=enabled?Math.max(0.15,brightness/32):0.3;
-    preview.style.opacity=opacity;
 
-    // Update status with clockface name
-    const clockName=$('nightClockSelect').value==='_builtin'?'Reloj integrado':$('nightClockSelect').value;
-    if(enabled){
-        $('nightPreviewStatus').textContent=clockName+' | '+$('nightStart').value+' - '+$('nightEnd').value;
-    }else{
-        $('nightPreviewStatus').textContent='Desactivado';
+    // Update builtin preview colors (if preview elements exist)
+    const hourEl=$('nightPreviewHour');
+    const minEl=$('nightPreviewMin');
+    if(hourEl&&minEl){
+        hourEl.style.color=color;
+        minEl.style.color=color;
+        hourEl.style.opacity=opacity;
+        minEl.style.opacity=opacity;
+        const now=new Date();
+        hourEl.textContent=String(now.getHours()).padStart(2,'0');
+        minEl.textContent=String(now.getMinutes()).padStart(2,'0');
     }
 
-    // Show thumbnail of selected night clockface if not builtin
-    updateNightThumb();
+    // Update status (if element exists)
+    const statusEl=$('nightPreviewStatus');
+    if(statusEl){
+        const sel=$('nightClockSelect');
+        const clockName=sel&&sel.value==='_builtin'?'Reloj integrado':(sel?sel.value:'');
+        statusEl.textContent=enabled?(clockName+' | '+($('nightStart')?$('nightStart').value:'')+' - '+($('nightEnd')?$('nightEnd').value:'')):'Desactivado';
+    }
 }
 
 function updateNightThumb(){
     const sel=$('nightClockSelect').value;
     const thumbEl=$('nightThumb');
-    if(!thumbEl)return;
+    const builtinEl=$('nightPreviewBuiltin');
+    if(!thumbEl||!builtinEl)return;
     if(sel==='_builtin'){
         thumbEl.style.display='none';
-        $('nightPreviewTime').style.display='block';
-    }else if(thumbCache[sel]){
-        thumbEl.style.display='block';
-        $('nightPreviewTime').style.display='none';
-        drawThumb(thumbEl,thumbCache[sel]);
+        builtinEl.style.display='flex';
+    }else{
+        builtinEl.style.display='none';
+        if(thumbCache[sel]){
+            thumbEl.style.display='block';
+            drawThumb(thumbEl,thumbCache[sel]);
+        }else{
+            // Try to load thumbnail
+            thumbEl.style.display='none';
+            loadThumbForNight(sel);
+        }
     }
+}
+
+async function loadThumbForNight(name){
+    try{
+        const r=await fetch('/api/clockfaces/thumb?name='+encodeURIComponent(name));
+        if(r.ok){
+            const d=await r.json();
+            if(d.img){
+                thumbCache[name]={bg:d.bg,img:d.img};
+                updateNightThumb();
+            }
+        }
+    }catch(e){}
 }
 
 function buildNightClockSelect(){
@@ -883,11 +932,22 @@ function buildNightClockSelect(){
         sel.value='_builtin';
         $('nightClock').value='_builtin';
     }
+    // Update color settings visibility
+    const colorSettings=$('nightColorSettings');
+    if(colorSettings){
+        colorSettings.style.display=(sel.value==='_builtin')?'block':'none';
+    }
     updateNightPreview();
 }
 
 function onNightClockChange(){
-    $('nightClock').value=$('nightClockSelect').value;
+    const sel=$('nightClockSelect').value;
+    $('nightClock').value=sel;
+    // Show/hide color settings based on selection
+    const colorSettings=$('nightColorSettings');
+    if(colorSettings){
+        colorSettings.style.display=(sel==='_builtin')?'block':'none';
+    }
     updateNightPreview();
     markCanvasChanged();
 }
@@ -897,6 +957,12 @@ let brightTimeout=null;
 function sendBright(val){
     clearTimeout(brightTimeout);
     brightTimeout=setTimeout(()=>fetch('/api/set?displayBright='+val,{method:'POST'}),100);
+}
+
+let nightBrightTimeout=null;
+function sendNightBright(val){
+    clearTimeout(nightBrightTimeout);
+    nightBrightTimeout=setTimeout(()=>fetch('/api/set?nightBright='+val,{method:'POST'}),100);
 }
 
 // Save functions
@@ -946,27 +1012,40 @@ async function saveClock(){
     const btn=$('canvasSaveBtn');
     btn.disabled=true;
     const rot=$('rotationEnabled').checked;
-    await saveField('rotationEnabled',rot?'1':'0');
-    await saveField('rotationInterval',$('rotationInterval').value);
 
+    // Validate first
     if(rot){
         const list=$('rotationList').value;
         if(!list){toast('Selecciona al menos una caratula');btn.disabled=false;return;}
-        await saveField('canvasFile',list.split(',')[0]);
-        await saveField('rotationList',list);
     }else{
         const cf=$('canvasFile').value;
         if(!cf){toast('Selecciona una caratula');btn.disabled=false;return;}
-        await saveField('canvasFile',cf);
-        await saveField('rotationList','');
     }
 
-    await saveField('nightEnabled',$('nightEnabled').checked?'1':'0');
-    await saveField('nightStart',$('nightStart').value);
-    await saveField('nightEnd',$('nightEnd').value);
-    await saveField('nightBright',$('nightBright').value);
-    await saveField('nightColor',hexToRgb565($('nightColor').value));
-    await saveField('nightClock',$('nightClock').value);
+    // Build all params and send in parallel batches
+    const params=[];
+    params.push(['rotationEnabled',rot?'1':'0']);
+    params.push(['rotationInterval',$('rotationInterval').value]);
+    if(rot){
+        const list=$('rotationList').value;
+        params.push(['canvasFile',list.split(',')[0]]);
+        params.push(['rotationList',list]);
+    }else{
+        params.push(['canvasFile',$('canvasFile').value]);
+        params.push(['rotationList','']);
+    }
+    params.push(['nightEnabled',$('nightEnabled').checked?'1':'0']);
+    params.push(['nightStart',$('nightStart').value]);
+    params.push(['nightEnd',$('nightEnd').value]);
+    params.push(['nightBright',$('nightBright').value]);
+    params.push(['nightColor',hexToRgb565($('nightColor').value)]);
+    params.push(['nightClock',$('nightClock').value]);
+
+    // Send in batches of 3 to avoid overwhelming ESP32
+    for(let i=0;i<params.length;i+=3){
+        const batch=params.slice(i,i+3);
+        await Promise.all(batch.map(p=>saveField(p[0],p[1])));
+    }
 
     await fetch('/api/reload',{method:'POST'});
     clearCanvasChanged();
@@ -977,8 +1056,13 @@ async function saveClock(){
 // Load settings
 async function load(){
     try{
-        const r=await fetch('/api/settings');
+        const controller=new AbortController();
+        const tid=setTimeout(()=>controller.abort(),10000);
+        const r=await fetch('/api/settings',{signal:controller.signal});
+        clearTimeout(tid);
+        if(!r.ok)throw new Error('Settings HTTP '+r.status);
         settings=await r.json();
+        console.log('[load] Settings loaded');
 
         $('current-ssid').textContent=settings.wifiConnected||'-';
         $('wifi-rssi').textContent=settings.wifiRssi?'('+settings.wifiRssi+' dBm)':'';
@@ -1018,6 +1102,7 @@ async function load(){
         $('nightClock').value=settings.nightClock||'_builtin';
         toggleNightSettings();
         updateNightPreview();
+        updateColorBtnActive($('nightColor').value);
 
         $('sysName').textContent=settings.name||'ClockWise-XE1E';
         $('sysVersion').textContent=settings.version||'1.0.0';
@@ -1025,11 +1110,14 @@ async function load(){
         $('localServerHost').value=settings.localServerHost||'192.168.1.100';
         $('localServerPort').value=settings.localServerPort||8080;
 
-        loadStorageInfo();
-        loadStoredClockfaces();
-        loadSystemInfo();
+        // Run secondary loads in background - don't await to prevent blocking
+        console.log('[load] Starting secondary loads...');
+        loadStorageInfo().catch(e=>console.error('[loadStorageInfo]',e));
+        loadSystemInfo().catch(e=>console.error('[loadSystemInfo]',e));
+        loadStoredClockfaces().catch(e=>console.error('[loadStoredClockfaces]',e));
         onRepoSourceChange();
-    }catch(e){console.error(e);}
+        console.log('[load] Complete');
+    }catch(e){console.error('[load] Error:',e);}
     // Always update previews even if settings load fails
     updateRotationPreview();
     updateColorSwapPreview();
@@ -1037,7 +1125,14 @@ async function load(){
 }
 
 load();
-setInterval(()=>{var el=$('nightPreviewTime');if(el)el.textContent=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});},1000);
+setInterval(()=>{
+    const h=$('nightPreviewHour'),m=$('nightPreviewMin');
+    if(h&&m){
+        const now=new Date();
+        h.textContent=String(now.getHours()).padStart(2,'0');
+        m.textContent=String(now.getMinutes()).padStart(2,'0');
+    }
+},1000);
 </script>
 </body>
 </html>
