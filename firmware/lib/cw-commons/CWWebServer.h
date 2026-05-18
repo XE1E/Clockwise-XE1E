@@ -48,7 +48,7 @@ struct ClockwiseWebServer
   {
     // Página principal
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->send(200, "text/html", WEB_UI_HTML);
+      request->send(200, "text/html", (const uint8_t*)WEB_UI_HTML, sizeof(WEB_UI_HTML) - 1);
     });
 
     // API: obtener configuración
