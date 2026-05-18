@@ -294,7 +294,6 @@ struct WiFiController
 
   void onConnected()
   {
-    WiFi.setSleep(false);  // must be set after connection is established
     connectionSucessfulOnce = true;
     ClockwiseWebServer::getInstance()->startWebServer();
 
