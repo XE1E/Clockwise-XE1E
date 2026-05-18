@@ -294,6 +294,7 @@ struct WiFiController
 
   void onConnected()
   {
+    WiFi.setSleep(false);  // must be set after connection is established
     connectionSucessfulOnce = true;
     ClockwiseWebServer::getInstance()->startWebServer();
 
@@ -316,7 +317,6 @@ struct WiFiController
   bool begin()
   {
     WiFi.mode(WIFI_STA);
-    WiFi.setSleep(false);
     WiFi.disconnect();
 
     improvSerial.setDeviceInfo(ImprovTypes::ChipFamily::CF_ESP32,
