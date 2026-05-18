@@ -616,11 +616,18 @@ class ClockfaceEditor {
 
     }
 
+    _drawThumbToCtx(ctx) {
+        ctx.imageSmoothingEnabled = false;
+        const rgb = ColorUtils.rgb565ToRgb(this.clockface.bgColor);
+        ctx.fillStyle = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+        ctx.fillRect(0, 0, 64, 64);
+        ctx.drawImage(this.canvas, 0, 0);
+    }
+
     openThumbModal() {
         const preview = document.getElementById('thumb-preview');
         const ctx = preview.getContext('2d');
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(this.canvas, 0, 0);
+        this._drawThumbToCtx(ctx);
         document.getElementById('thumb-filename').textContent = `${this.clockface.name}.png`;
         document.getElementById('thumb-modal').classList.add('active');
     }
@@ -629,9 +636,7 @@ class ClockfaceEditor {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = 64;
         tempCanvas.height = 64;
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCtx.imageSmoothingEnabled = false;
-        tempCtx.drawImage(this.canvas, 0, 0);
+        this._drawThumbToCtx(tempCanvas.getContext('2d'));
 
         const link = document.createElement('a');
         link.download = `${this.clockface.name}.png`;
@@ -643,11 +648,8 @@ class ClockfaceEditor {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = 64;
         tempCanvas.height = 64;
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCtx.imageSmoothingEnabled = false;
-        tempCtx.drawImage(this.canvas, 0, 0);
+        this._drawThumbToCtx(tempCanvas.getContext('2d'));
 
-        // Get base64 without the data:image/png;base64, prefix
         const dataUrl = tempCanvas.toDataURL('image/png');
         this.clockface.thumbnail = dataUrl.replace(/^data:image\/png;base64,/, '');
     }
@@ -856,10 +858,6 @@ class ClockfaceEditor {
 
         document.getElementById('btn-open-sprites').addEventListener('click', () => {
             this.openSpriteModal();
-        });
-
-        document.getElementById('btn-reset-sprites').addEventListener('click', () => {
-            this.resetSpritePositionsForExport();
         });
 
         document.getElementById('btn-add-sprite').addEventListener('click', () => {
