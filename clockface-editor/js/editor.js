@@ -1432,6 +1432,7 @@ class ClockfaceEditor {
             if (confirm('Crear nuevo clockface? Se perderan los cambios no guardados.')) {
                 this.clockface = new Clockface();
                 this.selectedId = null;
+                this.clearReferenceImage();
                 this.updateUI();
                 this.render();
             }
