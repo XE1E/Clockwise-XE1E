@@ -627,20 +627,13 @@ async function loadThumbsSequential(){
         const{name,canvas}=thumbQueue.shift();
         if(thumbCache[name]){drawThumb(canvas,thumbCache[name]);continue;}
         try{
-            await new Promise(r=>setTimeout(r,50));
-            const r=await fetch('/api/clockfaces/get?name='+encodeURIComponent(name));
+            const controller=new AbortController();
+            const tid=setTimeout(()=>controller.abort(),6000);
+            const r=await fetch('/api/clockfaces/thumb?name='+encodeURIComponent(name),{signal:controller.signal});
+            clearTimeout(tid);
             if(!r.ok){canvas.style.background='#333';continue;}
-            const cf=await r.json();
-            let img=null;
-            // 1. Check for dedicated thumbnail field first
-            if(cf.thumbnail)img=cf.thumbnail;
-            // 2. Then check setup images
-            if(!img&&cf.setup)for(const el of cf.setup){if(el.image){img=el.image;break;}}
-            // 3. Then check loop images
-            if(!img&&cf.loop)for(const el of cf.loop){if(el.image){img=el.image;break;}}
-            // 4. Finally check first sprite frame
-            if(!img&&cf.sprites&&cf.sprites[0]&&cf.sprites[0][0])img=cf.sprites[0][0].image;
-            thumbCache[name]={bg:cf.bgColor||0,img};
+            const data=await r.json();
+            thumbCache[name]={bg:data.bg||0,img:data.img||null};
             drawThumb(canvas,thumbCache[name]);
         }catch(e){canvas.style.background='#333';console.error(e);}
     }

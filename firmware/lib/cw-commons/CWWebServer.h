@@ -48,8 +48,7 @@ struct ClockwiseWebServer
   {
     // Página principal
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", WEB_UI_HTML);
-      request->send(response);
+      request->send(200, "text/html", WEB_UI_HTML);
     });
 
     // API: obtener configuración
@@ -376,6 +375,42 @@ struct ClockwiseWebServer
         }
       }
     );
+
+    // API: thumbnail ligero — lee solo primeros 12KB para extraer imagen sin bajar JSON completo
+    server.on("/api/clockfaces/thumb", HTTP_GET, [](AsyncWebServerRequest *request) {
+      if (!request->hasParam("name")) { request->send(400); return; }
+      String name = request->getParam("name")->value();
+      if (!SPIFFS.begin(true)) { request->send(500); return; }
+      String path = "/" + name + ".json";
+      if (!SPIFFS.exists(path)) { request->send(404); return; }
+
+      File f = SPIFFS.open(path, FILE_READ);
+      size_t fileSize = f.size();
+      const size_t READ_SIZE = fileSize < 12288 ? fileSize : 12288;
+      char* buf = (char*)malloc(READ_SIZE + 1);
+      if (!buf) { f.close(); request->send(500); return; }
+      f.read((uint8_t*)buf, READ_SIZE);
+      buf[READ_SIZE] = '\0';
+      f.close();
+
+      int bg = 0;
+      char* bgPos = strstr(buf, "\"bgColor\":");
+      if (bgPos) bg = atoi(bgPos + 10);
+
+      String imgStr = "";
+      const char* keys[] = {"\"thumbnail\":\"", "\"image\":\""};
+      for (const char* key : keys) {
+        char* pos = strstr(buf, key);
+        if (pos) {
+          const char* start = pos + strlen(key);
+          const char* end = strchr(start, '"');
+          if (end && end > start) { imgStr = String(start, (unsigned int)(end - start)); break; }
+        }
+      }
+      free(buf);
+      request->send(200, "application/json",
+        "{\"bg\":" + String(bg) + ",\"img\":\"" + imgStr + "\"}");
+    });
 
     // API: eliminar carátula
     server.on("/api/clockfaces/delete", HTTP_POST, [](AsyncWebServerRequest *request) {
