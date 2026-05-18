@@ -250,7 +250,9 @@ void setup()
 void loop()
 {
   wifi.handleImprovWiFi();
-  wifi.checkReconnect();
+  if (wifi.checkReconnect()) {
+    ezt::updateNTP();
+  }
 
   if (wifi.isConnected())
   {

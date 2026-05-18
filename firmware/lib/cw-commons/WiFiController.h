@@ -1,7 +1,7 @@
 #pragma once
 
 // Increase WiFi connection timeout for weak signals
-#define MAX_ATTEMPTS_WIFI_CONNECTION 40
+#define MAX_ATTEMPTS_WIFI_CONNECTION 15
 
 #include <WiFi.h>
 #include <ESPmDNS.h>
@@ -22,8 +22,8 @@ struct WiFiNetwork {
 
 struct WiFiController
 {
-  long elapsedTimeOffline = 0;
-  long lastReconnectAttempt = 0;
+  unsigned long elapsedTimeOffline = 0;
+  unsigned long lastReconnectAttempt = 0;
   bool connectionSucessfulOnce = false;
   bool apModeActive = false;
   bool reconnecting = false;
@@ -84,19 +84,20 @@ struct WiFiController
     return false;
   }
 
-  void checkReconnect()
+  // Returns true if a reconnection was just established
+  bool checkReconnect()
   {
     if (apModeActive || WiFi.status() == WL_CONNECTED) {
       if (reconnecting) {
         reconnecting = false;
         StatusController::getInstance()->clearReconnecting();
       }
-      return;
+      return false;
     }
-    if (!connectionSucessfulOnce) return;
+    if (!connectionSucessfulOnce) return false;
 
     unsigned long now = millis();
-    if (now - lastReconnectAttempt < RECONNECT_INTERVAL) return;
+    if (now - lastReconnectAttempt < RECONNECT_INTERVAL) return false;
 
     lastReconnectAttempt = now;
     reconnecting = true;
@@ -105,14 +106,14 @@ struct WiFiController
 
     // Intento rápido: reconectar a la misma red
     WiFi.reconnect();
-    delay(3000);
+    WiFi.waitForConnectResult(3000);
 
     if (WiFi.status() == WL_CONNECTED) {
       reconnecting = false;
       elapsedTimeOffline = 0;
       StatusController::getInstance()->clearReconnecting();
       Serial.printf("[WiFi] Reconnected to %s\n", WiFi.SSID().c_str());
-      return;
+      return true;
     }
 
     // Si falla, intentar mejor red disponible
@@ -122,7 +123,9 @@ struct WiFiController
       elapsedTimeOffline = 0;
       StatusController::getInstance()->clearReconnecting();
       ClockwiseWebServer::getInstance()->startWebServer();
+      return true;
     }
+    return false;
   }
 
   void handleImprovWiFi()
@@ -313,6 +316,8 @@ struct WiFiController
   bool begin()
   {
     WiFi.mode(WIFI_STA);
+    WiFi.setSleep(false);
+    WiFi.setAutoReconnect(true);
     WiFi.disconnect();
 
     improvSerial.setDeviceInfo(ImprovTypes::ChipFamily::CF_ESP32,
