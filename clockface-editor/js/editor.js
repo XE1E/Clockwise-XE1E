@@ -1471,6 +1471,7 @@ class ClockfaceEditor {
                 const json = JSON.parse(document.getElementById('import-json').value);
                 this.clockface = Clockface.fromJSON(json);
                 this.selectedId = null;
+                this.clearReferenceImage();
                 await this.loadImagesAsync();
                 this.updateUI();
                 this.render();
