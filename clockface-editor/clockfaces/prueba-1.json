@@ -1,0 +1,122 @@
+{
+  "name": "prueba-1",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "delay": 250,
+  "setup": [
+    {
+      "type": "text",
+      "x": 1,
+      "y": 14,
+      "content": "Prueba",
+      "font": "bold",
+      "fgColor": 6018,
+      "bgColor": 0,
+      "id": "14dh1k"
+    },
+    {
+      "type": "text",
+      "x": 23,
+      "y": 30,
+      "content": "de",
+      "font": "medium",
+      "fgColor": 64000,
+      "bgColor": 0,
+      "id": "w5exhk"
+    },
+    {
+      "type": "text",
+      "x": 11,
+      "y": 46,
+      "content": "TEXTO",
+      "font": "big",
+      "fgColor": 2749,
+      "bgColor": 0,
+      "id": "xw54xz"
+    },
+    {
+      "type": "circle",
+      "x": 53,
+      "y": 27,
+      "radius": 3,
+      "color": 65535,
+      "id": "gd1rgo"
+    },
+    {
+      "type": "line",
+      "x": 0,
+      "y": 18,
+      "x1": 63,
+      "y1": 18,
+      "color": 65535,
+      "id": "533101"
+    },
+    {
+      "type": "line",
+      "x": 0,
+      "y": 19,
+      "x1": 63,
+      "y1": 19,
+      "color": 65535,
+      "id": "x3pr3e"
+    },
+    {
+      "type": "rect",
+      "x": 5,
+      "y": 23,
+      "width": 10,
+      "height": 10,
+      "color": 65535,
+      "id": "hqtbbr"
+    },
+    {
+      "type": "rect",
+      "x": 6,
+      "y": 24,
+      "width": 8,
+      "height": 8,
+      "color": 65535,
+      "id": "x32zeo"
+    },
+    {
+      "type": "circle",
+      "x": 53,
+      "y": 27,
+      "radius": 4,
+      "color": 65535,
+      "id": "l7fbcr"
+    },
+    {
+      "type": "line",
+      "x": 0,
+      "y": 48,
+      "x1": 63,
+      "y1": 48,
+      "color": 61408,
+      "id": "7faim6"
+    },
+    {
+      "type": "line",
+      "x": 0,
+      "y": 47,
+      "x1": 63,
+      "y1": 47,
+      "color": 65312,
+      "id": "s9kmn9"
+    }
+  ],
+  "sprites": [],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 5,
+      "y": 57,
+      "content": "H:i:s",
+      "font": "square",
+      "fgColor": 47143,
+      "bgColor": 0,
+      "id": "yc84ds"
+    }
+  ]
+}
