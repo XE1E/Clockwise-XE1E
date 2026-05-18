@@ -950,18 +950,20 @@ async function saveTime(){
 }
 
 async function saveClock(){
+    const btn=$('canvasSaveBtn');
+    btn.disabled=true;
     const rot=$('rotationEnabled').checked;
     await saveField('rotationEnabled',rot?'1':'0');
     await saveField('rotationInterval',$('rotationInterval').value);
 
     if(rot){
         const list=$('rotationList').value;
-        if(!list){toast('Selecciona al menos una caratula');return;}
+        if(!list){toast('Selecciona al menos una caratula');btn.disabled=false;return;}
         await saveField('canvasFile',list.split(',')[0]);
         await saveField('rotationList',list);
     }else{
         const cf=$('canvasFile').value;
-        if(!cf){toast('Selecciona una caratula');return;}
+        if(!cf){toast('Selecciona una caratula');btn.disabled=false;return;}
         await saveField('canvasFile',cf);
         await saveField('rotationList','');
     }
@@ -975,6 +977,7 @@ async function saveClock(){
 
     await fetch('/api/reload',{method:'POST'});
     clearCanvasChanged();
+    btn.disabled=false;
     toast('Cambios aplicados');
 }
 
@@ -1037,6 +1040,7 @@ async function load(){
     // Always update previews even if settings load fails
     updateRotationPreview();
     updateColorSwapPreview();
+    clearCanvasChanged();
 }
 
 load();
