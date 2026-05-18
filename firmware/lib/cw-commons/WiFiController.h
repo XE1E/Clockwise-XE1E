@@ -1,7 +1,7 @@
 #pragma once
 
 // Increase WiFi connection timeout for weak signals
-#define MAX_ATTEMPTS_WIFI_CONNECTION 15
+#define MAX_ATTEMPTS_WIFI_CONNECTION 40
 
 #include <WiFi.h>
 #include <ESPmDNS.h>
