@@ -307,10 +307,10 @@ struct WiFiController
     Serial.printf("[WiFi] IP: %s, RSSI: %d dBm\n",
                   WiFi.localIP().toString().c_str(), rssi);
 
-    // Show IP and signal on display for 10 seconds
+    // Show IP and signal on display for 3 seconds
     StatusController::getInstance()->showIPAddress(
       WiFi.localIP().toString().c_str(), rssi);
-    delay(10000);
+    delay(3000);
   }
 
   bool begin()

@@ -33,9 +33,10 @@ struct ClockwiseWebServer
 
   void startWebServer()
   {
+    Serial.printf("[Web] Starting server, free heap: %d\n", ESP.getFreeHeap());
     setupRoutes();
     server.begin();
-    Serial.println("[Web] Async server started on port 80");
+    Serial.printf("[Web] Server started on port 80, free heap: %d\n", ESP.getFreeHeap());
   }
 
   void stopWebServer()
