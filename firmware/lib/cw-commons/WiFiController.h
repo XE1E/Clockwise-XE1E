@@ -317,7 +317,7 @@ struct WiFiController
   {
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
-    WiFi.disconnect(true);  // disconnect + erase cached credentials to avoid auto-reconnect race
+    WiFi.disconnect();
 
     improvSerial.setDeviceInfo(ImprovTypes::ChipFamily::CF_ESP32,
                                 CW_FW_NAME, CW_FW_VERSION, "ClockWise-XE1E");
