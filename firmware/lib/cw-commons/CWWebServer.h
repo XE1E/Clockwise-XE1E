@@ -206,18 +206,23 @@ struct ClockwiseWebServer
       },
       NULL,
       [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-        static String bodyBuffer;
+        static char* bodyBuffer = nullptr;
+        static size_t bufferPos = 0;
         if (index == 0) {
-          bodyBuffer = "";
-          bodyBuffer.reserve(total);
+          if (bodyBuffer) free(bodyBuffer);
+          bodyBuffer = (char*)malloc(total + 1);
+          bufferPos = 0;
         }
-        for (size_t i = 0; i < len; i++) {
-          bodyBuffer += (char)data[i];
+        if (bodyBuffer) {
+          memcpy(bodyBuffer + bufferPos, data, len);
+          bufferPos += len;
         }
-        if (index + len == total) {
-          CWPreview::getInstance()->setPreview(bodyBuffer);
+        if (index + len == total && bodyBuffer) {
+          bodyBuffer[total] = '\0';
+          CWPreview::getInstance()->setPreview(String(bodyBuffer));
           Serial.printf("[Preview] Received clockface JSON (%d bytes)\n", total);
-          bodyBuffer = "";
+          free(bodyBuffer);
+          bodyBuffer = nullptr;
         }
       }
     );
