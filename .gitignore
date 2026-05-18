@@ -11,3 +11,6 @@ sdkconfig*
 .vscode
 
 dependencies.lock
+
+# Firmware library dependencies
+components/
