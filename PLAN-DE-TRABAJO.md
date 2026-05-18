@@ -93,9 +93,9 @@ interfaz web moderna y soporte multi-WiFi.
    - Reset de fábrica
 
 ### 3.3 Pendiente
-- [ ] Integrar editores de carátulas (Fase 5)
-- [ ] Escaneo de redes WiFi disponibles
-- [ ] Preview de carátulas
+- [x] Integrar editores de carátulas (Fase 5)
+- [x] Escaneo de redes WiFi disponibles
+- [x] Preview de carátulas
 
 ---
 
@@ -132,7 +132,7 @@ interfaz web moderna y soporte multi-WiFi.
 - [ ] Revisar digit-designer.html
 - [ ] Revisar char-designer.html
 - [ ] Revisar font-converter.html
-- [ ] Integrar en nueva interfaz web
+- [x] Integrar en nueva interfaz web
 - [ ] Documentar uso de cada editor
 
 ### 5.2 Clockfaces
@@ -160,8 +160,8 @@ interfaz web moderna y soporte multi-WiFi.
 
 - [x] Test de conexión WiFi (señal débil, múltiples redes)
 - [x] Test de interfaz web (parámetros básicos)
-- [ ] Test de rotación de carátulas
-- [ ] Test de modo nocturno
+- [x] Test de rotación de carátulas
+- [x] Test de modo nocturno
 - [x] Test en hardware real
 - [ ] Compilar firmware release
 - [ ] Tag v1.0 en git
