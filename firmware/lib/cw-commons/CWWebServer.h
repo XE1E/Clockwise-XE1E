@@ -22,6 +22,7 @@ struct ClockwiseWebServer
   bool needs_display_rotation_update = false;
   uint8_t pending_display_rotation = 0;
   bool rotation_changed = false;
+  bool serverStarted = false;
 
   ClockwiseWebServer() : server(80) {}
 
@@ -33,10 +34,18 @@ struct ClockwiseWebServer
 
   void startWebServer()
   {
+    if (serverStarted) {
+      Serial.println("[Web] Server already running");
+      return;
+    }
     Serial.printf("[Web] Starting server, free heap: %d\n", ESP.getFreeHeap());
-    SPIFFS.begin(true);
+    if (!SPIFFS.begin(true)) {
+      Serial.println("[Web] SPIFFS mount failed!");
+      return;
+    }
     setupRoutes();
     server.begin();
+    serverStarted = true;
     Serial.printf("[Web] Server started on port 80, free heap: %d\n", ESP.getFreeHeap());
   }
 
@@ -315,6 +324,11 @@ struct ClockwiseWebServer
       }
     });
 
+    // API: ping para verificar que el servidor responde
+    server.on("/api/ping", HTTP_GET, [](AsyncWebServerRequest *request) {
+      request->send(200, "text/plain", "pong");
+    });
+
     // API: subir carátula (recibe JSON) - escribe directamente a SPIFFS sin buffering
     server.on("/api/clockfaces/upload", HTTP_POST,
       [](AsyncWebServerRequest *request) {
@@ -323,11 +337,12 @@ struct ClockwiseWebServer
       NULL,
       [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
         static File uploadFile;
-        static String fileName;
         static String filePath;
+        static bool uploadError = false;
 
         if (index == 0) {
-          // Get name from URL query string
+          uploadError = false;
+          String fileName;
           if (request->hasParam("name", true)) {
             fileName = request->getParam("name", true)->value();
           } else if (request->hasParam("name")) {
@@ -340,21 +355,30 @@ struct ClockwiseWebServer
           uploadFile = SPIFFS.open(filePath, FILE_WRITE);
           if (!uploadFile) {
             Serial.printf("[Storage] Failed to create: %s\n", filePath.c_str());
+            uploadError = true;
             return;
           }
-          Serial.printf("[Storage] Starting upload: %s (%d bytes)\n", filePath.c_str(), total);
+          Serial.printf("[Storage] Starting upload: %s (%d bytes), heap: %d\n", filePath.c_str(), total, ESP.getFreeHeap());
         }
+
+        if (uploadError) return;
 
         // Write chunk directly to file
         if (uploadFile) {
-          uploadFile.write(data, len);
+          size_t written = uploadFile.write(data, len);
+          if (written != len) {
+            Serial.printf("[Storage] Write error: %d/%d bytes\n", written, len);
+            uploadError = true;
+            uploadFile.close();
+            return;
+          }
         }
 
         // Close file when done
         if (index + len == total) {
           if (uploadFile) {
             uploadFile.close();
-            Serial.printf("[Storage] Saved clockface: %s (%d bytes)\n", filePath.c_str(), total);
+            Serial.printf("[Storage] Saved: %s (%d bytes), heap: %d\n", filePath.c_str(), total, ESP.getFreeHeap());
           }
         }
       }
