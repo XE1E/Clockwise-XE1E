@@ -97,12 +97,10 @@ struct ClockwiseWebServer
       json += "\"nightColor\":" + String(ClockwiseParams::getInstance()->nightColor) + ",";
       json += "\"nightClock\":\"" + ClockwiseParams::getInstance()->nightClockface + "\",";
       // Clockface
-      json += "\"canvasServer\":\"" + ClockwiseParams::getInstance()->canvasServer + "\",";
       json += "\"canvasFile\":\"" + ClockwiseParams::getInstance()->canvasFile + "\",";
       json += "\"rotationEnabled\":" + String(ClockwiseParams::getInstance()->rotationEnabled ? 1 : 0) + ",";
       json += "\"rotationInterval\":" + String(ClockwiseParams::getInstance()->rotationInterval) + ",";
       json += "\"rotationList\":\"" + ClockwiseParams::getInstance()->rotationList + "\",";
-      json += "\"clockfaceSource\":\"" + ClockwiseParams::getInstance()->clockfaceSource + "\",";
       json += "\"localServerHost\":\"" + ClockwiseParams::getInstance()->localServerHost + "\",";
       json += "\"localServerPort\":" + String(ClockwiseParams::getInstance()->localServerPort) + ",";
       // System
@@ -159,7 +157,6 @@ struct ClockwiseWebServer
         else if (key == "nightColor") ClockwiseParams::getInstance()->nightColor = value.toInt();
         else if (key == "nightClock") ClockwiseParams::getInstance()->nightClockface = value;
         // Clockface (clear preview when changing from web UI)
-        else if (key == "canvasServer") ClockwiseParams::getInstance()->canvasServer = value;
         else if (key == "canvasFile") {
           ClockwiseParams::getInstance()->canvasFile = value;
           CWPreview::getInstance()->clearPreview();
@@ -170,7 +167,6 @@ struct ClockwiseWebServer
         }
         else if (key == "rotationInterval") ClockwiseParams::getInstance()->rotationInterval = value.toInt();
         else if (key == "rotationList") ClockwiseParams::getInstance()->rotationList = value;
-        else if (key == "clockfaceSource") ClockwiseParams::getInstance()->clockfaceSource = value;
         else if (key == "localServerHost") ClockwiseParams::getInstance()->localServerHost = value;
         else if (key == "localServerPort") ClockwiseParams::getInstance()->localServerPort = value.toInt();
 

@@ -28,7 +28,6 @@ struct ClockwiseParams
     const char* const PREF_WIFI_PASSWORD_3 = "wifiPwd3";
     const char* const PREF_NTP_SERVER = "ntpServer";
     const char* const PREF_CANVAS_FILE = "canvasFile";
-    const char* const PREF_CANVAS_SERVER = "canvasServer";
     const char* const PREF_MANUAL_POSIX = "manualPosix";
     const char* const PREF_DISPLAY_ROTATION = "displayRotation";
     const char* const PREF_NIGHT_MODE_ENABLED = "nightEnabled";
@@ -41,7 +40,6 @@ struct ClockwiseParams
     const char* const PREF_ROTATION_LIST = "rotList";
     const char* const PREF_ROTATION_INDEX = "rotIndex";
     const char* const PREF_ROTATION_INTERVAL = "rotInterval";
-    const char* const PREF_CLOCKFACE_SOURCE = "cfSource";
     const char* const PREF_LOCAL_SERVER_HOST = "localHost";
     const char* const PREF_LOCAL_SERVER_PORT = "localPort";
 
@@ -62,7 +60,6 @@ struct ClockwiseParams
     String wifiPwd3;
     String ntpServer;
     String canvasFile;
-    String canvasServer;
     String manualPosix;
     uint8_t displayRotation;
     bool nightModeEnabled;
@@ -75,7 +72,6 @@ struct ClockwiseParams
     String rotationList;
     uint8_t rotationIndex;
     uint16_t rotationInterval;
-    String clockfaceSource;  // "cdn", "github", or "local"
     String localServerHost;  // IP/hostname for local dev server
     uint16_t localServerPort; // Port for local dev server
 
@@ -110,7 +106,6 @@ struct ClockwiseParams
         preferences.putString(PREF_WIFI_PASSWORD_3, wifiPwd3);
         preferences.putString(PREF_NTP_SERVER, ntpServer);
         preferences.putString(PREF_CANVAS_FILE, canvasFile);
-        preferences.putString(PREF_CANVAS_SERVER, canvasServer);
         preferences.putString(PREF_MANUAL_POSIX, manualPosix);
         preferences.putUInt(PREF_DISPLAY_ROTATION, displayRotation);
         preferences.putBool(PREF_NIGHT_MODE_ENABLED, nightModeEnabled);
@@ -123,7 +118,6 @@ struct ClockwiseParams
         preferences.putString(PREF_ROTATION_LIST, rotationList);
         preferences.putUInt(PREF_ROTATION_INDEX, rotationIndex);
         preferences.putUInt(PREF_ROTATION_INTERVAL, rotationInterval);
-        preferences.putString(PREF_CLOCKFACE_SOURCE, clockfaceSource);
         preferences.putString(PREF_LOCAL_SERVER_HOST, localServerHost);
         preferences.putUInt(PREF_LOCAL_SERVER_PORT, localServerPort);
     }
@@ -147,7 +141,6 @@ struct ClockwiseParams
         wifiPwd3 = preferences.getString(PREF_WIFI_PASSWORD_3, "");
         ntpServer = preferences.getString(PREF_NTP_SERVER, "time.google.com");
         canvasFile = preferences.getString(PREF_CANVAS_FILE, "");
-        canvasServer = preferences.getString(PREF_CANVAS_SERVER, "raw.githubusercontent.com");
         manualPosix = preferences.getString(PREF_MANUAL_POSIX, "");
         displayRotation = preferences.getUInt(PREF_DISPLAY_ROTATION, 0);
         nightModeEnabled = preferences.getBool(PREF_NIGHT_MODE_ENABLED, false);
@@ -160,7 +153,6 @@ struct ClockwiseParams
         rotationList = preferences.getString(PREF_ROTATION_LIST, "");
         rotationIndex = preferences.getUInt(PREF_ROTATION_INDEX, 0);
         rotationInterval = preferences.getUInt(PREF_ROTATION_INTERVAL, 1440);
-        clockfaceSource = preferences.getString(PREF_CLOCKFACE_SOURCE, "ghpages");
         localServerHost = preferences.getString(PREF_LOCAL_SERVER_HOST, "192.168.1.100");
         localServerPort = preferences.getUInt(PREF_LOCAL_SERVER_PORT, 8080);
     }
