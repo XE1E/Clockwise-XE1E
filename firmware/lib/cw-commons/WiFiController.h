@@ -160,6 +160,13 @@ struct WiFiController
     int n = WiFi.scanNetworks();
     Serial.printf("[WiFi] Found %d networks\n", n);
 
+    // Debug: mostrar redes guardadas
+    for (int j = 0; j < 3; j++) {
+      if (!networks[j].ssid.isEmpty()) {
+        Serial.printf("[WiFi] Saved[%d]: '%s' (len=%d)\n", j, networks[j].ssid.c_str(), networks[j].ssid.length());
+      }
+    }
+
     for (int i = 0; i < n; i++) {
       String scannedSSID = WiFi.SSID(i);
       int32_t scannedRSSI = WiFi.RSSI(i);

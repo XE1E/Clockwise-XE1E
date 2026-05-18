@@ -104,7 +104,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
     <div class="toolbar-info">
         <span>WiFi: <strong id="current-ssid">-</strong> <small id="wifi-rssi"></small></span>
         <span>IP: <strong id="ip-address">-</strong></span>
-        <span>RAM: <strong id="free-heap">-</strong></span>
+        <span>RAM: <strong id="ram-info">-</strong></span>
         <span>SPIFFS: <strong id="spiffs-info">-</strong></span>
         <span>Uptime: <strong id="uptime">-</strong></span>
     </div>
@@ -117,7 +117,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
     <div class="tabs">
         <button class="tab active" data-tab="wifi">WiFi</button>
         <button class="tab" data-tab="display">Pantalla</button>
-        <button class="tab" data-tab="time">Hora</button>
+        <button class="tab" data-tab="time">Hora y Fecha</button>
         <button class="tab" data-tab="canvas">Canvas</button>
         <button class="tab" data-tab="system">Sistema</button>
     </div>
@@ -169,7 +169,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         </div>
         <div class="cards">
             <div class="card">
-                <div class="card-header"><h3>Brillo</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M20 15.31L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg><h3>Brillo</h3></div>
                 <div class="card-body">
                     <div class="form-group">
                         <label class="form-label">Valor: <span class="range-value" id="brightVal">32</span></label>
@@ -178,7 +178,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h3>Rotacion</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M7.34 6.41L.86 12.9l6.49 6.48 6.49-6.48-6.5-6.49zM3.69 12.9l3.66-3.66L11 12.9l-3.66 3.66-3.65-3.66zm15.67-6H11.6l2 2h5.76l-2.38 5.76c-.18.44.37.85.76.56l4.67-3.54-3.05-4.78z"/></svg><h3>Rotacion</h3></div>
                 <div class="card-body">
                     <select class="form-select" id="displayRotation" onchange="updateRotationPreview()">
                         <option value="0">0 grados (normal)</option>
@@ -194,7 +194,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h3>Panel RGB/RBG</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M7.52 21.48A10.487 10.487 0 011.55 13H.05C.56 19.16 5.71 24 12 24l.66-.03-3.81-3.81-1.33 1.32zm.89-6.52c-.19 0-.37-.03-.52-.08-.16-.06-.29-.13-.4-.24-.11-.1-.2-.22-.26-.37-.06-.14-.09-.3-.09-.47h-1.3c0 .36.07.68.21.95s.33.5.56.69c.24.18.51.32.82.41.3.1.62.15.96.15.37 0 .72-.05 1.03-.15.32-.1.6-.25.83-.44s.42-.43.55-.72.2-.61.2-.97c0-.19-.02-.38-.07-.56-.05-.18-.12-.35-.23-.51-.1-.16-.24-.3-.4-.43-.17-.13-.37-.23-.61-.31.2-.09.37-.2.52-.33.15-.13.27-.27.37-.42.1-.15.17-.3.22-.46.05-.16.07-.32.07-.48 0-.36-.06-.68-.18-.96-.12-.28-.29-.51-.51-.69-.2-.19-.47-.33-.77-.43C9.1 8.05 8.76 8 8.39 8c-.36 0-.69.05-1 .16-.3.11-.57.26-.79.45-.21.19-.38.41-.51.67-.12.26-.18.54-.18.85h1.3c0-.17.03-.32.09-.45s.14-.25.25-.34c.11-.09.23-.17.38-.22.15-.05.3-.08.48-.08.4 0 .7.1.89.31.19.2.29.49.29.86 0 .18-.03.34-.08.49-.05.15-.14.27-.25.37-.11.1-.25.18-.41.24-.16.06-.36.09-.58.09H7.5v1.03h.77c.22 0 .42.02.6.07s.33.13.45.23c.12.11.22.24.29.4.07.16.1.35.1.57 0 .41-.12.72-.35.93-.23.23-.55.33-.95.33zm8.55-5.92c-.32-.33-.7-.59-1.14-.77-.43-.18-.92-.27-1.46-.27H12v8h2.3c.55 0 1.06-.09 1.51-.27.45-.18.84-.43 1.16-.76.32-.33.57-.73.74-1.19.17-.47.26-.99.26-1.57v-.4c0-.58-.09-1.1-.26-1.57-.18-.47-.43-.87-.75-1.2zm-.39 3.16c0 .42-.05.79-.14 1.13-.1.33-.24.62-.43.85-.19.23-.43.41-.71.53-.29.12-.62.18-.99.18h-.91V9.12h.97c.72 0 1.27.23 1.64.69.38.46.57 1.12.57 1.99v.4zM12 0l-.66.03 3.81 3.81 1.33-1.33c3.27 1.55 5.61 4.72 5.96 8.48h1.5C23.44 4.84 18.29 0 12 0z"/></svg><h3>Panel RGB/RBG</h3></div>
                 <div class="card-body">
                     <div class="form-checkbox">
                         <input type="checkbox" id="swapBlueGreen" onchange="updateColorSwapPreview()">
@@ -205,15 +205,30 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                         <div style="text-align:center"><div id="color-g" style="width:24px;height:24px;background:#0f0;border-radius:4px;transition:background 0.3s"></div><small id="label-g">G</small></div>
                         <div style="text-align:center"><div id="color-b" style="width:24px;height:24px;background:#00f;border-radius:4px;transition:background 0.3s"></div><small id="label-b">B</small></div>
                     </div>
+                    <p class="card-description" style="margin-top:8px;color:#f90">Requiere reinicio para aplicar</p>
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h3>Brillo Automatico (LDR)</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg><h3>Brillo Automatico (LDR)</h3></div>
                 <div class="card-body">
                     <p class="card-description">Valores del sensor LDR (0-4095). Max en 0 = desactivado.</p>
                     <div class="input-row">
                         <div class="form-group"><label class="form-label">Min</label><input type="number" class="form-input" id="autoBrightMin" min="0" max="4095"></div>
                         <div class="form-group"><label class="form-label">Max</label><input type="number" class="form-input" id="autoBrightMax" min="0" max="4095"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.92 6-4.72 7.28L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.94 2.55 2 6.81 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.28 2.28C5.92 18 4 15.21 4 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg><h3>Pin LDR</h3></div>
+                <div class="card-body">
+                    <p class="card-description">Puerto GPIO donde esta conectado el sensor de luz</p>
+                    <div class="form-group">
+                        <label class="form-label">GPIO Pin</label>
+                        <div class="input-row">
+                            <input type="number" class="form-input" id="ldrPin" min="0" max="39" value="35">
+                            <button class="btn btn-primary" onclick="readLdrPin()">Leer</button>
+                        </div>
+                        <div style="margin-top:8px;font-size:13px">Valor actual: <strong id="ldrValue">--</strong></div>
                     </div>
                 </div>
             </div>
@@ -229,7 +244,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         </div>
         <div class="cards">
             <div class="card">
-                <div class="card-header"><h3>Zona Horaria</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><h3>Zona Horaria</h3></div>
                 <div class="card-body">
                     <select class="form-select" id="timeZone">
                         <option value="CST6">Mexico Centro (UTC-6)</option>
@@ -245,7 +260,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h3>Servidor NTP</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M2 17h20v2H2v-2zm11.84-9.21c.1-.24.16-.51.16-.79 0-1.1-.9-2-2-2s-2 .9-2 2c0 .28.06.55.16.79C6.25 8.6 3.27 11.93 3 16h18c-.27-4.07-3.25-7.4-7.16-8.21z"/></svg><h3>Servidor NTP</h3></div>
                 <div class="card-body">
                     <select class="form-select" id="ntpServer">
                         <option value="time.cloudflare.com">Cloudflare (recomendado)</option>
@@ -256,20 +271,37 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h3>Formato</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><h3>Formato de Hora</h3></div>
                 <div class="card-body">
-                    <div class="form-checkbox" style="margin-bottom:10px">
+                    <p class="card-description">Elige entre formato de 24 horas o 12 horas (AM/PM)</p>
+                    <div class="form-checkbox">
                         <input type="checkbox" id="use24hFormat">
-                        <label for="use24hFormat">Formato 24 horas</label>
+                        <label for="use24hFormat">Usar formato 24 horas</label>
                     </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg><h3>Idioma</h3></div>
+                <div class="card-body">
+                    <p class="card-description">Nombres de dias y meses en espanol (Lun, Mar, Ene, Feb...)</p>
                     <div class="form-checkbox">
                         <input type="checkbox" id="useSpanish">
-                        <label for="useSpanish">Espanol (Lun, Mar, Ene...)</label>
+                        <label for="useSpanish">Usar espanol</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg><h3>Posix Timezone</h3></div>
+                <div class="card-body">
+                    <p class="card-description">Cadena Posix manual para evitar consultas remotas. <a href="https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv" target="_blank" style="color:var(--primary)">Ver lista</a></p>
+                    <div class="form-group">
+                        <label class="form-label">Posix String (opcional)</label>
+                        <input type="text" class="form-input" id="manualPosix" placeholder="CST6CDT,M3.2.0,M11.1.0">
                     </div>
                 </div>
             </div>
         </div>
-        <button class="btn btn-save" onclick="saveTime()" style="width:100%;margin-top:20px">Guardar Hora</button>
+        <button class="btn btn-save" onclick="saveTime()" style="width:100%;margin-top:20px">Guardar Hora y Fecha</button>
     </div>
 
     <!-- Canvas Tab -->
@@ -282,7 +314,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         <div class="cards">
             <!-- Storage & Stored Clockfaces -->
             <div class="card" style="grid-column: 1 / -1;">
-                <div class="card-header"><h3>Caratulas Guardadas en el Reloj</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg><h3>Caratulas Guardadas en el Reloj</h3></div>
                 <div class="card-body">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
                         <span>Almacenamiento:</span>
@@ -307,7 +339,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
 
             <!-- Upload -->
             <div class="card">
-                <div class="card-header"><h3>Subir Caratula</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg><h3>Subir Caratula</h3></div>
                 <div class="card-body">
                     <p class="card-description">Sube un archivo JSON desde tu computadora</p>
                     <input type="file" id="clockfaceFile" accept=".json" style="margin-bottom:10px">
@@ -317,7 +349,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
 
             <!-- Download from repo -->
             <div class="card">
-                <div class="card-header"><h3>Descargar del Repositorio</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg><h3>Descargar del Repositorio</h3></div>
                 <div class="card-body">
                     <div class="form-group">
                         <label class="form-label">Fuente</label>
@@ -343,7 +375,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
 
             <!-- Night Mode -->
             <div class="card" style="grid-column: 1 / -1;">
-                <div class="card-header"><h3>Modo Nocturno</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M9 2c-1.05 0-2.05.16-3 .46 4.06 1.27 7 5.06 7 9.54 0 4.48-2.94 8.27-7 9.54.95.3 1.95.46 3 .46 5.52 0 10-4.48 10-10S14.52 2 9 2z"/></svg><h3>Modo Nocturno</h3></div>
                 <div class="card-body">
                     <div style="display:flex;gap:20px;flex-wrap:wrap">
                         <div style="flex:1;min-width:280px">
@@ -404,6 +436,20 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                     </div>
                 </div>
             </div>
+
+            <!-- Info -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg><h3>Informacion</h3></div>
+                <div class="card-body">
+                    <p class="card-description">
+                        El Canvas Clockface usa archivos JSON que definen como se muestra el reloj.<br>
+                        Puedes crear tus propios disenos usando el <strong>Editor de Caratulas</strong>.
+                    </p>
+                    <div style="margin-top:15px">
+                        <a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/" target="_blank" class="btn btn-primary" style="text-decoration:none;display:inline-block">Abrir Editor de Caratulas</a>
+                    </div>
+                </div>
+            </div>
         </div>
         <button class="btn btn-save" id="canvasSaveBtn" onclick="saveClock()" style="width:100%;margin-top:20px">Aplicar Cambios</button>
     </div>
@@ -416,24 +462,41 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         </div>
         <div class="cards">
             <div class="card">
-                <div class="card-header"><h3>Informacion</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg><h3>Informacion</h3></div>
                 <div class="card-body">
-                    <p><strong>Firmware:</strong> <span id="sysName">ClockWise-XE1E</span></p>
-                    <p><strong>Version:</strong> <span id="sysVersion">1.0.0</span></p>
+                    <table style="width:100%;font-size:14px">
+                        <tr><td style="padding:5px 0">Firmware:</td><td><strong id="sysName">ClockWise-XE1E</strong></td></tr>
+                        <tr><td style="padding:5px 0">Version:</td><td><strong id="sysVersion">1.0.0</strong></td></tr>
+                        <tr><td style="padding:5px 0">MAC:</td><td><strong id="sysMac">--:--:--:--:--:--</strong></td></tr>
+                    </table>
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h3>Acciones</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg><h3>Acciones</h3></div>
                 <div class="card-body">
-                    <button class="btn btn-secondary" onclick="restartDevice()" style="width:100%;margin-bottom:10px">Reiniciar</button>
-                    <button class="btn btn-restart" onclick="if(confirm('Restaurar valores de fabrica?'))resetDevice()" style="width:100%">Reset de Fabrica</button>
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                        <button class="btn btn-save" onclick="restartDevice()" style="width:100%">Reiniciar Dispositivo</button>
+                        <button class="btn" style="background:var(--warning);color:#333;width:100%" onclick="if(confirm('Borrar configuracion WiFi? El dispositivo entrara en modo AP.'))resetWifi()">Borrar Config WiFi</button>
+                        <button class="btn btn-restart" onclick="if(confirm('ATENCION: Esto borrara TODA la configuracion. Continuar?'))resetDevice()" style="width:100%">Reset de Fabrica</button>
+                    </div>
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h3>Enlaces</h3></div>
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg><h3>Actualizacion OTA</h3></div>
                 <div class="card-body">
-                    <p><a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/" target="_blank">Editor de Caratulas</a></p>
-                    <p><a href="https://github.com/XE1E/Clockwise-XE1E" target="_blank">Repositorio GitHub</a></p>
+                    <p class="card-description">Actualiza el firmware sin conectar cables</p>
+                    <div class="form-group">
+                        <label class="form-label">Archivo .bin</label>
+                        <input type="file" class="form-input" id="ota-file" accept=".bin" style="padding:8px">
+                    </div>
+                    <button class="btn btn-save" onclick="uploadOTA()" style="width:100%;margin-top:10px">Subir Firmware</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg><h3>Enlaces</h3></div>
+                <div class="card-body">
+                    <p><a href="https://xe1e.github.io/Clockwise-XE1E/clockface-editor/" target="_blank" style="color:var(--primary)">Editor de Caratulas</a></p>
+                    <p><a href="https://github.com/XE1E/Clockwise-XE1E" target="_blank" style="color:var(--primary)">Repositorio GitHub</a></p>
                 </div>
             </div>
         </div>
@@ -470,7 +533,10 @@ async function loadSystemInfo(){
     try{
         const r=await fetch('/api/system');
         const d=await r.json();
-        $('free-heap').textContent=Math.round(d.freeHeap/1024)+'KB';
+        const usedRAM=d.totalHeap-d.freeHeap;
+        const pctRAM=Math.round(usedRAM/d.totalHeap*100);
+        $('ram-info').textContent=pctRAM+'% ('+Math.round(usedRAM/1024)+'/'+Math.round(d.totalHeap/1024)+'KB)';
+        if(d.mac&&$('sysMac'))$('sysMac').textContent=d.mac;
         uptimeStart=Date.now()-d.uptimeMs;
         updateUptime();
     }catch(e){console.error(e);}
@@ -499,6 +565,8 @@ function updateColorSwapPreview(){
     }
 }
 function resetDevice(){api('reset');toast('Restaurando...');}
+function resetWifi(){api('resetwifi');toast('WiFi borrado. Reiniciando...');}
+function uploadOTA(){alert('Funcion no Habilitada');return false;}
 
 // Color helpers
 function rgb565ToHex(v){
@@ -527,7 +595,7 @@ async function loadStorageInfo(){
         $('storageInfo').textContent=freeKB+'KB libres ('+pct+'% usado)';
         $('storageBar').style.width=pct+'%';
         $('storageBar').style.background=pct>90?'#ea4335':pct>70?'#fbbc04':'#34a853';
-        $('spiffs-info').textContent=usedKB+'/'+totalKB+'KB';
+        $('spiffs-info').textContent=pct+'% ('+usedKB+'/'+totalKB+'KB)';
     }catch(e){$('storageInfo').textContent='Error';console.error(e);}
 }
 
@@ -852,7 +920,17 @@ async function saveDisplay(){
     await saveField('swapBlueGreen',$('swapBlueGreen').checked?'1':'0');
     await saveField('autoBrightMin',$('autoBrightMin').value);
     await saveField('autoBrightMax',$('autoBrightMax').value);
+    await saveField('ldrPin',$('ldrPin').value);
     toast('Pantalla guardada');
+}
+
+async function readLdrPin(){
+    var pin=$('ldrPin').value;
+    try{
+        var r=await fetch('/api/pin?pin='+pin);
+        var d=await r.json();
+        $('ldrValue').textContent=d.value;
+    }catch(e){$('ldrValue').textContent='Error';}
 }
 
 async function saveTime(){
@@ -860,7 +938,8 @@ async function saveTime(){
     await saveField('ntpServer',$('ntpServer').value);
     await saveField('use24hFormat',$('use24hFormat').checked?'1':'0');
     await saveField('useSpanish',$('useSpanish').checked?'1':'0');
-    toast('Hora guardada');
+    await saveField('manualPosix',$('manualPosix').value);
+    toast('Hora y Fecha guardada');
 }
 
 async function saveClock(){
@@ -913,11 +992,13 @@ async function load(){
         $('swapBlueGreen').checked=settings.swapBlueGreen==1;
         $('autoBrightMin').value=settings.autoBrightMin||0;
         $('autoBrightMax').value=settings.autoBrightMax||0;
+        $('ldrPin').value=settings.ldrPin||35;
 
         $('timeZone').value=settings.timeZone||'CST6';
         $('ntpServer').value=settings.ntpServer||'time.cloudflare.com';
         $('use24hFormat').checked=settings.use24hFormat==1;
         $('useSpanish').checked=settings.useSpanish==1;
+        $('manualPosix').value=settings.manualPosix||'';
 
         $('canvasFile').value=settings.canvasFile||'';
         $('rotationEnabled').checked=settings.rotationEnabled==1;

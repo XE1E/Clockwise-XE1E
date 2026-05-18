@@ -108,13 +108,18 @@ void checkClockfaceRotation() {
   String rotList = ClockwiseParams::getInstance()->rotationList;
   if (rotList.length() == 0) return;
 
-  unsigned long intervalMs = ClockwiseParams::getInstance()->rotationInterval * 60000UL;
+  uint16_t interval = ClockwiseParams::getInstance()->rotationInterval;
+  if (interval == 0) return;
+
+  int count = 1;
+  for (int i = 0; i < rotList.length(); i++) {
+    if (rotList[i] == ',') count++;
+  }
+  if (count < 2) return;
+
+  unsigned long intervalMs = interval * 60000UL;
 
   if (millis() - rotationMillis >= intervalMs) {
-    int count = 1;
-    for (int i = 0; i < rotList.length(); i++) {
-      if (rotList[i] == ',') count++;
-    }
 
     uint8_t nextIndex = (ClockwiseParams::getInstance()->rotationIndex + 1) % count;
     ClockwiseParams::getInstance()->rotationIndex = nextIndex;
@@ -255,6 +260,14 @@ void loop()
     if (ClockwiseWebServer::getInstance()->needs_brightness_update && !nightModeActive) {
       ClockwiseWebServer::getInstance()->needs_brightness_update = false;
       dma_display->setBrightness8(ClockwiseWebServer::getInstance()->pending_brightness);
+    }
+
+    // Apply display rotation change from web UI immediately
+    if (ClockwiseWebServer::getInstance()->needs_display_rotation_update) {
+      ClockwiseWebServer::getInstance()->needs_display_rotation_update = false;
+      dma_display->setRotation(ClockwiseWebServer::getInstance()->pending_display_rotation);
+      dma_display->clearScreen();
+      needsClockfaceReload = true;
     }
 
     // Handle rotation enable/disable

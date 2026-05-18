@@ -19,6 +19,8 @@ struct ClockwiseWebServer
   bool needs_reload = false;
   bool needs_brightness_update = false;
   uint8_t pending_brightness = 0;
+  bool needs_display_rotation_update = false;
+  uint8_t pending_display_rotation = 0;
   bool rotation_changed = false;
 
   ClockwiseWebServer() : server(80) {}
@@ -67,9 +69,11 @@ struct ClockwiseWebServer
       json += "\"swapBlueGreen\":" + String(ClockwiseParams::getInstance()->swapBlueGreen ? 1 : 0) + ",";
       json += "\"autoBrightMin\":" + String(ClockwiseParams::getInstance()->autoBrightMin) + ",";
       json += "\"autoBrightMax\":" + String(ClockwiseParams::getInstance()->autoBrightMax) + ",";
+      json += "\"ldrPin\":" + String(ClockwiseParams::getInstance()->ldrPin) + ",";
       // Time
       json += "\"timeZone\":\"" + ClockwiseParams::getInstance()->timeZone + "\",";
       json += "\"ntpServer\":\"" + ClockwiseParams::getInstance()->ntpServer + "\",";
+      json += "\"manualPosix\":\"" + ClockwiseParams::getInstance()->manualPosix + "\",";
       json += "\"use24hFormat\":" + String(ClockwiseParams::getInstance()->use24hFormat ? 1 : 0) + ",";
       json += "\"useSpanish\":" + String(ClockwiseParams::getInstance()->useSpanish ? 1 : 0) + ",";
       // Night mode
@@ -115,13 +119,19 @@ struct ClockwiseWebServer
           pending_brightness = value.toInt();
           needs_brightness_update = true;
         }
-        else if (key == "displayRotation") ClockwiseParams::getInstance()->displayRotation = value.toInt();
+        else if (key == "displayRotation") {
+          ClockwiseParams::getInstance()->displayRotation = value.toInt();
+          pending_display_rotation = value.toInt();
+          needs_display_rotation_update = true;
+        }
         else if (key == "swapBlueGreen") ClockwiseParams::getInstance()->swapBlueGreen = (value == "1");
         else if (key == "autoBrightMin") ClockwiseParams::getInstance()->autoBrightMin = value.toInt();
         else if (key == "autoBrightMax") ClockwiseParams::getInstance()->autoBrightMax = value.toInt();
+        else if (key == "ldrPin") ClockwiseParams::getInstance()->ldrPin = value.toInt();
         // Time
         else if (key == "timeZone") ClockwiseParams::getInstance()->timeZone = value;
         else if (key == "ntpServer") ClockwiseParams::getInstance()->ntpServer = value;
+        else if (key == "manualPosix") ClockwiseParams::getInstance()->manualPosix = value;
         else if (key == "use24hFormat") ClockwiseParams::getInstance()->use24hFormat = (value == "1");
         else if (key == "useSpanish") ClockwiseParams::getInstance()->useSpanish = (value == "1");
         // Night mode
@@ -212,6 +222,19 @@ struct ClockwiseWebServer
       }
     );
 
+    // API: reset WiFi config
+    server.on("/api/resetwifi", HTTP_POST, [this](AsyncWebServerRequest *request) {
+      ClockwiseParams::getInstance()->wifiSsid = "";
+      ClockwiseParams::getInstance()->wifiPwd = "";
+      ClockwiseParams::getInstance()->wifiSsid2 = "";
+      ClockwiseParams::getInstance()->wifiPwd2 = "";
+      ClockwiseParams::getInstance()->wifiSsid3 = "";
+      ClockwiseParams::getInstance()->wifiPwd3 = "";
+      ClockwiseParams::getInstance()->save();
+      request->send(200, "text/plain", "WiFi reset, restarting...");
+      force_restart = true;
+    });
+
     // API: obtener info del sistema (RAM, uptime, etc)
     server.on("/api/system", HTTP_GET, [](AsyncWebServerRequest *request) {
       String json = "{";
@@ -221,6 +244,7 @@ struct ClockwiseWebServer
       json += "\"chipModel\":\"" + String(ESP.getChipModel()) + "\",";
       json += "\"chipCores\":" + String(ESP.getChipCores()) + ",";
       json += "\"cpuFreqMHz\":" + String(ESP.getCpuFreqMHz()) + ",";
+      json += "\"mac\":\"" + WiFi.macAddress() + "\",";
       json += "\"uptimeMs\":" + String(millis());
       json += "}";
       request->send(200, "application/json", json);
