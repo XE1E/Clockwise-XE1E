@@ -404,13 +404,18 @@ struct ClockwiseWebServer
       if (bgPos) bg = atoi(bgPos + 10);
 
       String imgStr = "";
-      const char* keys[] = {"\"thumbnail\":\"", "\"image\":\""};
+      const char* keys[] = {"\"thumbnail\":", "\"image\":"};
       for (const char* key : keys) {
         char* pos = strstr(buf, key);
         if (pos) {
-          const char* start = pos + strlen(key);
-          const char* end = strchr(start, '"');
-          if (end && end > start) { imgStr = String(start, (unsigned int)(end - start)); break; }
+          // Skip to the opening quote (handles optional space after colon)
+          const char* p = pos + strlen(key);
+          while (*p == ' ' || *p == '\t') p++;
+          if (*p == '"') {
+            const char* start = p + 1;
+            const char* end = strchr(start, '"');
+            if (end && end > start) { imgStr = String(start, (unsigned int)(end - start)); break; }
+          }
         }
       }
       free(buf);
