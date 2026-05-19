@@ -128,17 +128,17 @@ interfaz web moderna y soporte multi-WiFi.
 **Prioridad:** Media
 
 ### 5.1 Editores existentes (clockface-editor/)
-- [ ] Revisar y actualizar index.html (editor principal)
-- [ ] Revisar digit-designer.html
+- [x] Revisar y actualizar index.html (editor principal)
+- [x] Revisar digit-designer.html
 - [ ] Revisar char-designer.html
 - [ ] Revisar font-converter.html
 - [x] Integrar en nueva interfaz web
 - [ ] Documentar uso de cada editor
 
 ### 5.2 Clockfaces
-- [ ] Verificar funcionamiento de carátulas built-in
-- [ ] Verificar carátulas JSON
-- [ ] Generar thumbnails faltantes
+- [x] Verificar funcionamiento de carátulas built-in
+- [x] Verificar carátulas JSON
+- [x] Generar thumbnails faltantes
 - [ ] Documentar formato JSON de carátulas
 
 ---
