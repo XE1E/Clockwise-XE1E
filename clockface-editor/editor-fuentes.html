@@ -72,8 +72,8 @@
             margin: 10px 0;
         }
         .pixel {
-            width: 14px;
-            height: 14px;
+            width: 22px;
+            height: 22px;
             background: #000;
             cursor: pointer;
         }
@@ -319,11 +319,11 @@
                 <div>
                     <div class="preview-row">
                         <div class="preview-box">
-                            <span>1x</span>
+                            <span>4x</span>
                             <canvas id="preview-1x" class="preview-canvas"></canvas>
                         </div>
                         <div class="preview-box">
-                            <span>4x</span>
+                            <span>6x</span>
                             <canvas id="preview-4x" class="preview-canvas"></canvas>
                         </div>
                     </div>
@@ -511,7 +511,7 @@
         function createGrid() {
             const grid = document.getElementById('pixel-grid');
             grid.innerHTML = '';
-            grid.style.gridTemplateColumns = `repeat(${WIDTH}, 14px)`;
+            grid.style.gridTemplateColumns = `repeat(${WIDTH}, 22px)`;
 
             if (!chars[currentChar]) chars[currentChar] = createEmptyGrid();
 
@@ -541,8 +541,8 @@
             const c1 = document.getElementById('preview-1x');
             const c4 = document.getElementById('preview-4x');
             c1.width = WIDTH; c1.height = HEIGHT;
-            c1.style.width = WIDTH * 2 + 'px'; c1.style.height = HEIGHT * 2 + 'px';
-            c4.width = WIDTH * 4; c4.height = HEIGHT * 4;
+            c1.style.width = WIDTH * 4 + 'px'; c1.style.height = HEIGHT * 4 + 'px';
+            c4.width = WIDTH * 6; c4.height = HEIGHT * 6;
 
             const ctx1 = c1.getContext('2d');
             const ctx4 = c4.getContext('2d');
@@ -582,7 +582,7 @@
 
                 const canvas = document.createElement('canvas');
                 canvas.width = WIDTH; canvas.height = HEIGHT;
-                canvas.style.width = WIDTH * 2 + 'px'; canvas.style.height = HEIGHT * 2 + 'px';
+                canvas.style.width = WIDTH * 3 + 'px'; canvas.style.height = HEIGHT * 3 + 'px';
                 const ctx = canvas.getContext('2d');
                 ctx.fillStyle = '#000';
                 ctx.fillRect(0, 0, WIDTH, HEIGHT);
