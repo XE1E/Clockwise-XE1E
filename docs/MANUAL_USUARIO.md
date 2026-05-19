@@ -18,47 +18,110 @@
 2. Usa una herramienta como ESP Flash Tool
 3. Flashea el archivo a la direccion 0x0
 
-### 2. Conectar a WiFi
+### 2. Conectar a WiFi (Primera vez)
 
 1. Enciende el reloj (conecta la fuente de 5V)
-2. El reloj creara una red WiFi llamada **"Clockwise"**
-3. Conectate a esa red desde tu celular o computadora
-4. Se abrira automaticamente una pagina de configuracion
-5. Selecciona tu red WiFi e ingresa la contrasena
-6. El reloj se reiniciara y se conectara a tu red
+2. El reloj mostrara el logo de Clockwise y luego "WiFi Connecting..."
+3. Como no hay red configurada, creara una red WiFi llamada **"Clockwise-XXXX"**
+4. Conectate a esa red desde tu celular o computadora
+5. Se abrira automaticamente una pagina de configuracion (Improv WiFi)
+6. Selecciona tu red WiFi e ingresa la contrasena
+7. El reloj se reiniciara y se conectara a tu red
 
 ### 3. Acceder a la Configuracion
 
-1. Asegurate de estar en la misma red WiFi que el reloj
-2. Abre un navegador y escribe: **http://clockwise.local**
-3. La pagina de configuracion se mostrara
+Despues de conectar el reloj a tu WiFi, puedes acceder a la configuracion de dos formas:
 
-**Nota:** Si `clockwise.local` no funciona (comun en Windows sin Bonjour), busca la IP del reloj:
-   - Revisa tu router para ver dispositivos conectados
-   - O usa una app como "Fing" para escanear la red
-   - Luego escribe la IP directamente (ej: `192.168.1.50`)
+#### Ver la IP en pantalla
+- Al encender, el reloj muestra brevemente la IP asignada (ej: `192.168.1.50`)
+- Escribe esa IP en tu navegador
+
+#### Usar el nombre mDNS
+- Abre un navegador y escribe: **http://clockwise-xe1e.local**
+- Funciona en la mayoria de dispositivos (Mac, iOS, Android, Linux)
+- En Windows puede requerir Bonjour instalado
+
+**Si ninguna opcion funciona:**
+- Revisa tu router para ver dispositivos conectados
+- Busca un dispositivo llamado "ESP32" o "Clockwise"
+- Usa una app como "Fing" para escanear la red
 
 ---
 
-## Configuracion del Reloj
+## Interfaz de Configuracion
+
+La pagina de configuracion tiene 5 pestanas:
+
+| Pestana | Contenido |
+|---------|-----------|
+| **WiFi** | Configurar hasta 3 redes WiFi |
+| **Pantalla** | Brillo, rotacion, brillo automatico |
+| **Hora y Fecha** | Zona horaria, formato 24h, idioma, servidor NTP |
+| **Canvas** | Caratulas guardadas, subir/descargar, modo nocturno, rotacion |
+| **Sistema** | Version de firmware, reiniciar, reset de fabrica |
+
+### Barra Superior
+- Muestra red WiFi actual, IP, memoria disponible, uso de SPIFFS y tiempo encendido
+- Boton **Reiniciar** para aplicar cambios
+
+---
+
+## WiFi
+
+### Multiples Redes WiFi
+El reloj puede guardar hasta **3 redes WiFi**:
+- **Red 1 (Principal):** La red que usaras normalmente
+- **Red 2 y 3 (Respaldo):** Redes alternativas si la principal no esta disponible
+
+El reloj intentara conectar en orden: Red 1 → Red 2 → Red 3
+
+### Cambiar de Red
+1. Ve a la pestana WiFi
+2. Ingresa SSID y contrasena de la nueva red
+3. Haz clic en "Guardar WiFi"
+4. Reinicia el reloj
+
+**Nota:** Solo funcionan redes WiFi de **2.4 GHz** (no 5 GHz).
+
+---
+
+## Pantalla
 
 ### Brillo
-- Mueve el control deslizante para ajustar el brillo
-- 0 = apagado, 255 = maximo brillo
+- Mueve el control deslizante para ajustar (1-255)
+- El cambio se aplica inmediatamente
 - **Recomendado:** 30-60 para uso normal
 
-### Formato de Hora
-- Activa para mostrar hora en formato 24 horas (14:00)
-- Desactiva para formato 12 horas (2:00 PM)
+### Rotacion de Pantalla
+Si montaste el reloj en otra orientacion:
+- 0° = Normal
+- 90° = Rotado a la derecha
+- 180° = De cabeza
+- 270° = Rotado a la izquierda
 
-### Idioma
-- Activa "Espanol" para ver dias y meses en espanol
-- Lun, Mar, Mie... Ene, Feb, Mar...
+El cambio se aplica inmediatamente.
+
+### Brillo Automatico (LDR)
+Si tu reloj tiene sensor de luz (LDR):
+
+1. En "Brillo Automatico", haz clic en **"Leer Pin"** con luz normal
+2. Anota el valor (ej: 2500)
+3. Oscurece la habitacion y haz clic en **"Leer Pin"** de nuevo
+4. Anota el valor (ej: 500)
+5. Ingresa el valor bajo en "Min" y el alto en "Max"
+6. Guarda
+
+**Para desactivar:** Pon ambos valores en 0.
+
+---
+
+## Hora y Fecha
 
 ### Zona Horaria
 Ingresa tu zona horaria. Ejemplos:
+
 | Pais | Zona Horaria |
-|---|---|
+|------|--------------|
 | Mexico (Centro) | America/Mexico_City |
 | Mexico (Pacifico) | America/Tijuana |
 | Colombia | America/Bogota |
@@ -68,155 +131,130 @@ Ingresa tu zona horaria. Ejemplos:
 | Peru | America/Lima |
 | Venezuela | America/Caracas |
 
+### Formato de Hora
+- **Activado:** Formato 24 horas (14:00)
+- **Desactivado:** Formato 12 horas (2:00 PM)
+
+### Idioma Espanol
+- **Activado:** Dias y meses en espanol (Lun, Mar, Ene, Feb...)
+- **Desactivado:** En ingles (Mon, Tue, Jan, Feb...)
+
+### Servidor NTP
+Por defecto usa `time.google.com`. Puedes cambiarlo si lo necesitas.
+
 ---
 
-## Brillo Automatico
+## Canvas (Caratulas)
 
-Si tu reloj tiene sensor de luz (LDR), puedes activar el brillo automatico:
+### Caratulas Guardadas
+Las caratulas se almacenan en la memoria del reloj. Puedes:
+- **Ver miniaturas** de cada caratula
+- **Seleccionar** cual mostrar haciendo clic
+- **Eliminar** con el boton X
+- **Subir nuevas** desde tu computadora
+- **Descargar** del repositorio de GitHub
 
-1. Busca la tarjeta "Automatic Bright"
-2. Calibra los valores:
-   - Haz clic en "Read Pin" con luz normal y anota el valor
-   - Oscurece la habitacion, haz clic en "Read Pin" y anota el valor
-   - Ingresa el valor bajo en "Min" y el alto en "Max"
-3. Guarda la configuracion
+### Subir Caratula
+1. Haz clic en "Subir Caratula"
+2. Selecciona un archivo `.json` de caratula
+3. La caratula se guarda en el reloj
 
-**Para desactivar:** Pon ambos valores en 0.
+### Descargar del Repositorio
+1. Selecciona la fuente (GitHub XE1E o Servidor Local)
+2. Elige la caratula del menu desplegable
+3. Haz clic en "Descargar y Guardar"
+
+### Servidor Local (Desarrollo)
+Si estas creando caratulas y quieres probarlas:
+1. Selecciona fuente "Servidor Local"
+2. Ingresa la IP de tu computadora y puerto (ej: 8080)
+3. Ejecuta en tu computadora: `python -m http.server 8080`
+4. Escribe el nombre de la caratula y descarga
 
 ---
 
 ## Modo Nocturno
 
-El modo nocturno reduce el brillo y cambia la caratula durante la noche para no molestar al dormir.
+Reduce el brillo y cambia la caratula durante la noche.
 
 ### Configurar
-1. Activa "Modo Nocturno"
-2. Configura el horario (ej: inicio 22:00, fin 07:00)
-3. Ajusta el brillo nocturno (recomendado: 4-8)
-4. Selecciona el color de los digitos (rojo recomendado)
-5. Elige la caratula nocturna
-6. Guarda y reinicia
+1. Activa **"Modo Nocturno"**
+2. Configura horario:
+   - **Hora inicio:** Cuando empieza (ej: 22:00)
+   - **Hora fin:** Cuando termina (ej: 07:00)
+3. Ajusta el **brillo nocturno** (recomendado: 4-8)
+4. Selecciona el **color de los digitos** haciendo clic en uno de los botones de color
+5. Elige la **caratula nocturna**:
+   - "Builtin" usa un reloj minimalista integrado
+   - O selecciona una de las caratulas guardadas
+6. Haz clic en "Guardar Canvas"
 
-### Colores Recomendados
-- **Rojo:** No afecta la vision nocturna
-- **Naranja:** Suave y calido
-- **Verde oscuro:** Bajo impacto visual
+### Colores Recomendados para Dormir
+| Color | Efecto |
+|-------|--------|
+| **Rojo** | No afecta la vision nocturna |
+| **Naranja** | Suave y calido |
+| **Verde oscuro** | Bajo impacto visual |
+
+El color seleccionado muestra un borde blanco para identificarlo.
 
 ---
 
-## Rotacion de Caratulas
+## Rotacion Automatica de Caratulas
 
 Cambia automaticamente entre diferentes caratulas.
 
 ### Configurar
-1. Activa "Rotacion de Caratulas"
-2. Configura el intervalo en minutos:
+1. Activa **"Rotacion automatica"**
+2. Configura el **intervalo en minutos**:
    - 60 = cada hora
-   - 1440 = cada dia
-3. Marca las caratulas que quieres incluir
-4. Guarda y reinicia
+   - 1440 = cada dia (24 horas)
+3. Selecciona las caratulas haciendo clic en cada una (aparece numero de orden)
+4. Arrastra para reordenar la secuencia
+5. Haz clic en "Guardar Canvas"
 
 **Nota:** La rotacion se pausa durante el modo nocturno.
 
 ---
 
-## Caratulas Disponibles
+## Sistema
 
-| Caratula | Descripcion |
-|---|---|
-| Nyan Cat | El gato arcoiris animado |
-| Pac-Man | Clasico de arcade |
-| Goomba | Enemigo de Mario Bros |
-| Snoopy | El perro de Peanuts |
-| Snoopy Navidad | Version navidena |
-| Clock Club | Estilo moderno |
-| Donkey Kong | Arcade clasico |
-| Pepsi | Logo retro |
-| Retro Computer | Estilo computadora antigua |
-| Star Wars | Tematica espacial |
-| Reloj Nocturno | Minimalista, ideal para dormir |
+### Version de Firmware
+Muestra la version actual del firmware instalado.
 
----
+### Reiniciar
+Reinicia el reloj. Necesario despues de algunos cambios.
 
-## Cambiar Caratula Manualmente
+### Reset de Fabrica
+Borra toda la configuracion y vuelve a valores por defecto:
+- WiFi: sin configurar
+- Zona horaria: America/Mexico_City
+- Brillo: 32
+- Formato 24h: activado
+- Idioma espanol: activado
 
-1. Accede a la pagina de configuracion
-2. En "Description file" escribe el nombre de la caratula
-3. Guarda y reinicia
-
-Nombres disponibles: `nyan-cat`, `pac-man`, `goomba_move`, `snoopy3`, `christmassnoopy`, `clock-club`, `donkey-kong`, `pepsi-final-2`, `retro-computer`, `star-wars`, `night-clock`
-
----
-
-## Probar Caratulas (Desarrollo)
-
-Si estas creando o editando caratulas, puedes probarlas en el reloj antes de subirlas a GitHub.
-
-### Metodo Rapido: Boton "Probar en Reloj" (Recomendado)
-
-La forma mas facil es usar el boton integrado en el Editor de Caratulas:
-
-1. Abre el **Editor de Caratulas** desde la pagina de configuracion
-2. Disena o importa tu caratula
-3. Haz clic en el boton verde **"Probar en Reloj"**
-4. Ingresa la IP de tu reloj (ej: `192.168.1.50`)
-5. Haz clic en **"Enviar al Reloj"**
-6. La caratula aparece inmediatamente en el reloj
-
-**Ventajas:**
-- No necesitas instalar nada
-- No necesitas usar la terminal
-- La IP se guarda para la proxima vez
-- Cambios instantaneos
-
-**Como encontrar la IP del reloj:**
-- Aparece en la pantalla del reloj al encender
-- O busca "Clockwise" en la lista de dispositivos de tu router
-
-### Metodo Alternativo: Servidor Local
-
-Si prefieres trabajar con archivos JSON guardados localmente:
-
-1. Guarda tu archivo JSON en una carpeta
-2. Abre una terminal en esa carpeta y ejecuta:
-   ```bash
-   python -m http.server 8080
-   ```
-3. En la configuracion del reloj:
-   - Fuente: **"Local (desarrollo)"**
-   - IP: la de tu computadora (ej: `192.168.1.100`)
-   - Puerto: `8080`
-4. Escribe el nombre de la caratula y guarda
-
-**Para obtener la IP de tu computadora:**
-- **Windows:** `ipconfig` en cmd
-- **Mac/Linux:** `ifconfig` o `ip addr`
-
----
-
-## Reiniciar el Reloj
-
-Haz clic en el boton "Restart" en la parte superior de la pagina de configuracion.
-
-Algunos cambios requieren reinicio para aplicarse:
-- Zona horaria
-- Modo nocturno
-- Rotacion de caratulas
+**Atencion:** Tambien borra las caratulas guardadas.
 
 ---
 
 ## Solucionar Problemas
 
-### No puedo conectarme a la red "Clockwise"
+### No puedo conectarme a la red "Clockwise-XXXX"
 - Espera 30 segundos despues de encender
 - Acercate mas al reloj
 - Reinicia el reloj desconectando y conectando la fuente
 
+### La pagina de configuracion no carga
+- Verifica que estes en la misma red WiFi que el reloj
+- Intenta con la IP directa en lugar de clockwise-xe1e.local
+- Espera unos segundos y recarga la pagina
+- Si el problema persiste, reinicia el reloj
+
 ### Olvide la IP del reloj
-- Intenta acceder a **http://clockwise.local** (mDNS)
-- Si no funciona, revisa la lista de dispositivos en tu router
+- La IP aparece brevemente en la pantalla al encender
+- Intenta **http://clockwise-xe1e.local**
+- Revisa la lista de dispositivos en tu router
 - Usa una app como "Fing" para escanear la red
-- Busca un dispositivo llamado "ESP32" o "Clockwise"
 
 ### La hora esta incorrecta
 - Verifica que la zona horaria sea correcta
@@ -225,47 +263,44 @@ Algunos cambios requieren reinicio para aplicarse:
 
 ### El brillo no cambia
 - Si usas brillo automatico, verifica los valores min/max
-- Intenta poner ambos en 0 para desactivar y usar brillo manual
+- Pon ambos en 0 para desactivar y usar brillo manual
 
 ### El modo nocturno no se activa
-- Verifica que este activado
+- Verifica que este activado y guardado
 - Confirma que el horario sea correcto
 - Revisa que la hora del reloj sea correcta
 
 ### Los colores se ven mal (azul y verde invertidos)
-- Activa la opcion "Swap Blue/Green pins" en configuracion avanzada
+- En Pantalla, activa "Intercambiar Azul/Verde"
 - Reinicia el reloj
 
 ### El reloj no se conecta a mi WiFi
 - Verifica que la contrasena sea correcta
-- Asegurate de que tu red sea de 2.4 GHz (no 5 GHz)
+- Asegurate de que tu red sea de **2.4 GHz** (no 5 GHz)
 - Acerca el reloj al router
 
----
-
-## Resetear Configuracion WiFi
-
-Si necesitas conectar el reloj a otra red WiFi:
-1. El reloj debe estar encendido
-2. Espera a que intente conectar (aprox 30 segundos)
-3. Si no puede conectar, automaticamente creara la red "Clockwise"
-4. Conectate y configura la nueva red
+### Los thumbnails no aparecen
+- Las caratulas necesitan tener el campo "thumbnail" en el JSON
+- Usa el generador de thumbnails del editor para agregarlos
+- Vuelve a subir las caratulas actualizadas
 
 ---
 
 ## Especificaciones
 
 | Caracteristica | Valor |
-|---|---|
-| Display | Panel LED 64x64 pixels |
+|----------------|-------|
+| Display | Panel LED HUB75 64x64 pixels |
+| Microcontrolador | ESP32 |
 | Conexion | WiFi 2.4 GHz |
 | Alimentacion | 5V / 4A minimo |
 | Sincronizacion | NTP (automatica por internet) |
+| Almacenamiento | SPIFFS para caratulas |
 
 ---
 
 ## Soporte
 
-Si tienes problemas o sugerencias, visita:
-- GitHub: [Enlace al repositorio]
-- Email: [Correo de soporte]
+Si tienes problemas o sugerencias:
+- **GitHub:** https://github.com/XE1E/Clockwise-XE1E
+- **Email:** webmaster@luyoa.com
