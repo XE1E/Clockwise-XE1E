@@ -310,7 +310,19 @@
 
                         const dataUrl = canvas.toDataURL('image/png');
                         const thumbBase64 = dataUrl.replace(/^data:image\/png;base64,/, '');
-                        const updatedJson = { ...json, thumbnail: thumbBase64 };
+                        // Build JSON with thumbnail BEFORE large arrays (setup/sprites/loop)
+                        // This ensures thumbnail is within the first 12KB that the ESP32 reads
+                        const updatedJson = {
+                            name: json.name,
+                            version: json.version,
+                            author: json.author,
+                            bgColor: json.bgColor,
+                            thumbnail: thumbBase64,
+                            delay: json.delay,
+                            setup: json.setup,
+                            sprites: json.sprites,
+                            loop: json.loop
+                        };
                         const jsonStr = JSON.stringify(updatedJson, null, 2);
                         const jsonSize = (new Blob([jsonStr]).size / 1024).toFixed(1);
 
@@ -428,7 +440,18 @@
                 const dataUrl = canvas.toDataURL('image/png');
                 const thumbBase64 = dataUrl.replace(/^data:image\/png;base64,/, '');
 
-                const updatedJson = { ...json, thumbnail: thumbBase64 };
+                // Build JSON with thumbnail BEFORE large arrays
+                const updatedJson = {
+                    name: json.name,
+                    version: json.version,
+                    author: json.author,
+                    bgColor: json.bgColor,
+                    thumbnail: thumbBase64,
+                    delay: json.delay,
+                    setup: json.setup,
+                    sprites: json.sprites,
+                    loop: json.loop
+                };
                 const jsonStr = JSON.stringify(updatedJson, null, 2);
                 const jsonSize = (new Blob([jsonStr]).size / 1024).toFixed(1);
 

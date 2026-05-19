@@ -504,21 +504,23 @@ class Clockface {
             .map(s => s.frames || s)
             .filter(frames => Array.isArray(frames) && frames.length > 0);
 
+        // Build result with thumbnail BEFORE large arrays (setup/sprites/loop)
+        // This ensures thumbnail is within the first 12KB that the ESP32 reads
         const result = {
             name: this.name,
             version: this.version,
             author: this.author,
             bgColor: this.bgColor,
-            delay: this.delay,
-            setup: setup,
-            sprites: validSprites,
-            loop: loop
         };
 
-        // Include thumbnail if available and requested
         if (includeThumbnail && this.thumbnail) {
             result.thumbnail = this.thumbnail;
         }
+
+        result.delay = this.delay;
+        result.setup = setup;
+        result.sprites = validSprites;
+        result.loop = loop;
 
         return result;
     }
