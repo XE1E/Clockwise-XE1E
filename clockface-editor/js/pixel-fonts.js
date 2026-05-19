@@ -261,7 +261,13 @@ const PixelFonts = {
     // Cargar fuentes desde carpeta fonts/
     async loadFromFolder(folderPath = 'fonts/') {
         try {
-            const indexRes = await fetch(folderPath + 'index.json');
+            // Detect GitHub Pages and use raw URL
+            const isGitHub = location.hostname.includes('github.io');
+            const baseUrl = isGitHub
+                ? 'https://raw.githubusercontent.com/XE1E/Clockwise-XE1E/main/clockface-editor/'
+                : '';
+
+            const indexRes = await fetch(baseUrl + folderPath + 'index.json');
             if (!indexRes.ok) return [];
 
             const index = await indexRes.json();
@@ -269,7 +275,7 @@ const PixelFonts = {
 
             for (const fontFile of index.fonts || []) {
                 try {
-                    const res = await fetch(folderPath + fontFile);
+                    const res = await fetch(baseUrl + folderPath + fontFile);
                     if (res.ok) {
                         const fontData = await res.json();
                         if (fontData.name && this.register(fontData.name, fontData)) {
