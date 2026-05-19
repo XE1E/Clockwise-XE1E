@@ -21,10 +21,9 @@
 #include "fonts/nocturno.h"
 #include "fonts/ledDisplay.h"
 // BDF converted fonts (only 8-pixel width fonts work correctly)
-#include "fonts/font7x14.h"
-#include "fonts/font7x14B.h"
 #include "fonts/font8x13.h"
 #include "fonts/font8x13B.h"
+#include "fonts/haxorMedium12.h"
 #include "PNGRender.h"
 #include "CustomSprite.h"
 #include "CWHttpClient.h"

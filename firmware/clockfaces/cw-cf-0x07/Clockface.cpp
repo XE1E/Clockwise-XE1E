@@ -151,14 +151,6 @@ void Clockface::setFont(const char *fontName)
     Locator::getDisplay()->setFont(&ledDisplay);
   }
   // BDF converted fonts
-  else if (strcmp(fontName, "7x14") == 0)
-  {
-    Locator::getDisplay()->setFont(&font7x14);
-  }
-  else if (strcmp(fontName, "7x14B") == 0)
-  {
-    Locator::getDisplay()->setFont(&font7x14B);
-  }
   else if (strcmp(fontName, "8x13") == 0)
   {
     Locator::getDisplay()->setFont(&font8x13);
@@ -166,6 +158,10 @@ void Clockface::setFont(const char *fontName)
   else if (strcmp(fontName, "8x13B") == 0)
   {
     Locator::getDisplay()->setFont(&font8x13B);
+  }
+  else if (strcmp(fontName, "haxor-12") == 0)
+  {
+    Locator::getDisplay()->setFont(&haxorMedium12);
   }
   else
   {
