@@ -2,26 +2,27 @@
   "name": "Star Wars",
   "version": 1,
   "author": "@jnthas",
+  "bgColor": 0,
+  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFAUlEQVR4AeyYTZbbRgyEKWfhLPN8ASc31BF8BN0wyQX8sowXsYKvxWoWwebfSJ6xLc5jEUChgO4GKY0977on/zkG8OQvQHe8Accb8OQTqB+Ba/zEB+K6hC9/f7g+Elprqac0xXZd2d+SPudK3btbHX4cs/TQc68DOP1yEte0X/78UPj3f3zuCj72VvFOW5rFbdLX+kS6Ux4/DlAMt7IH07ZidKP6IPI56wAiN1xfBxdPTViEuKBdWVJ7b6O+VjzHm2TRVb323xK3j9Fg1UxNaDoHabBbNOgE9PK3Wmocq3X2gMdHtcRqkxAwlIygJ1fWKGbTE3GD2KJTT8pX9XZqc6N0HAUxXLkpC464teHN5OmjVehHjBVHLH/JUgPQbK1BO39k27AaagEKhcrNd7pJ1/I31fLd9uRC9udQTnsjV7hG/bCtnBwypVZN1BSyxcFvgfdBrzhbcqDwaU/wcyj6SGqP4Xb+W6TEcast4/dn+ZVD4RxCP7lGC0yyy4TX4meoGl7+9b+r3GrZbw16RzXkWuhl45lQtAUqfgubf49rDxxSvmzrLHDKY+sbQLCK/DGJgtbCQbevvj7XEM/BG6Hx2H0OtpR3rfv7BmBqFgM0Y3HsKqw+1xBneD9yHrd8NOwJtPItzrbUrX4H0FhQMxaVLysNVly25ISc81ga7BZe+0E/B+8zGoAn8GkG8DPgQV4EHTzAB0sadGBOB++gF/oMacjL32JHA/CmFHuznFPeeXx4oFq4DM/j+zd71uYYvXrjF6TvllyT41LT3+oAEHljYjTOEQstHk516NwnFjI/980uvVvVslbl4xSKla+5FSdKVxSRzk1zHJLVSxucCPunN+GDoMYRVLm0PrlC9DfxfbjJTAaQm27qEiKvcz9Ss1fRTXYwlnMoAFv0OBuBvgUvHy2vhSTIsXjZnPfYfTZBjJ2rFZ8tNQCeHlghx9IpL4suQ7nRAES6pVCxL+C88o+2rOFQf/YBX+L+I6SYXOHj1uL8Czckwz+FPeFNEAFxsnCCc+6TV5wtOSDe14efg/Q1b4+wdWBx0ucv3FquRC5Q4Zr1uuwTO9QLTr7WV4ydHDZI1ZBrISSTixq0k0QQdQDhr140WhU9WNDaOPtYw+I2+o8NmukA+qQv7D5FHs/50pFvgbxAXn62HHQpn/WteFJvpza3Lw2GRfuoGnGyNRGOc+5H6vYndP35uv9TOryQ9eLdouEQwPk9Pj1a+jjuQOcvIhYEg2Lw4MHA3Dw44cbEvX+rhq/c8X+8QlEv1WIrGY4OAL8HaFXbaR/RT9cwgK/diZ8QncD7j59PDjjBefw5vua6rvRc06HPUA0257bG1Bb4PrrbzzCAW/x092MAT/fI04GPNyAN5OnC4w14ukeeDrz5DTifz5/O5/P1B8KndNZmuHkAl8vl0+VyOf1AeOwAmuP7CcjNb8BPcNbmEY4BNMfyROTxBjzqYf/7129XwXuKa1nXue/aOd41+NLttccbsHdiWc/0QeZz/Ovv/5wEz1EL4LAA/7VwvAH3Trr1VFs9ebKC573efdfIV96tci+1xxvw0sntrXvkU9u79pL+zd+A1sdiacOPzt09gNYBljhyc4cgBzxPDJx7pH/3AO7djD4a9/Z5af2bD+ClG39U3d0D0BNsWTbZ4sWRd4hvWde5L61ze/y7B7Bnse9Rewzge3wqr7mn4w14zWl/i7Xu7fk/AAAA///ebDdMAAAABklEQVQDAJBV373SJXBwAAAAAElFTkSuQmCC",
   "delay": 500,
-  "bgColor": 0, 
   "setup": [
-      {
-        "type": "datetime",
-        "content": "H:i",
-        "font": "square",
-        "fgColor": 65282,
-        "bgColor": 0,
-        "x": 16,
-        "y": 53
-      },
-      {
-        "type": "line",
-        "color": 29582,
-        "x": 10,
-        "y": 40,
-        "x1": 54,
-        "y1": 40
-      }
+    {
+      "type": "datetime",
+      "content": "H:i",
+      "font": "square",
+      "fgColor": 65282,
+      "bgColor": 0,
+      "x": 16,
+      "y": 53
+    },
+    {
+      "type": "line",
+      "color": 29582,
+      "x": 10,
+      "y": 40,
+      "x1": 54,
+      "y1": 40
+    }
   ],
   "sprites": [
     [
