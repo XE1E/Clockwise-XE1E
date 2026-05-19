@@ -269,6 +269,17 @@ Borra toda la configuracion y vuelve a valores por defecto:
 
 **Atencion:** Tambien borra las caratulas guardadas.
 
+### Actualizacion OTA (En desarrollo)
+La actualizacion por aire (Over-The-Air) permitira actualizar el firmware sin conectar el cable USB:
+
+1. Ve a la pestana **Sistema**
+2. Haz clic en **"Actualizar Firmware"**
+3. Selecciona el archivo `.bin` del nuevo firmware
+4. Espera a que termine la actualizacion
+5. El reloj se reiniciara automaticamente
+
+**Nota:** Esta funcion esta en desarrollo y estara disponible en una version futura.
+
 ---
 
 ## Solucionar Problemas
