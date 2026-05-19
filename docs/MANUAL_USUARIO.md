@@ -83,6 +83,14 @@ El reloj intentara conectar en orden: Red 1 → Red 2 → Red 3
 
 **Nota:** Solo funcionan redes WiFi de **2.4 GHz** (no 5 GHz).
 
+### Borrar Configuracion WiFi
+Para que el reloj olvide las redes guardadas y vuelva a crear el punto de acceso:
+1. Ve a la pestana **Sistema**
+2. Haz clic en **"Reset de Fabrica"**
+3. El reloj se reiniciara y creara la red "Clockwise-XXXX"
+
+**Alternativa:** Si el reloj no puede conectar a ninguna red guardada despues de varios intentos, automaticamente creara el punto de acceso.
+
 ---
 
 ## Pantalla
@@ -99,7 +107,12 @@ Si montaste el reloj en otra orientacion:
 - 180° = De cabeza
 - 270° = Rotado a la izquierda
 
-El cambio se aplica inmediatamente.
+Haz clic en **"Guardar Pantalla"** para aplicar el cambio.
+
+### Panel RGB (Intercambiar Azul/Verde)
+Algunos paneles LED tienen los colores azul y verde invertidos. Si los colores se ven mal:
+1. Activa la opcion **"Intercambiar Azul/Verde"**
+2. Haz clic en "Guardar Pantalla"
 
 ### Brillo Automatico (LDR)
 Si tu reloj tiene sensor de luz (LDR):
@@ -141,6 +154,20 @@ Ingresa tu zona horaria. Ejemplos:
 
 ### Servidor NTP
 Por defecto usa `time.google.com`. Puedes cambiarlo si lo necesitas.
+
+### Zona Horaria Manual (POSIX)
+Si tu zona horaria no esta en la lista o tiene reglas especiales de horario de verano, puedes usar una cadena POSIX:
+
+**Formato:** `STDoffset[DST[offset],start,end]`
+
+**Ejemplos:**
+| Zona | Cadena POSIX |
+|------|--------------|
+| Mexico Central | `CST6CDT,M4.1.0,M10.5.0` |
+| Argentina (sin DST) | `ART3` |
+| Espana | `CET-1CEST,M3.5.0,M10.5.0` |
+
+Deja el campo vacio para usar la zona horaria normal.
 
 ---
 
@@ -190,13 +217,20 @@ Reduce el brillo y cambia la caratula durante la noche.
 6. Haz clic en "Guardar Canvas"
 
 ### Colores Recomendados para Dormir
+
+**Colores suaves (menor impacto visual):**
 | Color | Efecto |
 |-------|--------|
-| **Rojo** | No afecta la vision nocturna |
+| **Rojo** | No afecta la vision nocturna, ideal para dormir |
+| **Rojo oscuro** | Aun mas tenue que el rojo |
 | **Naranja** | Suave y calido |
 | **Verde oscuro** | Bajo impacto visual |
 
-El color seleccionado muestra un borde blanco para identificarlo.
+**Evitar para dormir:**
+- Blanco, cyan, azul brillante (muy intensos)
+- Colores claros o saturados
+
+El color seleccionado muestra un borde blanco para identificarlo facilmente.
 
 ---
 
