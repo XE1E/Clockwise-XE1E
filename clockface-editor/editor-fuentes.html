@@ -885,26 +885,22 @@
             select.innerHTML = '<option value="">-- Buscando... --</option>';
 
             try {
-                const names = ['custom', 'night-clock', 'digits', 'mi-fuente'];
-                const found = [];
-
-                for (const name of names) {
-                    try {
-                        const res = await fetch('fonts/' + name + '.json', { method: 'HEAD' });
-                        if (res.ok) found.push(name);
-                    } catch (e) {}
-                }
+                // Fetch index.json to get list of fonts
+                const res = await fetch('fonts/index.json');
+                if (!res.ok) throw new Error('index.json not found');
+                const index = await res.json();
 
                 select.innerHTML = '<option value="">-- Seleccionar --</option>';
-                if (found.length) {
-                    for (const name of found) {
-                        select.innerHTML += '<option value="' + name + '">' + name + '.json</option>';
+                if (index.fonts && index.fonts.length) {
+                    for (const file of index.fonts) {
+                        const name = file.replace('.json', '');
+                        select.innerHTML += '<option value="' + name + '">' + name + '</option>';
                     }
                 } else {
                     select.innerHTML += '<option value="" disabled>No hay fuentes en fonts/</option>';
                 }
             } catch (e) {
-                select.innerHTML = '<option value="">Error al buscar</option>';
+                select.innerHTML = '<option value="">Error: ' + e.message + '</option>';
             }
         }
 
