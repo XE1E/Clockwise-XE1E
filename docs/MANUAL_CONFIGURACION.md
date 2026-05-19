@@ -148,8 +148,7 @@ Dejar terminal abierta. Acceder a `http://localhost:8000/`
 |-------------|-----------|
 | Editor de Caratulas | http://localhost:8000/index.html |
 | Generador Thumbnails | http://localhost:8000/generate-thumbs.html |
-| Character Designer | http://localhost:8000/char-designer.html |
-| Digit Designer | http://localhost:8000/digit-designer.html |
+| Editor de Fuentes | http://localhost:8000/editor-fuentes.html |
 | Font Converter | http://localhost:8000/font-converter.html |
 
 **GitHub Pages (sin servidor local):**
@@ -158,8 +157,7 @@ Dejar terminal abierta. Acceder a `http://localhost:8000/`
 |-------------|------------|
 | Editor de Caratulas | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/ |
 | Generador Thumbnails | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/generate-thumbs.html |
-| Character Designer | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/char-designer.html |
-| Digit Designer | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/digit-designer.html |
+| Editor de Fuentes | https://xe1e.github.io/Clockwise-XE1E/clockface-editor/editor-fuentes.html |
 
 **Nota:** Desde GitHub Pages algunas funciones no estan disponibles (guardar en carpetas locales).
 
@@ -291,37 +289,40 @@ Genera thumbnails PNG y los inyecta en archivos JSON.
 
 **Importante:** El thumbnail debe estar al inicio del JSON (antes de `setup`) para que el ESP32 lo encuentre (buffer de 12KB).
 
-### Character Designer
+### Editor de Fuentes
 
-**URL:** http://localhost:8000/char-designer.html
+**URL:** http://localhost:8000/editor-fuentes.html
 
-Editor de fuentes pixel para crear o modificar tipografias.
+Editor unificado de fuentes pixel para crear o modificar tipografias.
+
+**Grupos de caracteres:**
+- 0-9: Digitos
+- A-Z: Mayusculas
+- a-z: Minusculas
+- !@#: Simbolos
+- Acentos: Caracteres especiales en espanol (aeiou con tildes, ene, signos)
 
 **Flujo:**
-1. Cargar fuente base (BDF, JSON, o sistema)
-2. Editar caracteres pixel por pixel
-3. Guardar:
+1. Cargar fuente base:
+   - Fuentes predefinidas (pixel-fonts.js)
+   - Archivo JSON exportado
+   - Archivo BDF externo
+   - Galeria (carpeta fonts/)
+2. Seleccionar grupo de caracteres
+3. Editar pixel por pixel (click/arrastrar)
+4. Guardar caracter
+5. Exportar:
    - "Guardar en fonts/" → Galeria personalizada
    - "Agregar a predefinidas" → pixel-fonts.js
+   - "Descargar" → Archivo JSON backup
+   - "Exportar PNGs" → Imagenes individuales
 
 **Importar fuentes BDF:**
 - Font Library: https://fontlibrary.org
 - Bitmap Fonts: https://github.com/Tecate/bitmap-fonts
 - Unifont: https://unifoundry.com/unifont/
 
-### Digit Designer
-
-**URL:** http://localhost:8000/digit-designer.html
-
-Editor de digitos para Night Clock.
-
-**Uso:**
-1. Seleccionar digito (0-9) en pestanas
-2. Click/arrastrar para dibujar pixels
-3. "Guardar Local" para persistir en navegador
-4. "Exportar Todos" para backup
-
-**Tamaño:** Configurable 8-64px (default 20x28)
+**Tamaño:** Configurable 3-32px (ancho y alto independientes)
 
 ### Font Converter
 
@@ -329,7 +330,7 @@ Editor de digitos para Night Clock.
 
 Convierte fuentes BDF a formato JavaScript para pixel-fonts.js.
 
-**Uso avanzado:** Preferir Character Designer para flujo mas simple.
+**Uso avanzado:** Preferir Editor de Fuentes para flujo mas simple.
 
 ---
 
@@ -391,8 +392,7 @@ Clockwise-XE1E/
 ├── clockface-editor/            # Herramientas web
 │   ├── index.html               # Editor principal
 │   ├── generate-thumbs.html     # Generador thumbnails
-│   ├── char-designer.html       # Editor fuentes
-│   ├── digit-designer.html      # Editor digitos
+│   ├── editor-fuentes.html      # Editor de fuentes pixel
 │   ├── js/
 │   │   ├── editor.js            # Logica editor
 │   │   ├── elements.js          # Clases elementos

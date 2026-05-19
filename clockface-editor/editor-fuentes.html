@@ -2,13 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Character Designer (Obsoleto) - Clockwise</title>
-    <script>
-        // Esta herramienta ha sido reemplazada por Editor de Fuentes
-        if (confirm('Esta herramienta ha sido renombrada a "Editor de Fuentes".\n\nEl nuevo editor incluye todas las funciones mas soporte para caracteres en español.\n\n¿Ir al Editor de Fuentes?')) {
-            window.location.href = 'editor-fuentes.html';
-        }
-    </script>
+    <title>Editor de Fuentes - Clockwise</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -33,7 +27,6 @@
             .main-container { flex-wrap: wrap; }
         }
 
-        /* Panel izquierdo - Fuentes */
         .source-panel {
             background: #16213e;
             padding: 15px;
@@ -53,7 +46,6 @@
             color: #00ff88;
         }
 
-        /* Panel central - Editor */
         .editor-panel {
             background: #16213e;
             padding: 15px;
@@ -63,7 +55,6 @@
             flex-shrink: 0;
         }
 
-        /* Panel derecho - Exportar */
         .export-panel {
             background: #16213e;
             padding: 15px;
@@ -250,7 +241,7 @@
     </style>
 </head>
 <body>
-    <h1>Character Designer</h1>
+    <h1>Editor de Fuentes</h1>
     <p class="subtitle">Editor de fuentes pixel para Clockwise</p>
 
     <div class="main-container">
@@ -259,11 +250,11 @@
             <h3>CARGAR FUENTE</h3>
 
             <div class="source-section">
-                <h4>1. Fuentes del sistema</h4>
+                <h4>1. Fuentes predefinidas</h4>
                 <select id="system-font-select">
                     <option value="">-- Seleccionar fuente --</option>
                 </select>
-                <button class="btn btn-primary" onclick="loadSystemFont()">Cargar fuente del sistema</button>
+                <button class="btn btn-primary" onclick="loadSystemFont()">Cargar fuente</button>
                 <p class="help-text">Fuentes incluidas en pixel-fonts.js</p>
             </div>
 
@@ -282,12 +273,12 @@
             </div>
 
             <div class="source-section">
-                <h4>4. Carpeta fonts/ (GitHub)</h4>
+                <h4>4. Galeria (fonts/)</h4>
                 <select id="repo-font-select">
                     <option value="">-- Seleccionar --</option>
                 </select>
-                <button class="btn btn-purple" onclick="loadFromRepo()">Cargar del repositorio</button>
-                <button class="btn btn-small btn-primary" onclick="scanRepoFonts()" style="width:100%;margin-top:5px;">Escanear carpeta fonts/</button>
+                <button class="btn btn-purple" onclick="loadFromRepo()">Cargar de galeria</button>
+                <button class="btn btn-small btn-primary" onclick="scanRepoFonts()" style="width:100%;margin-top:5px;">Actualizar lista</button>
                 <p class="help-text">Requiere servidor local (python -m http.server)</p>
             </div>
 
@@ -299,8 +290,8 @@
                     <label>Alto:</label>
                     <input type="number" id="char-height" min="3" max="32" value="12">
                 </div>
-                <button class="btn btn-small btn-primary" onclick="applySize()">Aplicar tamaño</button>
-                <button class="btn btn-small btn-danger" onclick="resetAll()">Reset todo</button>
+                <button class="btn btn-small btn-primary" onclick="applySize()">Aplicar tamano</button>
+                <button class="btn btn-small btn-danger" onclick="resetAll()">Reiniciar todo</button>
             </div>
         </div>
 
@@ -311,6 +302,7 @@
                 <button class="group-btn" onclick="selectGroup('upper')">A-Z</button>
                 <button class="group-btn" onclick="selectGroup('lower')">a-z</button>
                 <button class="group-btn" onclick="selectGroup('symbols')">!@#</button>
+                <button class="group-btn" onclick="selectGroup('spanish')">acentos</button>
             </div>
 
             <div class="char-tabs" id="char-tabs"></div>
@@ -335,7 +327,7 @@
                             <canvas id="preview-4x" class="preview-canvas"></canvas>
                         </div>
                     </div>
-                    <h3>Vista previa de fuente</h3>
+                    <h3>Vista previa</h3>
                     <div class="all-chars" id="all-chars"></div>
                 </div>
             </div>
@@ -349,7 +341,7 @@
                 <h4>Guardar JSON (backup)</h4>
                 <input type="text" id="font-name" placeholder="Nombre de fuente" value="mi-fuente">
                 <button class="btn btn-success" onclick="saveToFolder()">Guardar en carpeta...</button>
-                <button class="btn btn-small btn-primary" onclick="exportToJSON()" style="width:100%;margin-top:5px;">Descargar (a Downloads)</button>
+                <button class="btn btn-small btn-primary" onclick="exportToJSON()" style="width:100%;margin-top:5px;">Descargar</button>
                 <p class="help-text">Recomendado: guardar en fonts/ para sincronizar</p>
             </div>
 
@@ -368,7 +360,7 @@
             <div class="source-section">
                 <h4>Exportar imagenes PNG</h4>
                 <button class="btn btn-primary" onclick="savePNGsToFolder()">Guardar en carpeta...</button>
-                <button class="btn btn-small btn-primary" onclick="downloadAllPNG()" style="width:100%;margin-top:5px;">Descargar (a Downloads)</button>
+                <button class="btn btn-small btn-primary" onclick="downloadAllPNG()" style="width:100%;margin-top:5px;">Descargar</button>
             </div>
 
             <div id="status-area"></div>
@@ -378,12 +370,13 @@
     <script src="js/pixel-fonts.js"></script>
     <script>
         // ==================== CONFIGURACION ====================
-        const STORAGE_KEY = 'clockwise-char-designer';
+        const STORAGE_KEY = 'clockwise-font-editor';
         const CHAR_GROUPS = {
             digits: '0123456789',
             upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
             lower: 'abcdefghijklmnopqrstuvwxyz',
-            symbols: ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+            symbols: ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~',
+            spanish: 'ÁÉÍÓÚÜÑáéíóúüñ¿¡'
         };
 
         let WIDTH = 8;
@@ -637,10 +630,10 @@
             const w = +document.getElementById('char-width').value;
             const h = +document.getElementById('char-height').value;
             if (w < 3 || w > 32 || h < 3 || h > 32) {
-                alert('Tamaño: 3-32 píxeles'); return;
+                alert('Tamano: 3-32 pixeles'); return;
             }
             if (w !== WIDTH || h !== HEIGHT) {
-                if (!confirm('¿Cambiar a ' + w + 'x' + h + '? Se reiniciarán los caracteres.')) return;
+                if (!confirm('Cambiar a ' + w + 'x' + h + '? Se reiniciaran los caracteres.')) return;
                 WIDTH = w; HEIGHT = h;
                 saveSettings();
                 const all = Object.values(CHAR_GROUPS).join('');
@@ -650,7 +643,7 @@
         }
 
         function resetAll() {
-            if (!confirm('¿Borrar TODOS los caracteres?')) return;
+            if (!confirm('Borrar TODOS los caracteres?')) return;
             const all = Object.values(CHAR_GROUPS).join('');
             for (const c of all) {
                 localStorage.removeItem(STORAGE_KEY + '-c-' + c.charCodeAt(0));
@@ -662,7 +655,6 @@
 
         // ==================== CARGAR FUENTES ====================
 
-        // 1. Cargar fuente del sistema (pixel-fonts.js)
         function loadSystemFont() {
             const name = document.getElementById('system-font-select').value;
             if (!name) { alert('Selecciona una fuente'); return; }
@@ -672,7 +664,6 @@
 
             const font = PixelFonts[name];
 
-            // Calcular dimensiones reales de los glyphs
             let maxW = 0, maxH = 0;
             let minYOff = 0, maxYEnd = 0;
 
@@ -680,17 +671,14 @@
                 if (!g || g[1] === 0) continue;
                 const [off, w, h, xAdv, xOff, yOff] = g;
                 if (w > maxW) maxW = w;
-                // yOffset es negativo (hacia arriba desde baseline)
-                // Calcular rango vertical total
                 if (yOff < minYOff) minYOff = yOff;
                 const yEnd = yOff + h;
                 if (yEnd > maxYEnd) maxYEnd = yEnd;
             }
 
-            // Altura total = desde el yOffset más negativo hasta el final más bajo
             const totalH = maxYEnd - minYOff;
 
-            if (!confirm(`Cargar "${name}" (${maxW}x${totalH})?\nEsto reemplazará los caracteres actuales.`)) return;
+            if (!confirm(`Cargar "${name}" (${maxW}x${totalH})?\nEsto reemplazara los caracteres actuales.`)) return;
 
             WIDTH = maxW || 8;
             HEIGHT = totalH || 12;
@@ -709,8 +697,6 @@
 
                 const [off, w, h, xAdv, xOff, yOff] = g;
 
-                // Calcular posición Y en el grid
-                // minYOff es el más negativo, lo usamos como referencia superior
                 const startY = yOff - minYOff;
 
                 let bit = off * 8;
@@ -721,7 +707,7 @@
                         const val = (font.bitmaps[byteIdx] >> bitPos) & 1;
 
                         const destY = startY + row;
-                        const destX = col; // xOff se ignora, centramos en el grid
+                        const destX = col;
 
                         if (destY >= 0 && destY < HEIGHT && destX >= 0 && destX < WIDTH) {
                             chars[c][destY][destX] = val;
@@ -735,7 +721,6 @@
             showStatus(`Fuente "${name}" cargada (${maxW}x${HEIGHT})`, 'success');
         }
 
-        // 2. Importar desde archivo JSON
         function importFromJSON(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -773,7 +758,6 @@
             e.target.value = '';
         }
 
-        // 3. Importar desde archivo BDF (Bitmap Distribution Format)
         function importFromBDF(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -787,8 +771,8 @@
                         return;
                     }
 
-                    const info = `Fuente: ${bdf.name || file.name}\nTamaño: ${bdf.width}x${bdf.height}\nCaracteres: ${bdf.chars.length}`;
-                    if (!confirm(info + '\n\n¿Cargar esta fuente?')) return;
+                    const info = `Fuente: ${bdf.name || file.name}\nTamano: ${bdf.width}x${bdf.height}\nCaracteres: ${bdf.chars.length}`;
+                    if (!confirm(info + '\n\nCargar esta fuente?')) return;
 
                     WIDTH = bdf.width;
                     HEIGHT = bdf.height;
@@ -896,13 +880,11 @@
             return result;
         }
 
-        // 3. Cargar desde carpeta fonts/ del repo
         async function scanRepoFonts() {
             const select = document.getElementById('repo-font-select');
-            select.innerHTML = '<option value="">-- Escaneando... --</option>';
+            select.innerHTML = '<option value="">-- Buscando... --</option>';
 
             try {
-                // Try to fetch index or common names
                 const names = ['custom', 'night-clock', 'digits', 'mi-fuente'];
                 const found = [];
 
@@ -922,7 +904,7 @@
                     select.innerHTML += '<option value="" disabled>No hay fuentes en fonts/</option>';
                 }
             } catch (e) {
-                select.innerHTML = '<option value="">Error al escanear</option>';
+                select.innerHTML = '<option value="">Error al buscar</option>';
             }
         }
 
@@ -955,7 +937,7 @@
                 updateUI();
                 showStatus('Cargado: ' + name + '.json', 'success');
             } catch (e) {
-                alert('Error: ' + e.message + '\n\nAsegúrate de correr: python -m http.server');
+                alert('Error: ' + e.message + '\n\nAsegurate de correr: python -m http.server');
             }
         }
 
@@ -983,12 +965,12 @@
             link.download = name + '.json';
             link.href = URL.createObjectURL(blob);
             link.click();
-            showStatus('Descargado: ' + name + '.json (en Downloads)', 'success');
+            showStatus('Descargado: ' + name + '.json', 'success');
         }
 
         async function saveToFolder() {
             if (!window.showDirectoryPicker) {
-                alert('Tu navegador no soporta selección de carpeta.\nUsa Chrome o Edge, o usa "Descargar" y mueve el archivo manualmente.');
+                alert('Tu navegador no soporta seleccion de carpeta.\nUsa Chrome o Edge, o usa "Descargar" y mueve el archivo manualmente.');
                 return;
             }
 
@@ -1027,7 +1009,6 @@
             }
         }
 
-        // Genera el codigo JS para una fuente
         function generateFontJS(name) {
             const all = Object.values(CHAR_GROUPS).join('');
             const sorted = [...all].sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
@@ -1113,9 +1094,8 @@
                 return;
             }
 
-            // Verificar si ya existe
             if (typeof PixelFonts !== 'undefined' && PixelFonts[name]) {
-                if (!confirm('La fuente "' + name + '" ya existe. ¿Reemplazarla?')) {
+                if (!confirm('La fuente "' + name + '" ya existe. Reemplazarla?')) {
                     return;
                 }
             }
@@ -1127,7 +1107,6 @@
             }
 
             if (!window.showDirectoryPicker) {
-                // Fallback: copiar al portapapeles con instrucciones
                 const fullCode = fontCode + ',';
                 navigator.clipboard.writeText(fullCode).then(() => {
                     alert('Codigo copiado al portapapeles.\n\nPara agregarlo:\n1. Abre js/pixel-fonts.js\n2. Busca la linea "drawChar(ctx, fontName..." \n3. Pega el codigo ANTES de esa linea\n4. Guarda el archivo');
@@ -1142,16 +1121,13 @@
                 alert('Selecciona la carpeta "js" dentro de clockface-editor');
                 const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
 
-                // Leer pixel-fonts.js actual
                 const fileHandle = await dirHandle.getFileHandle('pixel-fonts.js');
                 const file = await fileHandle.getFile();
                 let content = await file.text();
 
-                // Buscar si la fuente ya existe y reemplazarla
                 const existingPattern = new RegExp(`\\n    ${name}: \\{[\\s\\S]*?\\n    \\},?`, 'g');
                 content = content.replace(existingPattern, '');
 
-                // Insertar nueva fuente antes de drawChar
                 const insertPoint = content.indexOf('\n    drawChar(');
                 if (insertPoint === -1) {
                     throw new Error('No se encontro el punto de insercion en pixel-fonts.js');
@@ -1159,12 +1135,10 @@
 
                 const newContent = content.slice(0, insertPoint) + '\n' + fontCode + ',\n' + content.slice(insertPoint);
 
-                // Escribir archivo
                 const writable = await fileHandle.createWritable();
                 await writable.write(newContent);
                 await writable.close();
 
-                // Recargar PixelFonts
                 showStatus('Fuente "' + name + '" agregada a predefinidas', 'success');
                 alert('Fuente agregada!\n\nRecarga la pagina para verla en el selector de fuentes predefinidas.');
 
@@ -1183,7 +1157,6 @@
                 return;
             }
 
-            // Validar nombre (solo letras, numeros, guiones)
             if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
                 alert('El nombre solo puede contener letras, numeros, guiones y guion bajo');
                 return;
@@ -1200,7 +1173,6 @@
                 return;
             }
 
-            // Crear datos de fuente en formato compatible con PixelFonts.register()
             const sorted = [...all].sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
             let first = null, last = null;
             for (const c of sorted) {
@@ -1266,28 +1238,24 @@
             };
 
             if (!window.showDirectoryPicker) {
-                // Fallback: descargar y dar instrucciones
                 const blob = new Blob([JSON.stringify(fontData, null, 2)], { type: 'application/json' });
                 const link = document.createElement('a');
                 link.download = name + '.json';
                 link.href = URL.createObjectURL(blob);
                 link.click();
-                alert('Archivo descargado.\\n\\nPara agregarlo a la galeria:\\n1. Mueve ' + name + '.json a clockface-editor/fonts/\\n2. Edita fonts/index.json y agrega "' + name + '.json" al array "fonts"');
+                alert('Archivo descargado.\n\nPara agregarlo a la galeria:\n1. Mueve ' + name + '.json a clockface-editor/fonts/\n2. Edita fonts/index.json y agrega "' + name + '.json" al array "fonts"');
                 return;
             }
 
             try {
-                // Pedir carpeta fonts/
                 alert('Selecciona la carpeta "fonts" dentro de clockface-editor');
                 const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
 
-                // Guardar archivo de fuente
                 const fontFile = await dirHandle.getFileHandle(name + '.json', { create: true });
                 const fontWritable = await fontFile.createWritable();
                 await fontWritable.write(JSON.stringify(fontData, null, 2));
                 await fontWritable.close();
 
-                // Actualizar index.json
                 let index = { fonts: [] };
                 try {
                     const indexFile = await dirHandle.getFileHandle('index.json');
@@ -1304,7 +1272,7 @@
                 }
 
                 showStatus('Fuente "' + name + '" guardada en galeria', 'success');
-                alert('Fuente guardada!\\n\\nRecarga el editor de caratulas para usarla.');
+                alert('Fuente guardada!\n\nRecarga el editor de caratulas para usarla.');
 
             } catch (e) {
                 if (e.name !== 'AbortError') {
@@ -1315,7 +1283,7 @@
 
         async function savePNGsToFolder() {
             if (!window.showDirectoryPicker) {
-                alert('Tu navegador no soporta selección de carpeta.\nUsa Chrome o Edge, o usa "Descargar".');
+                alert('Tu navegador no soporta seleccion de carpeta.\nUsa Chrome o Edge, o usa "Descargar".');
                 return;
             }
 
@@ -1363,7 +1331,6 @@
             }
         }
 
-        // Mantener por compatibilidad con otros scripts
         function exportToJS() {
             const name = document.getElementById('font-name').value || 'custom';
             const js = generateFontJS(name);
