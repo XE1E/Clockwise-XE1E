@@ -884,9 +884,14 @@
             const select = document.getElementById('repo-font-select');
             select.innerHTML = '<option value="">-- Buscando... --</option>';
 
+            // Detect if on GitHub Pages
+            const isGitHub = location.hostname.includes('github.io');
+            const baseUrl = isGitHub
+                ? 'https://raw.githubusercontent.com/XE1E/Clockwise-XE1E/main/clockface-editor/'
+                : '';
+
             try {
-                // Fetch index.json to get list of fonts
-                const res = await fetch('fonts/index.json');
+                const res = await fetch(baseUrl + 'fonts/index.json');
                 if (!res.ok) throw new Error('index.json not found');
                 const index = await res.json();
 
@@ -908,8 +913,13 @@
             const name = document.getElementById('repo-font-select').value;
             if (!name) { alert('Selecciona un archivo'); return; }
 
+            const isGitHub = location.hostname.includes('github.io');
+            const baseUrl = isGitHub
+                ? 'https://raw.githubusercontent.com/XE1E/Clockwise-XE1E/main/clockface-editor/'
+                : '';
+
             try {
-                const res = await fetch('fonts/' + name + '.json');
+                const res = await fetch(baseUrl + 'fonts/' + name + '.json');
                 if (!res.ok) throw new Error('No encontrado');
                 const data = await res.json();
 
