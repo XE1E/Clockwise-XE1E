@@ -346,7 +346,13 @@ La cuadricula ayuda a alinear elementos pixel por pixel. Se ajusta automaticamen
 
 El editor incluye herramientas para generar imagenes PNG de 64x64 de los clockfaces.
 
-### Thumbnail Individual
+### Por que son importantes los thumbnails
+
+Los thumbnails permiten mostrar una vista previa de cada caratula en la interfaz web del reloj. El ESP32 solo lee los primeros **12KB** de cada archivo JSON para buscar el thumbnail, por lo que este campo debe estar **al inicio del archivo**, antes de los arrays grandes (`setup`, `sprites`, `loop`).
+
+El editor y las herramientas ya generan el JSON con el thumbnail en la posicion correcta automaticamente.
+
+### Thumbnail Individual (desde el Editor)
 
 1. Click en boton **"Thumbnail"** en la barra superior
 2. Se descarga automaticamente un PNG con el nombre del clockface
@@ -376,14 +382,76 @@ El editor incluye herramientas para generar imagenes PNG de 64x64 de los clockfa
 - Solo disponible en Chrome, Edge y navegadores basados en Chromium
 - Firefox/Safari: usar seleccion individual de archivos
 
-### Herramienta Standalone
+### Herramienta Standalone: generate-thumbs.html
 
-Tambien existe `generate-thumbs.html` que genera thumbnails de todos los clockfaces en la carpeta `clockfaces/`:
+Herramienta independiente para generar thumbnails y agregarlos a archivos JSON existentes.
 
 ```bash
 cd clockface-editor
 python -m http.server 8000
 # Abrir http://localhost:8000/generate-thumbs.html
+```
+
+#### Pestana "Generar desde carpeta"
+
+Genera thumbnails para todos los JSON en una carpeta:
+
+1. Click en **"Seleccionar Carpeta"**
+2. Elegir la carpeta con archivos `.json` (ej: `clockfaces/`)
+3. Se muestran todos los clockfaces con su thumbnail generado
+4. Indicadores de estado:
+   - **Verde "✓ Thumb"**: Ya tiene thumbnail en el JSON
+   - **Rojo "Sin thumb"**: No tiene thumbnail
+5. Opciones de descarga:
+
+| Boton | Descripcion |
+|-------|-------------|
+| **PNG** (individual) | Descargar solo la imagen PNG |
+| **JSON** (individual) | Descargar JSON con thumbnail embebido |
+| **Descargar PNGs** | Descargar todos los PNG |
+| **Descargar JSONs con Thumbnail** | Descargar todos los JSON actualizados |
+
+#### Pestana "Inyectar en JSON"
+
+Agrega thumbnail a un archivo JSON individual:
+
+1. Click en **"Seleccionar JSON"**
+2. Elegir un archivo `.json`
+3. Se genera el thumbnail automaticamente
+4. Descargar el JSON actualizado con **"JSON + Thumb"**
+
+#### Estructura del JSON generado
+
+El thumbnail se coloca al inicio del JSON para que el ESP32 lo encuentre:
+
+```json
+{
+  "name": "mi-clockface",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "thumbnail": "iVBORw0KGgoAAAANS...",  <- Al inicio
+  "delay": 250,
+  "setup": [...],   <- Arrays grandes al final
+  "sprites": [...],
+  "loop": [...]
+}
+```
+
+#### Flujo para actualizar caratulas existentes
+
+```
+1. Abrir generate-thumbs.html en Chrome/Edge
+           ↓
+2. Click "Seleccionar Carpeta" → elegir clockfaces/
+           ↓
+3. Verificar que se generaron correctamente (preview)
+           ↓
+4. Click "Descargar JSONs con Thumbnail"
+           ↓
+5. Reemplazar los archivos originales con los descargados
+           ↓
+6. Subir las caratulas actualizadas al reloj
 ```
 
 ---
