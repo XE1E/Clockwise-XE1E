@@ -7,6 +7,7 @@
 #include <CWPreview.h>
 #include "StatusController.h"
 #include "WebUI.h"
+#include "WebUI_minimal.h"
 
 #ifndef CLOCKFACE_NAME
   #define CLOCKFACE_NAME "UNKNOWN"
@@ -64,50 +65,54 @@ struct ClockwiseWebServer
       request->send(response);
     });
 
-    // API: obtener configuración
+    // API: obtener configuración (usando ArduinoJson para evitar fragmentación de heap)
     server.on("/api/settings", HTTP_GET, [](AsyncWebServerRequest *request) {
-      String json = "{";
+      StaticJsonDocument<1024> doc;
+      ClockwiseParams* p = ClockwiseParams::getInstance();
+
       // WiFi
-      json += "\"wifiSsid\":\"" + ClockwiseParams::getInstance()->wifiSsid + "\",";
-      json += "\"wifiHasPwd\":" + String(ClockwiseParams::getInstance()->wifiPwd.length() > 0 ? 1 : 0) + ",";
-      json += "\"wifiSsid2\":\"" + ClockwiseParams::getInstance()->wifiSsid2 + "\",";
-      json += "\"wifiHasPwd2\":" + String(ClockwiseParams::getInstance()->wifiPwd2.length() > 0 ? 1 : 0) + ",";
-      json += "\"wifiSsid3\":\"" + ClockwiseParams::getInstance()->wifiSsid3 + "\",";
-      json += "\"wifiHasPwd3\":" + String(ClockwiseParams::getInstance()->wifiPwd3.length() > 0 ? 1 : 0) + ",";
-      json += "\"wifiConnected\":\"" + WiFi.SSID() + "\",";
-      json += "\"wifiRssi\":" + String(WiFi.RSSI()) + ",";
+      doc["wifiSsid"] = p->wifiSsid;
+      doc["wifiHasPwd"] = p->wifiPwd.length() > 0 ? 1 : 0;
+      doc["wifiSsid2"] = p->wifiSsid2;
+      doc["wifiHasPwd2"] = p->wifiPwd2.length() > 0 ? 1 : 0;
+      doc["wifiSsid3"] = p->wifiSsid3;
+      doc["wifiHasPwd3"] = p->wifiPwd3.length() > 0 ? 1 : 0;
+      doc["wifiConnected"] = WiFi.SSID();
+      doc["wifiRssi"] = WiFi.RSSI();
       // Display
-      json += "\"displayBright\":" + String(ClockwiseParams::getInstance()->displayBright) + ",";
-      json += "\"displayRotation\":" + String(ClockwiseParams::getInstance()->displayRotation) + ",";
-      json += "\"swapBlueGreen\":" + String(ClockwiseParams::getInstance()->swapBlueGreen ? 1 : 0) + ",";
-      json += "\"autoBrightMin\":" + String(ClockwiseParams::getInstance()->autoBrightMin) + ",";
-      json += "\"autoBrightMax\":" + String(ClockwiseParams::getInstance()->autoBrightMax) + ",";
-      json += "\"ldrPin\":" + String(ClockwiseParams::getInstance()->ldrPin) + ",";
+      doc["displayBright"] = p->displayBright;
+      doc["displayRotation"] = p->displayRotation;
+      doc["swapBlueGreen"] = p->swapBlueGreen ? 1 : 0;
+      doc["autoBrightMin"] = p->autoBrightMin;
+      doc["autoBrightMax"] = p->autoBrightMax;
+      doc["ldrPin"] = p->ldrPin;
       // Time
-      json += "\"timeZone\":\"" + ClockwiseParams::getInstance()->timeZone + "\",";
-      json += "\"ntpServer\":\"" + ClockwiseParams::getInstance()->ntpServer + "\",";
-      json += "\"manualPosix\":\"" + ClockwiseParams::getInstance()->manualPosix + "\",";
-      json += "\"use24hFormat\":" + String(ClockwiseParams::getInstance()->use24hFormat ? 1 : 0) + ",";
-      json += "\"useSpanish\":" + String(ClockwiseParams::getInstance()->useSpanish ? 1 : 0) + ",";
+      doc["timeZone"] = p->timeZone;
+      doc["ntpServer"] = p->ntpServer;
+      doc["manualPosix"] = p->manualPosix;
+      doc["use24hFormat"] = p->use24hFormat ? 1 : 0;
+      doc["useSpanish"] = p->useSpanish ? 1 : 0;
       // Night mode
-      json += "\"nightEnabled\":" + String(ClockwiseParams::getInstance()->nightModeEnabled ? 1 : 0) + ",";
-      json += "\"nightStart\":\"" + ClockwiseParams::getInstance()->nightModeStart + "\",";
-      json += "\"nightEnd\":\"" + ClockwiseParams::getInstance()->nightModeEnd + "\",";
-      json += "\"nightBright\":" + String(ClockwiseParams::getInstance()->nightBrightness) + ",";
-      json += "\"nightColor\":" + String(ClockwiseParams::getInstance()->nightColor) + ",";
-      json += "\"nightClock\":\"" + ClockwiseParams::getInstance()->nightClockface + "\",";
+      doc["nightEnabled"] = p->nightModeEnabled ? 1 : 0;
+      doc["nightStart"] = p->nightModeStart;
+      doc["nightEnd"] = p->nightModeEnd;
+      doc["nightBright"] = p->nightBrightness;
+      doc["nightColor"] = p->nightColor;
+      doc["nightClock"] = p->nightClockface;
       // Clockface
-      json += "\"canvasFile\":\"" + ClockwiseParams::getInstance()->canvasFile + "\",";
-      json += "\"rotationEnabled\":" + String(ClockwiseParams::getInstance()->rotationEnabled ? 1 : 0) + ",";
-      json += "\"rotationInterval\":" + String(ClockwiseParams::getInstance()->rotationInterval) + ",";
-      json += "\"rotationList\":\"" + ClockwiseParams::getInstance()->rotationList + "\",";
-      json += "\"localServerHost\":\"" + ClockwiseParams::getInstance()->localServerHost + "\",";
-      json += "\"localServerPort\":" + String(ClockwiseParams::getInstance()->localServerPort) + ",";
+      doc["canvasFile"] = p->canvasFile;
+      doc["rotationEnabled"] = p->rotationEnabled ? 1 : 0;
+      doc["rotationInterval"] = p->rotationInterval;
+      doc["rotationList"] = p->rotationList;
+      doc["localServerHost"] = p->localServerHost;
+      doc["localServerPort"] = p->localServerPort;
       // System
-      json += "\"version\":\"" CW_FW_VERSION "\",";
-      json += "\"name\":\"" CW_FW_NAME "\"";
-      json += "}";
-      request->send(200, "application/json", json);
+      doc["version"] = CW_FW_VERSION;
+      doc["name"] = CW_FW_NAME;
+
+      String output;
+      serializeJson(doc, output);
+      request->send(200, "application/json", output);
     });
 
     // API: establecer parámetro
@@ -255,25 +260,31 @@ struct ClockwiseWebServer
 
     // API: obtener info del sistema (RAM, uptime, etc)
     server.on("/api/system", HTTP_GET, [](AsyncWebServerRequest *request) {
-      String json = "{";
-      json += "\"freeHeap\":" + String(ESP.getFreeHeap()) + ",";
-      json += "\"totalHeap\":" + String(ESP.getHeapSize()) + ",";
-      json += "\"minFreeHeap\":" + String(ESP.getMinFreeHeap()) + ",";
-      json += "\"chipModel\":\"" + String(ESP.getChipModel()) + "\",";
-      json += "\"chipCores\":" + String(ESP.getChipCores()) + ",";
-      json += "\"cpuFreqMHz\":" + String(ESP.getCpuFreqMHz()) + ",";
-      json += "\"mac\":\"" + WiFi.macAddress() + "\",";
-      json += "\"uptimeMs\":" + String(millis());
-      json += "}";
-      request->send(200, "application/json", json);
+      StaticJsonDocument<256> doc;
+      doc["freeHeap"] = ESP.getFreeHeap();
+      doc["totalHeap"] = ESP.getHeapSize();
+      doc["minFreeHeap"] = ESP.getMinFreeHeap();
+      doc["chipModel"] = ESP.getChipModel();
+      doc["chipCores"] = ESP.getChipCores();
+      doc["cpuFreqMHz"] = ESP.getCpuFreqMHz();
+      doc["mac"] = WiFi.macAddress();
+      doc["uptimeMs"] = millis();
+      String output;
+      serializeJson(doc, output);
+      request->send(200, "application/json", output);
     });
 
     // API: obtener espacio de almacenamiento
     server.on("/api/storage", HTTP_GET, [](AsyncWebServerRequest *request) {
+      StaticJsonDocument<128> doc;
       size_t total = SPIFFS.totalBytes();
       size_t used = SPIFFS.usedBytes();
-      String json = "{\"total\":" + String(total) + ",\"used\":" + String(used) + ",\"free\":" + String(total - used) + "}";
-      request->send(200, "application/json", json);
+      doc["total"] = total;
+      doc["used"] = used;
+      doc["free"] = total - used;
+      String output;
+      serializeJson(doc, output);
+      request->send(200, "application/json", output);
     });
 
     // API: listar carátulas guardadas (solo nombre y tamaño - rápido)
@@ -383,7 +394,7 @@ struct ClockwiseWebServer
       }
     );
 
-    // API: thumbnail ligero — lee solo primeros 12KB para extraer imagen sin bajar JSON completo
+    // API: thumbnail ligero — lee solo primeros 4KB para extraer imagen sin bajar JSON completo
     server.on("/api/clockfaces/thumb", HTTP_GET, [](AsyncWebServerRequest *request) {
       if (!request->hasParam("name")) { request->send(400); return; }
       String name = request->getParam("name")->value();
@@ -392,9 +403,13 @@ struct ClockwiseWebServer
 
       File f = SPIFFS.open(path, FILE_READ);
       size_t fileSize = f.size();
-      const size_t READ_SIZE = fileSize < 12288 ? fileSize : 12288;
+      const size_t READ_SIZE = fileSize < 4096 ? fileSize : 4096;
       char* buf = (char*)malloc(READ_SIZE + 1);
-      if (!buf) { f.close(); request->send(500); return; }
+      if (!buf) {
+        f.close();
+        request->send(503, "text/plain", "Retry");
+        return;
+      }
       f.read((uint8_t*)buf, READ_SIZE);
       buf[READ_SIZE] = '\0';
       f.close();
@@ -408,7 +423,6 @@ struct ClockwiseWebServer
       for (const char* key : keys) {
         char* pos = strstr(buf, key);
         if (pos) {
-          // Skip to the opening quote (handles optional space after colon)
           const char* p = pos + strlen(key);
           while (*p == ' ' || *p == '\t') p++;
           if (*p == '"') {
@@ -419,6 +433,7 @@ struct ClockwiseWebServer
         }
       }
       free(buf);
+
       request->send(200, "application/json",
         "{\"bg\":" + String(bg) + ",\"img\":\"" + imgStr + "\"}");
     });
