@@ -499,17 +499,26 @@ body {
 .footer-right { flex: 1; justify-content: flex-end; }
 
 .footer-left input {
-    width: 38px;
-    padding: 4px 5px;
+    width: 48px;
+    padding: 6px 4px;
     border: 1px solid var(--border-color);
-    border-radius: 3px;
+    border-radius: 4px;
     background: var(--bg-light);
     color: var(--text-primary);
     text-align: center;
-    font-size: 0.9em;
+    font-size: 13px;
+    font-weight: 500;
 }
 
-.footer-left input[placeholder="AAAA"] { width: 52px; }
+.footer-left input[placeholder="AAAA"] { width: 62px; }
+
+.footer-left input::-webkit-inner-spin-button,
+.footer-left input::-webkit-outer-spin-button {
+    opacity: 1;
+    cursor: pointer;
+    width: 18px;
+    height: 100%;
+}
 
 .footer-sep {
     color: var(--border-color);
