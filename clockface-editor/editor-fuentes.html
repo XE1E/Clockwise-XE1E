@@ -12,9 +12,27 @@
             padding: 20px;
             margin: 0;
         }
-        h1 { text-align: center; margin-bottom: 5px; }
         h3 { margin: 10px 0 5px 0; color: #888; font-size: 13px; }
-        .subtitle { text-align: center; color: #888; font-size: 12px; margin-bottom: 20px; }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: #16213e;
+            border-bottom: 1px solid #444;
+            height: 48px;
+            margin: -20px -20px 15px -20px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .logo-icon { font-size: 1.4em; }
+        .header-actions { display: flex; gap: 8px; }
 
         .main-container {
             display: flex;
@@ -50,9 +68,9 @@
             background: #16213e;
             padding: 15px;
             border-radius: 10px;
-            min-width: 350px;
-            max-width: 500px;
-            flex-shrink: 0;
+            min-width: 400px;
+            flex-grow: 1;
+            max-width: 800px;
         }
 
         .export-panel {
@@ -110,6 +128,7 @@
         .btn-danger { background: #c0392b; color: white; }
         .btn-success { background: #27ae60; color: white; }
         .btn-purple { background: #8e44ad; color: white; }
+        .btn-secondary { background: #0f3460; color: #eee; border: 1px solid #444; }
         .btn:hover { opacity: 0.85; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -146,7 +165,7 @@
             gap: 2px;
             flex-wrap: wrap;
             margin-bottom: 10px;
-            max-height: 80px;
+            max-height: 120px;
             overflow-y: auto;
         }
         .char-tab {
@@ -164,22 +183,12 @@
         .char-tab.active { background: #00ff88; color: #000; }
         .char-tab.has-data { border-color: #27ae60; }
 
-        .current-char {
-            font-size: 32px;
-            font-weight: bold;
-            color: #00ff88;
-            text-align: center;
-            padding: 10px;
-            background: #0a0a1a;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
 
         .all-chars {
             display: flex;
             gap: 5px;
             flex-wrap: wrap;
-            max-height: 150px;
+            max-height: 200px;
             overflow-y: auto;
             padding: 10px;
             background: #0a0a1a;
@@ -241,8 +250,15 @@
     </style>
 </head>
 <body>
-    <h1>Editor de Fuentes</h1>
-    <p class="subtitle">Editor de fuentes pixel para Clockwise</p>
+    <header class="app-header">
+        <div class="logo">
+            <span class="logo-icon">🔤</span>
+            <span>Editor de Fuentes</span>
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;">← Carátulas</a>
+        </div>
+    </header>
 
     <div class="main-container">
         <!-- Panel izquierdo: Cargar fuentes -->
@@ -307,9 +323,8 @@
 
             <div class="char-tabs" id="char-tabs"></div>
 
-            <div style="display:flex;gap:15px;">
+            <div style="display:flex;gap:20px;">
                 <div>
-                    <div class="current-char" id="current-char-display">0</div>
                     <div class="pixel-grid" id="pixel-grid"></div>
                     <div class="controls-row">
                         <button class="btn btn-small btn-danger" onclick="clearChar()">Limpiar</button>
@@ -317,14 +332,14 @@
                     </div>
                 </div>
                 <div>
-                    <div class="preview-row">
+                    <div class="preview-row" style="gap:20px;">
                         <div class="preview-box">
                             <span>4x</span>
-                            <canvas id="preview-1x" class="preview-canvas"></canvas>
+                            <canvas id="preview-4x" class="preview-canvas"></canvas>
                         </div>
                         <div class="preview-box">
-                            <span>6x</span>
-                            <canvas id="preview-4x" class="preview-canvas"></canvas>
+                            <span>8x</span>
+                            <canvas id="preview-8x" class="preview-canvas"></canvas>
                         </div>
                     </div>
                     <h3>Vista previa</h3>
@@ -498,7 +513,6 @@
                 tab.onclick = () => selectChar(c);
                 container.appendChild(tab);
             }
-            document.getElementById('current-char-display').textContent = currentChar === ' ' ? '␣' : currentChar;
         }
 
         function selectChar(c) {
@@ -538,25 +552,24 @@
         }
 
         function updatePreviews() {
-            const c1 = document.getElementById('preview-1x');
             const c4 = document.getElementById('preview-4x');
-            c1.width = WIDTH; c1.height = HEIGHT;
-            c1.style.width = WIDTH * 4 + 'px'; c1.style.height = HEIGHT * 4 + 'px';
-            c4.width = WIDTH * 6; c4.height = HEIGHT * 6;
+            const c8 = document.getElementById('preview-8x');
+            c4.width = WIDTH * 4; c4.height = HEIGHT * 4;
+            c8.width = WIDTH * 8; c8.height = HEIGHT * 8;
 
-            const ctx1 = c1.getContext('2d');
             const ctx4 = c4.getContext('2d');
-            ctx1.fillStyle = ctx4.fillStyle = '#000';
-            ctx1.fillRect(0, 0, WIDTH, HEIGHT);
-            ctx4.fillRect(0, 0, WIDTH * 4, HEIGHT * 4);
+            const ctx8 = c8.getContext('2d');
+            ctx4.fillStyle = ctx8.fillStyle = '#000';
+            ctx4.fillRect(0, 0, c4.width, c4.height);
+            ctx8.fillRect(0, 0, c8.width, c8.height);
 
             if (chars[currentChar]) {
-                ctx1.fillStyle = ctx4.fillStyle = '#00ff88';
+                ctx4.fillStyle = ctx8.fillStyle = '#00ff88';
                 for (let y = 0; y < HEIGHT; y++) {
                     for (let x = 0; x < WIDTH; x++) {
                         if (chars[currentChar][y][x]) {
-                            ctx1.fillRect(x, y, 1, 1);
                             ctx4.fillRect(x * 4, y * 4, 4, 4);
+                            ctx8.fillRect(x * 8, y * 8, 8, 8);
                         }
                     }
                 }

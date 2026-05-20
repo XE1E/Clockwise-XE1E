@@ -1,15 +1,16 @@
 :root {
-    --bg-dark: #0d1117;
-    --bg-medium: #161b22;
-    --bg-light: #21262d;
-    --border-color: #30363d;
-    --text-primary: #e6edf3;
-    --text-secondary: #8b949e;
-    --accent: #58a6ff;
-    --accent-hover: #79b8ff;
-    --danger: #f85149;
-    --success: #3fb950;
+    --bg-dark: #1a1a2e;
+    --bg-medium: #16213e;
+    --bg-light: #0f3460;
+    --border-color: #444;
+    --text-primary: #eee;
+    --text-secondary: #888;
+    --accent: #0f4c75;
+    --accent-hover: #1a6a9a;
+    --danger: #c0392b;
+    --success: #27ae60;
     --warning: #d29922;
+    --highlight: #00ff88;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,9 +65,8 @@ body {
 /* ===== LEFT TOOLBAR ===== */
 .toolbar-left {
     width: 52px;
-    background: linear-gradient(to right, #1a1f26, #161b22);
+    background: var(--bg-medium);
     border-right: 1px solid var(--border-color);
-    box-shadow: inset -1px 0 0 rgba(255,255,255,0.03);
     padding: 10px 6px;
     display: flex;
     flex-direction: column;
@@ -201,20 +201,21 @@ body {
 
 /* ===== RIGHT PANEL ===== */
 .panel-right {
-    width: 250px;
-    background: linear-gradient(to left, #1a1f26, #161b22);
+    width: 260px;
+    background: var(--bg-medium);
     border-left: 1px solid var(--border-color);
-    box-shadow: inset 1px 0 0 rgba(255,255,255,0.03);
     overflow-y: auto;
 }
 
 .panel-section {
-    border-bottom: 1px solid var(--border-color);
-    background: rgba(255,255,255,0.01);
+    background: var(--bg-light);
+    margin: 8px;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .panel-section:hover {
-    background: rgba(255,255,255,0.02);
+    background: var(--bg-light);
 }
 
 .panel-header {
@@ -225,12 +226,13 @@ body {
     cursor: pointer;
     font-size: 0.85em;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: var(--highlight);
     text-transform: uppercase;
+    background: var(--bg-medium);
 }
 
 .panel-header:hover {
-    background: var(--bg-light);
+    background: var(--accent);
 }
 
 .collapse-icon {
@@ -243,7 +245,7 @@ body {
 
 .panel-content {
     padding: 10px 12px 14px;
-    background: rgba(33, 38, 45, 0.5);
+    background: var(--bg-light);
 }
 
 .prop-row {
@@ -267,12 +269,12 @@ body {
 
 .prop-row input, .prop-row select {
     width: 100%;
-    padding: 7px 10px;
+    padding: 6px 10px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: var(--bg-light);
+    background: var(--bg-dark);
     color: var(--text-primary);
-    font-size: 0.9em;
+    font-size: 12px;
 }
 
 .prop-row input:focus, .prop-row select:focus {
@@ -310,12 +312,12 @@ body {
 
 .prop-row-half input, .prop-row-half select {
     width: 100%;
-    padding: 7px 10px;
+    padding: 6px 10px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: var(--bg-light);
+    background: var(--bg-dark);
     color: var(--text-primary);
-    font-size: 0.9em;
+    font-size: 12px;
 }
 
 .color-row {
@@ -568,34 +570,33 @@ body {
 
 /* ===== BUTTONS ===== */
 .btn {
-    padding: 6px 12px;
+    padding: 8px 12px;
     border: none;
-    border-radius: 4px;
-    font-size: 0.85em;
+    border-radius: 5px;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.15s;
 }
 
+.btn:hover { opacity: 0.85; }
+
 .btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:hover { background: var(--accent-hover); opacity: 1; }
 
 .btn-secondary {
     background: var(--bg-light);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
 }
-.btn-secondary:hover { background: var(--bg-medium); }
+.btn-secondary:hover { background: var(--bg-medium); opacity: 1; }
 
 .btn-success { background: var(--success); color: white; }
-.btn-success:hover { background: #45a049; }
-
+.btn-danger { background: var(--danger); color: white; }
 .btn-info { background: #17a2b8; color: white; }
-.btn-info:hover { background: #138496; }
-
 .btn-warning { background: #f0ad4e; color: #333; }
-.btn-warning:hover { background: #ec971f; }
+.btn-purple { background: #8e44ad; color: white; }
 
-.btn-small { padding: 4px 8px; font-size: 0.8em; }
+.btn-small { padding: 5px 10px; font-size: 11px; }
 
 /* ===== MODALS ===== */
 .modal {
