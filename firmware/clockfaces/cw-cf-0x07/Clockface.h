@@ -24,6 +24,7 @@
 #include "fonts/font8x13.h"
 #include "fonts/font8x13B.h"
 #include "fonts/haxorMedium12.h"
+#include "fonts/tiny5.h"
 #include "PNGRender.h"
 #include "CustomSprite.h"
 #include "CWHttpClient.h"

@@ -163,6 +163,10 @@ void Clockface::setFont(const char *fontName)
   {
     Locator::getDisplay()->setFont(&haxorMedium12);
   }
+  else if (strcmp(fontName, "tiny5") == 0)
+  {
+    Locator::getDisplay()->setFont(&tiny5);
+  }
   else
   {
     Locator::getDisplay()->setFont();
