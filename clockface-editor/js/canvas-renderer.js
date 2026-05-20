@@ -170,11 +170,11 @@ class CanvasRenderer {
 
     drawSelection(element) {
         this.ctx.strokeStyle = '#00ff00';
-        this.ctx.lineWidth = 1;
+        this.ctx.lineWidth = 0.5;
         this.ctx.setLineDash([2, 2]);
 
         let bounds = this.getElementBounds(element);
-        this.ctx.strokeRect(bounds.x - 1, bounds.y - 1, bounds.width + 2, bounds.height + 2);
+        this.ctx.strokeRect(bounds.x - 0.5, bounds.y - 0.5, bounds.width + 1, bounds.height + 1);
 
         this.ctx.setLineDash([]);
 
@@ -182,10 +182,10 @@ class CanvasRenderer {
         if (handles.length > 0) {
             this.ctx.fillStyle = '#ffffff';
             this.ctx.strokeStyle = '#00ff00';
-            this.ctx.lineWidth = 1;
+            this.ctx.lineWidth = 0.5;
             for (const handle of handles) {
-                this.ctx.fillRect(handle.x - 1, handle.y - 1, 3, 3);
-                this.ctx.strokeRect(handle.x - 1, handle.y - 1, 3, 3);
+                this.ctx.fillRect(handle.x - 1, handle.y - 1, 2, 2);
+                this.ctx.strokeRect(handle.x - 0.5, handle.y - 0.5, 2, 2);
             }
         }
     }

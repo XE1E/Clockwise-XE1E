@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clockwise - Editor de Clockfaces</title>
+    <title>Editor de Carátulas - Clockwise</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -12,11 +12,11 @@
         <header class="app-header">
             <div class="logo">
                 <span class="logo-icon">&#9201;</span>
-                <span>Clockface Editor</span>
+                <span>Editor de Carátulas</span>
             </div>
             <div class="header-actions">
-                <button id="btn-new" class="btn btn-secondary" title="Nuevo">Nuevo</button>
-                <button id="btn-import" class="btn btn-secondary" title="Importar JSON">Importar</button>
+                <button id="btn-new" class="btn btn-info" title="Nuevo">Nuevo</button>
+                <button id="btn-import" class="btn btn-warning" title="Importar JSON">Importar</button>
                 <button id="btn-export" class="btn btn-primary" title="Exportar JSON">Exportar</button>
                 <button id="btn-test-clock" class="btn btn-success" title="Enviar al reloj">Probar</button>
             </div>
@@ -92,7 +92,7 @@
             <!-- Right Panel -->
             <aside class="panel-right">
                 <!-- Collapsible: Properties -->
-                <div class="panel-section" id="section-props">
+                <div class="panel-section collapsed" id="section-props">
                     <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
                         <span>Propiedades</span>
                         <span class="collapse-icon">&#9660;</span>
@@ -162,8 +162,7 @@
 
                         <div class="prop-row" id="fg-font">
                             <label>Fuente</label>
-                            <select id="el-font"></select>
-                            <canvas id="font-preview" width="180" height="24"></canvas>
+                            <select id="el-font" class="select-highlight"></select>
                         </div>
 
                         <div class="prop-row-half" id="fg-colors-grid">
@@ -305,9 +304,9 @@
                             <button id="btn-open-sprites" class="btn btn-tool" title="Editor de sprites">Sprites</button>
                             <button id="btn-open-reference" class="btn btn-tool" title="Imagen guia">Referencia</button>
                         </div>
-                        <div style="margin-top:8px;font-size:0.75em;">
-                            <a href="char-designer.html" target="_blank" style="color:var(--accent);margin-right:12px;">Editor Caracteres</a>
-                            <a href="generate-thumbs.html" target="_blank" style="color:var(--accent);">Generador Thumbs</a>
+                        <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;">
+                            <a href="editor-fuentes.html" target="_blank" class="btn btn-tool" style="text-align:center;text-decoration:none;">🔤 Editor de Fuentes</a>
+                            <a href="generate-thumbs.html" target="_blank" class="btn btn-tool" style="text-align:center;text-decoration:none;">🖼️ Generador Thumbs</a>
                         </div>
                         <div id="sprite-count" style="font-size:0.75em;color:var(--text-secondary);margin-top:6px;">0 sprites</div>
                     </div>

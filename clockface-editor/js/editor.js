@@ -485,6 +485,14 @@ class ClockfaceEditor {
         document.getElementById('zoom-in').addEventListener('click', () => this.setZoom(this.zoom + 2));
         document.getElementById('zoom-out').addEventListener('click', () => this.setZoom(this.zoom - 2));
 
+        // Wheel zoom on canvas
+        const wrapper = document.querySelector('.canvas-wrapper');
+        wrapper.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -2 : 2;
+            this.setZoom(this.zoom + delta);
+        }, { passive: false });
+
         document.getElementById('show-grid').addEventListener('change', (e) => {
             document.querySelector('.canvas-grid').classList.toggle('hidden', !e.target.checked);
         });
@@ -691,6 +699,59 @@ class ClockfaceEditor {
         } catch (e) {
             if (e.name !== 'AbortError') {
                 console.error('Error saving thumbnail:', e);
+                alert('Error al guardar: ' + e.message);
+            }
+        }
+    }
+
+    async exportWithSaveDialog() {
+        this.resetSpritePositionsForExport();
+
+        const warnings = this.clockface.validate();
+        if (warnings.length > 0) {
+            const msg = 'Advertencias:\n\n' + warnings.join('\n') + '\n\n¿Continuar con la exportación?';
+            if (!confirm(msg)) {
+                return;
+            }
+        }
+
+        this.generateThumbnail();
+
+        if (!('showSaveFilePicker' in window)) {
+            const json = JSON.stringify(this.clockface.toJSON(true), null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${this.clockface.name}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            return;
+        }
+
+        try {
+            const lastDir = await this.getSavedDirectoryHandle();
+            const options = {
+                suggestedName: `${this.clockface.name}.json`,
+                types: [{
+                    description: 'JSON Clockface',
+                    accept: { 'application/json': ['.json'] }
+                }]
+            };
+            if (lastDir) {
+                options.startIn = lastDir;
+            }
+
+            const fileHandle = await window.showSaveFilePicker(options);
+            const writable = await fileHandle.createWritable();
+            const json = JSON.stringify(this.clockface.toJSON(true), null, 2);
+            await writable.write(json);
+            await writable.close();
+
+            alert(`Carátula guardada: ${fileHandle.name}`);
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                console.error('Error saving:', e);
                 alert('Error al guardar: ' + e.message);
             }
         }
@@ -1444,26 +1505,7 @@ class ClockfaceEditor {
         });
 
         document.getElementById('btn-export').addEventListener('click', () => {
-            this.resetSpritePositionsForExport();
-
-            // Validate and show warnings
-            const warnings = this.clockface.validate();
-            if (warnings.length > 0) {
-                const msg = 'Advertencias:\n\n' + warnings.join('\n') + '\n\n¿Continuar con la exportación?';
-                if (!confirm(msg)) {
-                    return;
-                }
-            }
-
-            // Auto-generate thumbnail from current canvas
-            this.generateThumbnail();
-
-            const includeThumbnail = document.getElementById('export-include-thumb')?.checked ?? true;
-            const json = JSON.stringify(this.clockface.toJSON(includeThumbnail), null, 2);
-            document.getElementById('export-json').value = json;
-            document.getElementById('export-modal').classList.add('active');
-            this.updateFolderInfo();
-            this.updateExportSize();
+            this.exportWithSaveDialog();
         });
 
         document.getElementById('btn-do-import').addEventListener('click', async () => {
