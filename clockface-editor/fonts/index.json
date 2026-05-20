@@ -1,6 +1,7 @@
 {
   "description": "Fuentes personalizadas para Clockwise",
   "fonts": [
+    "tiny5.json",
     "led-display.json",
     "8x13.json",
     "8x13B.json",
