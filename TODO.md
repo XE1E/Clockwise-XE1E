@@ -11,7 +11,7 @@
 
 ### Fase 3: Interfaz Web Nueva
 - [x] Diseño con pestañas
-- [ ] Tema claro/oscuro
+- [x] Tema claro/oscuro
 - [x] Integrar editores de clockface
 
 ### Pendientes
