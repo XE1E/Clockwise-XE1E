@@ -892,43 +892,58 @@ body {
 /* Pixel Editor */
 .pixel-editor-section {
     margin-top: 12px;
-    padding: 12px;
+    padding: 15px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 8px;
+    background: var(--bg-dark);
 }
 
-.pixel-editor-section h4 { margin-bottom: 10px; font-size: 0.9em; }
+.pixel-editor-section h4 { margin-bottom: 12px; font-size: 1em; color: var(--highlight); }
 
-.pixel-editor-container { display: flex; gap: 12px; flex-wrap: wrap; }
+.pixel-editor-container { display: flex; gap: 20px; align-items: flex-start; }
 
-.pixel-tools { display: flex; flex-direction: column; gap: 8px; }
+.pixel-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 150px;
+    background: var(--bg-light);
+    padding: 12px;
+    border-radius: 8px;
+}
 
-.pixel-tool-group { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-.pixel-tool-group label { font-size: 0.8em; color: var(--text-secondary); }
+.pixel-tool-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pixel-tool-group label { font-size: 12px; color: var(--text-secondary); }
+.tool-label { font-size: 11px; color: var(--text-secondary); display: block; width: 100%; margin-bottom: 4px; }
 
-.pixel-tool { padding: 4px 6px !important; }
+.pixel-tool { padding: 8px 10px !important; font-size: 16px !important; }
 .pixel-tool.active { background: var(--accent) !important; color: white !important; }
 
-.pixel-canvas-wrapper { border: 1px solid var(--border-color); background: #1a1a1a; display: inline-block; }
+.pixel-canvas-wrapper { border: 2px solid var(--border-color); background: #0a0a0a; display: inline-block; border-radius: 4px; }
 #pixel-editor-canvas { image-rendering: pixelated; cursor: crosshair; }
 
-.pixel-palette { display: flex; flex-direction: column; gap: 8px; }
+.pixel-palette { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
 
-.current-color-display { display: flex; gap: 4px; align-items: center; }
+.current-color-display { display: flex; gap: 6px; align-items: center; }
+#pixel-current-color { width: 36px; height: 36px; border: 2px solid #fff; border-radius: 4px; }
+#pixel-color-picker { width: 36px; height: 36px; }
 
-.color-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; max-width: 120px; }
+.color-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
 
 .color-preset {
-    width: 24px; height: 24px;
+    width: 28px; height: 28px;
     border: 2px solid transparent;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
 }
 
 .color-preset:hover { transform: scale(1.1); }
 .color-preset.selected { border-color: #fff; }
 
-.pixel-editor-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
+.pixel-editor-actions { display: flex; gap: 8px; margin-top: 15px; }
+.pixel-editor-actions .btn { padding: 8px 12px; }
+
+.pixel-tools input[type="number"] { width: 55px; padding: 6px; text-align: center; }
 
 /* Batch Thumbnails */
 .batch-input-section {
