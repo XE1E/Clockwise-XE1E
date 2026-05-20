@@ -427,7 +427,7 @@ body {
 .btn-tool {
     padding: 6px 8px;
     font-size: 0.8em;
-    background: #2d333b;
+    background: var(--bg-light);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     border-radius: 4px;
@@ -436,13 +436,13 @@ body {
 }
 
 .btn-tool:hover {
-    background: #3d444d;
+    background: var(--accent);
     border-color: var(--accent);
 }
 
 /* Display section */
 .display-info {
-    background: #2d333b;
+    background: var(--bg-light);
     padding: 8px 12px;
     border-radius: 4px;
     margin-bottom: 10px;
@@ -482,7 +482,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 8px 16px;
-    background: linear-gradient(to bottom, #1a1f26, var(--bg-medium));
+    background: var(--bg-medium);
     border-top: 1px solid var(--border-color);
     height: 44px;
     font-size: 0.85em;
