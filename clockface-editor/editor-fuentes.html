@@ -922,6 +922,46 @@
             }
         }
 
+        function convertPixelFontsToEditor(data) {
+            // Convert PixelFonts format (bitmaps/glyphs) to editor format (chars with 2D arrays)
+            if (!data.bitmaps || !data.glyphs) return null;
+
+            const first = data.first || 32;
+            const result = { chars: {} };
+            let maxW = 0, maxH = 0;
+
+            for (let i = 0; i < data.glyphs.length; i++) {
+                const g = data.glyphs[i];
+                if (!g || g[1] === 0) continue;
+
+                const [offset, w, h, xAdv, xOff, yOff] = g;
+                const charCode = first + i;
+                const c = String.fromCharCode(charCode);
+
+                if (w > maxW) maxW = w;
+                if (h > maxH) maxH = h;
+
+                // Extract bitmap data for this glyph
+                const grid = [];
+                for (let row = 0; row < h; row++) {
+                    const rowData = [];
+                    for (let col = 0; col < w; col++) {
+                        const bitIndex = offset + row * w + col;
+                        const bit = data.bitmaps[bitIndex] ? 1 : 0;
+                        rowData.push(bit);
+                    }
+                    grid.push(rowData);
+                }
+
+                result.chars[charCode] = { char: c, data: grid, w, h, xOff, yOff };
+            }
+
+            result.width = maxW;
+            result.height = maxH;
+            result.name = data.name || 'converted';
+            return result;
+        }
+
         async function loadFromRepo() {
             const name = document.getElementById('repo-font-select').value;
             if (!name) { alert('Selecciona un archivo'); return; }
@@ -934,7 +974,13 @@
             try {
                 const res = await fetch(baseUrl + 'fonts/' + name + '.json');
                 if (!res.ok) throw new Error('No encontrado');
-                const data = await res.json();
+                let data = await res.json();
+
+                // Convert PixelFonts format if needed
+                if (data.bitmaps && data.glyphs) {
+                    data = convertPixelFontsToEditor(data);
+                    if (!data) throw new Error('Error convirtiendo formato');
+                }
 
                 WIDTH = data.width || 8;
                 HEIGHT = data.height || 12;
@@ -949,7 +995,16 @@
                 if (data.chars) {
                     for (const [code, info] of Object.entries(data.chars)) {
                         const c = info.char || String.fromCharCode(+code);
-                        if (chars[c] !== undefined && info.data) chars[c] = info.data;
+                        if (chars[c] !== undefined && info.data) {
+                            // Resize grid if needed to match current WIDTH/HEIGHT
+                            const grid = createEmptyGrid();
+                            for (let y = 0; y < Math.min(info.data.length, HEIGHT); y++) {
+                                for (let x = 0; x < Math.min(info.data[y].length, WIDTH); x++) {
+                                    grid[y][x] = info.data[y][x];
+                                }
+                            }
+                            chars[c] = grid;
+                        }
                     }
                 }
 
