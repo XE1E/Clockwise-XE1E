@@ -16,8 +16,8 @@
 
 ### Pendientes
 - [ ] Actualizacion OTA (subir firmware desde web)
-- [ ] Revisar fuentes del firmware y eliminar las no usadas (Flash 83.8%)
 - [ ] Subir carátulas al repo GitHub desde el editor (requiere token)
+- [ ] Agregar capturas de pantalla a MANUAL_CONFIGURACION.md (crear docs/images/)
 
 ## Próximo
 
@@ -27,6 +27,12 @@
 - [ ] Buffer HTTP completo
 
 ## Completado
+
+### 2026-05-19
+- [x] Fix: página web no cargaba (ArduinoJson en /api/settings evita fragmentación heap)
+- [x] Fix: thumbnails cargando en paralelo agotaban memoria (carga secuencial)
+- [x] Revisar fuentes firmware: eliminadas no funcionales, solo 8x13, 8x13B, haxor-12
+- [x] WebUI_minimal.h creada como alternativa ligera para testing
 
 ### 2026-05-15
 - [x] Simplificación: carátulas SIEMPRE desde SPIFFS local

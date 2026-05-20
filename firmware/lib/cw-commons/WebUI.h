@@ -19,6 +19,19 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             --text: #202124;
             --text-secondary: #5f6368;
             --border: #dadce0;
+            --input-bg: #ffffff;
+            --toolbar-bg: #333;
+            --card-header-bg: #f1f3f4;
+        }
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --border: #444;
+            --input-bg: #3d3d3d;
+            --toolbar-bg: #252525;
+            --card-header-bg: #363636;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
@@ -26,7 +39,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         .header { background: linear-gradient(135deg, #1a73e8, #34a853); color: white; padding: 20px; text-align: center; }
         .header h1 { font-size: 24px; font-weight: 500; margin-bottom: 5px; }
         .header .version { font-size: 12px; opacity: 0.8; }
-        .toolbar { background: #333; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .toolbar { background: var(--toolbar-bg); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .toolbar-info { display: flex; gap: 20px; font-size: 14px; }
         .toolbar-info span { display: flex; align-items: center; gap: 5px; }
         .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
@@ -36,8 +49,8 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         .btn-save:hover, .btn-primary:hover { background: var(--primary-dark); }
         .btn-warning { background: #ff9800 !important; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
-        .btn-secondary { background: #e8e8e8; color: var(--text); }
-        .btn-secondary:hover { background: #d0d0d0; }
+        .btn-secondary { background: var(--border); color: var(--text); }
+        .btn-secondary:hover { background: var(--text-secondary); }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .tabs-container { background: var(--bg); padding-top: 10px; }
         .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 0; flex-wrap: wrap; }
@@ -50,7 +63,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         .section-title svg { width: 24px; height: 24px; fill: var(--primary); }
         .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         .card { background: var(--card-bg); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
-        .card-header { padding: 15px 20px; background: #f1f3f4; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        .card-header { padding: 15px 20px; background: var(--card-header-bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
         .card-header h3 { font-size: 16px; font-weight: 500; }
         .card-header svg { width: 20px; height: 20px; fill: var(--text-secondary); }
         .card-body { padding: 20px; }
@@ -60,21 +73,22 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         .form-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--text); }
         .form-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; transition: border-color 0.2s; }
         .form-input:focus { outline: none; border-color: var(--primary); }
-        .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; background: white; cursor: pointer; }
+        .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; background: var(--input-bg); color: var(--text); cursor: pointer; }
+        .form-input { background: var(--input-bg); color: var(--text); }
         .form-checkbox { display: flex; align-items: center; gap: 10px; }
         .form-checkbox input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
         .form-checkbox label { cursor: pointer; }
         .input-row { display: flex; gap: 10px; }
         .input-row .form-input, .input-row .form-group { flex: 1; }
         .range-value { font-weight: 600; color: var(--primary); }
-        .wifi-network { background: #f8f9fa; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .wifi-network { background: var(--card-header-bg); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .wifi-network-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .wifi-network-title { font-weight: 500; font-size: 14px; }
         .wifi-priority { font-size: 12px; color: var(--text-secondary); background: #e8f0fe; padding: 2px 8px; border-radius: 10px; }
         .storage-bar { height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin: 10px 0; }
         .storage-bar-fill { height: 100%; background: var(--primary); transition: width 0.3s; }
         .clockface-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 10px; }
-        .clockface-item { border: 2px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; transition: all 0.2s; background: white; }
+        .clockface-item { border: 2px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--card-bg); }
         .clockface-item:hover { border-color: var(--primary); }
         .clockface-item.selected { border-color: var(--success); background: #e6f4ea; }
         .clockface-item[draggable="true"] { cursor: grab; }
@@ -93,6 +107,8 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
         .color-btn:hover { border-color: var(--primary); }
         .color-btn.active { border-color: #fff; box-shadow: 0 0 0 2px var(--primary), inset 0 0 0 1px rgba(0,0,0,0.3); }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 500; z-index: 1000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .pwd-toggle { position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;opacity:0.7; }
+        .pwd-toggle:hover { opacity:1; }
         @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } .tabs { overflow-x: auto; } .tab { padding: 10px 15px; white-space: nowrap; } }
     </style>
 </head>
@@ -111,6 +127,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             <span>Uptime: <strong id="uptime">-</strong></span>
         </div>
         <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="toggleTheme()" id="themeBtn">🌙</button>
             <button class="btn btn-restart" onclick="restartDevice()">Reiniciar</button>
         </div>
     </div>
@@ -140,7 +157,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             </div>
             <div class="input-row">
                 <div class="form-group"><label class="form-label">SSID</label><input type="text" class="form-input" id="wifiSsid"></div>
-                <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="wifiPwd" placeholder="(sin cambios)"></div>
+                <div class="form-group"><label class="form-label">Password</label><div style="position:relative"><input type="password" class="form-input" id="wifiPwd" placeholder="(sin cambios)" style="padding-right:36px"><button type="button" onclick="togglePwd('wifiPwd')" class="pwd-toggle" title="Mostrar">👁</button></div></div>
             </div>
         </div>
         <div class="wifi-network">
@@ -150,7 +167,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             </div>
             <div class="input-row">
                 <div class="form-group"><label class="form-label">SSID</label><input type="text" class="form-input" id="wifiSsid2"></div>
-                <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="wifiPwd2" placeholder="(sin cambios)"></div>
+                <div class="form-group"><label class="form-label">Password</label><div style="position:relative"><input type="password" class="form-input" id="wifiPwd2" placeholder="(sin cambios)" style="padding-right:36px"><button type="button" onclick="togglePwd('wifiPwd2')" class="pwd-toggle" title="Mostrar">👁</button></div></div>
             </div>
         </div>
         <div class="wifi-network">
@@ -160,7 +177,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             </div>
             <div class="input-row">
                 <div class="form-group"><label class="form-label">SSID</label><input type="text" class="form-input" id="wifiSsid3"></div>
-                <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="wifiPwd3" placeholder="(sin cambios)"></div>
+                <div class="form-group"><label class="form-label">Password</label><div style="position:relative"><input type="password" class="form-input" id="wifiPwd3" placeholder="(sin cambios)" style="padding-right:36px"><button type="button" onclick="togglePwd('wifiPwd3')" class="pwd-toggle" title="Mostrar">👁</button></div></div>
             </div>
         </div>
         <button class="btn btn-save" onclick="saveWifi()" style="width:100%">Guardar WiFi</button>
@@ -192,8 +209,8 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                         <option value="3">270 grados</option>
                     </select>
                     <div style="display:flex;justify-content:center;margin-top:12px">
-                        <div id="rotation-preview" style="width:48px;height:48px;background:#000;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:transform 0.3s">
-                            <span style="color:#0f0;font-family:monospace;font-size:12px">12:00</span>
+                        <div id="rotation-preview" style="width:80px;height:80px;background:#000;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:transform 0.3s">
+                            <span style="color:#0f0;font-family:monospace;font-size:18px;font-weight:bold">12:00</span>
                         </div>
                     </div>
                 </div>
@@ -510,15 +527,28 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
 const $=id=>document.getElementById(id);
 let settings={},storedClockfaces=[],thumbCache={},canvasChanged=false;
 
-// Tabs
-document.querySelectorAll('.tab').forEach(tab=>{
-    tab.onclick=()=>{
-        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(p=>p.classList.remove('active'));
-        tab.classList.add('active');
-        $('tab-'+tab.dataset.tab).classList.add('active');
-    };
-});
+// Theme (dark by default)
+function toggleTheme(){
+const d=document.documentElement,dark=d.getAttribute('data-theme')==='dark';
+d.setAttribute('data-theme',dark?'light':'dark');
+$('themeBtn').textContent=dark?'🌙':'☀️';
+localStorage.setItem('theme',dark?'light':'dark');
+}
+(function(){const t=localStorage.getItem('theme');const isDark=t!=='light';document.documentElement.setAttribute('data-theme',isDark?'dark':'light');setTimeout(()=>$('themeBtn').textContent=isDark?'☀️':'🌙',0);})();
+
+// Password toggle
+function togglePwd(id){const i=$(id);const t=i.type==='password'?'text':'password';i.type=t;i.nextElementSibling.textContent=t==='password'?'👁':'🙈';}
+
+// Tabs (remember last tab)
+function switchTab(name){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(p=>p.classList.remove('active'));
+document.querySelector('.tab[data-tab="'+name+'"]').classList.add('active');
+$('tab-'+name).classList.add('active');
+localStorage.setItem('lastTab',name);
+}
+document.querySelectorAll('.tab').forEach(tab=>{tab.onclick=()=>switchTab(tab.dataset.tab);});
+(function(){const t=localStorage.getItem('lastTab');if(t&&document.querySelector('.tab[data-tab="'+t+'"]'))switchTab(t);})();
 
 function toast(msg){const t=$('toast');t.textContent=msg||'Guardado';t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
 
