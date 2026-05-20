@@ -941,14 +941,17 @@
                 if (w > maxW) maxW = w;
                 if (h > maxH) maxH = h;
 
-                // Extract bitmap data for this glyph
+                // Extract bitmap data for this glyph (bitmaps is packed bytes, not individual bits)
                 const grid = [];
+                let bitIndex = offset * 8; // offset is byte index, convert to bit index
                 for (let row = 0; row < h; row++) {
                     const rowData = [];
                     for (let col = 0; col < w; col++) {
-                        const bitIndex = offset + row * w + col;
-                        const bit = data.bitmaps[bitIndex] ? 1 : 0;
+                        const byteIdx = Math.floor(bitIndex / 8);
+                        const bitPos = 7 - (bitIndex % 8);
+                        const bit = (data.bitmaps[byteIdx] >> bitPos) & 1;
                         rowData.push(bit);
+                        bitIndex++;
                     }
                     grid.push(rowData);
                 }
