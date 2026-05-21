@@ -577,41 +577,47 @@
                         <div id="frames-list" class="frames-list"></div>
                         <div id="pixel-editor-section" class="pixel-editor-section" style="display:none;">
                             <h4>Editor de Pixeles</h4>
-                            <div class="pixel-editor-container">
-                                <div class="pixel-tools">
-                                    <div class="pixel-tool-group">
-                                        <label>Tamaño:</label>
-                                        <input type="number" id="pixel-canvas-size" value="16" min="4" max="64" title="Tamaño del canvas en pixeles">
-                                        <button class="btn btn-small" id="btn-pixel-resize" title="Aplicar tamaño">OK</button>
-                                    </div>
-                                    <div class="pixel-tool-group">
-                                        <span class="tool-label">Herramientas:</span>
-                                        <button class="btn btn-small pixel-tool active" data-tool="draw" title="Dibujar (D)">&#9998;</button>
-                                        <button class="btn btn-small pixel-tool" data-tool="erase" title="Borrar (E)">&#9003;</button>
-                                        <button class="btn btn-small pixel-tool" data-tool="fill" title="Rellenar (F)">&#9638;</button>
-                                        <button class="btn btn-small pixel-tool" data-tool="pick" title="Tomar color (P)">&#128167;</button>
-                                    </div>
-                                    <div class="pixel-tool-group">
-                                        <button class="btn btn-small btn-danger" id="btn-pixel-clear" title="Limpiar canvas">Limpiar</button>
-                                        <button class="btn btn-small" id="btn-pixel-grid" title="Mostrar/ocultar grid">Grid</button>
-                                    </div>
-                                    <div class="pixel-palette">
-                                        <span class="tool-label">Color:</span>
-                                        <div class="current-color-display">
-                                            <div id="pixel-current-color" title="Color actual"></div>
-                                            <input type="color" id="pixel-color-picker" value="#ffffff" title="Selector de color">
+                            <div class="pixel-editor-layout">
+                                <div class="pixel-editor-main">
+                                    <div class="pixel-tools">
+                                        <div class="pixel-tool-group">
+                                            <label>Ancho:</label>
+                                            <input type="number" id="pixel-canvas-width" value="16" min="4" max="64" style="width:50px;">
+                                            <label>Alto:</label>
+                                            <input type="number" id="pixel-canvas-height" value="16" min="4" max="64" style="width:50px;">
+                                            <button class="btn btn-small" id="btn-pixel-resize" title="Aplicar tamaño">OK</button>
                                         </div>
-                                        <div class="color-presets" id="color-presets"></div>
+                                        <div class="pixel-tool-group">
+                                            <button class="btn btn-small pixel-tool active" data-tool="draw" title="Dibujar (D)">&#9998;</button>
+                                            <button class="btn btn-small pixel-tool" data-tool="erase" title="Borrar (E)">&#9003;</button>
+                                            <button class="btn btn-small pixel-tool" data-tool="fill" title="Rellenar (F)">&#9638;</button>
+                                            <button class="btn btn-small pixel-tool" data-tool="pick" title="Tomar color (P)">&#128167;</button>
+                                            <button class="btn btn-small btn-danger" id="btn-pixel-clear" title="Limpiar">Limpiar</button>
+                                            <button class="btn btn-small" id="btn-pixel-grid" title="Grid">Grid</button>
+                                        </div>
+                                        <div class="pixel-palette">
+                                            <div class="current-color-display">
+                                                <div id="pixel-current-color" title="Color actual"></div>
+                                                <input type="color" id="pixel-color-picker" value="#ffffff" title="Selector de color">
+                                            </div>
+                                            <div class="color-presets" id="color-presets"></div>
+                                        </div>
                                     </div>
-                                    <div class="pixel-editor-actions">
-                                        <button class="btn btn-small btn-secondary" id="btn-pixel-cancel" title="Cancelar y cerrar">Cancelar</button>
-                                        <button class="btn btn-small btn-primary" id="btn-pixel-add-frame" title="Agregar como nuevo frame">Agregar</button>
-                                        <button class="btn btn-small btn-warning" id="btn-pixel-replace-frame" title="Reemplazar frame editado" style="display:none;">Reemplazar</button>
-                                        <button class="btn btn-small btn-success" id="btn-pixel-copy-frame" title="Copiar frame actual para editar">Copiar</button>
+                                    <div class="pixel-canvas-wrapper">
+                                        <canvas id="pixel-editor-canvas" width="320" height="320"></canvas>
                                     </div>
                                 </div>
-                                <div class="pixel-canvas-wrapper">
-                                    <canvas id="pixel-editor-canvas" width="320" height="320"></canvas>
+                                <div class="pixel-editor-sidebar">
+                                    <div class="pixel-preview-box">
+                                        <h5>Preview</h5>
+                                        <canvas id="pixel-preview-canvas" width="64" height="64"></canvas>
+                                    </div>
+                                    <div class="pixel-editor-actions">
+                                        <button class="btn btn-small btn-primary" id="btn-pixel-add-frame" title="Agregar y continuar">+ Agregar</button>
+                                        <button class="btn btn-small btn-success" id="btn-pixel-save-frame" title="Guardar y cerrar" style="display:none;">Guardar</button>
+                                        <button class="btn btn-small btn-warning" id="btn-pixel-replace-frame" title="Reemplazar frame" style="display:none;">Reemplazar</button>
+                                        <button class="btn btn-small btn-secondary" id="btn-pixel-cancel" title="Cerrar editor">Cerrar</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

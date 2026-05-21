@@ -18,7 +18,8 @@ class ClockfaceEditor {
         this.pixelEditorState = {
             canvas: null,
             ctx: null,
-            size: 16,
+            width: 16,
+            height: 16,
             pixels: [],
             currentColor: '#ffffff',
             currentTool: 'draw',
@@ -1033,17 +1034,23 @@ class ClockfaceEditor {
 
         document.getElementById('btn-pixel-editor').addEventListener('click', () => {
             document.getElementById('pixel-editor-section').style.display = 'block';
+            pe.editingFrameIndex = -1;
+            document.getElementById('btn-pixel-replace-frame').style.display = 'none';
+            document.getElementById('btn-pixel-save-frame').style.display = 'none';
             this.resetPixelCanvas();
         });
 
         document.getElementById('btn-pixel-cancel').addEventListener('click', () => {
-            document.getElementById('pixel-editor-section').style.display = 'none';
+            this.hidePixelEditor();
         });
 
         document.getElementById('btn-pixel-resize').addEventListener('click', () => {
-            const size = parseInt(document.getElementById('pixel-canvas-size').value) || 16;
-            pe.size = Math.max(4, Math.min(64, size));
-            document.getElementById('pixel-canvas-size').value = pe.size;
+            const w = parseInt(document.getElementById('pixel-canvas-width').value) || 16;
+            const h = parseInt(document.getElementById('pixel-canvas-height').value) || 16;
+            pe.width = Math.max(4, Math.min(64, w));
+            pe.height = Math.max(4, Math.min(64, h));
+            document.getElementById('pixel-canvas-width').value = pe.width;
+            document.getElementById('pixel-canvas-height').value = pe.height;
             this.resetPixelCanvas();
         });
 
@@ -1076,15 +1083,19 @@ class ClockfaceEditor {
         pe.canvas.addEventListener('mouseleave', () => pe.isDrawing = false);
 
         document.getElementById('btn-pixel-add-frame').addEventListener('click', () => {
-            this.addPixelFrameToSprite();
+            this.addPixelFrameToSprite(false);
         });
 
         document.getElementById('btn-pixel-replace-frame').addEventListener('click', () => {
             this.replacePixelFrameInSprite();
         });
 
-        document.getElementById('btn-pixel-copy-frame').addEventListener('click', () => {
-            this.copyCurrentFrameToPixelEditor();
+        document.getElementById('btn-pixel-save-frame').addEventListener('click', () => {
+            if (this.pixelEditorState.editingFrameIndex >= 0) {
+                this.replacePixelFrameInSprite();
+            } else {
+                this.addPixelFrameToSprite(true);
+            }
         });
     }
 
@@ -1100,9 +1111,9 @@ class ClockfaceEditor {
     resetPixelCanvas() {
         const pe = this.pixelEditorState;
         pe.pixels = [];
-        for (let y = 0; y < pe.size; y++) {
+        for (let y = 0; y < pe.height; y++) {
             pe.pixels[y] = [];
-            for (let x = 0; x < pe.size; x++) {
+            for (let x = 0; x < pe.width; x++) {
                 pe.pixels[y][x] = null;
             }
         }
@@ -1111,17 +1122,19 @@ class ClockfaceEditor {
 
     renderPixelCanvas() {
         const pe = this.pixelEditorState;
-        const cellSize = Math.floor(256 / pe.size);
-        const canvasSize = cellSize * pe.size;
-        pe.canvas.width = canvasSize;
-        pe.canvas.height = canvasSize;
+        const maxDim = Math.max(pe.width, pe.height);
+        const cellSize = Math.floor(256 / maxDim);
+        const canvasW = cellSize * pe.width;
+        const canvasH = cellSize * pe.height;
+        pe.canvas.width = canvasW;
+        pe.canvas.height = canvasH;
 
         pe.ctx.fillStyle = '#1a1a1a';
-        pe.ctx.fillRect(0, 0, canvasSize, canvasSize);
+        pe.ctx.fillRect(0, 0, canvasW, canvasH);
 
-        for (let y = 0; y < pe.size; y++) {
-            for (let x = 0; x < pe.size; x++) {
-                if (pe.pixels[y][x]) {
+        for (let y = 0; y < pe.height; y++) {
+            for (let x = 0; x < pe.width; x++) {
+                if (pe.pixels[y] && pe.pixels[y][x]) {
                     pe.ctx.fillStyle = pe.pixels[y][x];
                     pe.ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
                 }
@@ -1131,15 +1144,48 @@ class ClockfaceEditor {
         if (pe.showGrid) {
             pe.ctx.strokeStyle = 'rgba(255,255,255,0.15)';
             pe.ctx.lineWidth = 1;
-            for (let i = 0; i <= pe.size; i++) {
+            for (let i = 0; i <= pe.width; i++) {
                 pe.ctx.beginPath();
                 pe.ctx.moveTo(i * cellSize, 0);
-                pe.ctx.lineTo(i * cellSize, canvasSize);
+                pe.ctx.lineTo(i * cellSize, canvasH);
                 pe.ctx.stroke();
+            }
+            for (let i = 0; i <= pe.height; i++) {
                 pe.ctx.beginPath();
                 pe.ctx.moveTo(0, i * cellSize);
-                pe.ctx.lineTo(canvasSize, i * cellSize);
+                pe.ctx.lineTo(canvasW, i * cellSize);
                 pe.ctx.stroke();
+            }
+        }
+
+        this.renderPixelPreview();
+    }
+
+    renderPixelPreview() {
+        const pe = this.pixelEditorState;
+        const previewCanvas = document.getElementById('pixel-preview-canvas');
+        if (!previewCanvas) return;
+
+        const ctx = previewCanvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 64, 64);
+
+        const scale = Math.min(64 / pe.width, 64 / pe.height);
+        const offsetX = Math.floor((64 - pe.width * scale) / 2);
+        const offsetY = Math.floor((64 - pe.height * scale) / 2);
+
+        for (let y = 0; y < pe.height; y++) {
+            for (let x = 0; x < pe.width; x++) {
+                if (pe.pixels[y] && pe.pixels[y][x]) {
+                    ctx.fillStyle = pe.pixels[y][x];
+                    ctx.fillRect(
+                        offsetX + Math.floor(x * scale),
+                        offsetY + Math.floor(y * scale),
+                        Math.ceil(scale),
+                        Math.ceil(scale)
+                    );
+                }
             }
         }
     }
@@ -1147,10 +1193,11 @@ class ClockfaceEditor {
     getPixelCoords(e) {
         const pe = this.pixelEditorState;
         const rect = pe.canvas.getBoundingClientRect();
-        const cellSize = pe.canvas.width / pe.size;
+        const maxDim = Math.max(pe.width, pe.height);
+        const cellSize = Math.floor(256 / maxDim);
         const x = Math.floor((e.clientX - rect.left) / cellSize);
         const y = Math.floor((e.clientY - rect.top) / cellSize);
-        return { x: Math.max(0, Math.min(pe.size - 1, x)), y: Math.max(0, Math.min(pe.size - 1, y)) };
+        return { x: Math.max(0, Math.min(pe.width - 1, x)), y: Math.max(0, Math.min(pe.height - 1, y)) };
     }
 
     onPixelMouseDown(e) {
@@ -1192,20 +1239,20 @@ class ClockfaceEditor {
     floodFill(x, y, targetColor, fillColor) {
         const pe = this.pixelEditorState;
         if (targetColor === fillColor) return;
-        if (x < 0 || x >= pe.size || y < 0 || y >= pe.size) return;
+        if (x < 0 || x >= pe.width || y < 0 || y >= pe.height) return;
         if (pe.pixels[y][x] !== targetColor) return;
 
         const stack = [[x, y]];
         while (stack.length > 0) {
             const [cx, cy] = stack.pop();
-            if (cx < 0 || cx >= pe.size || cy < 0 || cy >= pe.size) continue;
+            if (cx < 0 || cx >= pe.width || cy < 0 || cy >= pe.height) continue;
             if (pe.pixels[cy][cx] !== targetColor) continue;
             pe.pixels[cy][cx] = fillColor;
             stack.push([cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]);
         }
     }
 
-    addPixelFrameToSprite() {
+    addPixelFrameToSprite(closeAfter = false) {
         const pe = this.pixelEditorState;
         const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
         if (spriteIndex < 0) return;
@@ -1216,7 +1263,11 @@ class ClockfaceEditor {
         this.updateSpriteList();
         this.loadSpriteFrames();
 
-        this.hidePixelEditor();
+        if (closeAfter) {
+            this.hidePixelEditor();
+        } else {
+            this.resetPixelCanvas();
+        }
     }
 
     replacePixelFrameInSprite() {
@@ -1248,13 +1299,13 @@ class ClockfaceEditor {
     getPixelCanvasAsBase64() {
         const pe = this.pixelEditorState;
         const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = pe.size;
-        tempCanvas.height = pe.size;
+        tempCanvas.width = pe.width;
+        tempCanvas.height = pe.height;
         const ctx = tempCanvas.getContext('2d');
 
-        for (let y = 0; y < pe.size; y++) {
-            for (let x = 0; x < pe.size; x++) {
-                if (pe.pixels[y][x]) {
+        for (let y = 0; y < pe.height; y++) {
+            for (let x = 0; x < pe.width; x++) {
+                if (pe.pixels[y] && pe.pixels[y][x]) {
                     ctx.fillStyle = pe.pixels[y][x];
                     ctx.fillRect(x, y, 1, 1);
                 }
@@ -1267,38 +1318,31 @@ class ClockfaceEditor {
     hidePixelEditor() {
         this.pixelEditorState.editingFrameIndex = -1;
         document.getElementById('btn-pixel-replace-frame').style.display = 'none';
+        document.getElementById('btn-pixel-save-frame').style.display = 'none';
         document.getElementById('pixel-editor-section').style.display = 'none';
     }
 
-    async copyCurrentFrameToPixelEditor() {
+    loadFrameToPixelEditor(frameIndex) {
         const pe = this.pixelEditorState;
         const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
         if (spriteIndex < 0) return;
 
         const sprite = this.clockface.sprites[spriteIndex];
-        if (!sprite || !sprite.frames || sprite.frames.length === 0) {
-            alert('No hay frames para copiar');
+        if (!sprite || !sprite.frames || frameIndex >= sprite.frames.length) {
             return;
         }
 
-        const frameIndex = prompt(`Numero de frame a copiar/editar (0-${sprite.frames.length - 1}):`, '0');
-        if (frameIndex === null) return;
-
-        const idx = parseInt(frameIndex);
-        if (isNaN(idx) || idx < 0 || idx >= sprite.frames.length) {
-            alert('Indice invalido');
-            return;
-        }
-
-        // Store the frame index being edited
-        pe.editingFrameIndex = idx;
+        pe.editingFrameIndex = frameIndex;
         document.getElementById('btn-pixel-replace-frame').style.display = 'inline-block';
+        document.getElementById('btn-pixel-save-frame').style.display = 'inline-block';
 
-        const frame = sprite.frames[idx];
+        const frame = sprite.frames[frameIndex];
         const img = new Image();
         img.onload = () => {
-            pe.size = Math.max(img.width, img.height);
-            document.getElementById('pixel-canvas-size').value = pe.size;
+            pe.width = img.width;
+            pe.height = img.height;
+            document.getElementById('pixel-canvas-width').value = pe.width;
+            document.getElementById('pixel-canvas-height').value = pe.height;
             this.resetPixelCanvas();
 
             const tempCanvas = document.createElement('canvas');
@@ -1308,8 +1352,8 @@ class ClockfaceEditor {
             ctx.drawImage(img, 0, 0);
 
             const imageData = ctx.getImageData(0, 0, img.width, img.height);
-            for (let y = 0; y < img.height && y < pe.size; y++) {
-                for (let x = 0; x < img.width && x < pe.size; x++) {
+            for (let y = 0; y < img.height && y < pe.height; y++) {
+                for (let x = 0; x < img.width && x < pe.width; x++) {
                     const i = (y * img.width + x) * 4;
                     const r = imageData.data[i];
                     const g = imageData.data[i + 1];
@@ -1421,6 +1465,10 @@ class ClockfaceEditor {
                 <span class="frame-item-index">${frameIndex}</span>
                 <button class="frame-item-delete" title="Eliminar">&times;</button>
             `;
+            item.addEventListener('click', (e) => {
+                if (e.target.classList.contains('frame-item-delete')) return;
+                this.loadFrameToPixelEditor(frameIndex);
+            });
             item.querySelector('.frame-item-delete').addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.clockface.removeFrameFromSprite(spriteIndex, frameIndex);
