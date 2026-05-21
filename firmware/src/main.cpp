@@ -13,7 +13,11 @@
 #define MIN_BRIGHT_DISPLAY_ON 4
 #define MIN_BRIGHT_DISPLAY_OFF 0
 
-#define ESP32_LED_BUILTIN 2
+#ifdef CONFIG_IDF_TARGET_ESP32S3
+  #define ESP32_LED_BUILTIN -1  // ESP32-S3 DevKit uses RGB LED (WS2812), not simple GPIO
+#else
+  #define ESP32_LED_BUILTIN 2
+#endif
 
 MatrixPanel_I2S_DMA *dma_display = nullptr;
 
@@ -152,6 +156,20 @@ void displaySetup(bool swapBlueGreen, uint8_t displayBright, uint8_t displayRota
 {
   HUB75_I2S_CFG mxconfig(64, 64, 1);
 
+#ifdef CONFIG_IDF_TARGET_ESP32S3
+  // ESP32-S3: uses library defaults for pins, only need to set pin E for 64x64 panels
+  mxconfig.gpio.e = 38;
+
+  if (swapBlueGreen)
+  {
+    // Swap Blue and Green pins for ESP32-S3 pinout
+    mxconfig.gpio.b1 = 5;
+    mxconfig.gpio.b2 = 15;
+    mxconfig.gpio.g1 = 6;
+    mxconfig.gpio.g2 = 16;
+  }
+#else
+  // ESP32 original pinout
   if (swapBlueGreen)
   {
     // Swap Blue and Green pins because the panel is RBG instead of RGB.
@@ -160,8 +178,9 @@ void displaySetup(bool swapBlueGreen, uint8_t displayBright, uint8_t displayRota
     mxconfig.gpio.g1 = 27;
     mxconfig.gpio.g2 = 13;
   }
-
   mxconfig.gpio.e = 18;
+#endif
+
   mxconfig.clkphase = false;
 
   // Display Setup
@@ -203,7 +222,9 @@ void automaticBrightControl()
 void setup()
 {
   Serial.begin(115200);
-  pinMode(ESP32_LED_BUILTIN, OUTPUT);
+  if (ESP32_LED_BUILTIN >= 0) {
+    pinMode(ESP32_LED_BUILTIN, OUTPUT);
+  }
 
   StatusController::getInstance()->blink_led(5, 100);
 

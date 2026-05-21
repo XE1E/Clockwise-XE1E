@@ -4,7 +4,11 @@
 #include <Locator.h>
 #include "picopixel.h"
 
-#define ESP32_LED_BUILTIN 2
+#ifdef CONFIG_IDF_TARGET_ESP32S3
+  #define ESP32_LED_BUILTIN -1  // ESP32-S3 DevKit uses RGB LED (WS2812), not simple GPIO
+#else
+  #define ESP32_LED_BUILTIN 2
+#endif
 
 const uint8_t CW_STATUS_NTP[] PROGMEM = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3f, 0xff, 0xf0, 0x00, 0x40, 0x00, 0x08, 0x01, 
@@ -218,6 +222,7 @@ struct StatusController
 
 	void blink_led(int d, int times)
 	{
+		if (ESP32_LED_BUILTIN < 0) return;  // Skip if no simple LED available
 		for (int j = 0; j < times; j++)
 		{
 			digitalWrite(ESP32_LED_BUILTIN, HIGH);
