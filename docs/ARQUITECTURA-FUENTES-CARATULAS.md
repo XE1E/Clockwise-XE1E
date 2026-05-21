@@ -119,7 +119,7 @@ const GFXfont miFuente PROGMEM = {
 
 ---
 
-## Arquitectura Propuesta (Opción B)
+## Arquitectura Propuesta
 
 ### Objetivo
 
@@ -130,7 +130,51 @@ Permitir dos tipos de usuarios:
 
 Ambos sin necesidad de compilar firmware localmente.
 
-### Solución: Firmware Universal + Build Service
+### Modelo de Independencia: Repo Original + Forks
+
+**Principio fundamental**: El proyecto original NUNCA se modifica por personalizaciones de usuarios.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 REPO ORIGINAL (mantenedor)                       │
+│                                                                  │
+│  - Firmware "oficial" con 15-20 fuentes comunes                 │
+│  - Releases estables y probados                                 │
+│  - Editores web (fuentes, carátulas)                            │
+│  - Galería de carátulas oficiales                               │
+│  - Documentación                                                │
+│                                                                  │
+│  ✓ 90% de usuarios usarán esto directamente                     │
+│  ✓ NO se modifica por usuarios individuales                     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ Usuario quiere fuentes custom
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    FORK DEL USUARIO                              │
+│                                                                  │
+│  - Copia completa e independiente del proyecto                  │
+│  - Usuario agrega sus fuentes personalizadas                    │
+│  - Su propio GitHub Actions compila automáticamente             │
+│  - Genera su propio firmware .bin                               │
+│  - Puede recibir actualizaciones del repo original (git merge)  │
+│                                                                  │
+│  ✓ 100% independiente del proyecto original                     │
+│  ✓ GitHub Actions gratis para repos públicos                    │
+│  ✓ Control total sobre su versión                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Flujos por Tipo de Usuario
+
+| Usuario | Necesita | Usa |
+|---------|----------|-----|
+| Básico | Solo carátulas | Repo original + firmware oficial |
+| Creativo (carátulas) | Diseñar carátulas con fuentes existentes | Repo original + firmware oficial |
+| Creativo (fuentes) | Fuentes personalizadas | Fork propio + su firmware |
+
+### Solución Técnica: Firmware Universal + Forks
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -188,11 +232,13 @@ Ambos sin necesidad de compilar firmware localmente.
 ### Flujo Usuario Creativo (Fuentes Nuevas)
 
 ```
-1. Crea/edita fuente en editor web
-2. Agrega a pixel-fonts.js
-3. Exporta a firmware/*.h
-4. Commit + Push a GitHub
-5. GitHub Actions compila nuevo .bin
+1. Hacer FORK del repo original en GitHub
+2. Clonar su fork localmente (o editar en GitHub)
+3. Crear/editar fuente en editor web
+4. Agregar a pixel-fonts.js (en su fork)
+5. Exportar a firmware/*.h (en su fork)
+6. Commit + Push a su fork
+7. GitHub Actions de su fork compila nuevo .bin
 6. Descarga .bin y flashea con Web Flasher
 ```
 

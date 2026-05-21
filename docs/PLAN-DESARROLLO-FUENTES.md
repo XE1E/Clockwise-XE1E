@@ -9,6 +9,28 @@ Permitir que usuarios finales puedan:
 
 ---
 
+## Modelo de Independencia
+
+**Principio**: El proyecto original NUNCA se modifica por personalizaciones de usuarios.
+
+| Tipo de Usuario | Qué usa | Modifica repo original |
+|-----------------|---------|------------------------|
+| Básico | Firmware oficial + carátulas de galería | NO |
+| Creativo (carátulas) | Firmware oficial + carátulas propias | NO |
+| Creativo (fuentes) | Fork propio + fuentes custom | NO (usa su fork) |
+
+**Flujo para fuentes custom**:
+```
+Usuario hace FORK → Modifica su fork → Su GitHub Actions compila → Su .bin personal
+```
+
+Esto garantiza:
+- Proyecto original limpio y estable
+- Usuarios avanzados con control total
+- GitHub Actions gratis para cada fork público
+
+---
+
 ## Fases del Proyecto
 
 ### Fase 1: Sincronización de Fuentes (Editor → Firmware)
@@ -68,12 +90,20 @@ Permitir que usuarios finales puedan:
 
 - [ ] **2.4** Agregar badge de build status al README
 
+- [ ] **2.5** Documentar flujo de fork para usuarios avanzados
+  - Guía paso a paso: cómo hacer fork
+  - Cómo agregar fuentes personalizadas
+  - Cómo funciona GitHub Actions en el fork
+  - Cómo descargar su .bin personalizado
+  - Cómo sincronizar con actualizaciones del repo original
+
 **Entregables**:
 - Workflow de GitHub Actions funcional
 - Releases automáticos con .bin descargable
 - Badge de estado en README
+- Guía de fork para usuarios avanzados
 
-**Estimación**: 1-2 días
+**Estimación**: 2-3 días
 
 ---
 
