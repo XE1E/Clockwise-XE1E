@@ -1,5 +1,7 @@
 # Clockwise XE1E
 
+[![Build Firmware](https://github.com/XE1E/Clockwise-XE1E/actions/workflows/build-firmware.yml/badge.svg)](https://github.com/XE1E/Clockwise-XE1E/actions/workflows/build-firmware.yml)
+
 > Reloj de pared inteligente con matriz LED 64x64
 
 Fork personalizado de [Clockwise](https://github.com/jnthas/clockwise) por [@jnthas](https://github.com/jnthas).
