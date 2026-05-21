@@ -23,7 +23,8 @@ class ClockfaceEditor {
             currentColor: '#ffffff',
             currentTool: 'draw',
             showGrid: true,
-            isDrawing: false
+            isDrawing: false,
+            editingFrameIndex: -1
         };
         this.spriteAnimationState = {
             enabled: true,
@@ -1077,6 +1078,10 @@ class ClockfaceEditor {
             this.addPixelFrameToSprite();
         });
 
+        document.getElementById('btn-pixel-replace-frame').addEventListener('click', () => {
+            this.replacePixelFrameInSprite();
+        });
+
         document.getElementById('btn-pixel-copy-frame').addEventListener('click', () => {
             this.copyCurrentFrameToPixelEditor();
         });
@@ -1204,6 +1209,43 @@ class ClockfaceEditor {
         const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
         if (spriteIndex < 0) return;
 
+        const base64 = this.getPixelCanvasAsBase64();
+        this.clockface.addFrameToSprite(spriteIndex, base64);
+        this.updateFramesList();
+        this.updateSpriteList();
+        this.loadSpriteFrames();
+
+        this.hidePixelEditor();
+    }
+
+    replacePixelFrameInSprite() {
+        const pe = this.pixelEditorState;
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+        const frameIndex = pe.editingFrameIndex;
+
+        if (spriteIndex < 0 || frameIndex < 0) {
+            alert('No hay frame seleccionado para reemplazar');
+            return;
+        }
+
+        const sprite = this.clockface.sprites[spriteIndex];
+        if (!sprite || frameIndex >= sprite.frames.length) {
+            alert('Frame invalido');
+            return;
+        }
+
+        const base64 = this.getPixelCanvasAsBase64();
+        sprite.frames[frameIndex].image = base64;
+
+        this.updateFramesList();
+        this.updateSpriteList();
+        this.loadSpriteFrames();
+
+        this.hidePixelEditor();
+    }
+
+    getPixelCanvasAsBase64() {
+        const pe = this.pixelEditorState;
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = pe.size;
         tempCanvas.height = pe.size;
@@ -1218,12 +1260,12 @@ class ClockfaceEditor {
             }
         }
 
-        const base64 = tempCanvas.toDataURL('image/png');
-        this.clockface.addFrameToSprite(spriteIndex, base64);
-        this.updateFramesList();
-        this.updateSpriteList();
-        this.loadSpriteFrames();
+        return tempCanvas.toDataURL('image/png');
+    }
 
+    hidePixelEditor() {
+        this.pixelEditorState.editingFrameIndex = -1;
+        document.getElementById('btn-pixel-replace-frame').style.display = 'none';
         document.getElementById('pixel-editor-section').style.display = 'none';
     }
 
@@ -1238,7 +1280,7 @@ class ClockfaceEditor {
             return;
         }
 
-        const frameIndex = prompt(`Numero de frame a copiar (0-${sprite.frames.length - 1}):`, '0');
+        const frameIndex = prompt(`Numero de frame a copiar/editar (0-${sprite.frames.length - 1}):`, '0');
         if (frameIndex === null) return;
 
         const idx = parseInt(frameIndex);
@@ -1246,6 +1288,10 @@ class ClockfaceEditor {
             alert('Indice invalido');
             return;
         }
+
+        // Store the frame index being edited
+        pe.editingFrameIndex = idx;
+        document.getElementById('btn-pixel-replace-frame').style.display = 'inline-block';
 
         const frame = sprite.frames[idx];
         const img = new Image();
