@@ -1289,7 +1289,7 @@
             return lines.join('\n');
         }
 
-        function exportFontHeader(fontName) {
+        async function exportFontHeader(fontName) {
             const content = generateFontHeader(fontName);
             if (!content) {
                 alert('No se pudo generar el archivo .h para "' + fontName + '"');
@@ -1297,15 +1297,55 @@
             }
 
             const safeName = fontName.replace(/[^a-zA-Z0-9]/g, '_');
+            const fileName = safeName + '.h';
+
+            if (window.showDirectoryPicker) {
+                try {
+                    let dirHandle = await getSavedDirHandle('firmwareFontsDir');
+
+                    if (dirHandle) {
+                        const ok = await verifyDirPermission(dirHandle);
+                        if (!ok) dirHandle = null;
+                    }
+
+                    if (!dirHandle) {
+                        dirHandle = await window.showDirectoryPicker();
+                        await saveDirHandle('firmwareFontsDir', dirHandle);
+                    }
+
+                    const exists = await checkFileExists(dirHandle, fileName);
+                    if (exists) {
+                        if (!confirm('El archivo "' + fileName + '" ya existe. ¿Sobrescribir?')) {
+                            return;
+                        }
+                    }
+
+                    const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(content);
+                    await writable.close();
+
+                    showStatus('Exportado: ' + fileName, 'success');
+                } catch (e) {
+                    if (e.name !== 'AbortError') {
+                        console.error(e);
+                        downloadFile(fileName, content);
+                    }
+                }
+            } else {
+                downloadFile(fileName, content);
+            }
+        }
+
+        function downloadFile(fileName, content) {
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = safeName + '.h';
+            a.download = fileName;
             a.click();
             URL.revokeObjectURL(url);
-
-            showStatus('Exportado: ' + safeName + '.h', 'success');
+            showStatus('Descargado: ' + fileName, 'success');
         }
 
         async function exportAllFontHeaders() {
@@ -1353,34 +1393,45 @@
             }
             files['_SETFONT_TEMPLATE.txt'] = setFontTemplate;
 
-            // Create ZIP if JSZip is available, otherwise download individually
-            if (typeof JSZip !== 'undefined') {
-                const zip = new JSZip();
-                for (const [filename, content] of Object.entries(files)) {
-                    zip.file(filename, content);
+            // Try to save to folder
+            if (window.showDirectoryPicker) {
+                try {
+                    let dirHandle = await getSavedDirHandle('firmwareFontsDir');
+
+                    if (dirHandle) {
+                        const ok = await verifyDirPermission(dirHandle);
+                        if (!ok) dirHandle = null;
+                    }
+
+                    if (!dirHandle) {
+                        alert('Selecciona la carpeta donde guardar los archivos .h');
+                        dirHandle = await window.showDirectoryPicker();
+                        await saveDirHandle('firmwareFontsDir', dirHandle);
+                    }
+
+                    let saved = 0;
+                    for (const [filename, content] of Object.entries(files)) {
+                        const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(content);
+                        await writable.close();
+                        saved++;
+                    }
+
+                    showStatus('Exportados ' + saved + ' archivos a carpeta', 'success');
+                    return;
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
+                    console.error(e);
                 }
-                const blob = await zip.generateAsync({ type: 'blob' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'clockwise-fonts.zip';
-                a.click();
-                URL.revokeObjectURL(url);
-                showStatus('Exportado ZIP con ' + fontNames.length + ' fuentes', 'success');
-            } else {
-                // Download files individually
-                for (const [filename, content] of Object.entries(files)) {
-                    const blob = new Blob([content], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    await new Promise(r => setTimeout(r, 100));
-                }
-                showStatus('Exportados ' + fontNames.length + ' archivos .h', 'success');
             }
+
+            // Fallback: download individually
+            for (const [filename, content] of Object.entries(files)) {
+                downloadFile(filename, content);
+                await new Promise(r => setTimeout(r, 100));
+            }
+            showStatus('Descargados ' + Object.keys(files).length + ' archivos', 'success');
         }
 
         // ==================== GALERIA ====================
@@ -1430,13 +1481,14 @@
                 }
                 const totalH = maxYEnd - minYOff;
 
+                const safeId = name.replace(/[^a-zA-Z0-9]/g, '_');
                 item.innerHTML = `
                     <div class="gallery-item-header">
                         <span class="gallery-item-name">${name}</span>
                         <span class="gallery-item-info">${maxW}x${totalH} | ${charCount} chars</span>
                     </div>
                     <div class="gallery-preview">
-                        <canvas id="gallery-preview-${name}"></canvas>
+                        <canvas id="gallery-preview-${safeId}"></canvas>
                     </div>
                     <div class="gallery-actions">
                         <button class="btn btn-small btn-primary" onclick="editFontFromGallery('${name}')">Editar</button>
@@ -1446,30 +1498,49 @@
                 `;
                 grid.appendChild(item);
 
-                const canvas = document.getElementById('gallery-preview-' + name);
-                renderFontPreview(canvas, name, 'ABC abc 123');
+                const canvas = document.getElementById('gallery-preview-' + safeId);
+                if (canvas) {
+                    renderFontPreview(canvas, name, 'ABC abc 123');
+                }
             }
         }
 
         function renderFontPreview(canvas, fontName, text) {
-            const font = PixelFonts[fontName];
-            if (!font) return;
+            try {
+                const font = PixelFonts[fontName];
+                if (!font) {
+                    console.warn('Font not found:', fontName);
+                    return;
+                }
 
-            const scale = 3;
-            const metrics = PixelFonts.measureText(fontName, text);
+                if (!PixelFonts.measureText || !PixelFonts.drawText) {
+                    console.warn('PixelFonts.measureText or drawText not available');
+                    return;
+                }
 
-            canvas.width = metrics.width * scale;
-            canvas.height = metrics.height * scale;
+                const scale = 3;
+                const metrics = PixelFonts.measureText(fontName, text);
 
-            const ctx = canvas.getContext('2d');
-            ctx.imageSmoothingEnabled = false;
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                if (!metrics || !metrics.width || !metrics.height) {
+                    console.warn('Invalid metrics for font:', fontName, metrics);
+                    return;
+                }
 
-            ctx.save();
-            ctx.scale(scale, scale);
-            PixelFonts.drawText(ctx, fontName, text, 0, -metrics.minYOffset, '#00ff88', null);
-            ctx.restore();
+                canvas.width = metrics.width * scale;
+                canvas.height = metrics.height * scale;
+
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false;
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.save();
+                ctx.scale(scale, scale);
+                PixelFonts.drawText(ctx, fontName, text, 0, -metrics.minYOffset, '#00ff88', null);
+                ctx.restore();
+            } catch (e) {
+                console.error('Error rendering preview for', fontName, e);
+            }
         }
 
         function editFontFromGallery(name) {
