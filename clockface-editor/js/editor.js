@@ -951,9 +951,10 @@ class ClockfaceEditor {
         });
 
         document.getElementById('btn-add-sprite').addEventListener('click', () => {
-            this.clockface.addSprite([]);
+            const newIndex = this.clockface.addSprite([]);
             this.updateSpriteList();
             this.updateSpriteSelect();
+            this.selectSpriteForEdit(newIndex);
         });
 
         document.getElementById('add-frame-file').addEventListener('change', async (e) => {
