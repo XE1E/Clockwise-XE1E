@@ -77,37 +77,41 @@ Esto garantiza:
 
 **Tareas**:
 
-- [ ] **2.1** Crear workflow `.github/workflows/build-firmware.yml`
-  ```yaml
+- [x] **2.1** Crear workflow `.github/workflows/build-firmware.yml`
   - Trigger: push a main (paths: firmware/**, clockface-editor/js/pixel-fonts.js)
-  - Steps: checkout, setup-python, install platformio, build, upload artifact
-  ```
+  - Trigger manual: workflow_dispatch con nombre de release opcional
+  - Steps: checkout, cache, setup-python, install platformio, build, upload artifact, create release
+  - **COMPLETADO**: `.github/workflows/build-firmware.yml`
 
-- [ ] **2.2** Configurar PlatformIO para CI
-  - Verificar platformio.ini tiene configuración correcta
-  - Agregar script de pre-build si es necesario
+- [x] **2.2** Configurar PlatformIO para CI
+  - platformio.ini ya tiene configuración correcta para esp32dev
+  - No requiere script de pre-build adicional
+  - **COMPLETADO**: Configuración existente funciona
 
-- [ ] **2.3** Publicar .bin como Release
-  - Crear release automático con tag de versión
-  - Adjuntar firmware.bin
-  - Generar changelog básico
+- [x] **2.3** Publicar .bin como Release
+  - Release automático con tag de versión (vYYYYMMDD.HHMM)
+  - Adjunta firmware-{date}-{sha}.bin
+  - Genera changelog con mensaje del commit
+  - **COMPLETADO**: Integrado en workflow
 
-- [ ] **2.4** Agregar badge de build status al README
+- [x] **2.4** Agregar badge de build status al README
+  - **COMPLETADO**: Badge agregado en README.md
 
-- [ ] **2.5** Documentar flujo de fork para usuarios avanzados
+- [x] **2.5** Documentar flujo de fork para usuarios avanzados
   - Guía paso a paso: cómo hacer fork
+  - Cómo habilitar GitHub Actions
   - Cómo agregar fuentes personalizadas
-  - Cómo funciona GitHub Actions en el fork
-  - Cómo descargar su .bin personalizado
+  - Cómo esperar el build y descargar .bin
   - Cómo sincronizar con actualizaciones del repo original
+  - **COMPLETADO**: `docs/GUIA-FORK-FUENTES-CUSTOM.md`
 
 **Entregables**:
-- Workflow de GitHub Actions funcional
-- Releases automáticos con .bin descargable
-- Badge de estado en README
-- Guía de fork para usuarios avanzados
+- ✅ Workflow de GitHub Actions funcional
+- ✅ Releases automáticos con .bin descargable
+- ✅ Badge de estado en README
+- ✅ Guía de fork para usuarios avanzados
 
-**Estimación**: 2-3 días
+**Estado**: COMPLETADO
 
 ---
 
@@ -281,10 +285,10 @@ Con esto ya se puede usar el sistema completo de forma manual.
 ## Criterios de Éxito
 
 ### MVP (Mínimo Viable)
-- [ ] Usuario puede exportar fuente a .h desde editor
-- [ ] GitHub Actions compila firmware automáticamente
+- [x] Usuario puede exportar fuente a .h desde editor
+- [x] GitHub Actions compila firmware automáticamente
 - [ ] Usuario puede flashear .bin desde navegador
-- [ ] Documentación clara del proceso
+- [x] Documentación clara del proceso
 
 ### Versión Completa
 - [ ] Sincronización automática de fuentes
