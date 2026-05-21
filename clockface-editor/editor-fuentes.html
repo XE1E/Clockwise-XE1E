@@ -1284,82 +1284,29 @@
                 grid.appendChild(item);
 
                 const canvas = document.getElementById('gallery-preview-' + name);
-                renderFontPreview(canvas, font, 'ABC abc 123');
+                renderFontPreview(canvas, name, 'ABC abc 123');
             }
         }
 
-        function renderFontPreview(canvas, font, text) {
+        function renderFontPreview(canvas, fontName, text) {
+            const font = PixelFonts[fontName];
+            if (!font) return;
+
             const scale = 3;
-            const measured = measureTextWithFont(font, text);
+            const metrics = PixelFonts.measureText(fontName, text);
 
-            let minYOff = 0, maxYEnd = 0;
-            for (const g of font.glyphs) {
-                if (!g || g[1] === 0) continue;
-                const [off, w, h, xAdv, xOff, yOff] = g;
-                if (yOff < minYOff) minYOff = yOff;
-                const yEnd = yOff + h;
-                if (yEnd > maxYEnd) maxYEnd = yEnd;
-            }
-            const totalH = maxYEnd - minYOff;
+            canvas.width = metrics.width * scale;
+            canvas.height = metrics.height * scale;
 
-            canvas.width = measured.width * scale;
-            canvas.height = totalH * scale;
             const ctx = canvas.getContext('2d');
             ctx.imageSmoothingEnabled = false;
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            let x = 0;
-            for (const char of text) {
-                const code = char.charCodeAt(0);
-                if (code < font.first || code > font.last) {
-                    x += 4;
-                    continue;
-                }
-                const g = font.glyphs[code - font.first];
-                if (!g || !g[1]) {
-                    x += 4;
-                    continue;
-                }
-
-                const [off, w, h, xAdv, xOff, yOff] = g;
-                let bit = off * 8;
-
-                const drawY = yOff - minYOff;
-
-                for (let row = 0; row < h; row++) {
-                    for (let col = 0; col < w; col++) {
-                        const byteIdx = Math.floor(bit / 8);
-                        const bitPos = 7 - (bit % 8);
-                        const val = (font.bitmaps[byteIdx] >> bitPos) & 1;
-                        bit++;
-
-                        if (val) {
-                            ctx.fillStyle = '#00ff88';
-                            ctx.fillRect((x + xOff + col) * scale, (drawY + row) * scale, scale, scale);
-                        }
-                    }
-                }
-                x += xAdv;
-            }
-        }
-
-        function measureTextWithFont(font, text) {
-            let width = 0;
-            for (const char of text) {
-                const code = char.charCodeAt(0);
-                if (code < font.first || code > font.last) {
-                    width += 4;
-                    continue;
-                }
-                const g = font.glyphs[code - font.first];
-                if (!g || !g[1]) {
-                    width += 4;
-                    continue;
-                }
-                width += g[3];
-            }
-            return { width };
+            ctx.save();
+            ctx.scale(scale, scale);
+            PixelFonts.drawText(ctx, fontName, text, 0, -metrics.minYOffset, '#00ff88', null);
+            ctx.restore();
         }
 
         function editFontFromGallery(name) {
