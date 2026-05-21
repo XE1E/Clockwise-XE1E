@@ -1322,7 +1322,7 @@ class ClockfaceEditor {
             this.renderPixelCanvas();
             document.getElementById('pixel-editor-section').style.display = 'block';
         };
-        img.src = frame.image;
+        img.src = frame.image.startsWith('data:') ? frame.image : `data:image/png;base64,${frame.image}`;
     }
 
     openSpriteModal() {
