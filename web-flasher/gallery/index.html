@@ -227,45 +227,64 @@
     </div>
 
     <script>
-        const clockfaces = [
-            { name: "Pac-Man", file: "pac-man.json", preview: "pac-man.png" },
-            { name: "Nyan Cat", file: "nyan-cat.json", preview: "nyan-cat.png" },
-            { name: "Mario Clock", file: "mario-clock.json", preview: "mario-clock.png" },
-            { name: "Coca-Cola", file: "coca-cola-1.json", preview: "coca-cola-1.png" },
-            { name: "Coca-Cola 2", file: "coca-cola-2.json", preview: "coca-cola-2.png" },
-            { name: "Pepsi", file: "pepsi-final.json", preview: "pepsi-final.png" },
-            { name: "World Clock", file: "World Clock-2.json", preview: "world-clock.png" },
-            { name: "Hora en Palabras", file: "Hora en Palabras-1.json", preview: "hora-palabras-1.png" },
-            { name: "Hora en Palabras 2", file: "Hora en Palabras-2.json", preview: "hora-palabras-2.png" },
-            { name: "Night Clock", file: "nigth-clock-2.json", preview: "night-clock.png" },
-            { name: "Star Wars", file: "star-wars.json", preview: "star-wars.png" },
-            { name: "Donkey Kong", file: "donkey-kong.json", preview: "donkey-kong.png" },
-            { name: "Snoopy", file: "snoopy3.json", preview: "snoopy.png" },
-            { name: "Christmas Snoopy", file: "christmassnoopy.json", preview: "christmas-snoopy.png" },
-            { name: "Retro Computer", file: "retro-computer.json", preview: "retro-computer.png" },
-            { name: "Goomba", file: "goomba_move.json", preview: "goomba.png" }
+        const clockfaceFiles = [
+            "pac-man.json",
+            "nyan-cat.json",
+            "mario-clock.json",
+            "coca-cola-1.json",
+            "coca-cola-2.json",
+            "pepsi-final.json",
+            "World Clock-2.json",
+            "Hora en Palabras-1.json",
+            "Hora en Palabras-2.json",
+            "nigth-clock-2.json",
+            "star-wars.json",
+            "Star Wars v2.json",
+            "donkey-kong.json",
+            "snoopy3.json",
+            "christmassnoopy.json",
+            "retro-computer.json",
+            "goomba_move.json",
+            "eletrogate.json"
         ];
 
         const gallery = document.getElementById('gallery');
 
-        clockfaces.forEach(cf => {
-            const card = document.createElement('div');
-            card.className = 'clockface-card';
-            card.innerHTML = `
-                <div class="clockface-preview">
-                    <img src="previews/${cf.preview}" alt="${cf.name}"
-                         onerror="this.parentElement.innerHTML='<span class=\\'no-preview\\'>Sin preview</span>'">
-                </div>
-                <div class="clockface-info">
-                    <div class="clockface-name">${cf.name}</div>
-                    <div class="clockface-actions">
-                        <a href="clockfaces/${cf.file}" download class="btn btn-download">Descargar</a>
-                        <a href="../editor/?load=gallery/${cf.file}" class="btn btn-preview">Editar</a>
-                    </div>
-                </div>
-            `;
-            gallery.appendChild(card);
-        });
+        async function loadGallery() {
+            for (const file of clockfaceFiles) {
+                try {
+                    const response = await fetch(`clockfaces/${file}`);
+                    const data = await response.json();
+
+                    const card = document.createElement('div');
+                    card.className = 'clockface-card';
+
+                    const thumbnailSrc = data.thumbnail
+                        ? `data:image/png;base64,${data.thumbnail}`
+                        : '';
+
+                    card.innerHTML = `
+                        <div class="clockface-preview">
+                            ${thumbnailSrc
+                                ? `<img src="${thumbnailSrc}" alt="${data.name || file}">`
+                                : '<span class="no-preview">Sin preview</span>'}
+                        </div>
+                        <div class="clockface-info">
+                            <div class="clockface-name">${data.name || file.replace('.json', '')}</div>
+                            <div class="clockface-actions">
+                                <a href="clockfaces/${file}" download class="btn btn-download">Descargar</a>
+                                <a href="../editor/?load=gallery/clockfaces/${file}" class="btn btn-preview">Editar</a>
+                            </div>
+                        </div>
+                    `;
+                    gallery.appendChild(card);
+                } catch (e) {
+                    console.error(`Error loading ${file}:`, e);
+                }
+            }
+        }
+
+        loadGallery();
     </script>
 </body>
 </html>
