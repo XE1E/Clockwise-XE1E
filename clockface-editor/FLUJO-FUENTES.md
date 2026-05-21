@@ -12,13 +12,14 @@
 
 ## Opciones de Guardar/Exportar
 
-El editor de fuentes tiene **3 opciones** para guardar tu trabajo:
+El editor de fuentes tiene **4 opciones** para guardar tu trabajo:
 
-| Opción | Destino | Formato | Disponible en Editor Carátulas |
-|--------|---------|---------|-------------------------------|
-| **Guardar JSON (backup)** | Cualquier carpeta | JSON | NO (solo backup personal) |
-| **Agregar a galería** | Carpeta `fonts/` | JSON | SÍ (se carga automáticamente) |
-| **Agregar a predefinidas** | `pixel-fonts.js` | JavaScript | SÍ (siempre disponible) |
+| Opción | Destino | Formato | Propósito |
+|--------|---------|---------|-----------|
+| **Guardar JSON (backup)** | Cualquier carpeta | JSON | Backup personal |
+| **Agregar a galería** | Carpeta `fonts/` | JSON | Disponible en editor carátulas |
+| **Agregar a predefinidas** | `pixel-fonts.js` | JavaScript | Disponible siempre en editores |
+| **Exportar a firmware (.h)** | Carpeta firmware | C++ header | Compilar en firmware del reloj |
 
 ### 1. Guardar JSON (backup)
 
@@ -43,14 +44,38 @@ El editor de fuentes tiene **3 opciones** para guardar tu trabajo:
 - Funcionan aunque no exista la carpeta `fonts/`
 - Más permanente pero menos flexible que galería
 
+### 4. Exportar a firmware (.h)
+
+- Genera archivo `.h` en formato Adafruit GFX
+- **Para compilar en el firmware del reloj**
+- Exporta la fuente que estás editando actualmente
+- Requiere recompilar y flashear el firmware para que tenga efecto
+
+**Cuándo usar:**
+- Después de crear/editar una fuente nueva
+- Cuando quieres que la fuente esté disponible en el reloj físico
+
+**Flujo completo:**
+```
+Editar fuente → Exportar .h → Copiar a firmware/fonts/ → Compilar → Flashear
+```
+
+### Sincronizar con firmware (Galería)
+
+- Regenera TODOS los archivos `.h` desde `pixel-fonts.js`
+- Útil cuando `pixel-fonts.js` cambió y quieres actualizar el firmware
+- Genera también plantillas para `Clockface.h` y `Clockface.cpp`
+
 ### ¿Cuál usar?
 
 | Situación | Opción recomendada |
 |-----------|-------------------|
 | Guardar trabajo en progreso | **Guardar JSON** |
 | Probar una fuente temporalmente | **Agregar a galería** |
-| Fuente lista y definitiva | **Agregar a predefinidas** |
+| Fuente lista para editores web | **Agregar a predefinidas** |
+| Fuente lista para el reloj físico | **Exportar a firmware (.h)** |
 | Compartir fuente con alguien | **Guardar JSON** |
+| Actualizar todos los .h del firmware | **Sincronizar con firmware** |
 
 ---
 
