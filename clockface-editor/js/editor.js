@@ -45,6 +45,32 @@ class ClockfaceEditor {
         this.bindReferenceImage();
         this.render();
         this.startClock();
+        this.checkUrlLoad();
+    }
+
+    async checkUrlLoad() {
+        const params = new URLSearchParams(window.location.search);
+        const loadPath = params.get('load');
+        if (!loadPath) return;
+
+        try {
+            console.log('[Editor] Loading clockface from URL:', loadPath);
+            const response = await fetch(loadPath);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const json = await response.json();
+            this.clockface = Clockface.fromJSON(json);
+            this.selectedId = null;
+            this.clearReferenceImage();
+            await this.loadImagesAsync();
+            this.updateUI();
+            this.render();
+            console.log('[Editor] Clockface loaded:', this.clockface.name);
+        } catch (e) {
+            console.error('[Editor] Error loading clockface from URL:', e);
+            alert('Error cargando carátula: ' + e.message);
+        }
     }
 
     async loadCustomFonts() {
