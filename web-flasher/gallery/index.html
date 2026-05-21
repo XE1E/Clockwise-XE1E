@@ -70,11 +70,17 @@
             color: #000;
         }
 
+        .info-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
         .info-box {
             background: var(--card-bg);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 30px;
         }
 
         .info-box h2 {
@@ -207,14 +213,25 @@
             </div>
         </header>
 
-        <div class="info-box">
-            <h2>Como instalar una caratula</h2>
-            <ol>
-                <li>Descarga el archivo JSON de la caratula</li>
-                <li>Abre <code>clockwise-xe1e.local</code> en tu navegador</li>
-                <li>Ve a la seccion "Caratulas" y sube el archivo JSON</li>
-                <li>Selecciona la caratula y disfruta</li>
-            </ol>
+        <div class="info-container">
+            <div class="info-box">
+                <h2>Como instalar una caratula</h2>
+                <ol>
+                    <li>Descarga el archivo JSON de la caratula</li>
+                    <li>Abre <code>clockwise-xe1e.local</code> en tu navegador</li>
+                    <li>Ve a la seccion "Caratulas" y sube el archivo JSON</li>
+                    <li>Selecciona la caratula y disfruta</li>
+                </ol>
+            </div>
+            <div class="info-box">
+                <h2>Como editar una caratula</h2>
+                <ol>
+                    <li>Haz clic en "Editar" en la caratula que quieras modificar</li>
+                    <li>Personaliza colores, textos, posiciones y sprites</li>
+                    <li>Haz clic en "Descargar" para guardar el JSON</li>
+                    <li>Sube tu caratula modificada al reloj</li>
+                </ol>
+            </div>
         </div>
 
         <div class="gallery" id="gallery">
