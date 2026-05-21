@@ -202,7 +202,7 @@ pixel-fonts.js → Editor Carátulas → Renderizado
 ### 5. Gestionar Fuentes (Galería)
 
 ```
-Editor Fuentes → Ver galería → Editar/Eliminar
+Editor Fuentes → Ver galería → Editar/Eliminar/Sincronizar
 ```
 
 1. En Editor Fuentes, clic en **"Ver galería / Gestionar"**
@@ -214,7 +214,62 @@ Editor Fuentes → Ver galería → Editar/Eliminar
 4. Acciones disponibles:
    - **Editar**: Carga la fuente en el editor
    - **Eliminar**: Borra la fuente de `pixel-fonts.js` (pide confirmación)
+   - **Sincronizar con firmware**: Regenera todos los .h (botón en header)
 5. Cerrar galería: clic en X, tecla Escape, o clic fuera del modal
+
+### 6. Exportar Fuente a Firmware (.h)
+
+```
+Editor Fuentes → Exportar .h → Copiar a firmware → Compilar → Flashear
+```
+
+**Para una fuente nueva/editada:**
+
+1. Crear o editar la fuente en el editor
+2. En panel derecho, sección "Exportar a firmware (.h)"
+3. Clic en **"Exportar .h"**
+4. Seleccionar carpeta destino (se recuerda para próximas veces)
+5. Se genera archivo `{nombre}.h` en formato Adafruit GFX
+
+**Pasos manuales en firmware:**
+
+6. Copiar el archivo `.h` a `firmware/clockfaces/cw-cf-0x07/fonts/`
+
+7. Editar `Clockface.h` - agregar include:
+   ```cpp
+   #include "fonts/miFuente.h"
+   ```
+
+8. Editar `Clockface.cpp` - agregar caso en `setFont()`:
+   ```cpp
+   else if (strcmp(fontName, "mi-fuente") == 0) {
+       Locator::getDisplay()->setFont(&miFuente);
+   }
+   ```
+
+9. Compilar firmware con PlatformIO
+
+10. Flashear al reloj
+
+### 7. Sincronizar Todas las Fuentes con Firmware
+
+```
+Galería → Sincronizar con firmware → Copiar archivos → Compilar
+```
+
+**Cuándo usar:** Cuando `pixel-fonts.js` tiene fuentes nuevas o modificadas y quieres actualizar todo el firmware de una vez.
+
+1. Abrir galería de fuentes
+2. Clic en **"Sincronizar con firmware"**
+3. Seleccionar carpeta destino
+4. Se generan:
+   - Todos los archivos `.h` (uno por fuente)
+   - `_INCLUDES_TEMPLATE.txt` - código para Clockface.h
+   - `_SETFONT_TEMPLATE.txt` - código para Clockface.cpp
+
+5. Copiar archivos `.h` a `firmware/clockfaces/cw-cf-0x07/fonts/`
+6. Copiar contenido de templates a los archivos correspondientes
+7. Compilar y flashear
 
 ---
 

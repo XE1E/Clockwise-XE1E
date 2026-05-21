@@ -39,31 +39,35 @@ Esto garantiza:
 
 **Tareas**:
 
-- [ ] **1.1** Crear función `generateFontHeader(fontName)` en editor-fuentes.html
+- [x] **1.1** Crear función `generateFontHeader(fontName)` en editor-fuentes.html
   - Input: nombre de fuente en PixelFonts
   - Output: código C++ formato Adafruit GFX
   - Incluir: bitmaps, glyphs, struct GFXfont
+  - **COMPLETADO**: También `exportCurrentFontToHeader()` para fuente editada
 
-- [ ] **1.2** Agregar botón "Exportar .h" en galería de fuentes
-  - Genera y descarga archivo .h individual
+- [x] **1.2** Agregar botón "Exportar .h" en panel de exportación
+  - Genera y guarda archivo .h en carpeta seleccionada
   - Nombrado: `{fontName}.h`
+  - **COMPLETADO**: Botón en panel derecho, selector de carpeta con memoria
 
-- [ ] **1.3** Agregar botón "Exportar todas a firmware"
-  - Genera ZIP con todos los .h
+- [x] **1.3** Agregar botón "Sincronizar con firmware" en galería
+  - Genera todos los .h desde pixel-fonts.js
   - Incluye template de Clockface.h con includes
   - Incluye template de setFont() para Clockface.cpp
+  - **COMPLETADO**: Genera `_INCLUDES_TEMPLATE.txt` y `_SETFONT_TEMPLATE.txt`
 
-- [ ] **1.4** Documentar proceso manual de sincronización
+- [x] **1.4** Documentar proceso manual de sincronización
   - Instrucciones paso a paso
   - Dónde colocar archivos
   - Cómo actualizar Clockface.h y Clockface.cpp
+  - **COMPLETADO**: Documentado en FLUJO-FUENTES.md secciones 6 y 7
 
 **Entregables**:
-- Función de conversión JS → C++
-- UI para exportar fuentes individuales y en batch
-- Documentación de sincronización
+- ✅ Función de conversión JS → C++
+- ✅ UI para exportar fuentes individuales y en batch
+- ✅ Documentación de sincronización
 
-**Estimación**: 2-3 días
+**Estado**: COMPLETADO
 
 ---
 
