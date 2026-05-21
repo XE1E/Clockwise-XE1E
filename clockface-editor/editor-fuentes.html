@@ -741,7 +741,14 @@
             const reader = new FileReader();
             reader.onload = function(ev) {
                 try {
-                    const data = JSON.parse(ev.target.result);
+                    let data = JSON.parse(ev.target.result);
+
+                    // Convert PixelFonts format if needed (same as loadFromRepo)
+                    if (data.bitmaps && data.glyphs) {
+                        data = convertPixelFontsToEditor(data);
+                        if (!data) throw new Error('Error convirtiendo formato PixelFonts');
+                    }
+
                     WIDTH = data.width || 8;
                     HEIGHT = data.height || 12;
                     saveSettings();
@@ -756,7 +763,14 @@
                         for (const [code, info] of Object.entries(data.chars)) {
                             const c = info.char || String.fromCharCode(+code);
                             if (chars[c] !== undefined && info.data) {
-                                chars[c] = info.data;
+                                // Resize grid if needed to match current WIDTH/HEIGHT
+                                const grid = createEmptyGrid();
+                                for (let y = 0; y < Math.min(info.data.length, HEIGHT); y++) {
+                                    for (let x = 0; x < Math.min(info.data[y].length, WIDTH); x++) {
+                                        grid[y][x] = info.data[y][x];
+                                    }
+                                }
+                                chars[c] = grid;
                             }
                         }
                     }
@@ -928,7 +942,21 @@
 
             const first = data.first || 32;
             const result = { chars: {} };
-            let maxW = 0, maxH = 0;
+
+            // Calculate total cell dimensions (same logic as loadSystemFont)
+            let maxW = 0, minYOff = 0, maxYEnd = 0;
+            for (const g of data.glyphs) {
+                if (!g || g[1] === 0) continue;
+                const [off, w, h, xAdv, xOff, yOff] = g;
+                if (w > maxW) maxW = w;
+                if (yOff < minYOff) minYOff = yOff;
+                const yEnd = yOff + h;
+                if (yEnd > maxYEnd) maxYEnd = yEnd;
+            }
+            const totalH = maxYEnd - minYOff;
+
+            result.width = maxW || 8;
+            result.height = totalH || 12;
 
             for (let i = 0; i < data.glyphs.length; i++) {
                 const g = data.glyphs[i];
@@ -938,29 +966,34 @@
                 const charCode = first + i;
                 const c = String.fromCharCode(charCode);
 
-                if (w > maxW) maxW = w;
-                if (h > maxH) maxH = h;
-
-                // Extract bitmap data for this glyph (bitmaps is packed bytes, not individual bits)
+                // Create full-size grid and place glyph at correct position
                 const grid = [];
-                let bitIndex = offset * 8; // offset is byte index, convert to bit index
+                for (let y = 0; y < result.height; y++) {
+                    grid.push(new Array(result.width).fill(0));
+                }
+
+                const startY = yOff - minYOff;
+                let bitIndex = offset * 8;
+
                 for (let row = 0; row < h; row++) {
-                    const rowData = [];
                     for (let col = 0; col < w; col++) {
                         const byteIdx = Math.floor(bitIndex / 8);
                         const bitPos = 7 - (bitIndex % 8);
                         const bit = (data.bitmaps[byteIdx] >> bitPos) & 1;
-                        rowData.push(bit);
+
+                        const destY = startY + row;
+                        const destX = col;
+
+                        if (destY >= 0 && destY < result.height && destX >= 0 && destX < result.width) {
+                            grid[destY][destX] = bit;
+                        }
                         bitIndex++;
                     }
-                    grid.push(rowData);
                 }
 
                 result.chars[charCode] = { char: c, data: grid, w, h, xOff, yOff };
             }
 
-            result.width = maxW;
-            result.height = maxH;
             result.name = data.name || 'converted';
             return result;
         }
@@ -1202,15 +1235,25 @@
                 const file = await fileHandle.getFile();
                 let content = await file.text();
 
-                const existingPattern = new RegExp(`\\n    ${name}: \\{[\\s\\S]*?\\n    \\},?`, 'g');
-                content = content.replace(existingPattern, '');
+                // Remove existing font with same name (match font definition block)
+                const existingPattern = new RegExp(`\\n    ${name}: \\{[\\s\\S]*?\\n    \\},?\\n?`, 'g');
+                content = content.replace(existingPattern, '\n');
 
-                const insertPoint = content.indexOf('\n    drawChar(');
+                // Try multiple patterns to find insertion point
+                let insertPoint = content.indexOf('\n    drawChar(');
                 if (insertPoint === -1) {
-                    throw new Error('No se encontro el punto de insercion en pixel-fonts.js');
+                    insertPoint = content.indexOf('\n\n    drawChar(');
+                    if (insertPoint !== -1) insertPoint += 1; // Skip one newline
+                }
+                if (insertPoint === -1) {
+                    // Try with different indentation
+                    insertPoint = content.indexOf('\ndrawChar(');
+                }
+                if (insertPoint === -1) {
+                    throw new Error('No se encontro el punto de insercion en pixel-fonts.js.\nAsegurate de seleccionar la carpeta "js" correcta.');
                 }
 
-                const newContent = content.slice(0, insertPoint) + '\n' + fontCode + ',\n' + content.slice(insertPoint);
+                const newContent = content.slice(0, insertPoint) + '\n\n' + fontCode + ',\n' + content.slice(insertPoint);
 
                 const writable = await fileHandle.createWritable();
                 await writable.write(newContent);
