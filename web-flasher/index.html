@@ -101,7 +101,7 @@
             --esp-tools-button-text-color: #000;
         }
 
-        #flash-button {
+        #flash-button, #flash-button-s3 {
             background: var(--highlight);
             color: #000;
             border: none;
@@ -113,7 +113,7 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        #flash-button:hover {
+        #flash-button:hover, #flash-button-s3:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 25px rgba(240, 184, 0, 0.5);
         }
@@ -339,11 +339,11 @@
             <h2>Instrucciones</h2>
             <div class="steps">
                 <div class="step">Conecta tu ESP32 al puerto USB</div>
-                <div class="step">Haz clic en "INSTALAR FIRMWARE"</div>
-                <div class="step">Selecciona el puerto COM de tu ESP32</div>
-                <div class="step">Espera a que termine el flasheo (~30 seg)</div>
-                <div class="step">Configura WiFi con el asistente Improv</div>
-                <div class="step">Accede a la IP del reloj para configurar</div>
+                <div class="step">Selecciona tu placa (ESP32 o ESP32-S3)</div>
+                <div class="step">Haz clic en "INSTALAR" y selecciona el puerto COM</div>
+                <div class="step">Espera a que termine el flasheo (~1 min)</div>
+                <div class="step">El reloj creara una red WiFi "ClockWise-XXXX" para configurar</div>
+                <div class="step">Conectate a esa red y configura tu WiFi en 192.168.4.1</div>
             </div>
         </div>
 
