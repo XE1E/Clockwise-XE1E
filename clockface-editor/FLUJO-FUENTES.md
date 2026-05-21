@@ -174,6 +174,23 @@ pixel-fonts.js → Editor Carátulas → Renderizado
 4. La fuente aparece en el dropdown de fuentes
 5. Seleccionar fuente y usarla en elementos de texto
 
+### 5. Gestionar Fuentes (Galería)
+
+```
+Editor Fuentes → Ver galería → Editar/Eliminar
+```
+
+1. En Editor Fuentes, clic en **"Ver galería / Gestionar"**
+2. Se abre un modal con todas las fuentes de `pixel-fonts.js`
+3. Cada fuente muestra:
+   - Nombre y dimensiones (ej: `picopixel 5x7`)
+   - Cantidad de caracteres
+   - Vista previa: `ABC abc 123`
+4. Acciones disponibles:
+   - **Editar**: Carga la fuente en el editor
+   - **Eliminar**: Borra la fuente de `pixel-fonts.js` (pide confirmación)
+5. Cerrar galería: clic en X, tecla Escape, o clic fuera del modal
+
 ---
 
 ## Conversión entre Formatos
