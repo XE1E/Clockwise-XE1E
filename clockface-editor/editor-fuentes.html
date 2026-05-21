@@ -402,6 +402,72 @@
         let drawMode = true;
         const chars = {};
 
+        // ==================== INDEXEDDB PARA RECORDAR CARPETAS ====================
+        const DB_NAME = 'FontEditorDB';
+        const DB_STORE = 'directories';
+
+        async function getSavedDirHandle(key) {
+            return new Promise((resolve) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(DB_STORE)) {
+                        db.createObjectStore(DB_STORE);
+                    }
+                };
+                request.onsuccess = (e) => {
+                    const db = e.target.result;
+                    const tx = db.transaction(DB_STORE, 'readonly');
+                    const store = tx.objectStore(DB_STORE);
+                    const getReq = store.get(key);
+                    getReq.onsuccess = () => resolve(getReq.result || null);
+                    getReq.onerror = () => resolve(null);
+                };
+                request.onerror = () => resolve(null);
+            });
+        }
+
+        async function saveDirHandle(key, handle) {
+            return new Promise((resolve) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(DB_STORE)) {
+                        db.createObjectStore(DB_STORE);
+                    }
+                };
+                request.onsuccess = (e) => {
+                    const db = e.target.result;
+                    const tx = db.transaction(DB_STORE, 'readwrite');
+                    const store = tx.objectStore(DB_STORE);
+                    store.put(handle, key);
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => resolve();
+                };
+                request.onerror = () => resolve();
+            });
+        }
+
+        async function verifyDirPermission(dirHandle) {
+            if (!dirHandle) return null;
+            try {
+                const permission = await dirHandle.queryPermission({ mode: 'readwrite' });
+                if (permission === 'granted') return dirHandle;
+                const request = await dirHandle.requestPermission({ mode: 'readwrite' });
+                if (request === 'granted') return dirHandle;
+            } catch (e) {}
+            return null;
+        }
+
+        async function checkFileExists(dirHandle, fileName) {
+            try {
+                await dirHandle.getFileHandle(fileName, { create: false });
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
         // ==================== INICIALIZACION ====================
         function init() {
             loadSettings();
@@ -1085,12 +1151,28 @@
             }
 
             try {
-                const dirHandle = await window.showDirectoryPicker({
-                    mode: 'readwrite',
-                    startIn: 'documents'
-                });
+                // Try to use saved directory, or ask user
+                let dirHandle = await getSavedDirHandle('jsonDir');
+                dirHandle = await verifyDirPermission(dirHandle);
+
+                if (!dirHandle) {
+                    dirHandle = await window.showDirectoryPicker({
+                        mode: 'readwrite',
+                        startIn: 'documents'
+                    });
+                    await saveDirHandle('jsonDir', dirHandle);
+                }
 
                 const name = document.getElementById('font-name').value || 'custom';
+                const fileName = name + '.json';
+
+                // Check if file exists
+                if (await checkFileExists(dirHandle, fileName)) {
+                    if (!confirm(`El archivo "${fileName}" ya existe en ${dirHandle.name}/\n\n¿Deseas sobreescribirlo?`)) {
+                        return;
+                    }
+                }
+
                 const data = {
                     version: 1,
                     name: name,
@@ -1106,12 +1188,12 @@
                     }
                 }
 
-                const fileHandle = await dirHandle.getFileHandle(name + '.json', { create: true });
+                const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
                 const writable = await fileHandle.createWritable();
                 await writable.write(JSON.stringify(data, null, 2));
                 await writable.close();
 
-                showStatus('Guardado: ' + name + '.json en carpeta seleccionada', 'success');
+                showStatus(`Guardado: ${fileName} en ${dirHandle.name}/`, 'success');
             } catch (e) {
                 if (e.name !== 'AbortError') {
                     showStatus('Error: ' + e.message, 'warning');
@@ -1228,8 +1310,15 @@
             }
 
             try {
-                alert('Selecciona la carpeta "js" dentro de clockface-editor');
-                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                // Try to use saved js directory, or ask user
+                let dirHandle = await getSavedDirHandle('jsDir');
+                dirHandle = await verifyDirPermission(dirHandle);
+
+                if (!dirHandle) {
+                    alert('Selecciona la carpeta "js" dentro de clockface-editor');
+                    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    await saveDirHandle('jsDir', dirHandle);
+                }
 
                 const fileHandle = await dirHandle.getFileHandle('pixel-fonts.js');
                 const file = await fileHandle.getFile();
@@ -1368,10 +1457,26 @@
             }
 
             try {
-                alert('Selecciona la carpeta "fonts" dentro de clockface-editor');
-                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                // Try to use saved fonts directory, or ask user
+                let dirHandle = await getSavedDirHandle('fontsDir');
+                dirHandle = await verifyDirPermission(dirHandle);
 
-                const fontFile = await dirHandle.getFileHandle(name + '.json', { create: true });
+                if (!dirHandle) {
+                    alert('Selecciona la carpeta "fonts" dentro de clockface-editor');
+                    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    await saveDirHandle('fontsDir', dirHandle);
+                }
+
+                const fileName = name + '.json';
+
+                // Check if file exists
+                if (await checkFileExists(dirHandle, fileName)) {
+                    if (!confirm(`El archivo "${fileName}" ya existe en ${dirHandle.name}/\n\n¿Deseas sobreescribirlo?`)) {
+                        return;
+                    }
+                }
+
+                const fontFile = await dirHandle.getFileHandle(fileName, { create: true });
                 const fontWritable = await fontFile.createWritable();
                 await fontWritable.write(JSON.stringify(fontData, null, 2));
                 await fontWritable.close();
@@ -1383,15 +1488,15 @@
                     index = JSON.parse(await file.text());
                 } catch (e) {}
 
-                if (!index.fonts.includes(name + '.json')) {
-                    index.fonts.push(name + '.json');
+                if (!index.fonts.includes(fileName)) {
+                    index.fonts.push(fileName);
                     const indexFileWrite = await dirHandle.getFileHandle('index.json', { create: true });
                     const indexWritable = await indexFileWrite.createWritable();
                     await indexWritable.write(JSON.stringify(index, null, 2));
                     await indexWritable.close();
                 }
 
-                showStatus('Fuente "' + name + '" guardada en galeria', 'success');
+                showStatus(`Fuente "${name}" guardada en ${dirHandle.name}/`, 'success');
                 alert('Fuente guardada!\n\nRecarga el editor de caratulas para usarla.');
 
             } catch (e) {
@@ -1408,14 +1513,36 @@
             }
 
             try {
-                const dirHandle = await window.showDirectoryPicker({
-                    mode: 'readwrite',
-                    startIn: 'documents'
-                });
+                // Try to use saved PNG directory, or ask user
+                let dirHandle = await getSavedDirHandle('pngDir');
+                dirHandle = await verifyDirPermission(dirHandle);
+
+                if (!dirHandle) {
+                    dirHandle = await window.showDirectoryPicker({
+                        mode: 'readwrite',
+                        startIn: 'documents'
+                    });
+                    await saveDirHandle('pngDir', dirHandle);
+                }
 
                 const all = Object.values(CHAR_GROUPS).join('');
-                let count = 0;
+                const fontName = document.getElementById('font-name').value || 'font';
 
+                // Check if any PNG already exists
+                let existingCount = 0;
+                for (const c of all) {
+                    if (!hasData(c)) continue;
+                    const fileName = fontName + '-' + c.charCodeAt(0).toString(16).padStart(2, '0') + '.png';
+                    if (await checkFileExists(dirHandle, fileName)) existingCount++;
+                }
+
+                if (existingCount > 0) {
+                    if (!confirm(`${existingCount} archivo(s) PNG ya existen en ${dirHandle.name}/\n\n¿Deseas sobreescribirlos?`)) {
+                        return;
+                    }
+                }
+
+                let count = 0;
                 for (const c of all) {
                     if (!hasData(c)) continue;
 
@@ -1433,7 +1560,6 @@
                         }
                     }
 
-                    const fontName = document.getElementById('font-name').value || 'font';
                     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
                     const fileName = fontName + '-' + c.charCodeAt(0).toString(16).padStart(2, '0') + '.png';
                     const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
@@ -1443,7 +1569,7 @@
                     count++;
                 }
 
-                showStatus(count + ' PNGs guardados en carpeta', 'success');
+                showStatus(`${count} PNGs guardados en ${dirHandle.name}/`, 'success');
             } catch (e) {
                 if (e.name !== 'AbortError') {
                     showStatus('Error: ' + e.message, 'warning');
