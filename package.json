@@ -1,0 +1,15 @@
+{
+  "name": "clockwise-xe1e",
+  "version": "1.0.0",
+  "description": "ClockWise XE1E - LED Matrix Clock with customizable clockfaces",
+  "scripts": {
+    "sync-fonts": "node scripts/sync-fonts.js",
+    "sync-fonts:dry": "node scripts/sync-fonts.js --dry-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XE1E/Clockwise-XE1E.git"
+  },
+  "author": "XE1E",
+  "license": "MIT"
+}

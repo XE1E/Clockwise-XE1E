@@ -201,30 +201,32 @@ Esto garantiza:
 
 **Tareas**:
 
-- [ ] **5.1** Crear script Node.js `scripts/sync-fonts.js`
+- [x] **5.1** Crear script Node.js `scripts/sync-fonts.js`
   - Lee pixel-fonts.js
   - Genera todos los .h
-  - Actualiza Clockface.h (includes)
-  - Actualiza Clockface.cpp (setFont)
+  - Genera templates para Clockface.h (includes) y Clockface.cpp (setFont)
+  - **COMPLETADO**: `scripts/sync-fonts.js`
 
 - [ ] **5.2** Agregar al workflow de GitHub Actions
   - Ejecutar sync antes de compilar
   - Commit automático si hay cambios (opcional)
 
-- [ ] **5.3** Agregar comando npm para ejecutar local
+- [x] **5.3** Agregar comando npm para ejecutar local
   - `npm run sync-fonts`
-  - Para desarrolladores que quieren probar local
+  - `npm run sync-fonts:dry` para modo prueba
+  - **COMPLETADO**: `package.json` con scripts
 
-- [ ] **5.4** Validación de fuentes
+- [x] **5.4** Validación de fuentes
   - Verificar formato correcto antes de generar
   - Reportar errores claros
+  - **COMPLETADO**: Validación incluida en el script
 
 **Entregables**:
-- Script de sincronización funcional
-- Integración con CI/CD
-- Comando local para desarrolladores
+- ✅ Script de sincronización funcional
+- ⏳ Integración con CI/CD (pendiente)
+- ✅ Comando local para desarrolladores
 
-**Estimación**: 2-3 días
+**Estado**: EN PROGRESO (falta integración CI/CD)
 
 ---
 
