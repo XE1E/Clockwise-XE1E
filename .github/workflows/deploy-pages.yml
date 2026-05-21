@@ -31,72 +31,14 @@ jobs:
       - name: Create site structure
         run: |
           mkdir -p _site
+          # Web Flasher as root (main page)
           cp -r web-flasher/* _site/
+          # Editor in /editor subfolder
           mkdir -p _site/editor
           cp -r clockface-editor/* _site/editor/
+          # Docs in /docs subfolder
           mkdir -p _site/docs
           cp -r docs/* _site/docs/
-
-      - name: Create index redirect
-        run: |
-          cat > _site/index.html << 'EOF'
-          <!DOCTYPE html>
-          <html>
-          <head>
-              <meta charset="UTF-8">
-              <meta http-equiv="refresh" content="0; url=index.html">
-              <title>ClockWise XE1E</title>
-              <style>
-                  body {
-                      font-family: 'Segoe UI', sans-serif;
-                      background: #1a1a2e;
-                      color: #eaeaea;
-                      display: flex;
-                      justify-content: center;
-                      align-items: center;
-                      height: 100vh;
-                      margin: 0;
-                  }
-                  .container {
-                      text-align: center;
-                      max-width: 600px;
-                      padding: 40px;
-                  }
-                  h1 { color: #f0b800; }
-                  .links {
-                      display: flex;
-                      gap: 20px;
-                      justify-content: center;
-                      flex-wrap: wrap;
-                      margin-top: 30px;
-                  }
-                  a {
-                      background: #0f3460;
-                      color: #eaeaea;
-                      padding: 15px 30px;
-                      border-radius: 10px;
-                      text-decoration: none;
-                      transition: all 0.2s;
-                  }
-                  a:hover {
-                      background: #f0b800;
-                      color: #000;
-                  }
-              </style>
-          </head>
-          <body>
-              <div class="container">
-                  <h1>ClockWise XE1E</h1>
-                  <p>Reloj LED Matrix con caratulas personalizables</p>
-                  <div class="links">
-                      <a href="index.html">Web Flasher</a>
-                      <a href="editor/">Editor de Caratulas</a>
-                      <a href="https://github.com/XE1E/Clockwise-XE1E">GitHub</a>
-                  </div>
-              </div>
-          </body>
-          </html>
-          EOF
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
