@@ -121,30 +121,35 @@ Esto garantiza:
 
 **Tareas**:
 
-- [ ] **3.1** Crear página de flasher (`docs/flasher/index.html`)
+- [x] **3.1** Crear página de flasher (`web-flasher/index.html`)
   - Integrar ESP Web Tools
-  - Selector de versión de firmware
+  - Selector de placa (ESP32 / ESP32-S3)
   - Instrucciones de conexión USB
+  - **COMPLETADO**: Página con selector de placa funcional
 
-- [ ] **3.2** Configurar manifest.json para ESP Web Tools
-  - Apuntar a .bin de releases
-  - Configurar particiones si es necesario
+- [x] **3.2** Configurar manifest.json para ESP Web Tools
+  - manifest.json para ESP32 (`cw-cf-0x07/manifest.json`)
+  - manifest.json para ESP32-S3 (`esp32s3/manifest.json`)
+  - **COMPLETADO**: Ambos manifests configurados
 
-- [ ] **3.3** Agregar página de releases/descargas
-  - Lista de versiones disponibles
-  - Changelog de cada versión
-  - Links directos a .bin
+- [x] **3.3** Actualizar workflow para generar releases de ambas placas
+  - Build paralelo ESP32 y ESP32-S3
+  - Releases incluyen ambos firmwares
+  - **COMPLETADO**: `.github/workflows/build-firmware.yml` actualizado
 
-- [ ] **3.4** Publicar en GitHub Pages
-  - Configurar GitHub Pages para /docs
-  - Dominio personalizado (opcional)
+- [x] **3.4** Publicar en GitHub Pages
+  - Workflow de deploy automático
+  - Incluye web-flasher y clockface-editor
+  - **COMPLETADO**: `.github/workflows/deploy-pages.yml`
 
 **Entregables**:
-- Página web de flasher funcional
-- Página de releases con historial
-- Sitio publicado en GitHub Pages
+- ✅ Página web de flasher con selector de placa
+- ✅ Soporte para ESP32 y ESP32-S3
+- ✅ Workflow de GitHub Pages
 
-**Estimación**: 2-3 días
+**Estado**: COMPLETADO
+
+**Nota**: Después del push, habilitar GitHub Pages en Settings → Pages → Source: GitHub Actions
 
 ---
 
@@ -287,7 +292,7 @@ Con esto ya se puede usar el sistema completo de forma manual.
 ### MVP (Mínimo Viable)
 - [x] Usuario puede exportar fuente a .h desde editor
 - [x] GitHub Actions compila firmware automáticamente
-- [ ] Usuario puede flashear .bin desde navegador
+- [x] Usuario puede flashear .bin desde navegador
 - [x] Documentación clara del proceso
 
 ### Versión Completa

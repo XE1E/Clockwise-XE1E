@@ -41,10 +41,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade platformio
 
-      - name: Build firmware
+      - name: Build firmware (ESP32)
         run: |
           cd firmware
           pio run --environment esp32dev
+
+      - name: Build firmware (ESP32-S3)
+        run: |
+          cd firmware
+          pio run --environment esp32s3
 
       - name: Get version info
         id: version
@@ -53,15 +58,24 @@ jobs:
           echo "time=$(date +'%H%M')" >> $GITHUB_OUTPUT
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Rename firmware file
+      - name: Prepare firmware files
         run: |
-          cp firmware/.pio/build/esp32dev/firmware.bin firmware-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}.bin
+          mkdir -p release-files
+          cp firmware/.pio/build/esp32dev/firmware.bin release-files/firmware-esp32-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}.bin
+          cp firmware/.pio/build/esp32s3/firmware.bin release-files/firmware-esp32s3-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}.bin
 
-      - name: Upload firmware artifact
+      - name: Upload firmware artifact (ESP32)
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}
-          path: firmware-*.bin
+          name: firmware-esp32-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}
+          path: release-files/firmware-esp32-*.bin
+          retention-days: 30
+
+      - name: Upload firmware artifact (ESP32-S3)
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-esp32s3-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}
+          path: release-files/firmware-esp32s3-*.bin
           retention-days: 30
 
       - name: Create Release
@@ -77,14 +91,18 @@ jobs:
             - **Date**: ${{ steps.version.outputs.date }}
             - **Branch**: ${{ github.ref_name }}
 
+            ### Supported Boards
+            - **ESP32** (esp32doit-devkit-v1)
+            - **ESP32-S3** (esp32-s3-devkitc-1)
+
             ### Changes
             ${{ github.event.head_commit.message }}
 
             ### Installation
-            1. Download `firmware-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}.bin`
-            2. Use [ESP Web Tools](https://web.esphome.io/) or esptool to flash
+            1. Download the firmware for your board
+            2. Use [Web Flasher](https://xe1e.github.io/Clockwise-XE1E/web-flasher/) or esptool to flash
 
-          files: firmware-*.bin
+          files: release-files/firmware-*.bin
           draft: false
           prerelease: false
         env:

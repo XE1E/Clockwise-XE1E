@@ -1,0 +1,16 @@
+{
+    "name": "ClockWise XE1E (ESP32-S3)",
+    "version": "1.0.0",
+    "builds": [
+        {
+            "chipFamily": "ESP32-S3",
+            "improv": true,
+            "parts": [
+                {
+                    "path": "firmware.bin",
+                    "offset": 0
+                }
+            ]
+        }
+    ]
+}

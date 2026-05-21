@@ -198,6 +198,49 @@
             background: var(--highlight);
             color: #000;
         }
+
+        .board-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .board-option {
+            background: var(--accent);
+            border: 2px solid transparent;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .board-option:hover {
+            border-color: var(--highlight);
+        }
+
+        .board-option.selected {
+            border-color: var(--highlight);
+            background: rgba(240, 184, 0, 0.1);
+        }
+
+        .board-option .board-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .board-option .board-desc {
+            font-size: 0.85em;
+            color: var(--text-dim);
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -237,14 +280,39 @@
                 <div class="warning-title">Requisitos</div>
                 <ul>
                     <li>Navegador con WebSerial (Chrome, Edge, Opera)</li>
-                    <li>ESP32 conectado por USB</li>
+                    <li>ESP32 o ESP32-S3 conectado por USB</li>
                     <li>Cable USB con datos (no solo carga)</li>
                 </ul>
             </div>
 
-            <div class="flash-section">
+            <h3 style="text-align: center; margin-bottom: 15px; color: var(--text-dim);">Selecciona tu placa:</h3>
+
+            <div class="board-selector">
+                <div class="board-option selected" data-board="esp32" onclick="selectBoard('esp32')">
+                    <div class="board-name">ESP32</div>
+                    <div class="board-desc">DevKit V1, DOIT, etc.</div>
+                </div>
+                <div class="board-option" data-board="esp32s3" onclick="selectBoard('esp32s3')">
+                    <div class="board-name">ESP32-S3</div>
+                    <div class="board-desc">DevKitC-1</div>
+                </div>
+            </div>
+
+            <div class="flash-section" id="flash-esp32">
                 <esp-web-install-button manifest="static/firmware/cw-cf-0x07/manifest.json">
-                    <button id="flash-button" slot="activate">INSTALAR FIRMWARE</button>
+                    <button id="flash-button" slot="activate">INSTALAR EN ESP32</button>
+                    <span class="unsupported" slot="unsupported">
+                        Tu navegador no soporta WebSerial. Usa Chrome, Edge u Opera en escritorio.
+                    </span>
+                    <span class="not-allowed" slot="not-allowed">
+                        WebSerial requiere HTTPS. Accede via https://xe1e.github.io/Clockwise-XE1E/web-flasher/
+                    </span>
+                </esp-web-install-button>
+            </div>
+
+            <div class="flash-section hidden" id="flash-esp32s3">
+                <esp-web-install-button manifest="static/firmware/esp32s3/manifest.json">
+                    <button id="flash-button-s3" slot="activate">INSTALAR EN ESP32-S3</button>
                     <span class="unsupported" slot="unsupported">
                         Tu navegador no soporta WebSerial. Usa Chrome, Edge u Opera en escritorio.
                     </span>
@@ -254,6 +322,18 @@
                 </esp-web-install-button>
             </div>
         </div>
+
+        <script>
+            function selectBoard(board) {
+                document.querySelectorAll('.board-option').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                document.querySelector(`[data-board="${board}"]`).classList.add('selected');
+
+                document.getElementById('flash-esp32').classList.toggle('hidden', board !== 'esp32');
+                document.getElementById('flash-esp32s3').classList.toggle('hidden', board !== 'esp32s3');
+            }
+        </script>
 
         <div class="card">
             <h2>Instrucciones</h2>
