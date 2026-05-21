@@ -333,3 +333,22 @@ Con esto ya se puede usar el sistema completo de forma manual.
 - El plan es flexible y puede ajustarse según necesidades
 - Cada fase puede subdividirse si es muy grande
 - Se recomienda hacer releases incrementales (no esperar a tener todo)
+
+---
+
+## Cosas para Considerar (Futuro)
+
+Ideas para mejoras futuras que no son prioritarias actualmente:
+
+### Mantenimiento de Galería
+Actualmente es manual (editar `clockfaceFiles` en index.html). Opciones futuras:
+- **Auto-scan**: Leer todos los .json de la carpeta automáticamente
+- **manifest.json**: Archivo separado con lista, orden y metadatos
+- **Panel admin**: Interfaz web para gestionar carátulas (requiere backend)
+
+### Otras Ideas
+- Sistema de categorías/tags para carátulas
+- Búsqueda y filtros en galería
+- Votación/popularidad de carátulas
+- Contribuciones de la comunidad via PR con validación automática
+- Versionado de carátulas (historial de cambios)
