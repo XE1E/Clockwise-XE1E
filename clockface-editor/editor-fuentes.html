@@ -1291,8 +1291,19 @@
         function renderFontPreview(canvas, font, text) {
             const scale = 3;
             const measured = measureTextWithFont(font, text);
+
+            let minYOff = 0, maxYEnd = 0;
+            for (const g of font.glyphs) {
+                if (!g || g[1] === 0) continue;
+                const [off, w, h, xAdv, xOff, yOff] = g;
+                if (yOff < minYOff) minYOff = yOff;
+                const yEnd = yOff + h;
+                if (yEnd > maxYEnd) maxYEnd = yEnd;
+            }
+            const totalH = maxYEnd - minYOff;
+
             canvas.width = measured.width * scale;
-            canvas.height = (font.lineHeight || 8) * scale;
+            canvas.height = totalH * scale;
             const ctx = canvas.getContext('2d');
             ctx.imageSmoothingEnabled = false;
             ctx.fillStyle = '#000';
@@ -1314,6 +1325,8 @@
                 const [off, w, h, xAdv, xOff, yOff] = g;
                 let bit = off * 8;
 
+                const drawY = yOff - minYOff;
+
                 for (let row = 0; row < h; row++) {
                     for (let col = 0; col < w; col++) {
                         const byteIdx = Math.floor(bit / 8);
@@ -1323,7 +1336,7 @@
 
                         if (val) {
                             ctx.fillStyle = '#00ff88';
-                            ctx.fillRect((x + xOff + col) * scale, (yOff + row) * scale, scale, scale);
+                            ctx.fillRect((x + xOff + col) * scale, (drawY + row) * scale, scale, scale);
                         }
                     }
                 }
