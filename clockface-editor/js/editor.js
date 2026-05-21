@@ -54,8 +54,10 @@ class ClockfaceEditor {
         if (!loadPath) return;
 
         try {
-            console.log('[Editor] Loading clockface from URL:', loadPath);
-            const response = await fetch(loadPath);
+            // Resolve relative path based on current location
+            const url = new URL(loadPath, window.location.href);
+            console.log('[Editor] Loading clockface from URL:', url.href);
+            const response = await fetch(url.href);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
