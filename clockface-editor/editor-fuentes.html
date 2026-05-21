@@ -1696,7 +1696,7 @@
 
                 ctx.save();
                 ctx.scale(scale, scale);
-                PixelFonts.drawText(ctx, fontName, text, 0, -metrics.minYOffset, '#00ff88', null);
+                PixelFonts.drawText(ctx, fontName, text, 0, -metrics.yOffset, '#00ff88', null);
                 ctx.restore();
             } catch (e) {
                 console.error('Error rendering preview for', fontName, e);
