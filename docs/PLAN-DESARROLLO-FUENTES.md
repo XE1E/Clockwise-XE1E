@@ -207,9 +207,9 @@ Esto garantiza:
   - Genera templates para Clockface.h (includes) y Clockface.cpp (setFont)
   - **COMPLETADO**: `scripts/sync-fonts.js`
 
-- [ ] **5.2** Agregar al workflow de GitHub Actions
+- [x] **5.2** Agregar al workflow de GitHub Actions
   - Ejecutar sync antes de compilar
-  - Commit automático si hay cambios (opcional)
+  - **COMPLETADO**: Agregado a `build-firmware.yml`
 
 - [x] **5.3** Agregar comando npm para ejecutar local
   - `npm run sync-fonts`
@@ -223,10 +223,10 @@ Esto garantiza:
 
 **Entregables**:
 - ✅ Script de sincronización funcional
-- ⏳ Integración con CI/CD (pendiente)
+- ✅ Integración con CI/CD
 - ✅ Comando local para desarrolladores
 
-**Estado**: EN PROGRESO (falta integración CI/CD)
+**Estado**: COMPLETADO
 
 ---
 

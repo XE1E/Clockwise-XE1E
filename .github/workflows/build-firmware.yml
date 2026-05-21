@@ -41,6 +41,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade platformio
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Sync fonts (pixel-fonts.js → firmware)
+        run: |
+          node scripts/sync-fonts.js
+          echo "Generated font files:"
+          ls -la firmware/clockfaces/cw-cf-0x07/fonts/*_gen.h 2>/dev/null || echo "No generated files"
+          ls -la firmware/clockfaces/cw-cf-0x07/fonts/_*.txt 2>/dev/null || echo "No template files"
+
       - name: Build firmware (ESP32)
         run: |
           cd firmware
