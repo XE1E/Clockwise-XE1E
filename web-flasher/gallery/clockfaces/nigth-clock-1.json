@@ -1,0 +1,32 @@
+{
+  "name": "nigth-clock-1",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACiklEQVR4AeybUXLDIAxE3Z6m9z9NbtP6zZTMlhE2MggS6k52gkGytE985Kef2z//mwPga/veVBOHcA3AleaPco7OguFcA+BtCoO1OZ7Y2ncexPkBeBu04h/bx5ZkNWflWHEd9vwAPEVzI5Zpa89TozHWByA31Fj8TzogdCOyltQ5B0AjSZJ4uiRHg3KDejZxXQaAATSyuQmQygBGGk+1RgPf65YBMA1Le9JKnzKAVpfA03d4p5vn67s6ruMA0GRuogSBfUTOYMUCwIwFAbMq4lR5jp51XscDoGGPIU8s725UPIA06dpGia+NvRCXp8QCsMwwYUvamZWn5x3XsQC00WRa93TNuT4PghAH4IqBCRDiAOg0c2N6NnkdA+DK9CeBiAHQYmbwbXk9AINvTwyAwVNsuXAxAPKOBk81L3/0PAYAHdRAyGMG3KQ4AFbzGEQAUbGHdM/K1/NO6zgANFgygVkVsapSnsZ0WscCoEmvGW88NRoUD4DmMJXEs6Wzcyunw54fQGo0fXubSHn5t/c9neL9ADoVHvWaszo3gDNCq5/fN+DlJnz0+4Bm9bx1vb/vvgE7hNf5MNHB3dw3YDDwcrna6ec/oDzPRvW5NwDTSUZzXbeooy8E3P48BwDNoL2BKZ9f89SeA4DKI6WwxTwtzAFAE5boaLDmABhp8mD6tLE2gBPz6wPA4YmWuwFPvxXTJ3ZdALir0JoAKqcPn/UAqHkcnmg9AGqY3xr6bKzXAqDTrzAPj7UA4MipdQDo9B0Q1gGgpiuvPylrALg4/XUA4CTJMX1S1rgBOLmo9wfQcP1h9v4AcJHkvP6krQUAR069N4DG6w+r1wLAFVbR4ZEe28fzX3DJO4otnP0AAAD//6ZfCN0AAAAGSURBVAMA9mXGgVxs6KAAAAAASUVORK5CYII=",
+  "delay": 250,
+  "setup": [],
+  "sprites": [],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 1,
+      "y": 29,
+      "content": "H",
+      "font": "nocturno",
+      "fgColor": 320,
+      "bgColor": 0,
+      "id": "04w9nr"
+    },
+    {
+      "type": "datetime",
+      "x": 24,
+      "y": 62,
+      "content": "i",
+      "font": "nocturno",
+      "fgColor": 320,
+      "bgColor": 0,
+      "id": "y5ke3r"
+    }
+  ]
+}

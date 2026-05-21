@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria de Caratulas - ClockWise XE1E</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --accent: #0f3460;
+            --highlight: #f0b800;
+            --text: #eaeaea;
+            --text-dim: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: var(--highlight);
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-links a {
+            background: var(--accent);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: var(--highlight);
+            color: #000;
+        }
+
+        .info-box {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h2 {
+            color: var(--highlight);
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .info-box ol {
+            margin-left: 20px;
+            color: var(--text-dim);
+        }
+
+        .info-box li {
+            margin: 8px 0;
+        }
+
+        .info-box code {
+            background: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .clockface-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .clockface-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .clockface-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+        }
+
+        .clockface-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .clockface-info {
+            padding: 15px;
+        }
+
+        .clockface-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .clockface-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-download {
+            background: var(--highlight);
+            color: #000;
+        }
+
+        .btn-download:hover {
+            background: #d4a000;
+        }
+
+        .btn-preview {
+            background: var(--accent);
+            color: var(--text);
+        }
+
+        .btn-preview:hover {
+            background: #1a4a80;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-dim);
+        }
+
+        footer a {
+            color: var(--highlight);
+        }
+
+        .no-preview {
+            color: var(--text-dim);
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Galeria de Caratulas</h1>
+            <p class="subtitle">Caratulas listas para usar en tu ClockWise</p>
+            <div class="nav-links">
+                <a href="../">Web Flasher</a>
+                <a href="../editor/">Editor de Caratulas</a>
+                <a href="https://github.com/XE1E/Clockwise-XE1E">GitHub</a>
+            </div>
+        </header>
+
+        <div class="info-box">
+            <h2>Como instalar una caratula</h2>
+            <ol>
+                <li>Descarga el archivo JSON de la caratula</li>
+                <li>Abre <code>clockwise-xe1e.local</code> en tu navegador</li>
+                <li>Ve a la seccion "Caratulas" y sube el archivo JSON</li>
+                <li>Selecciona la caratula y disfruta</li>
+            </ol>
+        </div>
+
+        <div class="gallery" id="gallery">
+            <!-- Las caratulas se cargan dinamicamente -->
+        </div>
+
+        <footer>
+            <p>Quieres contribuir? <a href="https://github.com/XE1E/Clockwise-XE1E" target="_blank">Envia tu caratula</a></p>
+        </footer>
+    </div>
+
+    <script>
+        const clockfaces = [
+            { name: "Pac-Man", file: "pac-man.json", preview: "pac-man.png" },
+            { name: "Nyan Cat", file: "nyan-cat.json", preview: "nyan-cat.png" },
+            { name: "Mario Clock", file: "mario-clock.json", preview: "mario-clock.png" },
+            { name: "Coca-Cola", file: "coca-cola-1.json", preview: "coca-cola-1.png" },
+            { name: "Coca-Cola 2", file: "coca-cola-2.json", preview: "coca-cola-2.png" },
+            { name: "Pepsi", file: "pepsi-final.json", preview: "pepsi-final.png" },
+            { name: "World Clock", file: "World Clock-2.json", preview: "world-clock.png" },
+            { name: "Hora en Palabras", file: "Hora en Palabras-1.json", preview: "hora-palabras-1.png" },
+            { name: "Hora en Palabras 2", file: "Hora en Palabras-2.json", preview: "hora-palabras-2.png" },
+            { name: "Night Clock", file: "nigth-clock-2.json", preview: "night-clock.png" },
+            { name: "Star Wars", file: "star-wars.json", preview: "star-wars.png" },
+            { name: "Donkey Kong", file: "donkey-kong.json", preview: "donkey-kong.png" },
+            { name: "Snoopy", file: "snoopy3.json", preview: "snoopy.png" },
+            { name: "Christmas Snoopy", file: "christmassnoopy.json", preview: "christmas-snoopy.png" },
+            { name: "Retro Computer", file: "retro-computer.json", preview: "retro-computer.png" },
+            { name: "Goomba", file: "goomba_move.json", preview: "goomba.png" }
+        ];
+
+        const gallery = document.getElementById('gallery');
+
+        clockfaces.forEach(cf => {
+            const card = document.createElement('div');
+            card.className = 'clockface-card';
+            card.innerHTML = `
+                <div class="clockface-preview">
+                    <img src="previews/${cf.preview}" alt="${cf.name}"
+                         onerror="this.parentElement.innerHTML='<span class=\\'no-preview\\'>Sin preview</span>'">
+                </div>
+                <div class="clockface-info">
+                    <div class="clockface-name">${cf.name}</div>
+                    <div class="clockface-actions">
+                        <a href="clockfaces/${cf.file}" download class="btn btn-download">Descargar</a>
+                        <a href="../editor/?load=gallery/${cf.file}" class="btn btn-preview">Editar</a>
+                    </div>
+                </div>
+            `;
+            gallery.appendChild(card);
+        });
+    </script>
+</body>
+</html>

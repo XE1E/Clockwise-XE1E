@@ -159,38 +159,39 @@ Esto garantiza:
 
 **Tareas**:
 
-- [ ] **4.1** Crear estructura de galería
+- [x] **4.1** Crear estructura de galería
   ```
-  docs/galeria/
+  web-flasher/gallery/
   ├── index.html           Página principal
   ├── clockfaces/          JSONs de carátulas
-  │   ├── digital-1.json
-  │   ├── analog-1.json
-  │   └── ...
   └── previews/            Imágenes de preview
-      ├── digital-1.png
-      └── ...
   ```
+  - **COMPLETADO**: Estructura creada en web-flasher/gallery/
 
-- [ ] **4.2** Crear página de galería con previews
+- [x] **4.2** Crear página de galería con previews
   - Grid de carátulas con imagen
   - Botón descargar JSON
-  - Filtros por categoría (opcional)
+  - Botón editar (abre en editor)
+  - **COMPLETADO**: Página con diseño responsive
 
-- [ ] **4.3** Agregar instrucciones de instalación
-  - Cómo subir JSON al reloj via WiFi
-  - Troubleshooting común
+- [x] **4.3** Agregar instrucciones de instalación
+  - Pasos para subir JSON al reloj
+  - **COMPLETADO**: Instrucciones en la página
 
-- [ ] **4.4** Integrar con editor de carátulas
-  - Botón "Publicar en galería" (opcional, requiere PR)
-  - O instrucciones para contribuir
+- [x] **4.4** Integrar con web-flasher y editor
+  - Enlace en sección Recursos
+  - Botón "Editar" abre carátula en editor
+  - **COMPLETADO**: Enlaces bidireccionales
 
 **Entregables**:
-- Galería web con carátulas pre-hechas
-- Sistema de previews
-- Documentación de uso
+- ✅ Galería web con 16+ carátulas
+- ✅ Sistema de previews (placeholders)
+- ✅ Instrucciones de instalación
+- ✅ Integración con editor
 
-**Estimación**: 2-3 días
+**Estado**: COMPLETADO
+
+**Nota**: Los previews PNG se pueden generar con el editor (generate-thumbs.html)
 
 ---
 

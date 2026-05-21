@@ -1,0 +1,53 @@
+{
+  "name": "Retro Computer",
+  "version": 1,
+  "author": "@jnthas",
+  "bgColor": 8645,
+  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFDUlEQVR4AezavYolRRgG4MYLMBIxMHAFQVZNjDbTWETQQAxEvAFNNTF3ERO9AEU2EEEDA+MNNzJRF8FgDQxEjLwAdZ+Fd/io6TOnqqfPmWZ2Bl6+n6r6ft6qrjMzpx95/aVX/3uY8ci0ws+du3emi8AKpU/nJkDj77/z9nRofHnz46mF3OclYZgASSsU8NlXt6ZD490PPpxayF1rofONYIgACQ69073x29MQW40HIUBgxb343PPTFpAmn3rh+lSBCLVmfJ/sOgECpvmabAt626Cabv/w/YNLuR2bs7sIyELBf//p7rRlpNZeOUSAxtuLaGu2GnubN2+IAM16FDxno3AsjwE1jpDQTYCPOc27AD0Ko8D2MYBkJPTm6iagNo/hY6C3iXYeElrfLrubgATQOIaPgZdfeW0aQWockcMEJPij1x6btoTUNSoXEzCaaHT+M89em8A6sgX/GtgsAb/9em8CTZIBGxBCjqKdv1kC2kJjIyL6GiQMEeCjL8kvUlYSzlvHEAE+Ac6bcK31a5EwRMBWTsBaJIozRMCWToDi10A3AfkVeI2ka8VY4zHoJuDHX35eq+5NxekmwAn47utvNlX8GsV0E+AEvPHWm2vk3FSMbgKuTsD9O+ChPwGbOrsrFdP9CLgDVsq5qTDdBLgDNlX5TDFLflHrJmAm36VwXXoC9u3SFQH7GLrs41cn4LLv8L7+hk7Ako+ZfQVc9PgQAVf/Ebr/1Xh27J97f09bQuoalYtOwOg3w8eav+SEDhHgDkiSOcl3SDx985OT12E+v/3tiZ6co7tvfhcBN67fePCGlgUhYU4aPyT+vfXFSfhP3/voRG8VX6iqmd/rPRV8FV0EWCCgb4Tpmt8ljV0k2ubVXVHJoHcToGGBkLBlqFFjQFd3BV/FEAECZTE9l5uXJ46N5CbVAmqLjM4+C8MEJJgEOQlenzk2kptUC6S2EbmYAEmSlAS+nISqx7dUJlZ2W64K40txLgLqc0bXYAqhr3UqxBLXv+WQIBd7DnM+86GOsWExARbbBUHpimz/bca3BuSAxO8hQU2BOiE2yYZFBCSAokAgu22HFAn8a0E8SLw892y1BGxgqyngg9gkGxYRIIAkgUB8SFBcJULh54X4IDbIxZafHrCBbbwHiwgQWJJAUogdIhS7JhJf/uQjA35zyF4sJqAmkBQUwk8/BMSG5CGffPyJqYKvhTW7sAoBCa7pNvlSOzGrTKw0XMeiZ6xK6zLeylkCLFgKCdzSu+A11jnU+WJUpJY0lTH2H3/9ObXIeKR5YsSu8hQBmVgLGtE1589TF2ELfsm9Z9DCXOMgX+owHzRBzsF8frkBIewK69uYxk8RwAkuL1JhkfR90Jj5vkluwQ+tP7axOXi05pri83uGNRr3lyDQjfFXzJFwigDJ6iIfYWxyH9IIEgJ/GkcnxSLnYAycArIXNkvjToLmrSN7SDhFgMUt9u16xtNUXW8McdWHqGpHtz66ZuqRtTFtQ3bUR65TYH5L3C4SkoOcJUAyg5gl10BIqE2uETckINppqzFbu45FnyUgg5EpPvaoVFy75qxTsKtwG9OeAnFbEqwHYy2sFyf+LgIy+SyJpBaaDKzNOF2BsVtpHBzr+hjwKV4T9IpKAsLBCeY3P7C+rttJQCYKYkFbZGub00KTLicQJ2jt+OdkG5OttjTEDjTrTgj4zTM/4KvYSUCdNFdYr6/GWVNPQxqsiL/Ks/L+DwAA///nD8xmAAAABklEQVQDAL8Zc90c9CkBAAAAAElFTkSuQmCC",
+  "delay": 250,
+  "setup": [
+    {
+      "type": "datetime",
+      "x": 17,
+      "y": 22,
+      "content": "H:i",
+      "font": "",
+      "fgColor": 19914,
+      "bgColor": 10661,
+      "id": "u75emc"
+    },
+    {
+      "type": "image",
+      "x": 0,
+      "y": 0,
+      "image": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAGFBMVEUZFRQ1KywnNihRP0xMXkmHc3C5npzZy8bMn3d8AAABp0lEQVRIx92VwYqDMBCGI4PpVV+h+AADvsEi7NVL4tWL8dpL9fV3khidmLSysAvLDrS0+OWfMZn8I9qLEOEHiiggAUrFwpjxBIhMcADVOYwxwIDSJLGu4wGgXnMBBzCYTHBA54qcGdDrkJiFZEA5Z0p48BQLTz6nReoxLeEWA/ck3gBd03VvAct8XABNFwNDUkN3oXBvrhSabyrMV/swXAHTH1CYf0VB/j/A/IBCerNihYw9zJHCsiz8Yj/Xz+jytnKmSK5/a51uc7mcBQE6e3ztkwjcaeV08skRYivG83o4ezWg2u2615C4PZKb92F1qbzLUhWhSBLQrALtjFoAiqCA1q/Z89E+jVLQf+boIz1FOE0cQP4KEM+LLcsRKOrav6pg4+sYNVhUNUXlgSAtvZtTgVjY9fQFDhBhPig1POmzANJqeXs4CQtIvwXDdswLtEVd6cfNSdgU0nfQU03KKqwO6OXqJBwQTlIrSqNomlEOO0IKD7RiB6ZhByq9Ljuwb/Jkq9R0UpSeNrbwNWyA7WPj2xuchOqrrSe3Ko1hzRLtZLabwll8AaS4npeRaNQxAAAAAElFTkSuQmCC",
+      "id": "tubby6"
+    },
+    {
+      "type": "rect",
+      "color": 19914,
+      "x": 46,
+      "y": 40,
+      "width": 1,
+      "height": 1
+    }
+  ],
+  "sprites": [
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXbJydZaeAFAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=="
+      },
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEWHc3AXF2vWAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=="
+      }
+    ]
+  ],
+  "loop": [
+    {
+      "type": "sprite",
+      "x": 43,
+      "y": 40,
+      "sprite": 0
+    }
+  ]
+}

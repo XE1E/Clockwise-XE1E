@@ -1,0 +1,32 @@
+{
+  "name": "nigth-clock-1",
+  "version": 1,
+  "author": "XE1E",
+  "bgColor": 0,
+  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADLklEQVR4AeyVC47bMAxE3Z6m9z9Nb9PmBRbAzFK2aYlUkN1FJpb4EWdGXuT39s3/1hjwZ/u3WSy8hHsG3CF/1HOUSzbnngFRUgi82hOpvXrmQV3cgChBr/7v9mtr8Mh5PV7dhFjcgMhQFeKJ9mKRGYO1MQNU0ODwl3aMsIHMWWbOuQEQaTCNp0t6bJEKtLmF674BCACV5BaY1DegUnibVW34Y27fAG7Dw6Ppkz59A0ZVYp49I3q72m/PmrjOMwCSKqJnAnFATzFyDUCMZwJiLaiz0B6bm7zONwDCEUGRWs4eRL4B7aavEqX+au2NOm3JNcATww17sMy8PpufuM41wBJtom3MrsnbfZEJeQbcEbDAhDwD7G2qMJtbvM4x4M7tLzIix4ARMcVvy/sZUPz25BhQfIsjL1yOAcqo+FZ1/NG+xgAYXDFBawrepDwDPPIIBBhiQQzYmNdv85PWeQZAsCcCsRbUWvT6bM2kda4BkIyKidYzYwD5BkAOUQ3sPZzlvZ4JsbgBjWh7Rkm0Pn1Gz5lUHzdg0uCqY87m/Bhw5tCn5z/vDbA/r6xPbnC9AZBUnJD+krb9mmw5je/7NQY0Ujx3Ii8P4uAl2NlE6pzaegMcEh1p20Yt6BY4Cfvz6qQ1VGuAJ8YSZq0Mj/Z6nvazB/YM6akzQAZvEAOWHGtigHWD9hLXmPZQ03CQqzOgkeF5QIj0E1pjBds1xVpL7Aimv8YAM/CI14pcjQErlOnMzltSb0CHiPK9vB88r96Ay8qSC/d/yxoDuKWGZF3R42sMiLLy6jHQiw/G3teA/RWN6ovWv58BCAdWSdLtM+K9DFDhMEwUz/HvYQDCAYwsksUzaq0BiAYwURSIZ+Q6A46EF4lfYwDCAdMtEA1s7MraO+tK315T+wZ4ZBENdkJlj31mnQE98WWK/UF1Buj8/QY0fGk/0isDagzQ258o4KlHz38GD77M/BoDLBcz3IbD68g5GAScIfUGOCSmhBAI9DCNiXH1BkDoLlSciHmm9exnsP+VbwCE+vPHM54J3qnUAcnlGyADU7YIA97hxIGXe8TyDWD4LDwI6+dl7815Kfi6+Q8AAP//W7ndIQAAAAZJREFUAwChWA6QT5bUzAAAAABJRU5ErkJggg==",
+  "delay": 250,
+  "setup": [],
+  "sprites": [],
+  "loop": [
+    {
+      "type": "datetime",
+      "x": 1,
+      "y": 29,
+      "content": "H",
+      "font": "nocturno",
+      "fgColor": 320,
+      "bgColor": 0,
+      "id": "04w9nr"
+    },
+    {
+      "type": "datetime",
+      "x": 24,
+      "y": 62,
+      "content": "i",
+      "font": "nocturno",
+      "fgColor": 320,
+      "bgColor": 0,
+      "id": "y5ke3r"
+    }
+  ]
+}

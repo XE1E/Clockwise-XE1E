@@ -1,0 +1,39 @@
+{
+  "name": "Donkey Kong",
+  "version": 1,
+  "author": "jnthas",
+  "bgColor": 0,
+  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEo0lEQVR4AeyarZIaQRSFuyhERAQPEpFHQCAQEYiIlXmEfRQeIXJEBCICgdhHWJEHQUREpCqZr4ezXG51Dz/TA9QyVRzO/evu22d6linYUQjh3yMDAer99/OqJiGUQD/dNbP2KkCzxH2/9yKArrq2Pn9ZBQvFPdsabOX9fIqX4F4EKNHYteYoKoC/UlxF4DdDDCiODeSLiQH5fn7Fu3BRAbo0cquxFwmwfV0Fi2rS/LXXJua7e16++OOnL8FCdTaGrXqx6uRv3fqKX8IXCXDJQvc65iwBpPyxzayniwBydePxOADlsYF8z8wFfFz+qX2p3vJZAtiB78U+EEBKVpPmnvbcddO/f/0MYLu7hzWffHJA8XO5yvS9devZeQ8EsIlHsaMAUoj7DPjNz3d/1clZqE55z8p7tnNY29fJz81rx2KrTuPE5ID2qTgcBcB4VIxQBXVATgRyQPmc0sofY433fGycz2u84vQI5HsmB9gzID+cABRBiZJgzj5Qqkf1xikYTsAlqkpBP1Zx3ZulWOtofvldmfmGE9BFRRS00BXvMmdqrJ/XromdGnNqbDgBpyp1D3X+JJToaTgBJVTUHNyPFop3ZTsndtf57PjhBFg1jtlP2xDAsTrluVoloPnamL5AW00qN5yAlCo+hrLAx/GJ3xL0YKFebKzNHk5AmzpezWrSVCsO//0+C7cEPYCms/07MbCPpK3hBKR1aaLb3beplbnyIWzq5Obtqv943oRbQqdPfdXNxdd213t0Wt6GE9AiTkxNPi/iZ/9e6Rh+u+qNd7t3nT51oD7pGyie4+EEpJSZm98BlPdKf13OwmI5vRvk+tRelPdc5ARUzy9BsAsolmJbZ21bm4vbGmxbd66dFGCd+HWXKw7OXeDa9fQItG5qL8rBSQFInALUB8dqn5bTINhaxgJiMMC+JjoJcM1G+1qrkwCpq5pqlCsr2Lwdb21bI1t5y8p14U4CdFn4XsZeRYDSV62keEkB9NkJl1zMz5W6LXxNV589gNw8SQFyxT6e2kBbjJyfQz45IB/GB9h94UAAlALrxHOAfxIs0ZBujRJzaQ7fp/bCvoDqxAcCKPhInBQApQDqSQyeroB8lP5QOzms6sfjXI44eQtiOdg6a6ueWN1KfNEjiE79xj5AbSZfSQGSle802CoAyumblfG3TQDSAZWB/FsxPQCtT49AfSue41YBcoPeU/xAAO55kNrgXtFZnZ7F04DSqH9L0AMIoelr32fdpnmxL2BC0TwQIEYe7C0pAEpZWE1QuJrs/5cY9QU+GfqG1hKrl+3rKgD1avvHVtxzUgBfdKn/px64WE4DDLAFfIHYMbueqpfXaL77/g8+dwXGWNX9eJ70queX+GWIcvhAvmXq5WNTBytmmXWBjZ1i07NFrycg1ZDfED4bpVYs2+aI9YEowHr37G+VsbYW9nWKn8psELAxxsD42B7KwT5nffWp3pRT3LOviwJoUGlmc2wAZm5sIJ9YDtScWpub45R4FEAqHRvg6/jlBeTG8ay+qv8GwAAbYANr4wMbs7Zfg3WB4r43xT37uiiAL3okf4SKl8ILxe/xfcOveWnvGvcfAAD//y+zMm0AAAAGSURBVAMA0sDSfTYqJiAAAAAASUVORK5CYII=",
+  "delay": 1000,
+  "setup": [
+    {
+      "type": "image",
+      "x": 0,
+      "y": 0,
+      "image": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACW0lEQVR42u2bLXaDQBDHJ33ICg5SkSNURERUICoic4TKHKGyR6iMqEBUVCByBEQPsqKS91KTDTBhP9mFzeM/DkJ4szO/+dgPVkR0pgVLFvPlxzzMe3Yino4PtHBZxQgB7vntqexd/zwXg/8zPReDBBAQkgCT57lID9s+F4MEEOBDgKj1sary6OPTS+/67/dbe9+WmHxdgIBJ+gDued/YzrKs9z553TSNVQ5Q6eVDAggYsqTJ4r4iY5uTJK9VsT+285QkDhGCKkBEZ5PnpQVts71tjjB1gq7vUempIwEEiLo8u8a8r+djia/++boAAVmMjB+rioQiT+on6hIErI65/2xQNX8PnSNM1WcMcSBgDAFTV4cYuWXxBNyVAbanMjhlyAEhc0Dsur34EJidALkaG2rHJ6T46oa5gIt1XX+bQrjHXUlADtDlAO7dY357r/nczIvwvnIiBAS45IDuWuFOSO9XF8+/ExHR11s16wAkgdn+cLmzudEdBIypAnIFtbU0JeF5Ka0eh76eF72RA3wIGFpf55Z+/dikNRIFmaa9AhBgO/u6enyf9oBaPStUAbTCMAAMAAOM6gOIiGhd3PUA0Qe4EMCt1SWBd4KpCu8E+Vg4CSDANm54J5jKbLCVw2AnaNqbAAGmDCqXALNrNehbem4SOJlyjdD2VCtWhYdWhXVxw09bprYqrPI8+gAXAkxEdK3Z3SeYYs9waK/CpCNygC6EupbzOXEpaNwXG77ie7KdkwICVL2/LpOmdFZYNX9R6cifQxUQdel9RojH/hxVwLbjQxVQEUAL/3z+H5OIJ2iGrWalAAAAAElFTkSuQmCC",
+      "id": "suhi8u"
+    },
+    {
+      "type": "datetime",
+      "x": 15,
+      "y": 44,
+      "content": "H:i",
+      "font": "square",
+      "fgColor": 41088,
+      "bgColor": 64776,
+      "id": "luxs89"
+    },
+    {
+      "type": "datetime",
+      "x": 23,
+      "y": 60,
+      "content": "m/d",
+      "font": "picopixel",
+      "fgColor": 64776,
+      "bgColor": 41088,
+      "id": "mthjm5"
+    }
+  ],
+  "sprites": [],
+  "loop": []
+}

@@ -1,0 +1,68 @@
+{
+  "name": "Star Wars v2",
+  "version": 1,
+  "author": "xe1e",
+  "bgColor": 0,
+  "thumbnail": "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",
+  "delay": 500,
+  "setup": [
+    {
+      "type": "datetime",
+      "x": 12,
+      "y": 47,
+      "content": "H:i:s",
+      "font": "medium",
+      "fgColor": 65282,
+      "bgColor": 0,
+      "id": "4siupy"
+    },
+    {
+      "type": "line",
+      "x": 6,
+      "y": 35,
+      "x1": 56,
+      "y1": 35,
+      "color": 29582,
+      "id": "6t47x1"
+    },
+    {
+      "type": "line",
+      "x": 6,
+      "y": 50,
+      "x1": 56,
+      "y1": 50,
+      "color": 29582,
+      "id": "enfj0x"
+    }
+  ],
+  "sprites": [
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAADwAAAAaCAIAAABka6gOAAAB7UlEQVRYw7VYUW7DMAgl1NL+sxPs/oequgPsP5Ni78OJg2x4kDSzosZxKGDAj9dOpZTpMZE2ludMV8fH14+lob4iIspE7Fs55InKWr1l/Vpe8/Kat0cyxazv9hpUtUI45MZ+8bGj3Mf42CK/FW+8ciFj6ZiyqR1nOVJFy3OOuCtVmfK5Op39WHYqOkdHA3gnYA8ttKbMVh7sb/p4zGQFAKRCasAhr+5iMVYNq5W0PXJIU2ho+2yXcrpyM5V1w53fAMJwlupcfh7rHNIz4kFaXnP8IMeRu1lSs9xUlbX8fn9atV7FRqPpAgzdOKbHNBZh5/cY/uTUHJ9pkEOHc7FSBXIXH6HT3Nt2csJKeCysBMXWXlnmUvx4Yag+BdLuilXNW1F1B1FFifji2e1Z4XTiKOlIYyfd4khrgpSolIIpUa+BTJIkv8Jjr3LTJw8KpkQW6TXTxeS2Q7OPYdCJ1nE2u7Ss1zFSrsV0ioVJ7f9IifziHpi4WqbjHNc9mLcLCIR/BNhE+caWqVIiyYcw5ylrISKuN4vT6UQvTol2M6HsM+Jq8mSneouToRE3MCXq2EWQEuHenu6idfHhUiKX4SQJT02dGhtQG7dTIq+KNJTAcGFCDZ1AFdz2AHwRUxL/gJiR8ylOFn7fQYn01O1U+Q8sffOJdjixlAAAAABJRU5ErkJggg=="
+      },
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAADwAAAAaCAIAAABka6gOAAAB9ElEQVRYw71XUW7DMAi1XUv7T0+w+x+qSg+w/1Rq2Yc7ygw8SBctslrHIRgeGF4qEdVTLda1XZby7vXx+eVpGI9KKXSneqrhLizPr5TS7LGty7Yuz9viinnvzhpMtUI4ZcbPaNKJCeOXi+1PeOOVNyLWeTYlidSOo5zJou2yZMyVqjx5ulMXibIDs8lQvQH2BPjA0Hoy9VSbxth0mm9lFk0AgFBIDRjyYS4Wa+bGZiaNWy8mYaySfvLQp4vlm3xTbjzZDUoYjtKYy19eD/2cIGf5fruek6bIEOfrhhllVkV3ul3PXq4PMb1pf6MMHXjp5qLt1vB3pPLxK+dDmHWHC2ulWcjD+giNbvPeWBfnHIBKqvJQ4Efedj1/vHCp3lWkwxUvm5/obOsSts384l73PDgDHCUdYXYyLWpak6RERIQp0aSB5fErTfeqMHzyoGBKlGQHrJ/PMT48LQxZsiBqV82GPzJV5qtGKtyx72JhUnt42jyYQ0qUSG7FxM001XOc92DOAwhkPwIAUT6wZZqUSPIhzHmGzIswmZzOXMxTIkBltZ6pN5mQDZk+/vJkSNcNTIl0Y89QItzb+1G0Ln+FlChkOJ1ng6PqAqQX/4ESRVlkVQlcLryDr/sfqCq47YHyVVqZP2xN5MIeOTQAJXspkRk6tvMbjCseYLehOjIAAAAASUVORK5CYII="
+      }
+    ]
+  ],
+  "loop": [
+    {
+      "type": "sprite",
+      "x": 2,
+      "y": 6,
+      "sprite": 0,
+      "frameDelay": 100,
+      "id": "vftcy1"
+    },
+    {
+      "type": "datetime",
+      "x": 10,
+      "y": 60,
+      "content": "l j",
+      "font": "medium",
+      "fgColor": 63141,
+      "bgColor": 0,
+      "id": "wck4q5"
+    }
+  ]
+}

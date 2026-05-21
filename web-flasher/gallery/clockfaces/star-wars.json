@@ -1,0 +1,45 @@
+{
+  "name": "Star Wars",
+  "version": 1,
+  "author": "@jnthas",
+  "bgColor": 0,
+  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFAUlEQVR4AeyYTZbbRgyEKWfhLPN8ASc31BF8BN0wyQX8sowXsYKvxWoWwebfSJ6xLc5jEUChgO4GKY0977on/zkG8OQvQHe8Accb8OQTqB+Ba/zEB+K6hC9/f7g+Elprqac0xXZd2d+SPudK3btbHX4cs/TQc68DOP1yEte0X/78UPj3f3zuCj72VvFOW5rFbdLX+kS6Ux4/DlAMt7IH07ZidKP6IPI56wAiN1xfBxdPTViEuKBdWVJ7b6O+VjzHm2TRVb323xK3j9Fg1UxNaDoHabBbNOgE9PK3Wmocq3X2gMdHtcRqkxAwlIygJ1fWKGbTE3GD2KJTT8pX9XZqc6N0HAUxXLkpC464teHN5OmjVehHjBVHLH/JUgPQbK1BO39k27AaagEKhcrNd7pJ1/I31fLd9uRC9udQTnsjV7hG/bCtnBwypVZN1BSyxcFvgfdBrzhbcqDwaU/wcyj6SGqP4Xb+W6TEcast4/dn+ZVD4RxCP7lGC0yyy4TX4meoGl7+9b+r3GrZbw16RzXkWuhl45lQtAUqfgubf49rDxxSvmzrLHDKY+sbQLCK/DGJgtbCQbevvj7XEM/BG6Hx2H0OtpR3rfv7BmBqFgM0Y3HsKqw+1xBneD9yHrd8NOwJtPItzrbUrX4H0FhQMxaVLysNVly25ISc81ga7BZe+0E/B+8zGoAn8GkG8DPgQV4EHTzAB0sadGBOB++gF/oMacjL32JHA/CmFHuznFPeeXx4oFq4DM/j+zd71uYYvXrjF6TvllyT41LT3+oAEHljYjTOEQstHk516NwnFjI/980uvVvVslbl4xSKla+5FSdKVxSRzk1zHJLVSxucCPunN+GDoMYRVLm0PrlC9DfxfbjJTAaQm27qEiKvcz9Ss1fRTXYwlnMoAFv0OBuBvgUvHy2vhSTIsXjZnPfYfTZBjJ2rFZ8tNQCeHlghx9IpL4suQ7nRAES6pVCxL+C88o+2rOFQf/YBX+L+I6SYXOHj1uL8Czckwz+FPeFNEAFxsnCCc+6TV5wtOSDe14efg/Q1b4+wdWBx0ucv3FquRC5Q4Zr1uuwTO9QLTr7WV4ydHDZI1ZBrISSTixq0k0QQdQDhr140WhU9WNDaOPtYw+I2+o8NmukA+qQv7D5FHs/50pFvgbxAXn62HHQpn/WteFJvpza3Lw2GRfuoGnGyNRGOc+5H6vYndP35uv9TOryQ9eLdouEQwPk9Pj1a+jjuQOcvIhYEg2Lw4MHA3Dw44cbEvX+rhq/c8X+8QlEv1WIrGY4OAL8HaFXbaR/RT9cwgK/diZ8QncD7j59PDjjBefw5vua6rvRc06HPUA0257bG1Bb4PrrbzzCAW/x092MAT/fI04GPNyAN5OnC4w14ukeeDrz5DTifz5/O5/P1B8KndNZmuHkAl8vl0+VyOf1AeOwAmuP7CcjNb8BPcNbmEY4BNMfyROTxBjzqYf/7129XwXuKa1nXue/aOd41+NLttccbsHdiWc/0QeZz/Ovv/5wEz1EL4LAA/7VwvAH3Trr1VFs9ebKC573efdfIV96tci+1xxvw0sntrXvkU9u79pL+zd+A1sdiacOPzt09gNYBljhyc4cgBzxPDJx7pH/3AO7djD4a9/Z5af2bD+ClG39U3d0D0BNsWTbZ4sWRd4hvWde5L61ze/y7B7Bnse9Rewzge3wqr7mn4w14zWl/i7Xu7fk/AAAA///ebDdMAAAABklEQVQDAJBV373SJXBwAAAAAElFTkSuQmCC",
+  "delay": 500,
+  "setup": [
+    {
+      "type": "datetime",
+      "content": "H:i",
+      "font": "square",
+      "fgColor": 65282,
+      "bgColor": 0,
+      "x": 16,
+      "y": 53
+    },
+    {
+      "type": "line",
+      "color": 29582,
+      "x": 10,
+      "y": 40,
+      "x1": 54,
+      "y1": 40
+    }
+  ],
+  "sprites": [
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAADwAAAAaCAIAAABka6gOAAAB7UlEQVRYw7VYUW7DMAgl1NL+sxPs/oequgPsP5Ni78OJg2x4kDSzosZxKGDAj9dOpZTpMZE2ludMV8fH14+lob4iIspE7Fs55InKWr1l/Vpe8/Kat0cyxazv9hpUtUI45MZ+8bGj3Mf42CK/FW+8ciFj6ZiyqR1nOVJFy3OOuCtVmfK5Op39WHYqOkdHA3gnYA8ttKbMVh7sb/p4zGQFAKRCasAhr+5iMVYNq5W0PXJIU2ho+2yXcrpyM5V1w53fAMJwlupcfh7rHNIz4kFaXnP8IMeRu1lSs9xUlbX8fn9atV7FRqPpAgzdOKbHNBZh5/cY/uTUHJ9pkEOHc7FSBXIXH6HT3Nt2csJKeCysBMXWXlnmUvx4Yag+BdLuilXNW1F1B1FFifji2e1Z4XTiKOlIYyfd4khrgpSolIIpUa+BTJIkv8Jjr3LTJw8KpkQW6TXTxeS2Q7OPYdCJ1nE2u7Ss1zFSrsV0ioVJ7f9IifziHpi4WqbjHNc9mLcLCIR/BNhE+caWqVIiyYcw5ylrISKuN4vT6UQvTol2M6HsM+Jq8mSneouToRE3MCXq2EWQEuHenu6idfHhUiKX4SQJT02dGhtQG7dTIq+KNJTAcGFCDZ1AFdz2AHwRUxL/gJiR8ylOFn7fQYn01O1U+Q8sffOJdjixlAAAAABJRU5ErkJggg=="
+      },
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAADwAAAAaCAIAAABka6gOAAAB9ElEQVRYw71XUW7DMAi1XUv7T0+w+x+qSg+w/1Rq2Yc7ygw8SBctslrHIRgeGF4qEdVTLda1XZby7vXx+eVpGI9KKXSneqrhLizPr5TS7LGty7Yuz9viinnvzhpMtUI4ZcbPaNKJCeOXi+1PeOOVNyLWeTYlidSOo5zJou2yZMyVqjx5ulMXibIDs8lQvQH2BPjA0Hoy9VSbxth0mm9lFk0AgFBIDRjyYS4Wa+bGZiaNWy8mYaySfvLQp4vlm3xTbjzZDUoYjtKYy19eD/2cIGf5fruek6bIEOfrhhllVkV3ul3PXq4PMb1pf6MMHXjp5qLt1vB3pPLxK+dDmHWHC2ulWcjD+giNbvPeWBfnHIBKqvJQ4Efedj1/vHCp3lWkwxUvm5/obOsSts384l73PDgDHCUdYXYyLWpak6RERIQp0aSB5fErTfeqMHzyoGBKlGQHrJ/PMT48LQxZsiBqV82GPzJV5qtGKtyx72JhUnt42jyYQ0qUSG7FxM001XOc92DOAwhkPwIAUT6wZZqUSPIhzHmGzIswmZzOXMxTIkBltZ6pN5mQDZk+/vJkSNcNTIl0Y89QItzb+1G0Ln+FlChkOJ1ng6PqAqQX/4ESRVlkVQlcLryDr/sfqCq47YHyVVqZP2xN5MIeOTQAJXspkRk6tvMbjCseYLehOjIAAAAASUVORK5CYII="
+      }
+    ]
+  ],
+  "loop": [
+    {
+      "type": "sprite",
+      "sprite": 0,
+      "x": 2,
+      "y": 6
+    }
+  ]
+}

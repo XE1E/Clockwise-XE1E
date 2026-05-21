@@ -1,0 +1,51 @@
+{
+  "name": "Goomba Moving",
+  "version": 1,
+  "author": "Raspfarbend HR",
+  "bgColor": 0,
+  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACV0lEQVR4AexYy2nDQBBd2x2kEoPcgmtxwCknh7iTQBrwwYJAmsgpLSh6hjXD6jM7ml3hlSbwsp/5v53Bxlu38r/sBHxVVaNB7vfJSgAKz12A1n9WArTJzWGfhIDPw775vV4brIDfz1GANkYSAvbvH488ds3O/ZzPDuvjUrHBGFEoXPWaJiHg++317jxV0XdnM/1LQsBMuWYJYwRoacV8ovUx91pfMfaIRxFjM6aj6gAkMua8BJmKgBIK5HI0AjiGli6f1AGYfeAZyEEeHlPyEROAYFMCPYtNmIeYgNBB6ecoAvDqHij4WNduCJDnxFBc3Psc/RqTB0sAnMU4KlWHJaDUwmLzNgL6mELbewzIXSu/4+92cxSYRYo+e8kd9YU9jYW9zwNr6Le9ayhCOc6dDoABBGtBh4C1FO7rNAI8E7lWzK0GufLyfq0DPBNrXa0D8PL46PPAOSXwWU3Rxrl/fxhaqS72KXNpY3a+F2xxmTJIab4WPwLcgxgBHENSOeaWQmof6lNf2Idy7dk6QMtg6fbWAdoXrE8nJwEXT+ILupw/Tm4dwDG0dLl1QOoXri4XlxOp8m1/o9jA1xYbClwuFX112ggs9bVj61J3QDjvsYGn6k2Nh/bvi9khAIoS9Dmd8y4216GcOgQMKZZyL83TCJAy9mz6VVU1Y+DytQ7gGFq63DpA+sLhvB3b3wMopP44feq7b8/Zh/mG+tYBISNrO1sHpH7xcE6l/rX20njWAVLGlqZvHSB90bquNxScfTjTL4fDZgycP6mc5op9aG8dEDJS2lmb7z8AAAD//+REVnYAAAAGSURBVAMAr8f+kE26vY8AAAAASUVORK5CYII=",
+  "delay": 750,
+  "setup": [
+    {
+      "type": "datetime",
+      "x": 17,
+      "y": 8,
+      "content": "H:i",
+      "font": "",
+      "fgColor": 61017,
+      "bgColor": 47526,
+      "id": "q0xye4"
+    },
+    {
+      "type": "image",
+      "x": 0,
+      "y": 1,
+      "image": "iVBORw0KGgoAAAANSUhEUgAAAD8AAAAtBAMAAADrb658AAAAD1BMVEUAAAAAAAAzMzO7MzPuzMzoiG0XAAAAAXRSTlMAQObYZgAAAHNJREFUOMvF02EKgCAMhuGBJxhdxPiusPufqcxk03AQ5Hp/aT6CEhKZcEeT0nIAk7t/GcCQu/8f8FgHsnuHtyBhZ2a7ek43Q7Aa1CuKKGEWMQdFJNBiQfvRBdTPOroIIkGpH0WDScFATN0TdUCmL4EMtRMcr3fQu8T3wz8AAAAASUVORK5CYII=",
+      "id": "omm0ni",
+      "comment": "head"
+    }
+  ],
+  "sprites": [
+    [
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAATBAMAAADSXRa0AAAAD1BMVEUAAAAAAAAzMzO7MzPuzMzoiG0XAAAAAXRSTlMAQObYZgAAAC9JREFUKM9jYIACFzTAgA4GQIESENBXAYiLKgkB9FYAU6KkNDAKYEoQLIyQJFsBAHweTIEqrbs+AAAAAElFTkSuQmCC",
+        "id": "b4qrs6",
+        "comment": "feet left"
+      },
+      {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAATBAMAAADSXRa0AAAAD1BMVEUAAAAAAAAzMzO7MzPuzMzoiG0XAAAAAXRSTlMAQObYZgAAADBJREFUKM9jYIACFzTAgA5orEAJCAZWgRIcIKRBvIFRAFMCYdNTAbISBA8jJMlWAAAbjUyBg5ad1QAAAABJRU5ErkJggg==",
+        "id": "1r6e1n",
+        "comment": "feet right"
+      }
+    ]
+  ],
+  "loop": [
+    {
+      "type": "sprite",
+      "x": 0,
+      "y": 45,
+      "sprite": 0,
+      "id": "nz0r0e"
+    }
+  ]
+}
