@@ -154,6 +154,8 @@ void displaySetup(bool swapBlueGreen, uint8_t displayBright, uint8_t displayRota
 | OE | 2 | Output Enable |
 | GND | GND | Tierra |
 
+![ESP32-S3-DevKitC-1 Pinout](ESP32-S3-DevKit-C.png)
+
 ### Diagrama de conexión
 
 <table>
