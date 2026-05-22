@@ -3,7 +3,7 @@
   "version": 1,
   "author": "XE1E",
   "bgColor": 0,
-  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADbElEQVR4AeyaW27VQBBESQRSsguWwydLypL4ZDnsIpFACjofNSp35uHHXNvxHaRSP6qnu6c8AhTl8cud//kgwPdfP95ziDrlamLOzzjnefnOuy/+VnYiAINLg+BAid+Sr/WFA1v6184mAeKQPz9/PwjeINbBqS5auBZiP+/hZ2Odc1v8JIA3YYla7FxP/4i5WQFyl2I5IcffKqeZ2FvMyArAc3O0Bnut/NaZHK+zsrma3rkkQE1hLYTtvcBRc3WPJAAJlnGQi8iJ4Gfkx3O1WGdkc7W5ubm6pbmJAPGwFsJG7pYx84RbzqF3EgCFBYi9oJnYvWb6nCQAiouIy8RYdT3sUXO1exJACVkuLSiH9YWJgeqihVsK7+Fnc3OdX+tPBGAIKDWrcaUzc/L0BaXaGlc6Mzc/EUCHGJiDeGyOjznqBOeUi9Zr3I91PeOsAD0HnK1X3GcIEBVZGr/9e3ufc2Zu3ZxePWs2v4Cnr08PPRfau1cSIH6hXEwO+JK5mBxQnXwsUB5LLBDvjSRAbTAL8qUF4lw9edVgianDl5VPDE8sEJPfE7MEYCGWE1iYXA+oJ7Zn37m7JQEYzhIcxBLjC8SCcj2semJ79FvaIwmw5CACLamfW3urvrX5EwH4CiyB9UPE5AVi5+f4nNF51XsOjljcXnYiAENLS5AXqBPI5Xxyziku5WKe+j3wQYA9hp5pxhDgTF/jiF3GCzhC9TPNvPwLaIk9BGgpdHV+vICrf+HW/cYLaCl0dX68gKt/4db9xgtoKXR1fryAq3/h1v3GC2gpdHV+vIDXv68v/Ej6Kmjdg/v6q358/vb8wo+k7wXcdyKAB/foj78D7vGr+50nL4Df0XOSWPC8+/CK8QXlsMrJkjsLkgAs50sR+6+qETsfffhcfcxTE88eGScB1iymyx15ga2zkwBbG9XOI5Tgdfyb7fERflEAXoSWxhL7grmc8/I55+CcuDU2ikYM1vTiTFEAFu25OMNa0EXcyuesfLf6Dxz8GhQFqDWTOLWaXhwX1IXpSQzkwwHiNVglwJJBiFWrZ3lADReTTxwhXjWy5GPt3DgJoEVlef74AjFNieUTC+TgBGI4rHJYYvKAxQVi4DG+clhADkSfeA2SACwmqJFirOfkR0ud4JxyWM+fwU8CnGGZI3b49AJsFe0/AAAA//+kS/t0AAAABklEQVQDAKXZzK4YrppLAAAAAElFTkSuQmCC",
+  "thumbnail": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADK0lEQVR4AeyaS24cMQxEG4MsfIwcJ8scyMgi8IGyzHFyDC8C2PMGKIFDaySx3R+3WoYLJIuURJY0NmD4Mk3T25mBANf5z/s9BNDdf//zY/LwOcVY1eIDxdbCA8t5n/yeuL0AmqKJfz//TgKxePwSbF1pvXLWlvbdIncToPUgO2huDYPl+K/MhQSIDIIYILJmj9qwALVXUBqCtUKpbstcSADdKEPMaZL1wpz1a6wJCUADDIDtBWEBWgfnlYDW+r3qZgnw6BUcYWAv9E0ADcQAAoXi8UuwdaX1yllb2neL3E0ADmIID3ggHl/wnGJrfa3NyVfNXjYJsFcDe597OgG84EMAr8jW8ev/13Sk9RO5svOlXsDTt6eVx/24fRLAq+9jLYUX4KxPLIjHipOFE8Rh4bACsSBuaZsEaNmYZrglwcb42gNfNVjiRznx3rKGtQKxr1kiDgkQOZCGBYaIrN2ydjUBGFrYcqDoWUkAmtWNYaMbleqX3q90VjSXBGAhIgjEc8EeDC0Qay988Vhi5ayFJy8otjVL+HcC1DakCVtjY+tTQywQW4jHet7H1AB4WfylkARA6aU2PdI+SQDURQSB+EiDzO01CcAGDC0QnwF3ApxhYD/jEMAr0ltcm2e8gJpCvefHC+j9hmvzjRdQU6j3/HgBvd9wbb7xAmoK9Z4fL6D3G67NN15ATaHe85fnX8+T/gx2Jsvc0/Xr8vL7ZdKfwXqwrTMw93X+afwMQIUzY7yAM98+s9+9gEf/vwdPcQ42hy/YWnGyNpfz7W+jXH5JLglAc/rfPSwxB8nil0Ad6wRi6rHiZOFL4Cc5eVn8tZAEoLncIY94ajUc/lGRBFhzAIQS5pzDR8Kuy8VwwNa1+FkBaLZ082zcUkMd+1iwDn4pMDQfFYE4svcHAWiQhiOb7F3L0AJCRPq5E6B1+Na6SCPUMgQ2CoYWomuTAGsNxb7Rpkr1NZFqeb93EoAEzVqI8zb3EYGza4lZh83x5Dy4RQYA+MrjwwF88VhieIEYvhVJABr1YBPLKcbm4GtV84hX3loGAJbDhwPysQK8IK7VJgFaF/RWd3gBPnsh7wAAAP//NR77lQAAAAZJREFUAwAXM9dfaCxAPAAAAABJRU5ErkJggg==",
   "delay": 250,
   "setup": [
     {
@@ -11,7 +11,7 @@
       "x": 1,
       "y": 13,
       "content": "Hw",
-      "font": "bold",
+      "font": "8x13B",
       "fgColor": 9609,
       "bgColor": 0,
       "id": "gywdg9"
@@ -29,9 +29,9 @@
     {
       "type": "line",
       "x": 0,
-      "y": 47,
-      "x1": 60,
-      "y1": 47,
+      "y": 46,
+      "x1": 62,
+      "y1": 46,
       "color": 65535,
       "id": "xvm5uz"
     },
@@ -50,10 +50,10 @@
   "loop": [
     {
       "type": "datetime",
-      "x": 31,
-      "y": 59,
-      "content": "l",
-      "font": "picopixel",
+      "x": 34,
+      "y": 60,
+      "content": "D",
+      "font": "medium",
       "fgColor": 65535,
       "bgColor": 0,
       "id": "i77lup"

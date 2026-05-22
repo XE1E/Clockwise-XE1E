@@ -180,19 +180,21 @@ class ClockfaceEditor {
 
             const reader = new FileReader();
             reader.onload = (event) => {
+                this.referenceImage.onload = () => {
+                    refContainer.classList.remove('hidden');
+                    this.referenceImage.style.opacity = opacitySlider.value / 100;
+                    this.refState = { scaleX: 100, scaleY: 100, x: 0, y: 0 };
+                    scaleXSlider.value = 100;
+                    scaleXVal.textContent = '100%';
+                    scaleYSlider.value = 100;
+                    scaleYVal.textContent = '100%';
+                    posX.value = 0;
+                    posY.value = 0;
+                    this.updateReferenceTransform();
+                    referenceOptions.style.display = 'flex';
+                    this.updateReferencePosition();
+                };
                 this.referenceImage.src = event.target.result;
-                refContainer.classList.remove('hidden');
-                this.referenceImage.style.opacity = opacitySlider.value / 100;
-                this.refState = { scaleX: 100, scaleY: 100, x: 0, y: 0 };
-                scaleXSlider.value = 100;
-                scaleXVal.textContent = '100%';
-                scaleYSlider.value = 100;
-                scaleYVal.textContent = '100%';
-                posX.value = 0;
-                posY.value = 0;
-                this.updateReferenceTransform();
-                referenceOptions.style.display = 'flex';
-                this.updateReferencePosition();
             };
             reader.readAsDataURL(file);
         });
@@ -287,20 +289,19 @@ class ClockfaceEditor {
         const scaleX = this.refState.scaleX / 100;
         const scaleY = this.refState.scaleY / 100;
         const baseSize = 64 * this.zoom;
-        const scaledW = baseSize * scaleX;
-        const scaledH = baseSize * scaleY;
         const offsetX = this.refState.x * this.zoom;
         const offsetY = this.refState.y * this.zoom;
 
         const refContainer = document.getElementById('reference-container');
-        refContainer.style.width = `${scaledW}px`;
-        refContainer.style.height = `${scaledH}px`;
+
+        // Set base size on image
+        this.referenceImage.style.width = `${baseSize}px`;
+        this.referenceImage.style.height = `${baseSize}px`;
+
+        // Use transform for scaling
+        refContainer.style.transform = `scale(${scaleX}, ${scaleY})`;
         refContainer.style.left = `${offsetX}px`;
         refContainer.style.top = `${offsetY}px`;
-
-        // Set image size directly to match container
-        this.referenceImage.style.width = `${scaledW}px`;
-        this.referenceImage.style.height = `${scaledH}px`;
     }
 
     clearReferenceImage() {

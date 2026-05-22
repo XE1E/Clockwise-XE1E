@@ -154,6 +154,7 @@ body {
     position: absolute;
     top: 0; left: 0;
     z-index: 2;
+    transform-origin: top left;
 }
 
 .reference-container.hidden { display: none; }
@@ -161,10 +162,7 @@ body {
 .reference-container.above { z-index: 20; }
 
 .reference-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    object-fit: fill;
+    display: block;
     image-rendering: pixelated;
     pointer-events: none;
     opacity: 0.5;
