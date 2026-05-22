@@ -156,6 +156,8 @@ void displaySetup(bool swapBlueGreen, uint8_t displayBright, uint8_t displayRota
 
 ![ESP32-S3-DevKitC-1 Pinout](ESP32-S3-DevKit-C.png)
 
+![ESP32-S3-DevKitC-1 IPEX N16R8](ESP32-S3-DevKit-C-Ipex.png)
+
 ### Diagrama de conexión
 
 <table>
