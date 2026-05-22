@@ -527,6 +527,36 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
 const $=id=>document.getElementById(id);
 let settings={},storedClockfaces=[],thumbCache={},canvasChanged=false;
 
+// Native clockfaces (built into firmware)
+const nativeClockfaces=[
+    {name:'_pacman',displayName:'Pac-Man',native:true,size:0}
+];
+
+// Draw native clockface thumbnails
+function drawNativeThumb(canvas,name){
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#000';
+    ctx.fillRect(0,0,64,64);
+    if(name==='_pacman'){
+        // Draw Pac-Man icon
+        ctx.fillStyle='#0016';
+        ctx.fillRect(1,1,62,62);
+        ctx.fillStyle='#FE40';
+        ctx.beginPath();
+        ctx.arc(32,32,20,0.2*Math.PI,1.8*Math.PI);
+        ctx.lineTo(32,32);
+        ctx.fill();
+        // Food dots
+        ctx.fillStyle='#B58C';
+        ctx.fillRect(8,30,4,4);
+        ctx.fillRect(52,30,4,4);
+        // Time placeholder
+        ctx.fillStyle='#FE40';
+        ctx.font='bold 10px monospace';
+        ctx.fillText('12:00',16,58);
+    }
+}
+
 // Theme (dark by default)
 function toggleTheme(){
 const d=document.documentElement,dark=d.getAttribute('data-theme')==='dark';
@@ -643,7 +673,9 @@ async function loadStoredClockfaces(){
         const r=await fetch('/api/clockfaces/list',{signal:controller.signal});
         clearTimeout(tid);
         if(!r.ok)throw new Error('HTTP '+r.status);
-        storedClockfaces=await r.json();
+        const spiffsClockfaces=await r.json();
+        // Combine native clockfaces with SPIFFS clockfaces
+        storedClockfaces=[...nativeClockfaces,...spiffsClockfaces];
         renderClockfaceGrid();
         buildNightClockSelect();
         loadThumbsSequential();
@@ -698,21 +730,29 @@ function renderClockfaceGrid(){
         const cf=storedClockfaces.find(c=>c.name===name)||{name,size:0};
         const isSelected=validSelected.includes(name);
         const orderNum=isSelected?validSelected.indexOf(name)+1:0;
-        return '<div class="clockface-item'+(isSelected?' selected':'')+'" data-name="'+name+'">'
+        const isNative=cf.native||false;
+        const displayName=cf.displayName||name;
+        return '<div class="clockface-item'+(isSelected?' selected':'')+(isNative?' native':'')+'" data-name="'+name+'">'
             +(orderNum?'<span class="order-num">'+orderNum+'</span>':'')
-            +'<button class="delete-btn" onclick="event.stopPropagation();deleteClockface(\''+name+'\')">×</button>'
+            +(isNative?'':'<button class="delete-btn" onclick="event.stopPropagation();deleteClockface(\''+name+'\')">×</button>')
             +'<canvas width="64" height="64"></canvas>'
-            +'<div class="name">'+name+'</div>'
-            +'<div class="size">'+Math.round(cf.size/1024)+'KB</div>'
+            +'<div class="name">'+displayName+'</div>'
+            +(isNative?'<div class="size">Nativo</div>':'<div class="size">'+Math.round(cf.size/1024)+'KB</div>')
             +'</div>';
     }).join('');
 
     cont.querySelectorAll('.clockface-item').forEach(el=>{
         const name=el.dataset.name;
         const canvas=el.querySelector('canvas');
+        const cf=storedClockfaces.find(c=>c.name===name);
 
-        if(thumbCache[name])drawThumb(canvas,thumbCache[name]);
-        else thumbQueue.push({name,canvas});
+        if(cf&&cf.native){
+            drawNativeThumb(canvas,name);
+        }else if(thumbCache[name]){
+            drawThumb(canvas,thumbCache[name]);
+        }else{
+            thumbQueue.push({name,canvas});
+        }
 
         el.onclick=e=>{if(!e.target.classList.contains('delete-btn'))toggleClockfaceSelect(name);};
 
@@ -926,9 +966,14 @@ function updateNightThumb(){
     const thumbEl=$('nightThumb');
     const builtinEl=$('nightPreviewBuiltin');
     if(!thumbEl||!builtinEl)return;
+    const cf=storedClockfaces.find(c=>c.name===sel);
     if(sel==='_builtin'){
         thumbEl.style.display='none';
         builtinEl.style.display='flex';
+    }else if(cf&&cf.native){
+        builtinEl.style.display='none';
+        thumbEl.style.display='block';
+        drawNativeThumb(thumbEl,sel);
     }else{
         builtinEl.style.display='none';
         if(thumbCache[sel]){
@@ -960,7 +1005,8 @@ function buildNightClockSelect(){
     const current=$('nightClock').value||'_builtin';
     let html='<option value="_builtin">Reloj Nocturno (integrado)</option>';
     storedClockfaces.forEach(c=>{
-        html+='<option value="'+c.name+'"'+(c.name===current?' selected':'')+'>'+c.name+'</option>';
+        const displayName=c.displayName||c.name;
+        html+='<option value="'+c.name+'"'+(c.name===current?' selected':'')+'>'+displayName+'</option>';
     });
     sel.innerHTML=html;
     if(current!=='_builtin'&&!storedClockfaces.some(c=>c.name===current)){
