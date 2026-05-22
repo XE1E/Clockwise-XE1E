@@ -796,9 +796,17 @@ body {
     background: var(--bg-dark);
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    max-height: 340px;
+    max-height: 280px;
     overflow-y: auto;
 }
+
+.sprite-list-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.sprite-list-actions .btn { flex: 1; font-size: 11px; }
 
 .sprite-item {
     display: flex;

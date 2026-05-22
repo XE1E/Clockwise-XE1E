@@ -958,6 +958,17 @@ class ClockfaceEditor {
             this.selectSpriteForEdit(newIndex);
         });
 
+        document.getElementById('btn-export-sprite').addEventListener('click', () => {
+            this.exportSprite();
+        });
+
+        document.getElementById('import-sprite-file').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            await this.importSprite(file);
+            e.target.value = '';
+        });
+
         document.getElementById('add-frame-file').addEventListener('change', async (e) => {
             const files = Array.from(e.target.files);
             if (files.length === 0) return;
@@ -1545,6 +1556,56 @@ class ClockfaceEditor {
             opt.textContent = `Sprite ${index} (${sprite.frames.length} frames)`;
             select.appendChild(opt);
         });
+    }
+
+    exportSprite() {
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+        if (spriteIndex < 0 || !this.clockface.sprites[spriteIndex]) {
+            alert('Selecciona un sprite para exportar');
+            return;
+        }
+
+        const sprite = this.clockface.sprites[spriteIndex];
+        const exportData = {
+            name: `Sprite ${spriteIndex}`,
+            frames: sprite.frames.map(f => ({
+                image: f.image.startsWith('data:') ? f.image.split(',')[1] : f.image
+            }))
+        };
+
+        const json = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sprite-${spriteIndex}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    async importSprite(file) {
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+
+            if (!data.frames || !Array.isArray(data.frames)) {
+                throw new Error('Formato invalido: falta array de frames');
+            }
+
+            const frames = data.frames.map(f => ({
+                image: f.image.startsWith('data:') ? f.image : f.image
+            }));
+
+            const newIndex = this.clockface.addSprite(frames);
+            this.updateSpriteList();
+            this.updateSpriteSelect();
+            this.selectSpriteForEdit(newIndex);
+
+            alert(`Sprite importado con ${frames.length} frames`);
+        } catch (e) {
+            console.error('Error importing sprite:', e);
+            alert('Error al importar sprite: ' + e.message);
+        }
     }
 
     fileToBase64(file) {
