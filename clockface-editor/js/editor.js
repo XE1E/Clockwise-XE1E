@@ -1486,6 +1486,8 @@ class ClockfaceEditor {
         sprite.frames.forEach((frame, frameIndex) => {
             const item = document.createElement('div');
             item.className = 'frame-item';
+            item.draggable = true;
+            item.dataset.frameIndex = frameIndex;
             const imgSrc = frame.image.startsWith('data:') ? frame.image : `data:image/png;base64,${frame.image}`;
             item.innerHTML = `
                 <img src="${imgSrc}" alt="Frame ${frameIndex}">
@@ -1503,6 +1505,39 @@ class ClockfaceEditor {
                 this.updateSpriteList();
                 this.loadSpriteFrames();
             });
+
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', frameIndex);
+                item.classList.add('dragging');
+            });
+
+            item.addEventListener('dragend', () => {
+                item.classList.remove('dragging');
+                document.querySelectorAll('.frame-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+            });
+
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const dragging = list.querySelector('.dragging');
+                if (dragging !== item) {
+                    item.classList.add('drag-over');
+                }
+            });
+
+            item.addEventListener('dragleave', () => {
+                item.classList.remove('drag-over');
+            });
+
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                item.classList.remove('drag-over');
+                const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                const toIndex = frameIndex;
+                if (fromIndex !== toIndex) {
+                    this.reorderFrame(spriteIndex, fromIndex, toIndex);
+                }
+            });
+
             list.appendChild(item);
         });
 
@@ -1514,6 +1549,18 @@ class ClockfaceEditor {
             this.openPixelEditorForNewFrame();
         });
         list.appendChild(addItem);
+    }
+
+    reorderFrame(spriteIndex, fromIndex, toIndex) {
+        const sprite = this.clockface.sprites[spriteIndex];
+        if (!sprite) return;
+
+        const frame = sprite.frames.splice(fromIndex, 1)[0];
+        sprite.frames.splice(toIndex, 0, frame);
+
+        this.updateFramesList();
+        this.updateSpriteList();
+        this.loadSpriteFrames();
     }
 
     openPixelEditorForNewFrame() {

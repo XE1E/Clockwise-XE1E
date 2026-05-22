@@ -953,9 +953,11 @@ body {
 
 .pixel-tools input[type="number"] { width: 50px; padding: 4px; text-align: center; }
 
-/* Frame item clickable */
-.frame-item { cursor: pointer; transition: transform 0.1s, border-color 0.1s; }
+/* Frame item clickable and draggable */
+.frame-item { cursor: pointer; transition: transform 0.1s, border-color 0.1s, opacity 0.1s; }
 .frame-item:hover { transform: scale(1.05); border-color: var(--accent); }
+.frame-item.dragging { opacity: 0.5; cursor: grabbing; }
+.frame-item.drag-over { border-color: var(--highlight); transform: scale(1.1); }
 
 .frame-item-add {
     display: flex;
