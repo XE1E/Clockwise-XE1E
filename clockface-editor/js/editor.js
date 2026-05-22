@@ -297,6 +297,10 @@ class ClockfaceEditor {
         refContainer.style.height = `${scaledH}px`;
         refContainer.style.left = `${offsetX}px`;
         refContainer.style.top = `${offsetY}px`;
+
+        // Ensure image fills container
+        this.referenceImage.style.width = '100%';
+        this.referenceImage.style.height = '100%';
     }
 
     clearReferenceImage() {
