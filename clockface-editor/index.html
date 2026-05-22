@@ -82,7 +82,13 @@
                 <div class="canvas-container">
                     <div class="canvas-wrapper">
                         <div id="canvas-bg" class="canvas-bg"></div>
-                        <img id="reference-image" class="reference-image hidden" alt="Reference">
+                        <div id="reference-container" class="reference-container hidden">
+                            <img id="reference-image" class="reference-image" alt="Reference">
+                            <div class="ref-handle ref-handle-tl" data-handle="tl"></div>
+                            <div class="ref-handle ref-handle-tr" data-handle="tr"></div>
+                            <div class="ref-handle ref-handle-bl" data-handle="bl"></div>
+                            <div class="ref-handle ref-handle-br" data-handle="br"></div>
+                        </div>
                         <canvas id="editor-canvas" width="64" height="64"></canvas>
                         <div class="canvas-grid"></div>
                     </div>

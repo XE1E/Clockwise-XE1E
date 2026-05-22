@@ -132,7 +132,8 @@ class ClockfaceEditor {
 
         document.getElementById('zoom-level').textContent = `${this.zoom}x`;
 
-        if (this.referenceImage && !this.referenceImage.classList.contains('hidden') && this.refState) {
+        const refContainer = document.getElementById('reference-container');
+        if (refContainer && !refContainer.classList.contains('hidden') && this.refState) {
             this.updateReferenceTransform();
         }
     }
@@ -152,13 +153,15 @@ class ClockfaceEditor {
         const referenceOptions = document.getElementById('reference-options');
         const behindCheckbox = document.getElementById('reference-behind');
         const clearBtn = document.getElementById('btn-clear-reference');
+        const refContainer = document.getElementById('reference-container');
 
         // Store reference state
         this.refState = { scaleX: 100, scaleY: 100, x: 0, y: 0 };
+        this.refDragState = { active: false, handle: null, startX: 0, startY: 0, startW: 0, startH: 0 };
 
         openBtn.addEventListener('click', () => {
             popup.style.display = 'flex';
-            if (this.referenceImage.src && !this.referenceImage.classList.contains('hidden')) {
+            if (this.referenceImage.src && !refContainer.classList.contains('hidden')) {
                 referenceOptions.style.display = 'flex';
             }
         });
@@ -178,7 +181,7 @@ class ClockfaceEditor {
             const reader = new FileReader();
             reader.onload = (event) => {
                 this.referenceImage.src = event.target.result;
-                this.referenceImage.classList.remove('hidden');
+                refContainer.classList.remove('hidden');
                 this.referenceImage.style.opacity = opacitySlider.value / 100;
                 this.refState = { scaleX: 100, scaleY: 100, x: 0, y: 0 };
                 scaleXSlider.value = 100;
@@ -227,6 +230,57 @@ class ClockfaceEditor {
         clearBtn.addEventListener('click', () => {
             this.clearReferenceImage();
         });
+
+        // Handle dragging reference image corners
+        document.querySelectorAll('.ref-handle').forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.refDragState.active = true;
+                this.refDragState.handle = handle.dataset.handle;
+                this.refDragState.startX = e.clientX;
+                this.refDragState.startY = e.clientY;
+                this.refDragState.startScaleX = this.refState.scaleX;
+                this.refDragState.startScaleY = this.refState.scaleY;
+            });
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!this.refDragState.active) return;
+
+            const dx = e.clientX - this.refDragState.startX;
+            const dy = e.clientY - this.refDragState.startY;
+            const baseSize = 64 * this.zoom;
+
+            let newScaleX = this.refDragState.startScaleX;
+            let newScaleY = this.refDragState.startScaleY;
+
+            const handle = this.refDragState.handle;
+            if (handle === 'tr' || handle === 'br') {
+                newScaleX = Math.max(10, Math.min(200, this.refDragState.startScaleX + (dx / baseSize) * 100));
+            }
+            if (handle === 'tl' || handle === 'bl') {
+                newScaleX = Math.max(10, Math.min(200, this.refDragState.startScaleX - (dx / baseSize) * 100));
+            }
+            if (handle === 'bl' || handle === 'br') {
+                newScaleY = Math.max(10, Math.min(200, this.refDragState.startScaleY + (dy / baseSize) * 100));
+            }
+            if (handle === 'tl' || handle === 'tr') {
+                newScaleY = Math.max(10, Math.min(200, this.refDragState.startScaleY - (dy / baseSize) * 100));
+            }
+
+            this.refState.scaleX = Math.round(newScaleX);
+            this.refState.scaleY = Math.round(newScaleY);
+            scaleXSlider.value = this.refState.scaleX;
+            scaleXVal.textContent = this.refState.scaleX + '%';
+            scaleYSlider.value = this.refState.scaleY;
+            scaleYVal.textContent = this.refState.scaleY + '%';
+            this.updateReferenceTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+            this.refDragState.active = false;
+        });
     }
 
     updateReferenceTransform() {
@@ -238,23 +292,25 @@ class ClockfaceEditor {
         const offsetX = this.refState.x * this.zoom;
         const offsetY = this.refState.y * this.zoom;
 
-        this.referenceImage.style.width = `${scaledW}px`;
-        this.referenceImage.style.height = `${scaledH}px`;
-        this.referenceImage.style.left = `${offsetX}px`;
-        this.referenceImage.style.top = `${offsetY}px`;
+        const refContainer = document.getElementById('reference-container');
+        refContainer.style.width = `${scaledW}px`;
+        refContainer.style.height = `${scaledH}px`;
+        refContainer.style.left = `${offsetX}px`;
+        refContainer.style.top = `${offsetY}px`;
     }
 
     clearReferenceImage() {
         this.referenceImage.src = '';
-        this.referenceImage.classList.add('hidden');
+        document.getElementById('reference-container').classList.add('hidden');
         document.getElementById('reference-options').style.display = 'none';
         document.getElementById('reference-file').value = '';
     }
 
     updateReferencePosition() {
         const behind = document.getElementById('reference-behind').checked;
-        this.referenceImage.classList.remove('behind', 'above');
-        this.referenceImage.classList.add(behind ? 'behind' : 'above');
+        const refContainer = document.getElementById('reference-container');
+        refContainer.classList.remove('behind', 'above');
+        refContainer.classList.add(behind ? 'behind' : 'above');
     }
 
     bindImageTool() {
