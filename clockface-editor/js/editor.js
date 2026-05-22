@@ -1100,6 +1100,63 @@ class ClockfaceEditor {
         document.getElementById('btn-pixel-replace-frame').addEventListener('click', () => {
             this.replacePixelFrameInSprite();
         });
+
+        document.getElementById('btn-pixel-copy-frame').addEventListener('click', () => {
+            this.copyFrameToPixelEditor();
+        });
+    }
+
+    copyFrameToPixelEditor() {
+        const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
+        if (spriteIndex < 0) return;
+
+        const sprite = this.clockface.sprites[spriteIndex];
+        if (!sprite || !sprite.frames || sprite.frames.length === 0) {
+            alert('No hay frames para copiar');
+            return;
+        }
+
+        const frameIndex = prompt(`Numero de frame a copiar (0-${sprite.frames.length - 1}):`, '0');
+        if (frameIndex === null) return;
+
+        const idx = parseInt(frameIndex);
+        if (isNaN(idx) || idx < 0 || idx >= sprite.frames.length) {
+            alert('Indice invalido');
+            return;
+        }
+
+        const pe = this.pixelEditorState;
+        const frame = sprite.frames[idx];
+        const img = new Image();
+        img.onload = () => {
+            pe.width = img.width;
+            pe.height = img.height;
+            document.getElementById('pixel-canvas-width').value = pe.width;
+            document.getElementById('pixel-canvas-height').value = pe.height;
+            this.resetPixelCanvas();
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            const ctx = tempCanvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            for (let y = 0; y < img.height && y < pe.height; y++) {
+                for (let x = 0; x < img.width && x < pe.width; x++) {
+                    const i = (y * img.width + x) * 4;
+                    const r = imageData.data[i];
+                    const g = imageData.data[i + 1];
+                    const b = imageData.data[i + 2];
+                    const a = imageData.data[i + 3];
+                    if (a > 128) {
+                        pe.pixels[y][x] = `rgb(${r},${g},${b})`;
+                    }
+                }
+            }
+            this.renderPixelCanvas();
+        };
+        img.src = frame.image.startsWith('data:') ? frame.image : `data:image/png;base64,${frame.image}`;
     }
 
     setPixelColor(color) {
@@ -1371,7 +1428,8 @@ class ClockfaceEditor {
                 </div>
                 <button class="sprite-item-delete" title="Eliminar">&times;</button>
             `;
-            item.querySelector('.sprite-item-info').addEventListener('click', () => {
+            item.addEventListener('click', (e) => {
+                if (e.target.classList.contains('sprite-item-delete')) return;
                 this.selectSpriteForEdit(index);
             });
             item.querySelector('.sprite-item-delete').addEventListener('click', (e) => {
@@ -1566,7 +1624,7 @@ class ClockfaceEditor {
         });
     }
 
-    exportSprite() {
+    async exportSprite() {
         const spriteIndex = this.spriteEditorState.selectedSpriteIndex;
         if (spriteIndex < 0 || !this.clockface.sprites[spriteIndex]) {
             alert('Selecciona un sprite para exportar');
@@ -1582,13 +1640,35 @@ class ClockfaceEditor {
         };
 
         const json = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `sprite-${spriteIndex}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
+
+        if ('showSaveFilePicker' in window) {
+            try {
+                const fileHandle = await window.showSaveFilePicker({
+                    suggestedName: `sprite-${spriteIndex}.json`,
+                    types: [{
+                        description: 'JSON Sprite',
+                        accept: { 'application/json': ['.json'] }
+                    }]
+                });
+                const writable = await fileHandle.createWritable();
+                await writable.write(json);
+                await writable.close();
+                alert(`Sprite guardado: ${fileHandle.name}`);
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    console.error('Error saving sprite:', e);
+                    alert('Error al guardar: ' + e.message);
+                }
+            }
+        } else {
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sprite-${spriteIndex}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
     }
 
     async importSprite(file) {
