@@ -143,8 +143,10 @@ class ClockfaceEditor {
         const closeBtn = document.getElementById('btn-close-reference');
         const fileInput = document.getElementById('reference-file');
         const opacitySlider = document.getElementById('reference-opacity');
-        const scaleSlider = document.getElementById('reference-scale');
-        const scaleVal = document.getElementById('reference-scale-val');
+        const scaleXSlider = document.getElementById('reference-scale-x');
+        const scaleXVal = document.getElementById('reference-scale-x-val');
+        const scaleYSlider = document.getElementById('reference-scale-y');
+        const scaleYVal = document.getElementById('reference-scale-y-val');
         const posX = document.getElementById('reference-x');
         const posY = document.getElementById('reference-y');
         const referenceOptions = document.getElementById('reference-options');
@@ -152,7 +154,7 @@ class ClockfaceEditor {
         const clearBtn = document.getElementById('btn-clear-reference');
 
         // Store reference state
-        this.refState = { scale: 100, x: 0, y: 0 };
+        this.refState = { scaleX: 100, scaleY: 100, x: 0, y: 0 };
 
         openBtn.addEventListener('click', () => {
             popup.style.display = 'flex';
@@ -178,9 +180,11 @@ class ClockfaceEditor {
                 this.referenceImage.src = event.target.result;
                 this.referenceImage.classList.remove('hidden');
                 this.referenceImage.style.opacity = opacitySlider.value / 100;
-                this.refState = { scale: 100, x: 0, y: 0 };
-                scaleSlider.value = 100;
-                scaleVal.textContent = '100%';
+                this.refState = { scaleX: 100, scaleY: 100, x: 0, y: 0 };
+                scaleXSlider.value = 100;
+                scaleXVal.textContent = '100%';
+                scaleYSlider.value = 100;
+                scaleYVal.textContent = '100%';
                 posX.value = 0;
                 posY.value = 0;
                 this.updateReferenceTransform();
@@ -194,9 +198,15 @@ class ClockfaceEditor {
             this.referenceImage.style.opacity = e.target.value / 100;
         });
 
-        scaleSlider.addEventListener('input', (e) => {
-            this.refState.scale = parseInt(e.target.value);
-            scaleVal.textContent = this.refState.scale + '%';
+        scaleXSlider.addEventListener('input', (e) => {
+            this.refState.scaleX = parseInt(e.target.value);
+            scaleXVal.textContent = this.refState.scaleX + '%';
+            this.updateReferenceTransform();
+        });
+
+        scaleYSlider.addEventListener('input', (e) => {
+            this.refState.scaleY = parseInt(e.target.value);
+            scaleYVal.textContent = this.refState.scaleY + '%';
             this.updateReferenceTransform();
         });
 
@@ -220,14 +230,16 @@ class ClockfaceEditor {
     }
 
     updateReferenceTransform() {
-        const scale = this.refState.scale / 100;
+        const scaleX = this.refState.scaleX / 100;
+        const scaleY = this.refState.scaleY / 100;
         const baseSize = 64 * this.zoom;
-        const scaledSize = baseSize * scale;
+        const scaledW = baseSize * scaleX;
+        const scaledH = baseSize * scaleY;
         const offsetX = this.refState.x * this.zoom;
         const offsetY = this.refState.y * this.zoom;
 
-        this.referenceImage.style.width = `${scaledSize}px`;
-        this.referenceImage.style.height = `${scaledSize}px`;
+        this.referenceImage.style.width = `${scaledW}px`;
+        this.referenceImage.style.height = `${scaledH}px`;
         this.referenceImage.style.left = `${offsetX}px`;
         this.referenceImage.style.top = `${offsetY}px`;
     }
@@ -2147,21 +2159,23 @@ class ClockfaceEditor {
         const x = Math.max(0, Math.min(63, coords.x));
         const y = Math.max(0, Math.min(63, coords.y));
 
-        if (element.type === 'rect' || element.type === 'fillrect') {
+        if (element.type === 'rect' || element.type === 'fillrect' || element.type === 'image') {
+            const oldW = element.width || 64;
+            const oldH = element.height || 64;
             switch (this.activeHandle) {
                 case 'tl':
-                    element.width = Math.max(1, element.x + element.width - x);
-                    element.height = Math.max(1, element.y + element.height - y);
+                    element.width = Math.max(1, element.x + oldW - x);
+                    element.height = Math.max(1, element.y + oldH - y);
                     element.x = x;
                     element.y = y;
                     break;
                 case 'tr':
                     element.width = Math.max(1, x - element.x);
-                    element.height = Math.max(1, element.y + element.height - y);
+                    element.height = Math.max(1, element.y + oldH - y);
                     element.y = y;
                     break;
                 case 'bl':
-                    element.width = Math.max(1, element.x + element.width - x);
+                    element.width = Math.max(1, element.x + oldW - x);
                     element.height = Math.max(1, y - element.y);
                     element.x = x;
                     break;
@@ -2169,6 +2183,9 @@ class ClockfaceEditor {
                     element.width = Math.max(1, x - element.x);
                     element.height = Math.max(1, y - element.y);
                     break;
+            }
+            if (element.type === 'image') {
+                this.updatePropertiesPanel();
             }
         } else if (element.type === 'circle' || element.type === 'fillcircle') {
             const dx = Math.abs(x - element.x);

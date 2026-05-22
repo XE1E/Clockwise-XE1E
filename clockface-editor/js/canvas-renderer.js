@@ -200,6 +200,15 @@ class CanvasRenderer {
                 handles.push({ type: 'bl', x: element.x, y: element.y + element.height });
                 handles.push({ type: 'br', x: element.x + element.width, y: element.y + element.height });
                 break;
+            case 'image': {
+                const w = element.width || 64;
+                const h = element.height || 64;
+                handles.push({ type: 'tl', x: element.x, y: element.y });
+                handles.push({ type: 'tr', x: element.x + w, y: element.y });
+                handles.push({ type: 'bl', x: element.x, y: element.y + h });
+                handles.push({ type: 'br', x: element.x + w, y: element.y + h });
+                break;
+            }
             case 'circle':
             case 'fillcircle':
                 handles.push({ type: 'top', x: element.x, y: element.y - element.radius });
