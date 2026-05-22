@@ -2362,6 +2362,9 @@ class ClockfaceEditor {
             for (const el of this.clockface.elements) {
                 if (el.type !== 'sprite' || !el.frameImages || el.frameImages.length === 0) continue;
 
+                // Skip animation for sprite being dragged
+                if (this.isDragging && this.selectedId === el.id) continue;
+
                 let state = sas.elementStates.get(el.id);
                 if (!state) {
                     state = {
