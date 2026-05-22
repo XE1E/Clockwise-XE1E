@@ -289,19 +289,23 @@ class ClockfaceEditor {
         const scaleX = this.refState.scaleX / 100;
         const scaleY = this.refState.scaleY / 100;
         const baseSize = 64 * this.zoom;
+        const w = Math.round(baseSize * scaleX);
+        const h = Math.round(baseSize * scaleY);
         const offsetX = this.refState.x * this.zoom;
         const offsetY = this.refState.y * this.zoom;
 
         const refContainer = document.getElementById('reference-container');
+        const img = this.referenceImage;
 
-        // Set base size on image
-        this.referenceImage.style.width = `${baseSize}px`;
-        this.referenceImage.style.height = `${baseSize}px`;
+        // Set size on container
+        refContainer.style.width = w + 'px';
+        refContainer.style.height = h + 'px';
+        refContainer.style.left = offsetX + 'px';
+        refContainer.style.top = offsetY + 'px';
+        refContainer.style.transform = 'none';
 
-        // Use transform for scaling
-        refContainer.style.transform = `scale(${scaleX}, ${scaleY})`;
-        refContainer.style.left = `${offsetX}px`;
-        refContainer.style.top = `${offsetY}px`;
+        // Set size on image with !important via cssText
+        img.style.cssText = `width: ${w}px !important; height: ${h}px !important; opacity: ${img.style.opacity || 0.5};`;
     }
 
     clearReferenceImage() {
