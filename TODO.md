@@ -18,6 +18,7 @@
 - [ ] Actualizacion OTA (subir firmware desde web)
 - [ ] Subir carátulas al repo GitHub desde el editor (requiere token)
 - [ ] Agregar capturas de pantalla a MANUAL_CONFIGURACION.md (crear docs/images/)
+- [ ] Integrar Mario Bros clock como clockface nativo (cw-cf-0x08) - https://github.com/jnthas/mariobros-clock
 
 ## Próximo
 
