@@ -1,27 +1,31 @@
 #pragma once
 
 #include <Arduino.h>
-
-
-#include "hour_font.h"
-#include "../cw-commons/picopixel.h"
-
 #include <Adafruit_GFX.h>
-#include <Tile.h>
+
+// Fonts
+#include "hour_font.h"
+#include "picopixel.h"
+
+// GFX Engine
 #include <Locator.h>
 #include <Game.h>
-#include <Object.h>
-#include <ImageUtils.h>
-#include <ColorUtil.h>
-#include "IClockface.h"
 
-//sprites
+// Commons
+#include "IClockface.h"
+#include "CWDateTime.h"
+
+// Sprites
 #include "pacman.h"
 
+// Simple coordinate struct for BFS
+struct Point {
+  int x, y;
+};
 
-class Clockface: public IClockface {
+class PacmanClockface: public IClockface {
   private:
-    const int MAP_SIZE = 12;
+    static const int MAP_SIZE = 12;
     Adafruit_GFX* _display;
     CWDateTime* _dateTime;
     bool pacmanState = true;
@@ -32,7 +36,12 @@ class Clockface: public IClockface {
     char weekDayTemp[4]= "\0";
     char monthTemp[4]= "\0";
 
-
+   // BFS related members
+   static const int MAX_QUEUE_SIZE = MAP_SIZE * MAP_SIZE;
+   Point queue[MAX_QUEUE_SIZE];
+   int queueFront, queueRear;
+   bool visited[MAP_SIZE][MAP_SIZE];
+   Point parent[MAP_SIZE][MAP_SIZE];
 
     enum MapBlock {
       EMPTY = 0,
@@ -45,7 +54,6 @@ class Clockface: public IClockface {
       PACMAN = 7,
       OUT_OF_MAP = 99
     };
-
 
     const byte _MAP_CONST[12][12] = {
       {4,1,1,1,1,1,7,1,1,1,1,4},
@@ -62,7 +70,6 @@ class Clockface: public IClockface {
       {4,1,1,1,1,1,1,1,1,1,1,4}
     };
 
-    
     byte _MAP[12][12] = {
       {4,1,1,1,1,1,7,1,1,1,1,4},
       {1,2,2,1,2,2,2,2,1,2,2,1},
@@ -78,30 +85,31 @@ class Clockface: public IClockface {
       {4,1,1,1,1,1,1,1,1,1,1,4}
     };
 
-
     const byte MAP_BORDER_SIZE = 2;
     const byte MAP_MIN_POS = 0 + MAP_BORDER_SIZE;
     const byte MAP_MAX_POS = 64 - MAP_BORDER_SIZE;
 
-    // first elem is the size
     const int PACMAN_MOVING_BLOCKS[4] = {3, MapBlock::EMPTY, MapBlock::FOOD, MapBlock::GATE};
     const int PACMAN_BLOCKING_BLOCKS[4] = {3, MapBlock::OUT_OF_MAP, MapBlock::WALL, MapBlock::CLOCK};
 
     void drawMap();
-    Clockface::MapBlock nextBlock(Direction dir);
-    Clockface::MapBlock nextBlock();
+    PacmanClockface::MapBlock nextBlock(Direction dir);
+    PacmanClockface::MapBlock nextBlock();
     void turnRandom();
-    int countBlocks(Clockface::MapBlock elem);
+    int countBlocks(PacmanClockface::MapBlock elem);
     bool contains(int v, const int* values);
     void resetMap();
     void directionDecision(MapBlock nextBlk, bool moving_axis_x);
+    bool isValid(int r, int c);
+    bool isTarget(int r, int c);
+    bool findShortestPath(int startX, int startY, Direction& nextMove);
+    void reconstructPath(Point start, Point end, Direction& nextMove);
     void updateClock();
     const char* weekDayName(int weekday);
     const char* monthName(int month);
-    
-    
+
   public:
-    Clockface(Adafruit_GFX* display);
-    void setup(CWDateTime *dateTime);
-    void update();
+    PacmanClockface(Adafruit_GFX* display);
+    void setup(CWDateTime *dateTime, bool showSplash = true) override;
+    void update() override;
 };

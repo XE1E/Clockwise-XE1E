@@ -1,8 +1,11 @@
 #include <Arduino.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 
-// Clockface
-#include <Clockface.h>
+// Clockfaces
+#include <JsonClockface.h>
+#include <PacmanClockface.h>
+#include <IClockface.h>
+
 // Commons
 #include <WiFiController.h>
 #include <CWDateTime.h>
@@ -21,7 +24,12 @@
 
 MatrixPanel_I2S_DMA *dma_display = nullptr;
 
-Clockface *clockface;
+IClockface *clockface = nullptr;
+JsonClockface *jsonClockface = nullptr;
+PacmanClockface *pacmanClockface = nullptr;
+
+// Native clockface names
+const char* PACMAN_CLOCKFACE = "_pacman";
 
 WiFiController wifi;
 CWDateTime cwDateTime;
@@ -34,6 +42,22 @@ bool nightModeActive = false;
 long rotationMillis = 0;
 bool needsClockfaceReload = false;
 String currentClockface = "";
+
+// Select the appropriate clockface based on name
+void selectClockface(const String& name) {
+  if (name == PACMAN_CLOCKFACE) {
+    clockface = pacmanClockface;
+    Serial.println("[Clockface] Using Pac-Man native clockface");
+  } else {
+    clockface = jsonClockface;
+    Serial.println("[Clockface] Using JSON clockface");
+  }
+}
+
+// Check if a clockface name is a native (built-in) clockface
+bool isNativeClockface(const String& name) {
+  return name == PACMAN_CLOCKFACE;
+}
 
 int parseHour(String timeStr) {
   int colonPos = timeStr.indexOf(':');
@@ -233,7 +257,13 @@ void setup()
   pinMode(ClockwiseParams::getInstance()->ldrPin, INPUT);
 
   displaySetup(ClockwiseParams::getInstance()->swapBlueGreen, ClockwiseParams::getInstance()->displayBright, ClockwiseParams::getInstance()->displayRotation);
-  clockface = new Clockface(dma_display);
+
+  // Create all clockface instances
+  jsonClockface = new JsonClockface(dma_display);
+  pacmanClockface = new PacmanClockface(dma_display);
+
+  // Default to JSON clockface
+  clockface = jsonClockface;
 
   autoBrightEnabled = (ClockwiseParams::getInstance()->autoBrightMax > 0);
 
@@ -273,12 +303,15 @@ void setup()
       String nightClock = ClockwiseParams::getInstance()->nightClockface;
       if (nightClock == "_builtin") {
         // Use setupNightMode to avoid loading any clockface
+        selectClockface(ClockwiseParams::getInstance()->canvasFile);
         clockface->setupNightMode(&cwDateTime, ClockwiseParams::getInstance()->nightColor);
       } else {
         ClockwiseParams::getInstance()->canvasFile = nightClock;
+        selectClockface(nightClock);
         clockface->setup(&cwDateTime);
       }
     } else {
+      selectClockface(ClockwiseParams::getInstance()->canvasFile);
       clockface->setup(&cwDateTime);
     }
   }
@@ -359,9 +392,11 @@ void loop()
         }
         String nightClock = ClockwiseParams::getInstance()->nightClockface;
         if (nightClock == "_builtin") {
+          selectClockface(currentClockface);
           clockface->setupNightMode(&cwDateTime, ClockwiseParams::getInstance()->nightColor);
         } else {
           ClockwiseParams::getInstance()->canvasFile = nightClock;
+          selectClockface(nightClock);
           clockface->setup(&cwDateTime, false);
         }
       } else {
@@ -371,6 +406,7 @@ void loop()
           dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
         }
         nightModeActive = false;
+        selectClockface(currentClockface);
         clockface->setBuiltinNightMode(false);
         clockface->setup(&cwDateTime, false);
       }
@@ -382,6 +418,7 @@ void loop()
 
       if (needsClockfaceReload) {
         needsClockfaceReload = false;
+        selectClockface(ClockwiseParams::getInstance()->canvasFile);
         clockface->setup(&cwDateTime, false);  // No splash on rotation
       }
     }

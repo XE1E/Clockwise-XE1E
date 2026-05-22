@@ -4,7 +4,8 @@
 #include <Game.h>
 #include <Locator.h>
 #include <EventBus.h>
-#include <ImageUtils.h>
+#include <EventTask.h>
+#include <Sprite.h>
 #include "assets.h"
 
 

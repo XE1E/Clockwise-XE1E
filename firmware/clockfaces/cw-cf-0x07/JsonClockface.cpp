@@ -1,20 +1,20 @@
 
-#include "Clockface.h"
+#include "JsonClockface.h"
 #include <CWPreview.h>
 #include <SPIFFS.h>
 
-unsigned long lastMillis = 0;
+unsigned long lastMillisJson = 0;
 
 // Buffer size for JSON clockface (32KB for larger clockfaces)
 static DynamicJsonDocument doc(32768);
 
-Clockface::Clockface(Adafruit_GFX *display)
+JsonClockface::JsonClockface(Adafruit_GFX *display)
 {
   _display = display;
   Locator::provide(display);
 }
 
-void Clockface::setup(CWDateTime *dateTime, bool showSplash)
+void JsonClockface::setup(CWDateTime *dateTime, bool showSplash)
 {
   this->_dateTime = dateTime;
   Serial.println("[Canvas] setup() called");
@@ -34,7 +34,7 @@ void Clockface::setup(CWDateTime *dateTime, bool showSplash)
   }
 }
 
-void Clockface::drawFallbackClock()
+void JsonClockface::drawFallbackClock()
 {
   Locator::getDisplay()->fillRect(0, 0, 64, 64, 0);
   Locator::getDisplay()->setFont(&hour8pt7b);
@@ -43,7 +43,7 @@ void Clockface::drawFallbackClock()
   Locator::getDisplay()->print(_dateTime->getFormattedTime("H:i"));
 }
 
-void Clockface::drawNightClock()
+void JsonClockface::drawNightClock()
 {
   Locator::getDisplay()->fillRect(0, 0, 64, 64, 0);
   Locator::getDisplay()->setFont(&Nocturno);
@@ -56,7 +56,7 @@ void Clockface::drawNightClock()
   Locator::getDisplay()->print(_dateTime->getFormattedTime("i"));
 }
 
-void Clockface::setupNightMode(CWDateTime *dateTime, uint16_t color)
+void JsonClockface::setupNightMode(CWDateTime *dateTime, uint16_t color)
 {
   this->_dateTime = dateTime;
   _builtinNightMode = true;
@@ -65,7 +65,7 @@ void Clockface::setupNightMode(CWDateTime *dateTime, uint16_t color)
   drawNightClock();
 }
 
-void Clockface::setBuiltinNightMode(bool enabled, uint16_t color)
+void JsonClockface::setBuiltinNightMode(bool enabled, uint16_t color)
 {
   _builtinNightMode = enabled;
   _nightColor = color;
@@ -75,31 +75,31 @@ void Clockface::setBuiltinNightMode(bool enabled, uint16_t color)
   }
 }
 
-void Clockface::drawSplashScreen(uint16_t color, const char *msg) {
-  
+void JsonClockface::drawSplashScreen(uint16_t color, const char *msg) {
+
   Locator::getDisplay()->fillRect(0, 0, 64, 64, 0);
   Locator::getDisplay()->drawBitmap(19, 18, CW_ICON_CANVAS, 27, 32, color);
-  
+
   StatusController::getInstance()->printCenter("- Canvas -", 7);
   StatusController::getInstance()->printCenter(msg, 61);
 }
 
-void Clockface::update()
+void JsonClockface::update()
 {
   // Built-in night mode clock
   if (_builtinNightMode) {
-    if (millis() - lastMillis >= 1000) {
+    if (millis() - lastMillisJson >= 1000) {
       drawNightClock();
-      lastMillis = millis();
+      lastMillisJson = millis();
     }
     return;
   }
 
   if (!_clockfaceLoaded) {
     // Fallback: just update time every second
-    if (millis() - lastMillis >= 1000) {
+    if (millis() - lastMillisJson >= 1000) {
       drawFallbackClock();
-      lastMillis = millis();
+      lastMillisJson = millis();
     }
     return;
   }
@@ -108,14 +108,14 @@ void Clockface::update()
   clockfaceLoop();
 
   // Update Date/Time - Using a fixed interval (1000 milliseconds)
-  if (millis() - lastMillis >= 1000)
+  if (millis() - lastMillisJson >= 1000)
   {
     refreshDateTime();
-    lastMillis = millis();
+    lastMillisJson = millis();
   }
 }
 
-void Clockface::setFont(const char *fontName)
+void JsonClockface::setFont(const char *fontName)
 {
 
   if (strcmp(fontName, "picopixel") == 0)
@@ -174,7 +174,7 @@ void Clockface::setFont(const char *fontName)
 }
 
 // Time in words conversion (Spanish)
-String Clockface::hourToWords(int h)
+String JsonClockface::hourToWords(int h)
 {
   const char* horas[] = {
     "DOCE", "UNA", "DOS", "TRES", "CUATRO", "CINCO",
@@ -183,7 +183,7 @@ String Clockface::hourToWords(int h)
   return horas[h % 12];
 }
 
-String Clockface::minuteToWords(int m)
+String JsonClockface::minuteToWords(int m)
 {
   const char* unidades[] = {
     "", "uno", "dos", "tres", "cuatro", "cinco",
@@ -214,7 +214,7 @@ String Clockface::minuteToWords(int m)
   return String(decenas[d]) + "\ny " + unidades[u];
 }
 
-String Clockface::getTimeInWords(const char *content)
+String JsonClockface::getTimeInWords(const char *content)
 {
   if (strcmp(content, "Hw") == 0) {
     return hourToWords(_dateTime->getHour());
@@ -226,7 +226,7 @@ String Clockface::getTimeInWords(const char *content)
   return "";
 }
 
-uint16_t Clockface::resolveColor(int32_t color)
+uint16_t JsonClockface::resolveColor(int32_t color)
 {
   if (color == -1) {
     return ClockwiseParams::getInstance()->nightColor;
@@ -234,7 +234,7 @@ uint16_t Clockface::resolveColor(int32_t color)
   return (uint16_t)color;
 }
 
-void Clockface::renderText(String text, JsonVariantConst value)
+void JsonClockface::renderText(String text, JsonVariantConst value)
 {
   int16_t x1, y1;
   uint16_t w, h;
@@ -290,7 +290,7 @@ void Clockface::renderText(String text, JsonVariantConst value)
   Locator::getDisplay()->print(text);
 }
 
-void Clockface::refreshDateTime()
+void JsonClockface::refreshDateTime()
 {
   // Check both "setup" and "loop" arrays for datetime elements
   JsonArrayConst setupElements = doc["setup"].as<JsonArrayConst>();
@@ -324,7 +324,7 @@ void Clockface::refreshDateTime()
   }
 }
 
-void Clockface::clockfaceSetup()
+void JsonClockface::clockfaceSetup()
 {
 
   // Clear screen
@@ -342,7 +342,7 @@ void Clockface::clockfaceSetup()
   createSprites();
 }
 
-void Clockface::createSprites()
+void JsonClockface::createSprites()
 {
   // Clear existing sprites to prevent memory leak on reload
   sprites.clear();
@@ -395,7 +395,7 @@ void Clockface::createSprites()
   }
 }
 
-void Clockface::handleSpriteAnimation(std::shared_ptr<CustomSprite>& sprite) {
+void JsonClockface::handleSpriteAnimation(std::shared_ptr<CustomSprite>& sprite) {
     uint8_t totalFrames = sprite->_totalFrames;
 
     // Hour-based sprites: select frame based on current hour instead of animating
@@ -443,7 +443,7 @@ void Clockface::handleSpriteAnimation(std::shared_ptr<CustomSprite>& sprite) {
     }
 }
 
-void Clockface::handleSpriteMovement(std::shared_ptr<CustomSprite>& sprite) {
+void JsonClockface::handleSpriteMovement(std::shared_ptr<CustomSprite>& sprite) {
     unsigned long moveStartTime = sprite->_cachedMoveStartTime;
     unsigned long moveDuration = sprite->_cachedMoveDuration;
     int8_t moveInitialX = sprite->_cachedOriginX;
@@ -504,7 +504,7 @@ void Clockface::handleSpriteMovement(std::shared_ptr<CustomSprite>& sprite) {
     }
 }
 
-void Clockface::clockfaceLoop() {
+void JsonClockface::clockfaceLoop() {
     // Render sprites
     for (auto& sprite : sprites) {
         handleSpriteAnimation(sprite);
@@ -546,7 +546,7 @@ void Clockface::clockfaceLoop() {
     }
 }
 
-void Clockface::renderElements(JsonArrayConst elements)
+void JsonClockface::renderElements(JsonArrayConst elements)
 {
   for (JsonVariantConst value : elements)
   {
@@ -590,7 +590,7 @@ void Clockface::renderElements(JsonArrayConst elements)
   }
 }
 
-bool Clockface::deserializeDefinition()
+bool JsonClockface::deserializeDefinition()
 {
   // Check for preview mode first (temporary, from editor)
   // Preview takes priority and is cleared on restart
