@@ -1032,14 +1032,6 @@ class ClockfaceEditor {
         this.setPixelColor('#ffffff');
         this.resetPixelCanvas();
 
-        document.getElementById('btn-pixel-editor').addEventListener('click', () => {
-            document.getElementById('pixel-editor-section').style.display = 'block';
-            pe.editingFrameIndex = -1;
-            document.getElementById('btn-pixel-replace-frame').style.display = 'none';
-            document.getElementById('btn-pixel-save-frame').style.display = 'none';
-            this.resetPixelCanvas();
-        });
-
         document.getElementById('btn-pixel-cancel').addEventListener('click', () => {
             this.hidePixelEditor();
         });
@@ -1088,14 +1080,6 @@ class ClockfaceEditor {
 
         document.getElementById('btn-pixel-replace-frame').addEventListener('click', () => {
             this.replacePixelFrameInSprite();
-        });
-
-        document.getElementById('btn-pixel-save-frame').addEventListener('click', () => {
-            if (this.pixelEditorState.editingFrameIndex >= 0) {
-                this.replacePixelFrameInSprite();
-            } else {
-                this.addPixelFrameToSprite(true);
-            }
         });
     }
 
@@ -1158,36 +1142,6 @@ class ClockfaceEditor {
             }
         }
 
-        this.renderPixelPreview();
-    }
-
-    renderPixelPreview() {
-        const pe = this.pixelEditorState;
-        const previewCanvas = document.getElementById('pixel-preview-canvas');
-        if (!previewCanvas) return;
-
-        const ctx = previewCanvas.getContext('2d');
-        ctx.imageSmoothingEnabled = false;
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, 64, 64);
-
-        const scale = Math.min(64 / pe.width, 64 / pe.height);
-        const offsetX = Math.floor((64 - pe.width * scale) / 2);
-        const offsetY = Math.floor((64 - pe.height * scale) / 2);
-
-        for (let y = 0; y < pe.height; y++) {
-            for (let x = 0; x < pe.width; x++) {
-                if (pe.pixels[y] && pe.pixels[y][x]) {
-                    ctx.fillStyle = pe.pixels[y][x];
-                    ctx.fillRect(
-                        offsetX + Math.floor(x * scale),
-                        offsetY + Math.floor(y * scale),
-                        Math.ceil(scale),
-                        Math.ceil(scale)
-                    );
-                }
-            }
-        }
     }
 
     getPixelCoords(e) {
@@ -1292,8 +1246,6 @@ class ClockfaceEditor {
         this.updateFramesList();
         this.updateSpriteList();
         this.loadSpriteFrames();
-
-        this.hidePixelEditor();
     }
 
     getPixelCanvasAsBase64() {
@@ -1318,7 +1270,6 @@ class ClockfaceEditor {
     hidePixelEditor() {
         this.pixelEditorState.editingFrameIndex = -1;
         document.getElementById('btn-pixel-replace-frame').style.display = 'none';
-        document.getElementById('btn-pixel-save-frame').style.display = 'none';
         document.getElementById('pixel-editor-section').style.display = 'none';
     }
 
@@ -1334,7 +1285,6 @@ class ClockfaceEditor {
 
         pe.editingFrameIndex = frameIndex;
         document.getElementById('btn-pixel-replace-frame').style.display = 'inline-block';
-        document.getElementById('btn-pixel-save-frame').style.display = 'inline-block';
 
         const frame = sprite.frames[frameIndex];
         const img = new Image();
@@ -1478,6 +1428,27 @@ class ClockfaceEditor {
             });
             list.appendChild(item);
         });
+
+        const addItem = document.createElement('div');
+        addItem.className = 'frame-item frame-item-add';
+        addItem.innerHTML = '<span class="frame-add-icon">+</span>';
+        addItem.title = 'Dibujar nuevo frame';
+        addItem.addEventListener('click', () => {
+            this.openPixelEditorForNewFrame();
+        });
+        list.appendChild(addItem);
+    }
+
+    openPixelEditorForNewFrame() {
+        const pe = this.pixelEditorState;
+        pe.editingFrameIndex = -1;
+        pe.width = 16;
+        pe.height = 16;
+        document.getElementById('pixel-canvas-width').value = 16;
+        document.getElementById('pixel-canvas-height').value = 16;
+        document.getElementById('btn-pixel-replace-frame').style.display = 'none';
+        this.resetPixelCanvas();
+        document.getElementById('pixel-editor-section').style.display = 'block';
     }
 
     async loadSpriteFrames() {

@@ -565,35 +565,31 @@
                     </div>
                     <div class="frames-section" id="frames-section" style="display:none;">
                         <div class="frames-header">
-                            <h4>Frames <span id="current-sprite-index">0</span></h4>
-                            <div style="display:flex;gap:5px;">
-                                <label class="btn btn-small btn-primary">
-                                    <input type="file" id="add-frame-file" accept="image/*" multiple hidden>
-                                    + Importar
-                                </label>
-                                <button class="btn btn-small btn-secondary" id="btn-pixel-editor">+ Dibujar</button>
-                            </div>
+                            <h4>Sprite <span id="current-sprite-index">0</span></h4>
+                            <label class="btn btn-small btn-primary">
+                                <input type="file" id="add-frame-file" accept="image/*" multiple hidden>
+                                + Importar
+                            </label>
                         </div>
-                        <div id="frames-list" class="frames-list"></div>
-                        <div id="pixel-editor-section" class="pixel-editor-section" style="display:none;">
-                            <h4>Editor de Pixeles</h4>
-                            <div class="pixel-editor-layout">
-                                <div class="pixel-editor-main">
+                        <div class="frames-and-preview">
+                            <div class="frames-list-container">
+                                <div id="frames-list" class="frames-list"></div>
+                                <div id="pixel-editor-section" class="pixel-editor-section" style="display:none;">
                                     <div class="pixel-tools">
-                                        <div class="pixel-tool-group">
+                                        <div class="pixel-tool-row">
                                             <label>Ancho:</label>
                                             <input type="number" id="pixel-canvas-width" value="16" min="4" max="64" style="width:50px;">
                                             <label>Alto:</label>
                                             <input type="number" id="pixel-canvas-height" value="16" min="4" max="64" style="width:50px;">
                                             <button class="btn btn-small" id="btn-pixel-resize" title="Aplicar tamaño">OK</button>
                                         </div>
-                                        <div class="pixel-tool-group">
-                                            <button class="btn btn-small pixel-tool active" data-tool="draw" title="Dibujar (D)">&#9998;</button>
-                                            <button class="btn btn-small pixel-tool" data-tool="erase" title="Borrar (E)">&#9003;</button>
-                                            <button class="btn btn-small pixel-tool" data-tool="fill" title="Rellenar (F)">&#9638;</button>
-                                            <button class="btn btn-small pixel-tool" data-tool="pick" title="Tomar color (P)">&#128167;</button>
-                                            <button class="btn btn-small btn-danger" id="btn-pixel-clear" title="Limpiar">Limpiar</button>
+                                        <div class="pixel-tool-row">
+                                            <button class="btn btn-small pixel-tool active" data-tool="draw" title="Dibujar">&#9998;</button>
+                                            <button class="btn btn-small pixel-tool" data-tool="erase" title="Borrar">&#9003;</button>
+                                            <button class="btn btn-small pixel-tool" data-tool="fill" title="Rellenar">&#9638;</button>
+                                            <button class="btn btn-small pixel-tool" data-tool="pick" title="Tomar color">&#128167;</button>
                                             <button class="btn btn-small" id="btn-pixel-grid" title="Grid">Grid</button>
+                                            <button class="btn btn-small btn-danger" id="btn-pixel-clear" title="Limpiar">Limpiar</button>
                                         </div>
                                         <div class="pixel-palette">
                                             <div class="current-color-display">
@@ -606,27 +602,20 @@
                                     <div class="pixel-canvas-wrapper">
                                         <canvas id="pixel-editor-canvas" width="320" height="320"></canvas>
                                     </div>
-                                </div>
-                                <div class="pixel-editor-sidebar">
-                                    <div class="pixel-preview-box">
-                                        <h5>Preview</h5>
-                                        <canvas id="pixel-preview-canvas" width="64" height="64"></canvas>
-                                    </div>
                                     <div class="pixel-editor-actions">
-                                        <button class="btn btn-small btn-primary" id="btn-pixel-add-frame" title="Agregar y continuar">+ Agregar</button>
-                                        <button class="btn btn-small btn-success" id="btn-pixel-save-frame" title="Guardar y cerrar" style="display:none;">Guardar</button>
+                                        <button class="btn btn-small btn-primary" id="btn-pixel-add-frame" title="Agregar frame">+ Agregar</button>
                                         <button class="btn btn-small btn-warning" id="btn-pixel-replace-frame" title="Reemplazar frame" style="display:none;">Reemplazar</button>
                                         <button class="btn btn-small btn-secondary" id="btn-pixel-cancel" title="Cerrar editor">Cerrar</button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="sprite-preview">
-                            <h4>Preview</h4>
-                            <canvas id="sprite-preview-canvas" width="128" height="128"></canvas>
-                            <div class="preview-controls">
-                                <button class="btn btn-small" id="btn-play-sprite">Play</button>
-                                <span id="sprite-frame-info">0/0</span>
+                            <div class="sprite-preview">
+                                <h4>Preview</h4>
+                                <canvas id="sprite-preview-canvas" width="128" height="128"></canvas>
+                                <div class="preview-controls">
+                                    <button class="btn btn-small" id="btn-play-sprite">Play</button>
+                                    <span id="sprite-frame-info">0/0</span>
+                                </div>
                             </div>
                         </div>
                     </div>
