@@ -302,10 +302,12 @@ class ClockfaceEditor {
         refContainer.style.height = h + 'px';
         refContainer.style.left = offsetX + 'px';
         refContainer.style.top = offsetY + 'px';
-        refContainer.style.transform = 'none';
 
-        // Set size on image with !important via cssText
-        img.style.cssText = `width: ${w}px !important; height: ${h}px !important; opacity: ${img.style.opacity || 0.5};`;
+        // Set size on image directly
+        img.style.setProperty('width', w + 'px', 'important');
+        img.style.setProperty('height', h + 'px', 'important');
+
+        console.log('Reference transform:', { w, h, offsetX, offsetY, imgWidth: img.style.width, imgHeight: img.style.height });
     }
 
     clearReferenceImage() {
