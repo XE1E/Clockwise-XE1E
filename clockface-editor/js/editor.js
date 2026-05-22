@@ -958,6 +958,14 @@ class ClockfaceEditor {
             this.selectSpriteForEdit(newIndex);
         });
 
+        document.getElementById('btn-draw-sprite').addEventListener('click', () => {
+            const newIndex = this.clockface.addSprite([]);
+            this.updateSpriteList();
+            this.updateSpriteSelect();
+            this.selectSpriteForEdit(newIndex);
+            this.openPixelEditorForNewFrame();
+        });
+
         document.getElementById('btn-export-sprite').addEventListener('click', () => {
             this.exportSprite();
         });

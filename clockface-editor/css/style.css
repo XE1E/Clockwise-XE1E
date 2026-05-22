@@ -792,6 +792,8 @@ body {
 
 .sprite-list-header h4, .frames-header h4 { margin: 0; font-size: 0.95em; }
 
+.sprite-header-buttons { display: flex; gap: 4px; }
+
 .sprite-list {
     background: var(--bg-dark);
     border: 1px solid var(--border-color);
