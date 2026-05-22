@@ -156,6 +156,10 @@ void displaySetup(bool swapBlueGreen, uint8_t displayBright, uint8_t displayRota
 
 ### Diagrama de conexión
 
+<table>
+<tr>
+<td>
+
 ```
 ESP32-S3-DevKitC-1          Panel HUB75 64x64
 ┌─────────────────┐         ┌─────────────────┐
@@ -181,6 +185,15 @@ ESP32-S3-DevKitC-1          Panel HUB75 64x64
 │                 │         │                 │
 └─────────────────┘         └─────────────────┘
 ```
+
+</td>
+<td>
+
+![Conector HUB75](HUB75.png)
+
+</td>
+</tr>
+</table>
 
 ### Pines a evitar en ESP32-S3
 
