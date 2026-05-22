@@ -295,19 +295,10 @@ class ClockfaceEditor {
         const offsetY = this.refState.y * this.zoom;
 
         const refContainer = document.getElementById('reference-container');
-        const img = this.referenceImage;
-
-        // Set size on container
         refContainer.style.width = w + 'px';
         refContainer.style.height = h + 'px';
         refContainer.style.left = offsetX + 'px';
         refContainer.style.top = offsetY + 'px';
-
-        // Set size on image directly
-        img.style.setProperty('width', w + 'px', 'important');
-        img.style.setProperty('height', h + 'px', 'important');
-
-        console.log('Reference transform:', { w, h, offsetX, offsetY, imgWidth: img.style.width, imgHeight: img.style.height });
     }
 
     clearReferenceImage() {

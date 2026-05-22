@@ -680,19 +680,24 @@ function renderClockfaceGrid(){
     const cont=$('clockfaceList');
     const rot=$('rotationEnabled').checked;
     const selected=($('rotationList').value||'').split(',').filter(s=>s);
+    const validSelected=selected.filter(n=>storedClockfaces.some(c=>c.name===n));
 
     if(storedClockfaces.length===0){
         cont.innerHTML='<span style="color:var(--text-secondary)">No hay caratulas. Sube o descarga una.</span>';
         return;
     }
 
-    const sorted=[...selected.filter(n=>storedClockfaces.some(c=>c.name===n)),...storedClockfaces.filter(c=>!selected.includes(c.name)).map(c=>c.name)];
+    if(validSelected.length!==selected.length){
+        $('rotationList').value=validSelected.join(',');
+    }
+
+    const sorted=[...validSelected,...storedClockfaces.filter(c=>!validSelected.includes(c.name)).map(c=>c.name)];
 
     thumbQueue=[];
     cont.innerHTML=sorted.map(name=>{
         const cf=storedClockfaces.find(c=>c.name===name)||{name,size:0};
-        const isSelected=selected.includes(name);
-        const orderNum=isSelected?selected.indexOf(name)+1:0;
+        const isSelected=validSelected.includes(name);
+        const orderNum=isSelected?validSelected.indexOf(name)+1:0;
         return '<div class="clockface-item'+(isSelected?' selected':'')+'" data-name="'+name+'">'
             +(orderNum?'<span class="order-num">'+orderNum+'</span>':'')
             +'<button class="delete-btn" onclick="event.stopPropagation();deleteClockface(\''+name+'\')">×</button>'

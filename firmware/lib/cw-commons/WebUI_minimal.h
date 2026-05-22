@@ -234,8 +234,10 @@ try{const r=await fetch('/api/clockfaces/list');cfs=await r.json();renderCfGrid(
 
 function renderCfGrid(){
 const sel=($('rotationList').value||'').split(',').filter(s=>s);
+const validSel=sel.filter(n=>cfs.some(c=>c.name===n));
+if(validSel.length!==sel.length)$('rotationList').value=validSel.join(',');
 if(!cfs.length){$('cfList').innerHTML='No hay caratulas';return;}
-$('cfList').innerHTML=cfs.map(c=>'<div class="cf-item'+(sel.includes(c.name)?' selected':'')+'" data-n="'+c.name+'" onclick="toggleCf(\''+c.name+'\')"><canvas width="64" height="64"></canvas>'+c.name+'</div>').join('');
+$('cfList').innerHTML=cfs.map(c=>'<div class="cf-item'+(validSel.includes(c.name)?' selected':'')+'" data-n="'+c.name+'" onclick="toggleCf(\''+c.name+'\')"><canvas width="64" height="64"></canvas>'+c.name+'</div>').join('');
 cfs.forEach(c=>{if(thumbs[c.name])drawThumb(c.name);});
 const pending=cfs.filter(c=>!thumbs[c.name]).map(c=>c.name);
 if(pending.length)loadThumbsSeq(pending);

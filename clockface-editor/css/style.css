@@ -153,6 +153,7 @@ body {
 .reference-container {
     position: absolute;
     z-index: 2;
+    overflow: visible;
 }
 
 .reference-container.hidden { display: none; }
@@ -160,7 +161,12 @@ body {
 .reference-container.above { z-index: 20; }
 
 #reference-image {
-    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
     image-rendering: pixelated;
     pointer-events: none;
 }
