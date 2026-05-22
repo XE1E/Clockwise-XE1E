@@ -187,7 +187,7 @@ ESP32-S3-DevKitC-1          Panel HUB75 64x64
 ```
 
 </td>
-<td>
+<td style="background-color: white; padding: 10px;">
 
 ![Conector HUB75](HUB75.png)
 
