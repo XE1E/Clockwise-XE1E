@@ -21,8 +21,8 @@
 ### 2. Conectar a WiFi (Primera vez)
 
 1. Enciende el reloj (conecta la fuente de 5V)
-2. El reloj mostrara el logo de Clockwise y luego "WiFi Connecting..."
-3. Como no hay red configurada, creara una red WiFi llamada **"Clockwise-XXXX"**
+2. El reloj mostrara el logo de Clockwise y luego "Conectando WiFi..."
+3. Como no hay red configurada, creara una red WiFi llamada **"ClockWise-XE1E"**
 4. Conectate a esa red desde tu celular o computadora
 5. Se abrira automaticamente una pagina de configuracion (Improv WiFi)
 6. Selecciona tu red WiFi e ingresa la contrasena
@@ -86,10 +86,10 @@ El reloj intentara conectar en orden: Red 1 → Red 2 → Red 3
 ### Borrar Configuracion WiFi
 Para que el reloj olvide las redes guardadas y vuelva a crear el punto de acceso:
 1. Ve a la pestana **Sistema**
-2. Haz clic en **"Reset de Fabrica"**
-3. El reloj se reiniciara y creara la red "Clockwise-XXXX"
+2. Haz clic en **"Borrar WiFi"**
+3. El reloj se reiniciara y creara la red "ClockWise-XE1E"
 
-**Alternativa:** Si el reloj no puede conectar a ninguna red guardada despues de varios intentos, automaticamente creara el punto de acceso.
+**Alternativa:** Si el reloj no puede conectar a ninguna red guardada despues de varios intentos, automaticamente creara el punto de acceso. Cada 5 minutos intentara reconectar a las redes guardadas.
 
 ---
 
@@ -153,7 +153,7 @@ Ingresa tu zona horaria. Ejemplos:
 - **Desactivado:** En ingles (Mon, Tue, Jan, Feb...)
 
 ### Servidor NTP
-Por defecto usa `time.google.com`. Puedes cambiarlo si lo necesitas.
+Por defecto usa `time.cloudflare.com` (recomendado por su velocidad y privacidad). Puedes cambiarlo si lo necesitas.
 
 ### Zona Horaria Manual (POSIX)
 Si tu zona horaria no esta en la lista o tiene reglas especiales de horario de verano, puedes usar una cadena POSIX:
@@ -173,8 +173,15 @@ Deja el campo vacio para usar la zona horaria normal.
 
 ## Canvas (Caratulas)
 
+### Caratulas Nativas
+El firmware incluye 2 caratulas nativas integradas que no ocupan espacio en memoria:
+- **Pac-Man:** Animacion clasica del comecocos con fantasmas
+- **Mario Bros:** Escena animada con Mario, bloques, monedas y nubes
+
+Estas caratulas aparecen automaticamente en la galeria y no pueden eliminarse.
+
 ### Caratulas Guardadas
-Las caratulas se almacenan en la memoria del reloj. Puedes:
+Las caratulas JSON se almacenan en la memoria del reloj. Puedes:
 - **Ver miniaturas** de cada caratula
 - **Seleccionar** cual mostrar haciendo clic
 - **Eliminar** con el boton X
@@ -258,6 +265,12 @@ Muestra la version actual del firmware instalado.
 
 ### Reiniciar
 Reinicia el reloj. Necesario despues de algunos cambios.
+
+### Borrar WiFi
+Borra solo las redes WiFi guardadas sin afectar otras configuraciones:
+1. Haz clic en **"Borrar WiFi"**
+2. El reloj se reiniciara y creara el punto de acceso "ClockWise-XE1E"
+3. Conectate al punto de acceso para configurar una nueva red
 
 ### Reset de Fabrica
 Borra toda la configuracion y vuelve a valores por defecto:

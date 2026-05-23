@@ -29,9 +29,11 @@ struct WiFiController
   bool reconnecting = false;
   WiFiNetwork networks[3];
   DNSServer dnsServer;
+  unsigned long lastAPRetryAttempt = 0;
 
   static const unsigned long RECONNECT_INTERVAL = 30000;  // 30 segundos entre intentos
   static const unsigned long RESTART_TIMEOUT = 300000;    // 5 minutos sin conexión = restart
+  static const unsigned long AP_RETRY_INTERVAL = 300000;  // 5 minutos entre reintentos en modo AP
 
   static void onImprovWiFiErrorCb(ImprovTypes::Error err)
   {
@@ -133,7 +135,52 @@ struct WiFiController
     improvSerial.handleSerial();
     if (apModeActive) {
       dnsServer.processNextRequest();
+      checkAPReconnect();
     }
+  }
+
+  // Intentar reconectar a WiFi mientras está en modo AP
+  bool checkAPReconnect()
+  {
+    unsigned long now = millis();
+    if (now - lastAPRetryAttempt < AP_RETRY_INTERVAL) return false;
+
+    lastAPRetryAttempt = now;
+
+    // Verificar si hay redes guardadas
+    loadSavedNetworks();
+    bool hasNetworks = false;
+    for (int i = 0; i < 3; i++) {
+      if (!networks[i].ssid.isEmpty()) {
+        hasNetworks = true;
+        break;
+      }
+    }
+    if (!hasNetworks) return false;
+
+    Serial.println("[WiFi] AP mode: retrying saved networks...");
+    StatusController::getInstance()->wifiReconnecting();
+
+    // Cambiar a modo AP+STA para mantener AP mientras intentamos conectar
+    WiFi.mode(WIFI_AP_STA);
+    delay(100);
+
+    if (connectToBestNetwork()) {
+      Serial.println("[WiFi] Connected! Exiting AP mode...");
+      dnsServer.stop();
+      WiFi.softAPdisconnect(true);
+      WiFi.mode(WIFI_STA);
+      apModeActive = false;
+      onConnected();
+      return true;
+    }
+
+    // Falló, volver a modo AP puro
+    Serial.println("[WiFi] Retry failed, staying in AP mode");
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP("ClockWise-XE1E", "");
+    StatusController::getInstance()->showAPMode(WiFi.softAPIP().toString().c_str());
+    return false;
   }
 
   // Cargar redes guardadas desde preferencias
