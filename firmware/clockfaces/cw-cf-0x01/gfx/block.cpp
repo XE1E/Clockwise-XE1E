@@ -28,27 +28,29 @@ void Block::drawUsedBlock() {
 void Block::updateCoin() {
   if (!coinActive) return;
 
-  if (millis() - coinMillis >= 40) {
-    // Clear previous coin position
+  if (millis() - coinMillis >= 80) {
     int coinX = _x + 7;
-    int prevCoinY = _y - 10 + coinY;
-    Locator::getDisplay()->fillRect(coinX, prevCoinY, 5, 7, SKY_COLOR);
 
-    coinY -= 2;  // Move coin up
-    coinFrame = (coinFrame + 1) % 2;
+    // Use _firstY (resting position) not _y (changes during bounce)
+    // Coin starts at row 1 (just below LED row 0) and stays there briefly
+    int coinDrawY = 1;
 
-    if (coinY < -20) {
-      // Coin animation finished
-      coinActive = false;
-      coinY = 0;
-    } else {
-      // Draw coin at new position
-      int newCoinY = _y - 10 + coinY;
-      if (coinFrame == 0) {
-        Locator::getDisplay()->drawRGBBitmap(coinX, newCoinY, COIN_FRAME1, 5, 7);
+    coinFrame++;
+
+    if (coinFrame <= 6) {
+      // Draw alternating coin frames at fixed position above block
+      if (coinFrame % 2 == 1) {
+        Locator::getDisplay()->drawRGBBitmap(coinX, coinDrawY, COIN_FRAME1, 5, 7);
       } else {
-        Locator::getDisplay()->drawRGBBitmap(coinX + 1, newCoinY, COIN_FRAME2, 3, 7);
+        // Clear and redraw rotated frame
+        Locator::getDisplay()->fillRect(coinX, coinDrawY, 5, 7, SKY_COLOR);
+        Locator::getDisplay()->drawRGBBitmap(coinX + 1, coinDrawY, COIN_FRAME2, 3, 7);
       }
+    } else {
+      // Animation finished - clear coin area
+      Locator::getDisplay()->fillRect(coinX, coinDrawY, 5, 7, SKY_COLOR);
+      coinActive = false;
+      coinFrame = 0;
     }
     coinMillis = millis();
   }

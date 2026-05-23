@@ -18,13 +18,16 @@ Object cloud1(CLOUD1, 13, 12);
 Object cloud2(CLOUD2, 13, 12);
 Object hill(HILL, 20, 22);
 
-
 Mario mario(23, 40);
 Block hourBlock(13, 8);
 Block minuteBlock(32, 8);
 
 unsigned long lastMillis = 0;
+unsigned long cloudAnimMillis = 0;
 int lastSecond = -1;
+int8_t cloudAnimOffset = 0;
+int8_t cloudAnimDir = 1;  // 1 = up, -1 = down
+const uint16_t CLOUD_HIGHLIGHT = 0x3DFF;  // Light blue highlight
 
 MarioClockface::MarioClockface(Adafruit_GFX* display) {
   _display = display;
@@ -71,6 +74,30 @@ void MarioClockface::update() {
   mario.update();
 
   int currentSecond = _dateTime->getSecond();
+
+  // Animacion de lineas azules en nubes (cada 800ms, mas lento)
+  if (millis() - cloudAnimMillis >= 800) {
+    // Borrar highlight anterior en cloud1 - usar blanco (color de nube)
+    Locator::getDisplay()->drawPixel(4, 24 + cloudAnimOffset, 0xFFFF);
+    Locator::getDisplay()->drawPixel(5, 24 + cloudAnimOffset, 0xFFFF);
+    // Borrar highlight anterior en cloud2 - usar blanco (color de nube)
+    Locator::getDisplay()->drawPixel(55, 10 + cloudAnimOffset, 0xFFFF);
+    Locator::getDisplay()->drawPixel(56, 10 + cloudAnimOffset, 0xFFFF);
+
+    // Mover offset
+    cloudAnimOffset += cloudAnimDir;
+    if (cloudAnimOffset >= 3) cloudAnimDir = -1;
+    if (cloudAnimOffset <= 0) cloudAnimDir = 1;
+
+    // Dibujar nuevo highlight en cloud1
+    Locator::getDisplay()->drawPixel(4, 24 + cloudAnimOffset, CLOUD_HIGHLIGHT);
+    Locator::getDisplay()->drawPixel(5, 24 + cloudAnimOffset, CLOUD_HIGHLIGHT);
+    // Dibujar nuevo highlight en cloud2
+    Locator::getDisplay()->drawPixel(55, 10 + cloudAnimOffset, CLOUD_HIGHLIGHT);
+    Locator::getDisplay()->drawPixel(56, 10 + cloudAnimOffset, CLOUD_HIGHLIGHT);
+
+    cloudAnimMillis = millis();
+  }
 
   // LED caminante en la fila superior
   if (currentSecond != lastSecond) {
