@@ -45,6 +45,7 @@ class PacmanClockface: public IClockface {
     };
     uint8_t currentMazeColor = 0;
     uint16_t wall_color = 0x0016;
+    uint8_t resetCounter = 0;
 
     // Fruit system
     bool fruitActive = false;

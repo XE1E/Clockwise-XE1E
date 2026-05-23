@@ -303,9 +303,13 @@ void PacmanClockface::directionDecision(MapBlock nextBlk, bool moving_axis_x) {
 void PacmanClockface::resetMap() {
   memcpy( _MAP, _MAP_CONST, sizeof(_MAP_CONST) );
 
-  // Change maze color on each reset
-  currentMazeColor = (currentMazeColor + 1) % 6;
-  wall_color = MAZE_COLORS[currentMazeColor];
+  // Change maze color every 30 resets
+  resetCounter++;
+  if (resetCounter >= 30) {
+    resetCounter = 0;
+    currentMazeColor = (currentMazeColor + 1) % 6;
+    wall_color = MAZE_COLORS[currentMazeColor];
+  }
 
   // Reset fruit state
   fruitActive = false;
