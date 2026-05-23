@@ -4,6 +4,8 @@ const int PacmanClockface::MAP_SIZE;
 unsigned long lastMillisPacman = 0;
 unsigned long lastMillisTimePacman = 0;
 unsigned long lastMillisSecPacman = 0;
+unsigned long lastMillisSuperFood = 0;
+unsigned long lastMillisFruit = 0;
 
 Pacman *pacman;
 
@@ -37,6 +39,25 @@ void PacmanClockface::update()
     lastMillisSecPacman = millis();
   }
 
+  // Super food blink animation (every 300ms)
+  if ((millis() - lastMillisSuperFood) >= 300) {
+    updateSuperFoodBlink();
+    lastMillisSuperFood = millis();
+  }
+
+  // Fruit spawn/despawn logic (every 15-30 seconds, visible for 5 seconds)
+  if (!fruitActive && (millis() - lastMillisFruit) >= 15000 + random(15000)) {
+    fruitActive = true;
+    fruitTimer = millis();
+    fruitType = random(2);  // 0=cherry, 1=strawberry
+    drawFruit();
+    lastMillisFruit = millis();
+  } else if (fruitActive && (millis() - fruitTimer) >= 5000) {
+    // Clear fruit after 5 seconds
+    fruitActive = false;
+    Locator::getDisplay()->fillRect(30, 44, 5, 5, 0x0000);
+  }
+
   // Clock
   if (millis() - lastMillisTimePacman >= 60000) {
     updateClock();
@@ -44,7 +65,7 @@ void PacmanClockface::update()
   }
 
   // Pacman
-  if (millis() - lastMillisPacman >= 75) {
+  if (millis() - lastMillisPacman >= 100) {
 
     bool fullBlock =
                      ((pacman->_direction == Direction::LEFT || pacman->_direction == Direction::RIGHT) && (pacman->getX()-2) % 5 == 0) ||
@@ -54,11 +75,49 @@ void PacmanClockface::update()
       int currentMapR = (pacman->getY() - 2) / 5;
       int currentMapC = (pacman->getX() - 2) / 5;
 
+      // Teleport tunnel logic - GATE blocks at edges (teleport when entering tunnel)
+      if (_MAP[currentMapR][currentMapC] == MapBlock::GATE ||
+          _MAP_CONST[currentMapR][currentMapC] == MapBlock::GATE) {
+        if (currentMapC == 0) {
+          // At left tunnel - teleport to right side
+          Locator::getDisplay()->fillRect(pacman->getX(), pacman->getY(), 5, 5, 0);
+          pacman->setPosition((11 * 5) + 2, pacman->getY());
+          pacman->turn(Direction::LEFT);  // Continue moving left after teleport
+          _MAP[currentMapR][0] = MapBlock::EMPTY;
+          _MAP[currentMapR][11] = MapBlock::EMPTY;
+          pacman->update();
+          lastMillisPacman = millis();
+          return;  // Skip rest of this frame
+        } else if (currentMapC == 11) {
+          // At right tunnel - teleport to left side
+          Locator::getDisplay()->fillRect(pacman->getX(), pacman->getY(), 5, 5, 0);
+          pacman->setPosition(2, pacman->getY());
+          pacman->turn(Direction::RIGHT);  // Continue moving right after teleport
+          _MAP[currentMapR][0] = MapBlock::EMPTY;
+          _MAP[currentMapR][11] = MapBlock::EMPTY;
+          pacman->update();
+          lastMillisPacman = millis();
+          return;  // Skip rest of this frame
+        }
+      }
+
       MapBlock currentBlockContent = static_cast<MapBlock>(_MAP[currentMapR][currentMapC]);
       _MAP[currentMapR][currentMapC] = MapBlock::EMPTY;
 
       if (currentBlockContent == MapBlock::SUPER_FOOD) {
         pacman->setState(Pacman::State::INVENCIBLE);
+      }
+
+      // Check if Pac-Man ate the fruit
+      if (fruitActive) {
+        int fruitMapR = 8;  // Fruit position row (44-2)/5 = 8
+        int fruitMapC = 6;  // Fruit position col (30-2)/5 = 5.6 ~ 6
+        if (currentMapR >= 7 && currentMapR <= 9 && currentMapC >= 5 && currentMapC <= 7) {
+          fruitActive = false;
+          Locator::getDisplay()->fillRect(30, 44, 5, 5, 0x0000);
+          // Bonus: extend invincibility or just visual feedback
+          pacman->setState(Pacman::State::INVENCIBLE);
+        }
       }
 
       MapBlock nextBlk = nextBlock();
@@ -71,6 +130,45 @@ void PacmanClockface::update()
 
     pacman->update();
     lastMillisPacman = millis();
+  }
+}
+
+void PacmanClockface::updateSuperFoodBlink() {
+  superFoodBlink = !superFoodBlink;
+  uint16_t spcfood_color = superFoodBlink ? 0xFBE0 : 0x7920;  // Orange / darker orange
+
+  for (int i = 0; i < MAP_SIZE; i++) {
+    for (int j = 0; j < MAP_SIZE; j++) {
+      if (_MAP[j][i] == MapBlock::SUPER_FOOD) {
+        Locator::getDisplay()->fillRect((i*5)+3, (j*5)+3, 3, 3, spcfood_color);
+      }
+    }
+  }
+}
+
+void PacmanClockface::drawFruit() {
+  int fx = 30;  // Center of screen X
+  int fy = 44;  // Below clock area Y
+
+  if (fruitType == 0) {
+    // Cherry - two red circles with green stem
+    Locator::getDisplay()->fillRect(fx, fy+2, 2, 2, FRUIT_CHERRY);
+    Locator::getDisplay()->fillRect(fx+3, fy+2, 2, 2, FRUIT_CHERRY);
+    Locator::getDisplay()->drawPixel(fx+1, fy+1, 0x07E0);  // Stem
+    Locator::getDisplay()->drawPixel(fx+2, fy, 0x07E0);
+    Locator::getDisplay()->drawPixel(fx+3, fy+1, 0x07E0);
+  } else {
+    // Strawberry - pink/red with seeds
+    Locator::getDisplay()->fillRect(fx+1, fy, 3, 4, FRUIT_STRAWBERRY);
+    Locator::getDisplay()->drawPixel(fx, fy+1, FRUIT_STRAWBERRY);
+    Locator::getDisplay()->drawPixel(fx, fy+2, FRUIT_STRAWBERRY);
+    Locator::getDisplay()->drawPixel(fx+4, fy+1, FRUIT_STRAWBERRY);
+    Locator::getDisplay()->drawPixel(fx+4, fy+2, FRUIT_STRAWBERRY);
+    // Green top
+    Locator::getDisplay()->drawPixel(fx+2, fy-1, 0x07E0);
+    // Yellow seeds
+    Locator::getDisplay()->drawPixel(fx+1, fy+1, 0xFFE0);
+    Locator::getDisplay()->drawPixel(fx+3, fy+2, 0xFFE0);
   }
 }
 
@@ -90,9 +188,9 @@ void PacmanClockface::updateClock() {
     Locator::getDisplay()->setFont(&Picopixel);
     Locator::getDisplay()->setTextColor(0xAD55);
     Locator::getDisplay()->setCursor(15, 41);
-    Locator::getDisplay()->print(monthName(this->_dateTime->getMonth()));
-    Locator::getDisplay()->print(" ");
     Locator::getDisplay()->print(this->_dateTime->getDay());
+    Locator::getDisplay()->print(" ");
+    Locator::getDisplay()->print(monthName(this->_dateTime->getMonth()));
     Locator::getDisplay()->print(" ");
     Locator::getDisplay()->print(weekDayName(this->_dateTime->getWeekday()));
 
@@ -204,6 +302,15 @@ void PacmanClockface::directionDecision(MapBlock nextBlk, bool moving_axis_x) {
 
 void PacmanClockface::resetMap() {
   memcpy( _MAP, _MAP_CONST, sizeof(_MAP_CONST) );
+
+  // Change maze color on each reset
+  currentMazeColor = (currentMazeColor + 1) % 6;
+  wall_color = MAZE_COLORS[currentMazeColor];
+
+  // Reset fruit state
+  fruitActive = false;
+  fruitTimer = millis();
+
   drawMap();
   updateClock();
 }
@@ -272,7 +379,6 @@ void PacmanClockface::drawMap()
   Locator::getDisplay()->fillRect(0, 0, 64, 64, 0x0000);
 
   uint16_t food_color = 0xB58C;
-  uint16_t wall_color = 0x0016;
   uint16_t spcfood_color = 0xFBE0;
 
   Locator::getDisplay()->drawRect(0,0,64,64,wall_color);
@@ -287,12 +393,43 @@ void PacmanClockface::drawMap()
       } else if (_MAP[j][i] == MapBlock::CLOCK) {
         Locator::getDisplay()->fillRect((i*5)+2,(j*5)+2,5,5,wall_color);
       } else if (_MAP[j][i] == MapBlock::GATE) {
-        Locator::getDisplay()->fillRect((i*5)+3,(j*5)+4,3,1,food_color);
+        // Tunnel entrance - don't draw anything (empty passage)
       } else if (_MAP[j][i] == MapBlock::SUPER_FOOD) {
         Locator::getDisplay()->fillRect((i*5)+3,(j*5)+3,3,3,spcfood_color);
       } else if (_MAP[j][i] == MapBlock::PACMAN) {
         pacman = new Pacman((i*5)+2,(j*5)+2);
       }
     }
+  }
+
+  // Draw static decorative ghosts
+  drawGhosts();
+}
+
+void PacmanClockface::drawGhosts() {
+  // Simple 5x5 ghost shape - body with eyes
+  for (int g = 0; g < 4; g++) {
+    int gx = GHOST_POSITIONS[g][0];
+    int gy = GHOST_POSITIONS[g][1];
+    uint16_t color = GHOST_COLORS[g];
+
+    // Ghost body (rounded top, wavy bottom)
+    Locator::getDisplay()->fillRect(gx+1, gy, 3, 4, color);   // Main body
+    Locator::getDisplay()->drawPixel(gx, gy+1, color);        // Left curve
+    Locator::getDisplay()->drawPixel(gx, gy+2, color);
+    Locator::getDisplay()->drawPixel(gx, gy+3, color);
+    Locator::getDisplay()->drawPixel(gx+4, gy+1, color);      // Right curve
+    Locator::getDisplay()->drawPixel(gx+4, gy+2, color);
+    Locator::getDisplay()->drawPixel(gx+4, gy+3, color);
+    // Wavy bottom
+    Locator::getDisplay()->drawPixel(gx, gy+4, color);
+    Locator::getDisplay()->drawPixel(gx+2, gy+4, color);
+    Locator::getDisplay()->drawPixel(gx+4, gy+4, color);
+
+    // Eyes (white with blue pupils)
+    Locator::getDisplay()->drawPixel(gx+1, gy+1, 0xFFFF);     // Left eye white
+    Locator::getDisplay()->drawPixel(gx+3, gy+1, 0xFFFF);     // Right eye white
+    Locator::getDisplay()->drawPixel(gx+1, gy+2, 0x001F);     // Left pupil
+    Locator::getDisplay()->drawPixel(gx+3, gy+2, 0x001F);     // Right pupil
   }
 }

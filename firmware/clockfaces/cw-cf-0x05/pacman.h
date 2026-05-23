@@ -63,6 +63,7 @@ class Pacman: public Sprite, public EventTask {
     int nextBlock();
     int getX();
     int getY();
+    void setPosition(int x, int y);
     void update();
     const char* name();
     void execute(EventType event, Sprite* caller);

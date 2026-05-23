@@ -316,6 +316,7 @@ struct WiFiController
   bool begin()
   {
     WiFi.mode(WIFI_STA);
+    WiFi.setTxPower(WIFI_POWER_19_5dBm);  // Max TX power for better range
     WiFi.disconnect();
 
     improvSerial.setDeviceInfo(ImprovTypes::ChipFamily::CF_ESP32,

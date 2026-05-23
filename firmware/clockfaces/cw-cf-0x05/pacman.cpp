@@ -58,14 +58,16 @@ void Pacman::update() {
 
 
   if (_state == INVENCIBLE) {
-    
+
     if (_iteration % 2 == 0) {
-      current_color = random(LONG_MAX);
+      // Generate bright RGB565 colors (high saturation)
+      uint16_t colors[] = {0xF800, 0x07E0, 0x001F, 0xFFE0, 0xF81F, 0x07FF, 0xFFFF};
+      current_color = colors[random(7)];
     } else {
       current_color = 0xFE40;
     }
-    
-    if ((millis() - invencibleTimeout) >= 7000) {
+
+    if ((millis() - invencibleTimeout) >= 4000) {
       _state = MOVING;
       current_color = 0xFE40;
     }
@@ -138,6 +140,10 @@ int Pacman::getX() {
 }
 int Pacman::getY() {
   return this->_y;
+}
+void Pacman::setPosition(int x, int y) {
+  this->_x = x;
+  this->_y = y;
 }
 
 const char* Pacman::name() {
