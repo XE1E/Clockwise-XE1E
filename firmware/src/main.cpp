@@ -4,6 +4,7 @@
 // Clockfaces
 #include <JsonClockface.h>
 #include <PacmanClockface.h>
+#include <MarioClockface.h>
 #include <IClockface.h>
 
 // Commons
@@ -27,9 +28,11 @@ MatrixPanel_I2S_DMA *dma_display = nullptr;
 IClockface *clockface = nullptr;
 JsonClockface *jsonClockface = nullptr;
 PacmanClockface *pacmanClockface = nullptr;
+MarioClockface *marioClockface = nullptr;
 
 // Native clockface names
 const char* PACMAN_CLOCKFACE = "_pacman";
+const char* MARIO_CLOCKFACE = "_mario";
 
 WiFiController wifi;
 CWDateTime cwDateTime;
@@ -48,6 +51,9 @@ void selectClockface(const String& name) {
   if (name == PACMAN_CLOCKFACE) {
     clockface = pacmanClockface;
     Serial.println("[Clockface] Using Pac-Man native clockface");
+  } else if (name == MARIO_CLOCKFACE) {
+    clockface = marioClockface;
+    Serial.println("[Clockface] Using Mario Bros native clockface");
   } else {
     clockface = jsonClockface;
     Serial.println("[Clockface] Using JSON clockface");
@@ -56,7 +62,7 @@ void selectClockface(const String& name) {
 
 // Check if a clockface name is a native (built-in) clockface
 bool isNativeClockface(const String& name) {
-  return name == PACMAN_CLOCKFACE;
+  return name == PACMAN_CLOCKFACE || name == MARIO_CLOCKFACE;
 }
 
 int parseHour(String timeStr) {
@@ -261,6 +267,7 @@ void setup()
   // Create all clockface instances
   jsonClockface = new JsonClockface(dma_display);
   pacmanClockface = new PacmanClockface(dma_display);
+  marioClockface = new MarioClockface(dma_display);
 
   // Default to JSON clockface
   clockface = jsonClockface;

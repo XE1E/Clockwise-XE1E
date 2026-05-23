@@ -18,16 +18,16 @@
 #include "gfx/mario.h"
 #include "gfx/block.h"
 
-class Clockface: public IClockface {
+class MarioClockface: public IClockface {
   private:
     Adafruit_GFX* _display;
     CWDateTime* _dateTime;
     void updateTime();
 
   public:
-    Clockface(Adafruit_GFX* display);
-    void setup(CWDateTime *dateTime);
-    void update();
+    MarioClockface(Adafruit_GFX* display);
+    void setup(CWDateTime *dateTime, bool showSplash = true) override;
+    void update() override;
     void externalEvent(int type);
 
 };

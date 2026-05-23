@@ -1,0 +1,16 @@
+{
+    "name": "cw-cf-0x01",
+    "version": "1.0.0",
+    "description": "Clockwise Mario Bros Clockface",
+    "frameworks": [
+        "arduino",
+        "espidf"
+    ],
+    "platforms": [
+        "espressif32"
+    ],
+    "build": {
+        "srcFilter": ["+<*.cpp>", "+<gfx/*.cpp>"],
+        "includeDir": "."
+    }
+}

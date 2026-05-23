@@ -13,22 +13,32 @@ class Block: public Sprite, public EventTask {
   private:
     enum State {
       IDLE,
-      HIT
-    };   
+      HIT,
+      USED
+    };
 
-    Direction direction; 
+    Direction direction;
 
     String _text;
 
     unsigned long lastMillis = 0;
-    State _state = IDLE; 
-    State _lastState = IDLE; 
+    unsigned long usedMillis = 0;
+    unsigned long coinMillis = 0;
+    State _state = IDLE;
+    State _lastState = IDLE;
     uint8_t _lastY;
     uint8_t _firstY;
-    
+
+    // Coin animation
+    bool coinActive = false;
+    int8_t coinY = 0;
+    int8_t coinFrame = 0;
+
     void idle();
     void hit();
     void setTextBlock();
+    void drawUsedBlock();
+    void updateCoin();
 
   public:
     Block(int x, int y);

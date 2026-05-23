@@ -1,5 +1,5 @@
 
-#include "Clockface.h"
+#include "MarioClockface.h"
 
 EventBus eventBus;
 
@@ -26,14 +26,14 @@ Block minuteBlock(32, 8);
 unsigned long lastMillis = 0;
 int lastSecond = -1;
 
-Clockface::Clockface(Adafruit_GFX* display) {
+MarioClockface::MarioClockface(Adafruit_GFX* display) {
   _display = display;
 
   Locator::provide(display);
   Locator::provide(&eventBus);
 }
 
-void Clockface::setup(CWDateTime *dateTime) {
+void MarioClockface::setup(CWDateTime *dateTime, bool showSplash) {
   _dateTime = dateTime;
 
   Locator::getDisplay()->setFont(&Super_Mario_Bros__24pt7b);
@@ -45,6 +45,9 @@ void Clockface::setup(CWDateTime *dateTime) {
   hill.draw(0, 34);
   cloud1.draw(0, 21);
   cloud2.draw(51, 7);
+
+  // Draw pipe in bottom right corner
+  Locator::getDisplay()->drawRGBBitmap(54, 40, PIPE, PIPE_SIZE[0], PIPE_SIZE[1]);
 
   updateTime();
 
@@ -62,7 +65,7 @@ void Clockface::setup(CWDateTime *dateTime) {
   }
 }
 
-void Clockface::update() {
+void MarioClockface::update() {
   hourBlock.update();
   minuteBlock.update();
   mario.update();
@@ -100,12 +103,12 @@ void Clockface::update() {
   }
 }
 
-void Clockface::updateTime() {
+void MarioClockface::updateTime() {
   hourBlock.setText(String(_dateTime->getHour()));
   minuteBlock.setText(String(_dateTime->getMinute(FORMAT_TWO_DIGITS)));
 }
 
-void Clockface::externalEvent(int type) {
+void MarioClockface::externalEvent(int type) {
   if (type == 0) {  //TODO create an enum
     mario.jump();
     updateTime();
