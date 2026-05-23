@@ -1,183 +1,170 @@
-# Clockwise XE1E
+<p align="center">
+  <img src="https://github.com/jnthas/clockwise/blob/gh-pages/static/images/clockwise_logo.png" alt="Clockwise Logo" width="200">
+</p>
 
-[![Build Firmware](https://github.com/XE1E/Clockwise-XE1E/actions/workflows/build-firmware.yml/badge.svg)](https://github.com/XE1E/Clockwise-XE1E/actions/workflows/build-firmware.yml)
+<h1 align="center">Clockwise XE1E</h1>
 
-> Reloj de pared inteligente con matriz LED 64x64
+<p align="center">
+  <b>Reloj inteligente con matriz LED 64x64 y editor de caratulas</b>
+</p>
 
-Fork personalizado de [Clockwise](https://github.com/jnthas/clockwise) por [@jnthas](https://github.com/jnthas).
+<p align="center">
+  <a href="https://github.com/XE1E/Clockwise-XE1E/actions/workflows/build-firmware.yml">
+    <img src="https://github.com/XE1E/Clockwise-XE1E/actions/workflows/build-firmware.yml/badge.svg" alt="Build">
+  </a>
+  <a href="https://github.com/XE1E/Clockwise-XE1E/releases">
+    <img src="https://img.shields.io/github/v/release/XE1E/Clockwise-XE1E?include_prereleases" alt="Release">
+  </a>
+  <a href="https://github.com/XE1E/Clockwise-XE1E/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/XE1E/Clockwise-XE1E" alt="License">
+  </a>
+</p>
 
-![Logo](https://github.com/jnthas/clockwise/blob/gh-pages/static/images/clockwise_logo.png)
+<p align="center">
+  <a href="#-instalacion-rapida">Instalacion</a> •
+  <a href="#-herramientas-web">Herramientas</a> •
+  <a href="#-funcionalidades">Funcionalidades</a> •
+  <a href="#-hardware">Hardware</a> •
+  <a href="#-documentacion">Docs</a>
+</p>
 
 ---
 
-## Funcionalidades XE1E
+## Caratulas de Ejemplo
 
-Este fork incluye las siguientes mejoras:
+<p align="center">
+  <img src="clockface-editor/clockfaces/thumbs/nyan-cat.png" width="80" alt="Nyan Cat">
+  <img src="clockface-editor/clockfaces/thumbs/pac-man.png" width="80" alt="Pac-Man">
+  <img src="clockface-editor/clockfaces/thumbs/donkey-kong.png" width="80" alt="Donkey Kong">
+  <img src="clockface-editor/clockfaces/thumbs/clock-club.png" width="80" alt="Clock Club">
+  <img src="clockface-editor/clockfaces/thumbs/retro-computer.png" width="80" alt="Retro">
+  <img src="clockface-editor/clockfaces/thumbs/star-wars.png" width="80" alt="Star Wars">
+  <img src="clockface-editor/clockfaces/thumbs/snoopy3.png" width="80" alt="Snoopy">
+</p>
 
-| Funcionalidad | Descripcion |
-|---|---|
-| Editor de Caratulas | Diseña caratulas con vista previa en tiempo real y prueba directo en el reloj |
-| Editor de Caracteres | Crea y edita fuentes pixel art para usar en las caratulas |
-| Caratulas Locales | Guarda caratulas en la memoria del reloj (SPIFFS) - funciona sin internet |
-| Thumbnails | Preview de caratulas en la interfaz web del reloj |
-| GitHub Pages | Nueva fuente de caratulas estable con SSL |
-| Modo Nocturno | Cambia automaticamente a una caratula minimalista con brillo reducido durante la noche |
-| Rotacion de Caratulas | Cambia entre caratulas seleccionadas en intervalos configurables |
-| Hora en Palabras | Muestra la hora en texto: "OCHO y media", "TRES y cuarto" |
-| 26+ Fuentes BDF | Fuentes bitmap adicionales para el editor y firmware |
-| Soporte Español | Nombres de dias y meses en español |
-| Paleta de Colores | Selector visual de colores para modo nocturno |
-| Herramientas Dev | Scripts para conversion de fuentes, generacion de thumbnails y mas |
+<p align="center"><i>+ Caratulas nativas animadas: Mario Bros y Pac-Man</i></p>
 
 ---
 
 ## Instalacion Rapida
 
-### Clonar el repositorio
-```bash
-git clone --recursive https://github.com/XE1E/Clockwise-XE1E.git
-cd Clockwise-XE1E
-```
+### Opcion 1: Web Flasher (Sin instalar nada)
 
-### Compilar y flashear
+1. Conecta tu ESP32 por USB
+2. Abre **[Web Flasher](https://xe1e.github.io/Clockwise-XE1E/)** en Chrome/Edge
+3. Haz clic en "Conectar" y selecciona el puerto
+4. Haz clic en "Flashear"
+
+### Opcion 2: Compilar desde codigo
+
 ```bash
-cd firmware
+git clone https://github.com/XE1E/Clockwise-XE1E.git
+cd Clockwise-XE1E/firmware
 pip install platformio
-python -m platformio run --target upload
+pio run -t upload
 ```
 
----
+### Primera conexion
 
-## Configuracion
-
-1. Enciende el reloj
-2. Conectate a la red WiFi **"Clockwise"**
-3. Configura tu red WiFi
-4. Accede a la IP del reloj desde tu navegador
-
----
-
-## Documentacion
-
-| Manual | Descripcion |
-|---|---|
-| [Manual de Usuario](docs/MANUAL_USUARIO.md) | Guia para usuarios finales |
-| [Manual de Configuracion](docs/MANUAL_CONFIGURACION.md) | Guia tecnica completa |
-
----
-
-## Hardware
-
-| Componente | Descripcion |
-|---|---|
-| ESP32 | DevKit v1 o similar |
-| Panel LED | HUB75 64x64 pixels |
-| Fuente | 5V / 4A minimo |
-| LDR (opcional) | Para brillo automatico |
-
-### Conexiones
-
-```
-ESP32          Panel HUB75
-─────          ───────────
-GPIO 25   ──>  R1
-GPIO 26   ──>  G1
-GPIO 27   ──>  B1
-GPIO 14   ──>  R2
-GPIO 12   ──>  G2
-GPIO 13   ──>  B2
-GPIO 23   ──>  A
-GPIO 19   ──>  B
-GPIO 5    ──>  C
-GPIO 17   ──>  D
-GPIO 18   ──>  E
-GPIO 16   ──>  CLK
-GPIO 4    ──>  LAT
-GPIO 15   ──>  OE
-GND       ──>  GND
-```
-
----
-
-## Caratulas Disponibles
-
-| Caratula | Descripcion |
-|---|---|
-| Nyan Cat | Gato arcoiris animado |
-| Pac-Man | Clasico de arcade |
-| Goomba | Enemigo de Mario Bros |
-| Snoopy | El perro de Peanuts |
-| Snoopy Navidad | Version navidena |
-| Clock Club | Estilo moderno |
-| Donkey Kong | Arcade clasico |
-| Pepsi | Logo retro |
-| Retro Computer | Estilo computadora antigua |
-| Star Wars | Tematica espacial |
+1. Enciende el reloj - aparecera "Conectando WiFi..."
+2. Conectate a la red **"ClockWise-XE1E"** desde tu celular
+3. Configura tu WiFi en la pagina que se abre
+4. Accede a `http://clockwise-xe1e.local` para configurar
 
 ---
 
 ## Herramientas Web
 
-Disponibles en GitHub Pages (sin instalar nada):
+Disponibles online, sin instalar nada:
 
-| Herramienta | Descripcion | URL |
-|---|---|---|
-| Editor de Caratulas | Diseña caratulas con preview en tiempo real | [Abrir](https://xe1e.github.io/Clockwise-XE1E/clockface-editor/) |
-| Generador Thumbnails | Agrega thumbnails a caratulas existentes | [Abrir](https://xe1e.github.io/Clockwise-XE1E/clockface-editor/generate-thumbs.html) |
-| Digit Designer | Crea sets de digitos personalizados | [Abrir](https://xe1e.github.io/Clockwise-XE1E/clockface-editor/digit-designer.html) |
-| Web Flasher | Instala firmware desde el navegador | [Abrir](https://xe1e.github.io/Clockwise-XE1E/web-flasher/) |
+| Herramienta | Descripcion |
+|-------------|-------------|
+| **[Web Flasher](https://xe1e.github.io/Clockwise-XE1E/)** | Instala el firmware desde el navegador |
+| **[Editor de Caratulas](https://xe1e.github.io/Clockwise-XE1E/editor/)** | Disena caratulas con preview en tiempo real |
+| **[Galeria](https://xe1e.github.io/Clockwise-XE1E/gallery/)** | Descarga caratulas listas para usar |
 
-**Servidor local** (necesario para generar thumbnails desde carpeta):
-```bash
-cd clockface-editor
-python -m http.server 8000
-# Abre http://localhost:8000
+---
+
+## Funcionalidades
+
+### Editor de Caratulas
+- Diseno visual con preview en tiempo real
+- Prueba directa en el reloj via WiFi
+- Textos, fechas, sprites animados, formas geometricas
+- 26+ fuentes pixel art incluidas
+- Generador de thumbnails automatico
+
+### Reloj Inteligente
+- **Multiples redes WiFi** - Guarda hasta 3 redes con failover automatico
+- **Modo Nocturno** - Brillo reducido y caratula minimalista por horario
+- **Rotacion automatica** - Cambia entre caratulas cada X minutos
+- **Hora en palabras** - "DIEZ y media", "TRES y cuarto"
+- **Brillo automatico** - Con sensor LDR opcional
+- **Soporte Espanol** - Dias y meses en espanol
+
+### Caratulas Nativas (Animadas)
+- **Pac-Man** - El clasico comecocos con fantasmas
+- **Mario Bros** - Mario, bloques con monedas, nubes animadas
+
+---
+
+## Hardware
+
+| Componente | Especificacion |
+|------------|----------------|
+| Microcontrolador | ESP32 DevKit v1 / ESP32-S3 |
+| Display | Panel LED HUB75 64x64 pixels |
+| Alimentacion | 5V / 4A minimo |
+| Sensor (opcional) | LDR para brillo automatico |
+
+### Conexiones ESP32 -> HUB75
+
+```
+R1=25  G1=26  B1=27  GND
+R2=14  G2=12  B2=13  E=18
+A=23   B=19   C=5    D=17
+CLK=16 LAT=4  OE=15  GND
 ```
 
 ---
 
-## Pagina de Configuracion
+## Documentacion
 
-Accede desde cualquier navegador a la IP del reloj.
+| Documento | Contenido |
+|-----------|-----------|
+| [Manual de Usuario](docs/MANUAL_USUARIO.md) | Guia completa de uso |
+| [Manual de Configuracion](docs/MANUAL_CONFIGURACION.md) | Configuracion avanzada |
 
-### Tabs disponibles:
+---
 
-| Tab | Funciones |
-|-----|-----------|
-| **WiFi** | Hasta 3 redes WiFi con prioridad |
-| **Pantalla** | Brillo manual/automatico (LDR), rotacion fisica, panel RGB/RBG |
-| **Hora** | Zona horaria, servidor NTP, formato 12h/24h, idioma |
-| **Canvas** | Gestion de caratulas (ver abajo) |
-| **Sistema** | Info del firmware, reinicio, reset de fabrica |
+## Estructura del Proyecto
 
-### Tab Canvas - Gestion de Caratulas
-
-- **Almacenamiento:** Barra de uso de memoria SPIFFS
-- **Thumbnails:** Vista previa de cada caratula guardada
-- **Seleccion:** Click para seleccionar caratula activa
-- **Rotacion:** Activa rotacion automatica, arrastra para ordenar
-- **Subir:** Carga caratulas JSON desde tu computadora
-- **Descargar:** Obtiene caratulas del repositorio GitHub o servidor local
-- **Modo Nocturno:** Horario, brillo, color, caratula personalizada o integrada
-
-### Thumbnails en Caratulas
-
-Para que aparezca la preview de una caratula en la interfaz web:
-
-1. **Automatico:** El editor genera thumbnail al exportar
-2. **Manual:** Usa `generate-thumbs.html` para agregar thumbnail a JSONs existentes
-
-El thumbnail se guarda en el campo `thumbnail` del JSON (~1-4 KB adicionales).
+```
+Clockwise-XE1E/
+├── firmware/           # Codigo ESP32 (PlatformIO)
+│   ├── src/            # Main y logica principal
+│   ├── lib/            # Librerias internas
+│   └── clockfaces/     # Caratulas nativas (C++)
+├── clockface-editor/   # Editor web de caratulas
+├── web-flasher/        # Instalador web
+└── docs/               # Documentacion
+```
 
 ---
 
 ## Creditos
 
 - **Proyecto original:** [Clockwise](https://github.com/jnthas/clockwise) por [@jnthas](https://github.com/jnthas)
-- **Librerias:** ESP32-HUB75-MatrixPanel-DMA, Adafruit GFX, ezTime, WiFiManager
+- **Librerias:** ESP32-HUB75-MatrixPanel-DMA, Adafruit GFX, ezTime, ArduinoJson
 
 ---
 
 ## Licencia
 
-Este proyecto mantiene la misma licencia del proyecto original. Ver [LICENSE](LICENSE).
+Este proyecto mantiene la licencia del proyecto original. Ver [LICENSE](LICENSE).
+
+---
+
+<p align="center">
+  <sub>Hecho con mass amor que mass de un reloj de pared merece</sub>
+</p>
