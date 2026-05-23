@@ -33,16 +33,16 @@
 ## Caratulas de Ejemplo
 
 <p align="center">
-  <img src="clockface-editor/clockfaces/thumbs/nyan-cat.png" width="80" alt="Nyan Cat">
-  <img src="clockface-editor/clockfaces/thumbs/pac-man.png" width="80" alt="Pac-Man">
+  <img src="clockface-editor/clockfaces/thumbs/mario-native.jpg" width="80" alt="Mario Bros">
+  <img src="clockface-editor/clockfaces/thumbs/pacman-native.jpg" width="80" alt="Pac-Man">
   <img src="clockface-editor/clockfaces/thumbs/donkey-kong.png" width="80" alt="Donkey Kong">
   <img src="clockface-editor/clockfaces/thumbs/clock-club.png" width="80" alt="Clock Club">
-  <img src="clockface-editor/clockfaces/thumbs/retro-computer.png" width="80" alt="Retro">
-  <img src="clockface-editor/clockfaces/thumbs/star-wars.png" width="80" alt="Star Wars">
+  <img src="clockface-editor/clockfaces/thumbs/hora-palabras.png" width="80" alt="Hora en Palabras">
   <img src="clockface-editor/clockfaces/thumbs/snoopy3.png" width="80" alt="Snoopy">
+  <img src="clockface-editor/clockfaces/thumbs/world-clock.png" width="80" alt="World Clock">
 </p>
 
-<p align="center"><i>+ Caratulas nativas animadas: Mario Bros y Pac-Man</i></p>
+<p align="center"><i>Mario Bros y Pac-Man son caratulas nativas animadas integradas en el firmware</i></p>
 
 ---
 
@@ -112,19 +112,48 @@ Disponibles online, sin instalar nada:
 
 | Componente | Especificacion |
 |------------|----------------|
-| Microcontrolador | ESP32 DevKit v1 / ESP32-S3 |
+| Microcontrolador | ESP32 DevKit v1 / ESP32-S3 N16R8 |
 | Display | Panel LED HUB75 64x64 pixels |
 | Alimentacion | 5V / 4A minimo |
 | Sensor (opcional) | LDR para brillo automatico |
 
-### Conexiones ESP32 -> HUB75
+### Pines HUB75 - ESP32
 
-```
-R1=25  G1=26  B1=27  GND
-R2=14  G2=12  B2=13  E=18
-A=23   B=19   C=5    D=17
-CLK=16 LAT=4  OE=15  GND
-```
+| Senal | GPIO | Notas |
+|-------|------|-------|
+| R1 | 25 | Rojo fila superior |
+| G1 | 26 | Verde (27 si swap) |
+| B1 | 27 | Azul (26 si swap) |
+| R2 | 14 | Rojo fila inferior |
+| G2 | 12 | Verde (13 si swap) |
+| B2 | 13 | Azul (12 si swap) |
+| A | 23 | Direccion linea |
+| B | 19 | Direccion linea |
+| C | 5 | Direccion linea |
+| D | 17 | Direccion linea |
+| E | 18 | Solo paneles 64x64 |
+| CLK | 16 | Reloj |
+| LAT | 4 | Latch |
+| OE | 15 | Output Enable |
+
+### Pines HUB75 - ESP32-S3
+
+| Senal | GPIO | Notas |
+|-------|------|-------|
+| R1 | 4 | Rojo fila superior |
+| G1 | 5 | Verde fila superior |
+| B1 | 6 | Azul fila superior |
+| R2 | 7 | Rojo fila inferior |
+| G2 | 15 | Verde fila inferior |
+| B2 | 16 | Azul fila inferior |
+| A | 18 | Direccion linea |
+| B | 8 | Direccion linea |
+| C | 3 | Direccion linea |
+| D | 42 | Direccion linea |
+| E | 38 | Solo paneles 64x64 |
+| CLK | 41 | Reloj |
+| LAT | 40 | Latch |
+| OE | 2 | Output Enable |
 
 ---
 
