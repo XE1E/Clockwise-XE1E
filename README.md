@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/jnthas/clockwise/blob/gh-pages/static/images/clockwise_logo.png" alt="Clockwise Logo" width="200">
+  <img src="https://github.com/jnthas/clockwise/blob/gh-pages/static/images/clockwise_logo.png" alt="Clockwise Logo" width="300">
 </p>
 
 <h1 align="center">Clockwise XE1E</h1>
