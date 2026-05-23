@@ -841,7 +841,7 @@ async function uploadClockface(){
     }catch(e){toast('JSON invalido');}
 }
 
-const cfGHPages=['pac-man','nyan-cat','night-clock','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','pepsi-final-2','world-clock','mario-clock'];
+const cfGHPages=['pac-man','nyan-cat','night-clock','donkey-kong','star-wars','goomba_move','clock-club','retro-computer','snoopy3','christmassnoopy','pepsi-final-2','world-clock'];
 
 function onRepoSourceChange(){
     const isLocal=$('repoSource').value==='local';
