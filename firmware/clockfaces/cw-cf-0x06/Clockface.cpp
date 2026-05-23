@@ -53,10 +53,7 @@ void Clockface::update()
 
     if (_dateTime->getMinute() == 0 && _dateTime->getSecond() == 0) {
       uint8_t wd = this->_dateTime->getWeekday();
-      Serial.println(wd);
-      //clean up the previous square
       refreshDate((wd == 0 ? 6 : wd-1), LIGHT_BLUE);
-      // update date
       refreshDate(wd, DARK_BLUE);
     }
 

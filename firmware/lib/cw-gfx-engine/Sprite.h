@@ -12,7 +12,5 @@ class Sprite {
 
   public:
     boolean collidedWith(Sprite* sprite);
-    void logPosition();
-
     virtual const char* name();
 };

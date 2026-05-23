@@ -39,7 +39,7 @@ CWDateTime cwDateTime;
 
 bool autoBrightEnabled;
 long autoBrightMillis = 0;
-uint8_t currentBrightSlot = -1;
+uint8_t currentBrightSlot = 255;
 
 bool nightModeActive = false;
 long rotationMillis = 0;
@@ -234,15 +234,13 @@ void automaticBrightControl()
       const uint8_t minBright = (currentValue < ldrMin ? MIN_BRIGHT_DISPLAY_OFF : MIN_BRIGHT_DISPLAY_ON);
       uint8_t maxBright = ClockwiseParams::getInstance()->displayBright;
 
-      uint8_t slots = 10; //10 slots
+      uint8_t slots = 10;
       uint8_t mapLDR = map(currentValue > ldrMax ? ldrMax : currentValue, ldrMin, ldrMax, 1, slots);
       uint8_t mapBright = map(mapLDR, 1, slots, minBright, maxBright);
 
-      // Serial.printf("LDR: %d, mapLDR: %d, Bright: %d\n", currentValue, mapLDR, mapBright);
-      if(abs(currentBrightSlot - mapLDR ) >= 2 || mapBright == 0){
-           dma_display->setBrightness8(mapBright);
-           currentBrightSlot=mapLDR;
-          //  Serial.printf("setBrightness: %d , Update currentBrightSlot to %d\n", mapBright, mapLDR);
+      if (abs(currentBrightSlot - mapLDR) >= 2 || mapBright == 0) {
+        dma_display->setBrightness8(mapBright);
+        currentBrightSlot = mapLDR;
       }
       autoBrightMillis = millis();
     }

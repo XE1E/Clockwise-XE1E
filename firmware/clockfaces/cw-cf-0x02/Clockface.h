@@ -27,7 +27,6 @@ class Clockface: public IClockface {
     void timeInWords(int h, int m, char* hWords, char* mWords);
     void updateTime();
     void updateDate();
-    void updateTemperature();
 
   public:
     Clockface(Adafruit_GFX* display);

@@ -29,13 +29,6 @@ const struct
         uint8_t newGreen = MIN(trunc(g * (factor / 10)), 255);
         uint8_t newBlue  = MIN(trunc(b * (factor / 10)), 255);
 
-        
-        // Serial.printf("Old RGB %d %d %d\n", r, g, b);
-        // Serial.printf("New RGB %d %d %d\n", newRed, newGreen, newBlue);
-        // delay(1000);
-
-
-
         return color565(newRed, newGreen, newBlue);
 
    }

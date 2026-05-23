@@ -134,7 +134,7 @@ void MarioClockface::updateTime() {
 }
 
 void MarioClockface::externalEvent(int type) {
-  if (type == 0) {  //TODO create an enum
+  if (type == 0) {
     mario.jump();
     updateTime();
   }

@@ -48,11 +48,6 @@ struct ClockwiseHttpClient
       return;
     }
 
-    // char arrCode[4];
-    // memcpy(arrCode, status + 8, 3);  //HTTP/1.1 404 Not Found
-    // arrCode[3] = 0;
-    // uint16_t httpCode = atoi(arrCode);
-
     // Check HTTP status
     char status[32] = {0};
     client->readBytesUntil('\r', status, sizeof(status));
