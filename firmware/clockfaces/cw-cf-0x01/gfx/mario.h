@@ -22,8 +22,6 @@ class Mario: public Sprite, public EventTask {
     };
 
     Direction direction;
-
-    int _lastX;
     int _lastY;
 
     const unsigned short* _sprite;

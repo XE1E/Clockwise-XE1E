@@ -22,7 +22,6 @@ Mario mario(23, 40);
 Block hourBlock(13, 8);
 Block minuteBlock(32, 8);
 
-unsigned long lastMillis = 0;
 unsigned long cloudAnimMillis = 0;
 int lastSecond = -1;
 int8_t cloudAnimOffset = 0;
@@ -126,7 +125,6 @@ void MarioClockface::update() {
     }
 
     lastSecond = currentSecond;
-    lastMillis = millis();
   }
 }
 

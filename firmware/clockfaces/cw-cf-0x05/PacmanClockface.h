@@ -28,7 +28,6 @@ class PacmanClockface: public IClockface {
     static const int MAP_SIZE = 12;
     Adafruit_GFX* _display;
     CWDateTime* _dateTime;
-    bool pacmanState = true;
     bool show_seconds = true;
 
     const char* _weekDayWords = "DOM\0LUN\0MAR\0MIE\0JUE\0VIE\0SAB\0";
@@ -113,7 +112,6 @@ class PacmanClockface: public IClockface {
     };
 
     const byte MAP_BORDER_SIZE = 2;
-    const byte MAP_MIN_POS = 0 + MAP_BORDER_SIZE;
     const byte MAP_MAX_POS = 64 - MAP_BORDER_SIZE;
 
     const int PACMAN_MOVING_BLOCKS[4] = {3, MapBlock::EMPTY, MapBlock::FOOD, MapBlock::GATE};

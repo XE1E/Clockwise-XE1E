@@ -1,7 +1,5 @@
 #include "block.h"
 
-//String &Block::_text;
-
 Block::Block(int x, int y) {
   _x = x;
   _y = y;
@@ -60,12 +58,9 @@ void Block::hit() {
   if (_state != HIT && _state != USED) {
     _lastState = _state;
     _state = HIT;
-    _lastY = _y;
     direction = UP;
 
-    // Start coin animation
     coinActive = true;
-    coinY = 0;
     coinFrame = 0;
     coinMillis = millis();
   }
@@ -121,7 +116,7 @@ void Block::update() {
       // Draw used block color while bouncing
       drawUsedBlock();
 
-      if (floor(_firstY - _y) >= MAX_MOVE_HEIGHT) {
+      if ((_firstY - _y) >= MAX_MOVE_HEIGHT) {
         direction = DOWN;
       }
 
@@ -141,16 +136,12 @@ void Block::update() {
 
 
 void Block::execute(EventType event, Sprite* caller) {
-  //Serial.println("Checking collision");
-
   if (event == EventType::MOVE) {
     if (this->collidedWith(caller)) {
-      Serial.println("Collision detected");
       hit();
       Locator::getEventBus()->broadcast(EventType::COLLISION, this);
     }
   }
-  
 }
 
 

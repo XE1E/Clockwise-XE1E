@@ -1,6 +1,5 @@
 #include "PacmanClockface.h"
 
-const int PacmanClockface::MAP_SIZE;
 unsigned long lastMillisPacman = 0;
 unsigned long lastMillisTimePacman = 0;
 unsigned long lastMillisSecPacman = 0;
@@ -269,8 +268,7 @@ bool PacmanClockface::findShortestPath(int startR, int startC, Direction& nextMo
                 parent[nextR][nextC] = current;
                 queue[++queueRear] = {nextR, nextC};
 
-                if (queueRear >= MAX_QUEUE_SIZE -1) {
-                    Serial.println("BFS Queue Overflow!");
+                if (queueRear >= MAX_QUEUE_SIZE - 1) {
                     return false;
                 }
             }
@@ -337,9 +335,6 @@ void PacmanClockface::turnRandom() {
     pacman->turn(static_cast<Direction>(dir));
     dir = random(4);
   } while (!contains(nextBlock(), PACMAN_MOVING_BLOCKS));
-
-  Serial.print("New direction: ");
-  Serial.println(pacman->_direction);
 }
 
 PacmanClockface::MapBlock PacmanClockface::nextBlock() {

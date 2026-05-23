@@ -26,12 +26,9 @@ class Block: public Sprite, public EventTask {
     unsigned long coinMillis = 0;
     State _state = IDLE;
     State _lastState = IDLE;
-    uint8_t _lastY;
     uint8_t _firstY;
 
-    // Coin animation
     bool coinActive = false;
-    int8_t coinY = 0;
     int8_t coinFrame = 0;
 
     void idle();

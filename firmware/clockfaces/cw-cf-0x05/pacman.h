@@ -32,12 +32,7 @@ class Pacman: public Sprite, public EventTask {
     };
 
     byte _iteration = 0;
-
-    int _lastX;
-    int _lastY;
     long current_color = 0xFE40;
-
-    const unsigned short* _sprite;
     unsigned long invencibleTimeout = 0;
     
 
@@ -60,7 +55,6 @@ class Pacman: public Sprite, public EventTask {
     void move(Direction dir);
     void turn(Direction dir);
     void setState(State state);
-    int nextBlock();
     int getX();
     int getY();
     void setPosition(int x, int y);

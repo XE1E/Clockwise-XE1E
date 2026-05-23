@@ -16,29 +16,23 @@ void Mario::move(Direction dir, int times) {
 }
 
 void Mario::jump() {
-  if (_state != JUMPING && (millis() - lastMillis > 500) ) {
-    // Serial.println("Jump - Start");
-
+  if (_state != JUMPING && (millis() - lastMillis > 500)) {
     _lastState = _state;
     _state = JUMPING;
 
     Locator::getDisplay()->fillRect(_x, _y, _width, _height, SKY_COLOR);
-    
+
     _width = MARIO_JUMP_SIZE[0];
     _height = MARIO_JUMP_SIZE[1];
     _sprite = MARIO_JUMP;
 
     direction = UP;
-
     _lastY = _y;
-    _lastX = _x;
-  }  
+  }
 }
 
 void Mario::idle() {
   if (_state != IDLE) {
-    // Serial.println("Idle - Start");
-
     _lastState = _state;
     _state = IDLE;
 
@@ -57,36 +51,28 @@ void Mario::init() {
 }
 
 void Mario::update() {
-  
-
   if (_state == IDLE && _state != _lastState) {
     Locator::getDisplay()->drawRGBBitmap(_x, _y, MARIO_IDLE, MARIO_IDLE_SIZE[0], MARIO_IDLE_SIZE[1]);
   } else if (_state == JUMPING) {
-    
     if (millis() - lastMillis >= 50) {
-
-      //Serial.println(_y);
-      
       Locator::getDisplay()->fillRect(_x, _y, _width, _height, SKY_COLOR);
-      
+
       _y = _y + (MARIO_PACE * (direction == UP ? -1 : 1));
 
       Locator::getDisplay()->drawRGBBitmap(_x, _y, _sprite, _width, _height);
-      
+
       Locator::getEventBus()->broadcast(MOVE, this);
 
-     
-      if (floor(_lastY - _y) >= MARIO_JUMP_HEIGHT) {
+      if ((_lastY - _y) >= MARIO_JUMP_HEIGHT) {
         direction = DOWN;
       }
 
-      if (_y+_height >= 56) {
+      if (_y + _height >= 56) {
         idle();
       }
 
       lastMillis = millis();
     }
-
   }
 }
 
