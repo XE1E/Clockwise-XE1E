@@ -705,6 +705,21 @@ class ClockfaceEditor {
                 this.updateSelectedElement();
             });
         });
+
+        // Help tooltip toggle
+        const helpIcon = document.getElementById('content-help');
+        const helpTooltip = document.getElementById('content-tooltip');
+        if (helpIcon && helpTooltip) {
+            helpIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                helpTooltip.classList.toggle('visible');
+            });
+            document.addEventListener('click', (e) => {
+                if (!helpTooltip.contains(e.target) && e.target !== helpIcon) {
+                    helpTooltip.classList.remove('visible');
+                }
+            });
+        }
     }
 
     bindThumbnailGenerator() {

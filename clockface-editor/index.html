@@ -151,8 +151,28 @@
                         </div>
 
                         <div class="prop-row" id="fg-content">
-                            <label>Contenido</label>
+                            <label>Contenido <span class="help-icon" id="content-help">?</span></label>
                             <input type="text" id="el-content" value="">
+                            <div class="help-tooltip" id="content-tooltip">
+                                <div class="tooltip-title">Formatos DateTime</div>
+                                <table class="tooltip-table">
+                                    <tr><th>Codigo</th><th>Resultado</th><th>Ejemplo</th></tr>
+                                    <tr><td>H</td><td>Hora 24h</td><td>14</td></tr>
+                                    <tr><td>h</td><td>Hora 12h</td><td>02</td></tr>
+                                    <tr><td>i</td><td>Minutos</td><td>30</td></tr>
+                                    <tr><td>s</td><td>Segundos</td><td>45</td></tr>
+                                    <tr><td>A</td><td>AM/PM</td><td>PM</td></tr>
+                                    <tr><td>d</td><td>Dia</td><td>29</td></tr>
+                                    <tr><td>m</td><td>Mes</td><td>04</td></tr>
+                                    <tr><td>Y</td><td>Ano</td><td>2026</td></tr>
+                                    <tr><td>l</td><td>Dia semana</td><td>Lunes</td></tr>
+                                    <tr><td>D</td><td>Dia corto</td><td>Lun</td></tr>
+                                    <tr><td>F</td><td>Mes nombre</td><td>Abril</td></tr>
+                                    <tr><td>M</td><td>Mes corto</td><td>Abr</td></tr>
+                                    <tr><td>Hw</td><td>Hora en palabras</td><td>DIEZ</td></tr>
+                                    <tr><td>iw</td><td>Min en palabras</td><td>y media</td></tr>
+                                </table>
+                            </div>
                         </div>
 
                         <div class="prop-row" id="fg-format-presets" style="display:none;">
