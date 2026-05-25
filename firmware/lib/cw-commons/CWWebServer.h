@@ -6,7 +6,7 @@
 #include <CWPreferences.h>
 #include <CWPreview.h>
 #include "StatusController.h"
-#include "WebUI.h"
+#include "WebUI_gz.h"
 #include "WebUI_minimal.h"
 
 #ifndef CLOCKFACE_NAME
@@ -59,9 +59,10 @@ struct ClockwiseWebServer
 
   void setupRoutes()
   {
-    // Página principal
+    // Página principal (gzipped para transferencia más rápida)
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", WEB_UI_HTML);
+      AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", WEB_UI_HTML_GZ, WEB_UI_HTML_GZ_LEN);
+      response->addHeader("Content-Encoding", "gzip");
       request->send(response);
     });
 
