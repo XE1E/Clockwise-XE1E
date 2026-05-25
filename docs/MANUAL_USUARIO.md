@@ -75,7 +75,17 @@ El reloj puede guardar hasta **3 redes WiFi**:
 
 El reloj intentara conectar en orden: Red 1 → Red 2 → Red 3
 
-### Cambiar de Red
+### Escanear Redes WiFi
+1. Ve a la pestana WiFi
+2. Haz clic en **"Escanear"**
+3. Espera unos segundos mientras busca redes disponibles
+4. Selecciona una red del menu desplegable
+5. Elige en cual slot guardarla (WiFi 1, 2 o 3)
+6. Haz clic en **"Usar"** para llenar los campos
+7. Ingresa la contrasena si es necesario
+8. Haz clic en "Guardar WiFi"
+
+### Cambiar de Red Manualmente
 1. Ve a la pestana WiFi
 2. Ingresa SSID y contrasena de la nueva red
 3. Haz clic en "Guardar WiFi"
@@ -219,9 +229,12 @@ Reduce el brillo y cambia la caratula durante la noche.
 3. Ajusta el **brillo nocturno** (recomendado: 4-8)
 4. Selecciona el **color de los digitos** haciendo clic en uno de los botones de color
 5. Elige la **caratula nocturna**:
-   - "Builtin" usa un reloj minimalista integrado
-   - O selecciona una de las caratulas guardadas
+   - **"Reloj Nocturno"** usa un reloj minimalista integrado con el color seleccionado
+   - **"Pac-Man"** o **"Mario Bros"** para usar las caratulas nativas
+   - O selecciona una de las **caratulas guardadas** en memoria
 6. Haz clic en "Guardar Canvas"
+
+**Nota:** El selector de color solo aplica para el reloj nocturno integrado. Las caratulas nativas y guardadas usan sus propios colores.
 
 ### Colores Recomendados para Dormir
 

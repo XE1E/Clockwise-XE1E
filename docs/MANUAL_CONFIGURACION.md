@@ -112,6 +112,16 @@ python -m platformio run --target clean
 python -m platformio run
 ```
 
+### Regenerar WebUI comprimido
+
+Si modificas `lib/cw-commons/WebUI.h`, debes regenerar el archivo comprimido:
+
+```powershell
+python tools/gzip_webui.py
+```
+
+Esto genera `WebUI_gz.h` con el HTML comprimido (reduce ~70% el tamaño de transferencia).
+
 ### Problemas al Flashear
 
 | Problema | Solucion |
@@ -387,6 +397,8 @@ Clockwise-XE1E/
 │   │   ├── cw-commons/          # WiFi, WebServer, Preferences
 │   │   └── cw-cf-0x07/          # Clockface Canvas (JSON)
 │   ├── clockfaces/              # Otros clockfaces compilados
+│   ├── tools/
+│   │   └── gzip_webui.py        # Comprime WebUI.h para transferencia rapida
 │   └── platformio.ini           # Configuracion PlatformIO
 │
 ├── clockface-editor/            # Herramientas web
