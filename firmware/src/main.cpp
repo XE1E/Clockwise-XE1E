@@ -65,6 +65,15 @@ bool isNativeClockface(const String& name) {
   return name == PACMAN_CLOCKFACE || name == MARIO_CLOCKFACE;
 }
 
+// Migrate old nightClockface values to new format
+String getNightClockface() {
+  String val = ClockwiseParams::getInstance()->nightClockface;
+  // Migrate old values
+  if (val == "cw-cf-0x05") return "_pacman";
+  if (val == "cw-cf-0x01") return "_mario";
+  return val;
+}
+
 int parseHour(String timeStr) {
   int colonPos = timeStr.indexOf(':');
   if (colonPos > 0) {
@@ -101,7 +110,13 @@ bool isNightTime() {
   }
 }
 
+unsigned long lastNightModeCheck = 0;
+
 void checkNightMode() {
+  // Only check every 5 seconds to reduce CPU usage
+  if (millis() - lastNightModeCheck < 5000) return;
+  lastNightModeCheck = millis();
+
   if (!ClockwiseParams::getInstance()->nightModeEnabled) {
     if (nightModeActive) {
       nightModeActive = false;
@@ -120,8 +135,10 @@ void checkNightMode() {
     currentClockface = ClockwiseParams::getInstance()->canvasFile;
     dma_display->setBrightness8(ClockwiseParams::getInstance()->nightBrightness);
 
-    String nightClock = ClockwiseParams::getInstance()->nightClockface;
+    String nightClock = getNightClockface();
     if (nightClock == "_builtin") {
+      // Builtin night mode always uses jsonClockface
+      clockface = jsonClockface;
       clockface->setBuiltinNightMode(true, ClockwiseParams::getInstance()->nightColor);
     } else {
       ClockwiseParams::getInstance()->canvasFile = nightClock;
@@ -136,7 +153,13 @@ void checkNightMode() {
   }
 }
 
+unsigned long lastRotationCheck = 0;
+
 void checkClockfaceRotation() {
+  // Only check every 10 seconds to reduce CPU usage
+  if (millis() - lastRotationCheck < 10000) return;
+  lastRotationCheck = millis();
+
   if (!ClockwiseParams::getInstance()->rotationEnabled || nightModeActive) return;
 
   String rotList = ClockwiseParams::getInstance()->rotationList;
@@ -305,10 +328,10 @@ void setup()
     if (shouldBeNight) {
       nightModeActive = true;
       dma_display->setBrightness8(ClockwiseParams::getInstance()->nightBrightness);
-      String nightClock = ClockwiseParams::getInstance()->nightClockface;
+      String nightClock = getNightClockface();
       if (nightClock == "_builtin") {
-        // Use setupNightMode to avoid loading any clockface
-        selectClockface(ClockwiseParams::getInstance()->canvasFile);
+        // Builtin night mode always uses jsonClockface
+        clockface = jsonClockface;
         clockface->setupNightMode(&cwDateTime, ClockwiseParams::getInstance()->nightColor);
       } else {
         ClockwiseParams::getInstance()->canvasFile = nightClock;
@@ -329,43 +352,48 @@ void loop()
     ezt::updateNTP();
   }
 
+  // Cache instances to avoid repeated getInstance() calls
+  ClockwiseWebServer* webServer = ClockwiseWebServer::getInstance();
+  ClockwiseParams* params = ClockwiseParams::getInstance();
+
   if (wifi.isConnected())
   {
-    ClockwiseWebServer::getInstance()->handleRestart();
+    webServer->handleRestart();
 
     // Apply brightness change from web UI immediately
-    if (ClockwiseWebServer::getInstance()->needs_brightness_update && !nightModeActive) {
-      ClockwiseWebServer::getInstance()->needs_brightness_update = false;
-      dma_display->setBrightness8(ClockwiseWebServer::getInstance()->pending_brightness);
+    if (webServer->needs_brightness_update && !nightModeActive) {
+      webServer->needs_brightness_update = false;
+      dma_display->setBrightness8(webServer->pending_brightness);
     }
 
     // Apply night brightness change from web UI immediately (only if night mode is active)
-    if (ClockwiseWebServer::getInstance()->needs_night_brightness_update) {
-      ClockwiseWebServer::getInstance()->needs_night_brightness_update = false;
+    if (webServer->needs_night_brightness_update) {
+      webServer->needs_night_brightness_update = false;
       if (nightModeActive) {
-        dma_display->setBrightness8(ClockwiseWebServer::getInstance()->pending_night_brightness);
+        dma_display->setBrightness8(webServer->pending_night_brightness);
       }
     }
 
     // Apply display rotation change from web UI immediately
-    if (ClockwiseWebServer::getInstance()->needs_display_rotation_update) {
-      ClockwiseWebServer::getInstance()->needs_display_rotation_update = false;
-      dma_display->setRotation(ClockwiseWebServer::getInstance()->pending_display_rotation);
+    if (webServer->needs_display_rotation_update) {
+      webServer->needs_display_rotation_update = false;
+      dma_display->setRotation(webServer->pending_display_rotation);
       dma_display->clearScreen();
       needsClockfaceReload = true;
     }
 
-    // Handle rotation enable/disable
-    if (ClockwiseWebServer::getInstance()->rotation_changed) {
-      ClockwiseWebServer::getInstance()->rotation_changed = false;
-      if (ClockwiseParams::getInstance()->rotationEnabled) {
-        String rotList = ClockwiseParams::getInstance()->rotationList;
+    // Handle rotation enable/disable (skip if needs_reload pending - it will handle everything)
+    if (webServer->rotation_changed && !webServer->needs_reload) {
+      webServer->rotation_changed = false;
+      // Skip if night mode is active
+      if (params->rotationEnabled && !nightModeActive) {
+        String rotList = params->rotationList;
         if (rotList.length() > 0) {
           int commaPos = rotList.indexOf(',');
           String firstClockface = (commaPos > 0) ? rotList.substring(0, commaPos) : rotList;
           firstClockface.trim();
-          ClockwiseParams::getInstance()->canvasFile = firstClockface;
-          ClockwiseParams::getInstance()->rotationIndex = 0;
+          params->canvasFile = firstClockface;
+          params->rotationIndex = 0;
           currentClockface = firstClockface;
           rotationMillis = millis();
           needsClockfaceReload = true;
@@ -373,49 +401,54 @@ void loop()
       }
     }
 
-    ezt::events();
+    // ezTime events - only process every 100ms
+    static unsigned long lastEztEvents = 0;
+    if (millis() - lastEztEvents >= 100) {
+      ezt::events();
+      lastEztEvents = millis();
+    }
   }
 
   if (wifi.connectionSucessfulOnce)
   {
     // Check for web-triggered reload
-    if (ClockwiseWebServer::getInstance()->needs_reload) {
-      ClockwiseWebServer::getInstance()->needs_reload = false;
-      currentClockface = ClockwiseParams::getInstance()->canvasFile;
-      Serial.printf("[Web] Settings updated, currentClockface: %s\n", currentClockface.c_str());
+    if (webServer->needs_reload) {
+      webServer->needs_reload = false;
+      webServer->rotation_changed = false;  // Clear rotation flag too
+      needsClockfaceReload = false;
+      Serial.println("[Web] Settings updated, applying...");
 
       // Check if we should be in night mode
-      bool shouldBeNight = ClockwiseParams::getInstance()->nightModeEnabled && isNightTime();
-      bool nightModeChanged = (shouldBeNight != nightModeActive);
+      bool shouldBeNight = params->nightModeEnabled && isNightTime();
 
       if (shouldBeNight) {
+        // Save the normal clockface BEFORE changing canvasFile
+        currentClockface = params->canvasFile;
         // Apply night mode settings
         nightModeActive = true;
-        // Only set brightness if night mode state changed
-        if (nightModeChanged) {
-          dma_display->setBrightness8(ClockwiseParams::getInstance()->nightBrightness);
-        }
-        String nightClock = ClockwiseParams::getInstance()->nightClockface;
+        dma_display->setBrightness8(params->nightBrightness);
+        String nightClock = getNightClockface();
         if (nightClock == "_builtin") {
-          selectClockface(currentClockface);
-          clockface->setupNightMode(&cwDateTime, ClockwiseParams::getInstance()->nightColor);
+          // Builtin night mode always uses jsonClockface
+          clockface = jsonClockface;
+          clockface->setupNightMode(&cwDateTime, params->nightColor);
         } else {
-          ClockwiseParams::getInstance()->canvasFile = nightClock;
+          // Use selected night clockface - must set canvasFile for jsonClockface to load it
+          params->canvasFile = nightClock;
           selectClockface(nightClock);
           clockface->setup(&cwDateTime, false);
         }
+        Serial.printf("[Web] Night mode: using %s\n", nightClock.c_str());
       } else {
         // Not in night mode - load normal clockface
-        // Only set brightness if night mode state changed
-        if (nightModeChanged) {
-          dma_display->setBrightness8(ClockwiseParams::getInstance()->displayBright);
-        }
         nightModeActive = false;
+        currentClockface = params->canvasFile;
+        dma_display->setBrightness8(params->displayBright);
         selectClockface(currentClockface);
         clockface->setBuiltinNightMode(false);
         clockface->setup(&cwDateTime, false);
+        Serial.printf("[Web] Normal mode: using %s\n", currentClockface.c_str());
       }
-      needsClockfaceReload = false;
       Serial.println("[Web] Reload complete");
     } else {
       checkNightMode();
@@ -423,7 +456,7 @@ void loop()
 
       if (needsClockfaceReload) {
         needsClockfaceReload = false;
-        selectClockface(ClockwiseParams::getInstance()->canvasFile);
+        selectClockface(params->canvasFile);
         clockface->setup(&cwDateTime, false);  // No splash on rotation
       }
     }
@@ -434,4 +467,6 @@ void loop()
   if (!nightModeActive) {
     automaticBrightControl();
   }
+
+  delay(1);  // Give time to WiFi/web server
 }

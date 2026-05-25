@@ -44,9 +44,10 @@ struct WiFiController
   static void onImprovWiFiConnectedCb(const char *ssid, const char *password)
   {
     // Guardar nueva red en slot 1 (principal)
-    ClockwiseParams::getInstance()->wifiSsid = String(ssid);
-    ClockwiseParams::getInstance()->wifiPwd = String(password);
-    ClockwiseParams::getInstance()->save();
+    ClockwiseParams* params = ClockwiseParams::getInstance();
+    params->wifiSsid = String(ssid);
+    params->wifiPwd = String(password);
+    params->save();
 
     ClockwiseWebServer::getInstance()->startWebServer();
 
@@ -186,18 +187,20 @@ struct WiFiController
   // Cargar redes guardadas desde preferencias
   void loadSavedNetworks()
   {
-    networks[0].ssid = ClockwiseParams::getInstance()->wifiSsid;
-    networks[0].password = ClockwiseParams::getInstance()->wifiPwd;
+    ClockwiseParams* params = ClockwiseParams::getInstance();
+
+    networks[0].ssid = params->wifiSsid;
+    networks[0].password = params->wifiPwd;
     networks[0].rssi = -100;
     networks[0].available = false;
 
-    networks[1].ssid = ClockwiseParams::getInstance()->wifiSsid2;
-    networks[1].password = ClockwiseParams::getInstance()->wifiPwd2;
+    networks[1].ssid = params->wifiSsid2;
+    networks[1].password = params->wifiPwd2;
     networks[1].rssi = -100;
     networks[1].available = false;
 
-    networks[2].ssid = ClockwiseParams::getInstance()->wifiSsid3;
-    networks[2].password = ClockwiseParams::getInstance()->wifiPwd3;
+    networks[2].ssid = params->wifiSsid3;
+    networks[2].password = params->wifiPwd3;
     networks[2].rssi = -100;
     networks[2].available = false;
   }

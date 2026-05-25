@@ -121,61 +121,62 @@ struct ClockwiseWebServer
         const AsyncWebParameter* p = request->getParam((size_t)0);
         String key = p->name();
         String value = p->value();
+        ClockwiseParams* params = ClockwiseParams::getInstance();
 
         // WiFi
-        if (key == "wifiSsid") ClockwiseParams::getInstance()->wifiSsid = value;
-        else if (key == "wifiPwd") ClockwiseParams::getInstance()->wifiPwd = value;
-        else if (key == "wifiSsid2") ClockwiseParams::getInstance()->wifiSsid2 = value;
-        else if (key == "wifiPwd2") ClockwiseParams::getInstance()->wifiPwd2 = value;
-        else if (key == "wifiSsid3") ClockwiseParams::getInstance()->wifiSsid3 = value;
-        else if (key == "wifiPwd3") ClockwiseParams::getInstance()->wifiPwd3 = value;
+        if (key == "wifiSsid") params->wifiSsid = value;
+        else if (key == "wifiPwd") params->wifiPwd = value;
+        else if (key == "wifiSsid2") params->wifiSsid2 = value;
+        else if (key == "wifiPwd2") params->wifiPwd2 = value;
+        else if (key == "wifiSsid3") params->wifiSsid3 = value;
+        else if (key == "wifiPwd3") params->wifiPwd3 = value;
         // Display
         else if (key == "displayBright") {
-          ClockwiseParams::getInstance()->displayBright = value.toInt();
+          params->displayBright = value.toInt();
           pending_brightness = value.toInt();
           needs_brightness_update = true;
         }
         else if (key == "displayRotation") {
-          ClockwiseParams::getInstance()->displayRotation = value.toInt();
+          params->displayRotation = value.toInt();
           pending_display_rotation = value.toInt();
           needs_display_rotation_update = true;
         }
-        else if (key == "swapBlueGreen") ClockwiseParams::getInstance()->swapBlueGreen = (value == "1");
-        else if (key == "autoBrightMin") ClockwiseParams::getInstance()->autoBrightMin = value.toInt();
-        else if (key == "autoBrightMax") ClockwiseParams::getInstance()->autoBrightMax = value.toInt();
-        else if (key == "ldrPin") ClockwiseParams::getInstance()->ldrPin = value.toInt();
+        else if (key == "swapBlueGreen") params->swapBlueGreen = (value == "1");
+        else if (key == "autoBrightMin") params->autoBrightMin = value.toInt();
+        else if (key == "autoBrightMax") params->autoBrightMax = value.toInt();
+        else if (key == "ldrPin") params->ldrPin = value.toInt();
         // Time
-        else if (key == "timeZone") ClockwiseParams::getInstance()->timeZone = value;
-        else if (key == "ntpServer") ClockwiseParams::getInstance()->ntpServer = value;
-        else if (key == "manualPosix") ClockwiseParams::getInstance()->manualPosix = value;
-        else if (key == "use24hFormat") ClockwiseParams::getInstance()->use24hFormat = (value == "1");
-        else if (key == "useSpanish") ClockwiseParams::getInstance()->useSpanish = (value == "1");
+        else if (key == "timeZone") params->timeZone = value;
+        else if (key == "ntpServer") params->ntpServer = value;
+        else if (key == "manualPosix") params->manualPosix = value;
+        else if (key == "use24hFormat") params->use24hFormat = (value == "1");
+        else if (key == "useSpanish") params->useSpanish = (value == "1");
         // Night mode
-        else if (key == "nightEnabled") ClockwiseParams::getInstance()->nightModeEnabled = (value == "1");
-        else if (key == "nightStart") ClockwiseParams::getInstance()->nightModeStart = value;
-        else if (key == "nightEnd") ClockwiseParams::getInstance()->nightModeEnd = value;
+        else if (key == "nightEnabled") params->nightModeEnabled = (value == "1");
+        else if (key == "nightStart") params->nightModeStart = value;
+        else if (key == "nightEnd") params->nightModeEnd = value;
         else if (key == "nightBright") {
-          ClockwiseParams::getInstance()->nightBrightness = value.toInt();
+          params->nightBrightness = value.toInt();
           pending_night_brightness = value.toInt();
           needs_night_brightness_update = true;
         }
-        else if (key == "nightColor") ClockwiseParams::getInstance()->nightColor = value.toInt();
-        else if (key == "nightClock") ClockwiseParams::getInstance()->nightClockface = value;
+        else if (key == "nightColor") params->nightColor = value.toInt();
+        else if (key == "nightClock") params->nightClockface = value;
         // Clockface (clear preview when changing from web UI)
         else if (key == "canvasFile") {
-          ClockwiseParams::getInstance()->canvasFile = value;
+          params->canvasFile = value;
           CWPreview::getInstance()->clearPreview();
         }
         else if (key == "rotationEnabled") {
-          ClockwiseParams::getInstance()->rotationEnabled = (value == "1");
+          params->rotationEnabled = (value == "1");
           rotation_changed = true;
         }
-        else if (key == "rotationInterval") ClockwiseParams::getInstance()->rotationInterval = value.toInt();
-        else if (key == "rotationList") ClockwiseParams::getInstance()->rotationList = value;
-        else if (key == "localServerHost") ClockwiseParams::getInstance()->localServerHost = value;
-        else if (key == "localServerPort") ClockwiseParams::getInstance()->localServerPort = value.toInt();
+        else if (key == "rotationInterval") params->rotationInterval = value.toInt();
+        else if (key == "rotationList") params->rotationList = value;
+        else if (key == "localServerHost") params->localServerHost = value;
+        else if (key == "localServerPort") params->localServerPort = value.toInt();
 
-        ClockwiseParams::getInstance()->save();
+        params->save();
       }
       request->send(204);
     });
@@ -245,15 +246,52 @@ struct ClockwiseWebServer
       }
     );
 
+    // API: iniciar escaneo WiFi (asíncrono)
+    server.on("/api/scan/start", HTTP_POST, [](AsyncWebServerRequest *request) {
+      WiFi.scanDelete();
+      WiFi.scanNetworks(true, true);
+      request->send(200, "application/json", "{\"status\":\"scanning\"}");
+    });
+
+    // API: obtener resultado del escaneo
+    server.on("/api/scan", HTTP_GET, [](AsyncWebServerRequest *request) {
+      int n = WiFi.scanComplete();
+      StaticJsonDocument<1024> doc;
+
+      if (n == WIFI_SCAN_RUNNING) {
+        doc["status"] = "scanning";
+      } else if (n == WIFI_SCAN_FAILED || n < 0) {
+        doc["status"] = "error";
+        WiFi.scanDelete();
+      } else {
+        doc["status"] = "done";
+        JsonArray networks = doc.createNestedArray("networks");
+        for (int i = 0; i < n && i < 15; i++) {
+          String ssid = WiFi.SSID(i);
+          if (ssid.length() == 0) continue;
+          JsonObject net = networks.createNestedObject();
+          net["ssid"] = ssid;
+          net["rssi"] = WiFi.RSSI(i);
+          net["open"] = (WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? 1 : 0;
+        }
+        WiFi.scanDelete();
+      }
+
+      String output;
+      serializeJson(doc, output);
+      request->send(200, "application/json", output);
+    });
+
     // API: reset WiFi config
     server.on("/api/resetwifi", HTTP_POST, [this](AsyncWebServerRequest *request) {
-      ClockwiseParams::getInstance()->wifiSsid = "";
-      ClockwiseParams::getInstance()->wifiPwd = "";
-      ClockwiseParams::getInstance()->wifiSsid2 = "";
-      ClockwiseParams::getInstance()->wifiPwd2 = "";
-      ClockwiseParams::getInstance()->wifiSsid3 = "";
-      ClockwiseParams::getInstance()->wifiPwd3 = "";
-      ClockwiseParams::getInstance()->save();
+      ClockwiseParams* params = ClockwiseParams::getInstance();
+      params->wifiSsid = "";
+      params->wifiPwd = "";
+      params->wifiSsid2 = "";
+      params->wifiPwd2 = "";
+      params->wifiSsid3 = "";
+      params->wifiPwd3 = "";
+      params->save();
       request->send(200, "text/plain", "WiFi reset, restarting...");
       force_restart = true;
     });

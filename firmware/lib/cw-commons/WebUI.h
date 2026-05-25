@@ -150,6 +150,19 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             <svg viewBox="0 0 24 24"><path d="M12 3C7.5 3 3.75 4.95 1 8l1.5 1.5C4.75 7 8.25 5.5 12 5.5s7.25 1.5 9.5 4L23 8c-2.75-3.05-6.5-5-11-5zm0 5c-3 0-5.75 1.35-7.5 3.5L6 13c1.35-1.65 3.4-2.75 6-2.75s4.65 1.1 6 2.75l1.5-1.5C17.75 9.35 15 8 12 8zm0 5c-1.85 0-3.35.85-4.5 2L12 19l4.5-4c-1.15-1.15-2.65-2-4.5-2z"/></svg>
             Configuracion WiFi
         </div>
+        <div class="wifi-network" style="background:var(--primary);padding:10px 15px">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <button class="btn" onclick="scanWifi()" id="scanBtn" style="white-space:nowrap">Escanear</button>
+                <select class="form-input" id="wifiSelect" onchange="selectWifi(this.value)" style="flex:1;min-width:120px">
+                    <option value="">-- Seleccionar red --</option>
+                </select>
+                <select class="form-input" id="wifiSlot" style="width:auto">
+                    <option value="1">WiFi 1</option>
+                    <option value="2">WiFi 2</option>
+                    <option value="3">WiFi 3</option>
+                </select>
+            </div>
+        </div>
         <div class="wifi-network">
             <div class="wifi-network-header">
                 <span class="wifi-network-title">Red WiFi 1</span>
@@ -997,20 +1010,27 @@ async function loadThumbForNight(name){
 function buildNightClockSelect(){
     const sel=$('nightClockSelect');
     const current=$('nightClock').value||'_builtin';
-    let html='<option value="_builtin">Reloj Nocturno (integrado)</option>';
-    storedClockfaces.forEach(c=>{
-        const displayName=c.displayName||c.name;
-        html+='<option value="'+c.name+'"'+(c.name===current?' selected':'')+'>'+displayName+'</option>';
-    });
-    sel.innerHTML=html;
-    if(current!=='_builtin'&&!storedClockfaces.some(c=>c.name===current)){
-        sel.value='_builtin';
-        $('nightClock').value='_builtin';
+    let html='<option value="_builtin"'+(current==='_builtin'?' selected':'')+'>Reloj Nocturno (integrado)</option>';
+    html+='<optgroup label="Nativas">';
+    html+='<option value="_pacman"'+(current==='_pacman'?' selected':'')+'>Pac-Man</option>';
+    html+='<option value="_mario"'+(current==='_mario'?' selected':'')+'>Mario Bros</option>';
+    html+='</optgroup>';
+    // Filter out native clockfaces from stored list
+    const spiffsOnly=storedClockfaces.filter(c=>c.name!=='_pacman'&&c.name!=='_mario');
+    if(spiffsOnly.length>0){
+        html+='<optgroup label="Guardadas">';
+        spiffsOnly.forEach(c=>{
+            const displayName=c.displayName||c.name;
+            html+='<option value="'+c.name+'"'+(c.name===current?' selected':'')+'>'+displayName+'</option>';
+        });
+        html+='</optgroup>';
     }
+    sel.innerHTML=html;
+    sel.value=current;
     // Update color settings visibility
     const colorSettings=$('nightColorSettings');
     if(colorSettings){
-        colorSettings.style.display=(sel.value==='_builtin')?'block':'none';
+        colorSettings.style.display=(current==='_builtin')?'block':'none';
     }
     updateNightPreview();
 }
@@ -1053,6 +1073,55 @@ async function saveWifi(){
     await saveField('wifiSsid3',$('wifiSsid3').value);
     if($('wifiPwd3').value)await saveField('wifiPwd3',$('wifiPwd3').value);
     toast('WiFi guardado');
+}
+
+let lastScanNetworks=[];
+async function scanWifi(){
+    const btn=$('scanBtn');
+    const sel=$('wifiSelect');
+    btn.disabled=true;
+    btn.textContent='Escaneando...';
+    sel.innerHTML='<option value="">Escaneando...</option>';
+    try{
+        await fetch('/api/scan/start',{method:'POST'});
+        let data,tries=0;
+        do{
+            await new Promise(r=>setTimeout(r,1000));
+            const r=await fetch('/api/scan');
+            data=await r.json();
+            tries++;
+        }while(data.status==='scanning'&&tries<10);
+        if(data.status==='error'){throw new Error('Scan failed');}
+        lastScanNetworks=data.networks||[];
+        sel.innerHTML='<option value="">-- Seleccionar red --</option>';
+        lastScanNetworks.forEach((n,i)=>{
+            const signal=n.rssi>-50?'Excelente':n.rssi>-70?'Buena':'Debil';
+            const lock=n.open?'':'🔒';
+            sel.innerHTML+=`<option value="${i}">${n.ssid} ${lock} (${signal})</option>`;
+        });
+        if(lastScanNetworks.length===0){
+            sel.innerHTML='<option value="">No se encontraron redes</option>';
+        }
+        toast(lastScanNetworks.length+' redes encontradas');
+    }catch(e){
+        sel.innerHTML='<option value="">Error al escanear</option>';
+        toast('Error al escanear','error');
+    }
+    btn.disabled=false;
+    btn.textContent='Escanear Redes';
+}
+
+function selectWifi(idx){
+    if(idx===''||!lastScanNetworks[idx])return;
+    const net=lastScanNetworks[idx];
+    const slot=$('wifiSlot').value;
+    const ssidField=slot==='1'?'wifiSsid':('wifiSsid'+slot);
+    const pwdField=slot==='1'?'wifiPwd':('wifiPwd'+slot);
+    $(ssidField).value=net.ssid;
+    $(pwdField).value='';
+    $(pwdField).placeholder=net.open?'(red abierta)':'Ingresa password';
+    $(pwdField).focus();
+    $('wifiSelect').value='';
 }
 
 async function saveDisplay(){

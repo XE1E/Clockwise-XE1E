@@ -186,12 +186,10 @@ void PacmanClockface::updateClock() {
 
     Locator::getDisplay()->setFont(&Picopixel);
     Locator::getDisplay()->setTextColor(0xAD55);
-    Locator::getDisplay()->setCursor(15, 41);
+    Locator::getDisplay()->setCursor(20, 41);
     Locator::getDisplay()->print(this->_dateTime->getDay());
     Locator::getDisplay()->print(" ");
     Locator::getDisplay()->print(monthName(this->_dateTime->getMonth()));
-    Locator::getDisplay()->print(" ");
-    Locator::getDisplay()->print(weekDayName(this->_dateTime->getWeekday()));
 
     Locator::getDisplay()->setFont(&hourFont);
     Locator::getDisplay()->setTextColor(0xFE40);

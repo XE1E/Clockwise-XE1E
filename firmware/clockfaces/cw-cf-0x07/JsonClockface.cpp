@@ -17,6 +17,7 @@ JsonClockface::JsonClockface(Adafruit_GFX *display)
 void JsonClockface::setup(CWDateTime *dateTime, bool showSplash)
 {
   this->_dateTime = dateTime;
+  _builtinNightMode = false;  // Reset night mode flag
   Serial.println("[Canvas] setup() called");
 
   if (showSplash) {
