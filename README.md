@@ -32,15 +32,20 @@
 
 ## Caratulas de Ejemplo
 
-<p align="center">
-  <img src="clockface-editor/clockfaces/thumbs/mario-native.jpg" width="80" alt="Mario Bros">
-  <img src="clockface-editor/clockfaces/thumbs/pacman-native.jpg" width="80" alt="Pac-Man">
-  <img src="clockface-editor/clockfaces/thumbs/donkey-kong.png" width="80" alt="Donkey Kong">
-  <img src="clockface-editor/clockfaces/thumbs/clock-club.png" width="80" alt="Clock Club">
-  <img src="clockface-editor/clockfaces/thumbs/hora-palabras.png" width="80" alt="Hora en Palabras">
-  <img src="clockface-editor/clockfaces/thumbs/snoopy3.png" width="80" alt="Snoopy">
-  <img src="clockface-editor/clockfaces/thumbs/world-clock.png" width="80" alt="World Clock">
-</p>
+<table align="center">
+  <tr>
+    <td><img src="clockface-editor/clockfaces/thumbs/mario-native.jpg" width="180" alt="Mario Bros"></td>
+    <td><img src="clockface-editor/clockfaces/thumbs/pacman-native.jpg" width="180" alt="Pac-Man"></td>
+    <td><img src="clockface-editor/clockfaces/thumbs/donkey-kong.png" width="180" alt="Donkey Kong"></td>
+    <td><img src="clockface-editor/clockfaces/thumbs/clock-club.png" width="180" alt="Clock Club"></td>
+  </tr>
+  <tr>
+    <td><img src="clockface-editor/clockfaces/thumbs/hora-palabras.png" width="180" alt="Hora en Palabras"></td>
+    <td><img src="clockface-editor/clockfaces/thumbs/snoopy3.png" width="180" alt="Snoopy"></td>
+    <td><img src="clockface-editor/clockfaces/thumbs/world-clock.png" width="180" alt="World Clock"></td>
+    <td><img src="clockface-editor/clockfaces/thumbs/pepsi-final-2.png" width="180" alt="Pepsi"></td>
+  </tr>
+</table>
 
 <p align="center"><i>Mario Bros y Pac-Man son caratulas nativas animadas integradas en el firmware</i></p>
 
