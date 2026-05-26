@@ -4,9 +4,7 @@
 
 <h1 align="center">Clockwise XE1E</h1>
 
-<p align="center">
-  <b>Reloj inteligente con matriz LED 64x64 y editor de caratulas</b>
-</p>
+<h3 align="center">Reloj inteligente con matriz LED 64x64 y editor de caratulas</h3>
 
 <p align="center">
   <a href="https://github.com/XE1E/Clockwise-XE1E/actions/workflows/build-firmware.yml">
