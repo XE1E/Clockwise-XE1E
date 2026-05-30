@@ -3,67 +3,713 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClockWise XE1E</title>
+  <title>ClockWise XE1E - Reloj LED Matrix 64x64</title>
+  <meta name="description" content="Reloj inteligente con matriz LED 64x64, editor de caratulas y flasher web. Compatible con ESP32 y ESP32-S3.">
+  <link rel="icon" type="image/png" href="https://github.com/jnthas/clockwise/blob/gh-pages/static/images/clockwise_logo.png?raw=true">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root { --bg: #0f1117; --card: #1a1d2e; --text: #e0e0e8; --accent: #f0b800; --dim: #9090a8; --r: 8px; }
-    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
-    h1 { color: var(--accent); margin-bottom: 8px; }
-    .subtitle { color: var(--dim); margin-bottom: 32px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; max-width: 900px; width: 100%; }
-    .card { background: var(--card); border-radius: var(--r); padding: 20px; text-decoration: none; color: var(--text); transition: transform 0.2s, box-shadow 0.2s; }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-    .card h2 { color: var(--accent); font-size: 16px; margin-bottom: 8px; }
-    .card p { color: var(--dim); font-size: 14px; }
-    .section { margin-top: 32px; width: 100%; max-width: 900px; }
-    .section h3 { color: var(--dim); font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-    footer { margin-top: 48px; color: var(--dim); font-size: 13px; }
-    footer a { color: var(--accent); text-decoration: none; }
+    :root {
+      --bg: #0a0a0f;
+      --bg-secondary: #12121a;
+      --card: #1a1d2e;
+      --card-hover: #232840;
+      --text: #e8e8f0;
+      --text-dim: #9090a8;
+      --accent: #f0b800;
+      --accent-hover: #ffc820;
+      --success: #10b981;
+      --radius: 12px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10, 10, 15, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo {
+      font-weight: 700;
+      font-size: 1.2em;
+      color: var(--accent);
+    }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { color: var(--text-dim); font-size: 0.9em; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+      background: radial-gradient(ellipse at top, #1a1a30 0%, var(--bg) 70%);
+    }
+    .hero-logo {
+      width: 150px;
+      height: auto;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 30px rgba(240, 184, 0, 0.3));
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--text-dim);
+      max-width: 600px;
+      margin-bottom: 40px;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(240, 184, 0, 0.3);
+      color: #000;
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .version-badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-top: 24px;
+    }
+
+    /* About */
+    .about {
+      padding: 80px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .about-text h2 {
+      font-size: 2rem;
+      margin-bottom: 24px;
+      color: var(--accent);
+    }
+    .about-text p {
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      font-size: 1.05rem;
+    }
+    .about-text ul {
+      list-style: none;
+      margin-top: 24px;
+    }
+    .about-text li {
+      padding: 8px 0;
+      padding-left: 28px;
+      position: relative;
+      color: var(--text-dim);
+    }
+    .about-text li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--success);
+      font-weight: bold;
+    }
+    .about-image {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+    }
+    .about-image img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(240, 184, 0, 0.1) 0%, rgba(240, 184, 0, 0.05) 100%);
+      border: 1px solid rgba(240, 184, 0, 0.2);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-top: 32px;
+    }
+    .highlight-box h3 {
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    .highlight-box p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    @media (max-width: 768px) {
+      .about-content { grid-template-columns: 1fr; }
+      .about-image { order: -1; }
+    }
+
+    /* Gallery */
+    .gallery {
+      padding: 80px 24px;
+      background: var(--bg-secondary);
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      margin-bottom: 16px;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-dim);
+      margin-bottom: 48px;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .gallery-item {
+      aspect-ratio: 1;
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .gallery-item:hover {
+      transform: scale(1.05);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .gallery-item::after {
+      content: attr(data-name);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      font-size: 0.8rem;
+      color: var(--text);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .gallery-item:hover::after { opacity: 1; }
+
+    /* Features */
+    .features {
+      padding: 80px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .feature-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 32px;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+    .feature-card:hover {
+      background: var(--card-hover);
+      border-color: rgba(240, 184, 0, 0.2);
+      transform: translateY(-4px);
+    }
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      color: var(--accent);
+    }
+    .feature-card p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+    }
+
+    /* Tools */
+    .tools {
+      padding: 80px 24px;
+      background: var(--bg-secondary);
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 48px auto 0;
+    }
+    .tool-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .tool-card:hover {
+      background: var(--card-hover);
+      transform: translateX(8px);
+      color: var(--text);
+    }
+    .tool-icon {
+      font-size: 2rem;
+      width: 60px;
+      height: 60px;
+      background: rgba(240, 184, 0, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tool-info h3 { font-size: 1.1rem; margin-bottom: 4px; }
+    .tool-info p { color: var(--text-dim); font-size: 0.9rem; }
+
+    /* Hardware */
+    .hardware {
+      padding: 80px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .hardware-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-top: 48px;
+    }
+    .hardware-images {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .hardware-img-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+    .hardware-img-card img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+    }
+    .hardware-img-card p {
+      margin-top: 12px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+    .hardware-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .hardware-table th, .hardware-table td {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .hardware-table th {
+      background: rgba(240, 184, 0, 0.1);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hardware-table td { color: var(--text-dim); }
+    @media (max-width: 768px) {
+      .hardware-content { grid-template-columns: 1fr; }
+    }
+
+    /* Footer */
+    footer {
+      padding: 60px 24px;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+    .footer-credit {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+    .footer-credit a { color: var(--accent); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero-buttons { flex-direction: column; width: 100%; max-width: 300px; }
+      .btn { width: 100%; justify-content: center; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
-  <h1>ClockWise XE1E</h1>
-  <p class="subtitle">Reloj LED Matrix 64x64 con ESP32</p>
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-content">
+      <span class="nav-logo">ClockWise XE1E</span>
+      <div class="nav-links">
+        <a href="#about">Acerca de</a>
+        <a href="#features">Funciones</a>
+        <a href="#tools">Herramientas</a>
+        <a href="#hardware">Hardware</a>
+        <a href="https://github.com/XE1E/Clockwise-XE1E">GitHub</a>
+      </div>
+    </div>
+  </nav>
 
-  <div class="cards">
-    <a href="clockface-editor/" class="card">
-      <h2>Editor de Caratulas</h2>
-      <p>Crea y edita caratulas con elementos visuales, sprites y animaciones.</p>
-    </a>
-    <a href="clockface-editor/digit-designer.html" class="card">
-      <h2>Disenador de Digitos</h2>
-      <p>Disena digitos personalizados pixel por pixel.</p>
-    </a>
-    <a href="clockface-editor/char-designer.html" class="card">
-      <h2>Disenador de Caracteres</h2>
-      <p>Crea caracteres y simbolos para tus fuentes.</p>
-    </a>
-    <a href="clockface-editor/font-converter.html" class="card">
-      <h2>Conversor de Fuentes</h2>
-      <p>Convierte fuentes a formato compatible con ClockWise.</p>
-    </a>
-  </div>
-
-  <div class="section">
-    <h3>Herramientas</h3>
-    <div class="cards">
-      <a href="clockface-editor/generate-thumbs.html" class="card">
-        <h2>Generar Thumbnails</h2>
-        <p>Genera miniaturas PNG de tus caratulas.</p>
+  <!-- Hero -->
+  <section class="hero">
+    <img src="https://github.com/jnthas/clockwise/blob/gh-pages/static/images/clockwise_logo.png?raw=true" alt="ClockWise Logo" class="hero-logo">
+    <h1>ClockWise XE1E</h1>
+    <p class="hero-subtitle">Reloj inteligente con matriz LED 64x64, editor de caratulas visual y flasher web. Compatible con ESP32 y ESP32-S3.</p>
+    <div class="hero-buttons">
+      <a href="web-flasher/" class="btn btn-primary">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3v6h4l-5 8v-6H8l5-8z"/></svg>
+        Instalar Firmware
       </a>
-      <a href="clockface-editor/config-page.html" class="card">
-        <h2>Configuracion</h2>
-        <p>Pagina de configuracion del reloj.</p>
-      </a>
-      <a href="clockface-editor/install.html" class="card">
-        <h2>Guia de Instalacion</h2>
-        <p>Instrucciones para instalar el firmware.</p>
+      <a href="clockface-editor/" class="btn btn-secondary">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Editor de Caratulas
       </a>
     </div>
-  </div>
+    <span class="version-badge">v1.0.0 - ESP32 y ESP32-S3</span>
+  </section>
 
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="about-content">
+      <div class="about-text">
+        <h2>Que es ClockWise XE1E?</h2>
+        <p>
+          ClockWise XE1E es un firmware open source para crear tu propio reloj inteligente
+          usando una matriz LED RGB de 64x64 pixeles y un microcontrolador ESP32 o ESP32-S3.
+        </p>
+        <p>
+          A diferencia de otros proyectos similares, ClockWise XE1E incluye un <strong>editor visual web</strong>
+          que te permite disenar tus propias caratulas sin necesidad de programar. Simplemente
+          arrastra elementos, ajusta colores y ve el resultado en tiempo real.
+        </p>
+        <ul>
+          <li>Instalacion en 2 minutos con el Web Flasher</li>
+          <li>Configuracion completa via WiFi (sin cables)</li>
+          <li>Funciona sin internet despues de configurar</li>
+          <li>Caratulas JSON editables y compartibles</li>
+          <li>Soporte completo en espanol</li>
+        </ul>
+        <div class="highlight-box">
+          <h3>Fork mejorado de Clockwise</h3>
+          <p>
+            Este proyecto es un fork del excelente <a href="https://github.com/jnthas/clockwise">Clockwise</a>
+            de @jnthas, con mejoras significativas: editor visual de caratulas, caratulas nativas animadas
+            (Mario, Pac-Man), soporte multi-WiFi, modo nocturno automatico, y muchas optimizaciones mas.
+          </p>
+        </div>
+      </div>
+      <div class="about-image">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+          <img src="clockface-editor/clockfaces/thumbs/mario-native.jpg" alt="Mario Bros" style="border-radius: 8px;">
+          <img src="clockface-editor/clockfaces/thumbs/pacman-native.jpg" alt="Pac-Man" style="border-radius: 8px;">
+        </div>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">
+          Caratulas nativas animadas: Mario Bros y Pac-Man
+        </p>
+        <div style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <img src="clockface-editor/clockfaces/thumbs/donkey-kong.png" alt="Donkey Kong" style="border-radius: 8px;">
+          <img src="clockface-editor/clockfaces/thumbs/nyan-cat.png" alt="Nyan Cat" style="border-radius: 8px;">
+        </div>
+        <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 12px;">
+          Caratulas JSON: diseñadas con el editor visual
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section class="gallery" id="gallery">
+    <h2 class="section-title">Galeria de Caratulas</h2>
+    <p class="section-subtitle">Caratulas listas para usar o crea las tuyas con el editor visual</p>
+    <div class="gallery-grid">
+      <div class="gallery-item" data-name="Mario Bros">
+        <img src="clockface-editor/clockfaces/thumbs/mario-native.jpg" alt="Mario Bros">
+      </div>
+      <div class="gallery-item" data-name="Pac-Man">
+        <img src="clockface-editor/clockfaces/thumbs/pacman-native.jpg" alt="Pac-Man">
+      </div>
+      <div class="gallery-item" data-name="Donkey Kong">
+        <img src="clockface-editor/clockfaces/thumbs/donkey-kong.png" alt="Donkey Kong">
+      </div>
+      <div class="gallery-item" data-name="Nyan Cat">
+        <img src="clockface-editor/clockfaces/thumbs/nyan-cat.png" alt="Nyan Cat">
+      </div>
+      <div class="gallery-item" data-name="Clock Club">
+        <img src="clockface-editor/clockfaces/thumbs/clock-club.png" alt="Clock Club">
+      </div>
+      <div class="gallery-item" data-name="Star Wars">
+        <img src="clockface-editor/clockfaces/thumbs/star-wars.png" alt="Star Wars">
+      </div>
+      <div class="gallery-item" data-name="Hora en Palabras">
+        <img src="clockface-editor/clockfaces/thumbs/hora-palabras.png" alt="Hora en Palabras">
+      </div>
+      <div class="gallery-item" data-name="Retro Computer">
+        <img src="clockface-editor/clockfaces/thumbs/retro-computer.png" alt="Retro Computer">
+      </div>
+      <div class="gallery-item" data-name="Snoopy">
+        <img src="clockface-editor/clockfaces/thumbs/snoopy3.png" alt="Snoopy">
+      </div>
+      <div class="gallery-item" data-name="Christmas Snoopy">
+        <img src="clockface-editor/clockfaces/thumbs/christmassnoopy.png" alt="Christmas Snoopy">
+      </div>
+      <div class="gallery-item" data-name="World Clock">
+        <img src="clockface-editor/clockfaces/thumbs/world-clock.png" alt="World Clock">
+      </div>
+      <div class="gallery-item" data-name="Night Clock">
+        <img src="clockface-editor/clockfaces/thumbs/night-clock.png" alt="Night Clock">
+      </div>
+      <div class="gallery-item" data-name="Pepsi">
+        <img src="clockface-editor/clockfaces/thumbs/pepsi-final-2.png" alt="Pepsi">
+      </div>
+      <div class="gallery-item" data-name="Goomba">
+        <img src="clockface-editor/clockfaces/thumbs/goomba_move.png" alt="Goomba">
+      </div>
+      <div class="gallery-item" data-name="Pac-Man Classic">
+        <img src="clockface-editor/clockfaces/thumbs/pac-man.png" alt="Pac-Man Classic">
+      </div>
+      <div class="gallery-item" data-name="Eletrogate">
+        <img src="clockface-editor/clockfaces/thumbs/eletrogate.png" alt="Eletrogate">
+      </div>
+    </div>
+    <p style="text-align: center; margin-top: 32px;">
+      <a href="web-flasher/gallery/" class="btn btn-secondary">Ver todas las caratulas</a>
+    </p>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <h2 class="section-title">Funcionalidades</h2>
+    <p class="section-subtitle">Todo lo que necesitas para tu reloj LED personalizado</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Editor Visual</h3>
+        <p>Disena caratulas con preview en tiempo real. Textos, sprites, formas y animaciones. 26+ fuentes pixel art incluidas.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🕹️</div>
+        <h3>Caratulas Nativas</h3>
+        <p>Mario Bros y Pac-Man animados integrados en el firmware. Personajes, bloques y efectos fluidos.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📶</div>
+        <h3>Multi-WiFi</h3>
+        <p>Guarda hasta 3 redes WiFi con failover automatico. Configuracion via portal cautivo.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌙</div>
+        <h3>Modo Nocturno</h3>
+        <p>Brillo reducido y caratula minimalista automatica por horario configurable.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>Rotacion Automatica</h3>
+        <p>Cambia entre multiples caratulas cada X minutos. Personaliza el orden y duracion.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💡</div>
+        <h3>Brillo Automatico</h3>
+        <p>Con sensor LDR opcional, ajusta el brillo segun la luz ambiente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section class="tools" id="tools">
+    <h2 class="section-title">Herramientas Web</h2>
+    <p class="section-subtitle">Todo desde el navegador, sin instalar nada</p>
+    <div class="tools-grid">
+      <a href="web-flasher/" class="tool-card">
+        <div class="tool-icon">⚡</div>
+        <div class="tool-info">
+          <h3>Web Flasher</h3>
+          <p>Instala el firmware directamente desde Chrome/Edge</p>
+        </div>
+      </a>
+      <a href="clockface-editor/" class="tool-card">
+        <div class="tool-icon">🎨</div>
+        <div class="tool-info">
+          <h3>Editor de Caratulas</h3>
+          <p>Disena caratulas con elementos visuales y sprites</p>
+        </div>
+      </a>
+      <a href="web-flasher/gallery/" class="tool-card">
+        <div class="tool-icon">🖼️</div>
+        <div class="tool-info">
+          <h3>Galeria</h3>
+          <p>Descarga caratulas listas para usar</p>
+        </div>
+      </a>
+      <a href="clockface-editor/digit-designer.html" class="tool-card">
+        <div class="tool-icon">🔢</div>
+        <div class="tool-info">
+          <h3>Disenador de Digitos</h3>
+          <p>Crea digitos personalizados pixel por pixel</p>
+        </div>
+      </a>
+      <a href="clockface-editor/font-converter.html" class="tool-card">
+        <div class="tool-icon">🔤</div>
+        <div class="tool-info">
+          <h3>Conversor de Fuentes</h3>
+          <p>Convierte fuentes a formato ClockWise</p>
+        </div>
+      </a>
+      <a href="clockface-editor/editor-fuentes.html" class="tool-card">
+        <div class="tool-icon">✏️</div>
+        <div class="tool-info">
+          <h3>Editor de Fuentes</h3>
+          <p>Edita y crea fuentes pixel art</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Hardware -->
+  <section class="hardware" id="hardware">
+    <h2 class="section-title">Hardware Compatible</h2>
+    <p class="section-subtitle">Componentes necesarios para armar tu reloj</p>
+    <div class="hardware-content">
+      <div class="hardware-images">
+        <div class="hardware-img-card">
+          <img src="docs/ESP32-S3-DevKit-C.png" alt="ESP32-S3 DevKit C">
+          <p>ESP32-S3 DevKitC-1 (recomendado)</p>
+        </div>
+        <div class="hardware-img-card">
+          <img src="docs/HUB75.png" alt="Panel LED HUB75">
+          <p>Panel LED HUB75 64x64 pixeles</p>
+        </div>
+      </div>
+      <div>
+        <table class="hardware-table">
+          <tr>
+            <th>Componente</th>
+            <th>Especificacion</th>
+          </tr>
+          <tr>
+            <td>Microcontrolador</td>
+            <td>ESP32 DevKit V1 o ESP32-S3 N16R8</td>
+          </tr>
+          <tr>
+            <td>Display</td>
+            <td>Panel LED HUB75 64x64 pixels</td>
+          </tr>
+          <tr>
+            <td>Alimentacion</td>
+            <td>5V / 4A minimo</td>
+          </tr>
+          <tr>
+            <td>Sensor (opcional)</td>
+            <td>LDR para brillo automatico</td>
+          </tr>
+        </table>
+        <p style="text-align: center; margin-top: 32px;">
+          <a href="docs/MANUAL_USUARIO.md" class="btn btn-secondary">Ver documentacion completa</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
   <footer>
-    <a href="https://github.com/XE1E/Clockwise-XE1E">GitHub</a> · ClockWise XE1E v1.0
+    <div class="footer-links">
+      <a href="https://github.com/XE1E/Clockwise-XE1E">GitHub</a>
+      <a href="docs/MANUAL_USUARIO.md">Manual de Usuario</a>
+      <a href="docs/MANUAL_CONFIGURACION.md">Configuracion</a>
+      <a href="https://github.com/XE1E/Clockwise-XE1E/releases">Releases</a>
+    </div>
+    <p class="footer-credit">
+      Fork de <a href="https://github.com/jnthas/clockwise">Clockwise</a> por <a href="https://github.com/jnthas">@jnthas</a>
+    </p>
   </footer>
 </body>
 </html>
