@@ -1,0 +1,22 @@
+{
+    "name": "cw-cf-0x08",
+    "version": "1.0.0",
+    "description": "Clockwise BME680 Environmental Clockface",
+    "frameworks": [
+        "arduino",
+        "espidf"
+    ],
+    "platforms": [
+        "espressif32"
+    ],
+    "dependencies": [
+        {
+            "owner": "adafruit",
+            "name": "Adafruit BME680 Library"
+        }
+    ],
+    "build": {
+        "srcFilter": ["+<*.cpp>"],
+        "includeDir": "."
+    }
+}

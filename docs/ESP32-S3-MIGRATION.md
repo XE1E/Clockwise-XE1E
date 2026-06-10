@@ -212,9 +212,100 @@ Los siguientes pines están reservados y NO deben usarse:
 
 ### LDR (sensor de luz)
 
-El pin por defecto para LDR en el proyecto puede necesitar cambio. GPIOs recomendados para ADC en S3:
-- GPIO 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 (ADC1)
-- GPIO 11, 12, 13, 14 (ADC2 - no usar con WiFi activo)
+El pin por defecto del LDR es **GPIO 35** (ver `CWPreferences.h`). En el ESP32-S3 con
+PSRAM octal (`board_build.arduino.memory_type = qio_opi`, módulos N16R8) los **GPIO 35,
+36 y 37 están ocupados por la PSRAM** y NO pueden usarse. Por eso en el S3 el LDR debe
+moverse a otro pin ADC1 libre.
+
+- **Recomendado en S3:** `GPIO 1` (ADC1_CH0). Configurar el pin desde la web UI o
+  `ldrPin` en preferencias.
+- GPIOs válidos para ADC en S3:
+  - GPIO 1, 9, 10 (ADC1, libres tras el cableado HUB75)
+  - GPIO 11, 12, 13, 14 (ADC2 — no usar con WiFi activo)
+- Pines ADC ya ocupados por HUB75 (no usar): 2, 3, 4, 5, 6, 7, 8, 15, 16, 18.
+
+#### Esquemático de conexión LDR
+
+Divisor de tensión: la lectura ADC sube con más luz (LDR arriba, resistencia fija a GND).
+
+```
+            3V3
+             │
+            ┌┴┐
+            │ │   LDR  (fotorresistor / GL5516, etc.)
+            └┬┘
+             │
+             ├───────────────────────►  GPIO 1  (ADC1_CH0)
+             │
+            ┌┴┐
+            │ │   R1 = 10 kΩ   (fija)
+            └┬┘
+             │
+            ─┴─  GND
+
+   Opcional: condensador 100 nF entre el nodo ADC y GND
+   para estabilizar la lectura (reduce ruido).
+```
+
+| Componente | Conexión |
+|------------|----------|
+| LDR pata A | 3V3 |
+| LDR pata B | nodo → GPIO 1 (ADC) |
+| R1 (10 kΩ) pata A | nodo → GPIO 1 (ADC) |
+| R1 (10 kΩ) pata B | GND |
+| C1 (100 nF, opcional) | entre nodo ADC y GND |
+
+> Calibración: usar el botón **Leer** del LDR en la web UI para ver el valor crudo
+> (0–4095) y ajustar `autoBrightMin` / `autoBrightMax`.
+
+### BME680 (sensor ambiental: temperatura, humedad, presión, gas/IAQ)
+
+Sensor I2C de Bosch para mostrar datos ambientales en una nueva carátula. Se alimenta a
+3.3 V y comparte el bus I2C (no usado actualmente por el proyecto).
+
+- **SDA → GPIO 9**
+- **SCL → GPIO 10**
+- Dirección I2C: `0x76` (pin SDO a GND) o `0x77` (pin SDO a 3V3). Por defecto la mayoría
+  de breakouts GY-BME680 vienen en `0x77`.
+- La mayoría de los módulos breakout ya incluyen resistencias pull-up y regulador; en ese
+  caso **omitir** las pull-ups externas y conectar VCC a 3V3.
+
+#### Esquemático de conexión BME680
+
+```
+   ESP32-S3-DevKitC-1                   Módulo BME680 (GY-BME680 / Adafruit)
+   ┌───────────────┐                    ┌─────────────────────────┐
+   │           3V3 ├────────────────────┤ VCC / VIN               │
+   │           GND ├──────────┬─────────┤ GND                     │
+   │                          │         │                         │
+   │        GPIO 9 ├────┬─────┼─────────┤ SDA / SDI               │
+   │       GPIO 10 ├─┬──┼─────┼─────────┤ SCL / SCK               │
+   │               │ │  │     │         │                         │
+   └───────────────┘ │  │     │         │ SDO ──► GND  = addr 0x76 │
+                     │  │     │         │ SDO ──► 3V3  = addr 0x77 │
+            pull-ups │  │     │         │ CS  ──► 3V3  = modo I2C  │
+         (solo si el R  R     │         └─────────────────────────┘
+          módulo NO  │  │     │
+          las trae)  └──┴─────┘  R = 4.7 kΩ a 3V3
+                     3V3 3V3
+```
+
+| Señal BME680 | GPIO ESP32-S3 | Notas |
+|--------------|---------------|-------|
+| VCC / VIN | 3V3 | NO usar 5V salvo que el módulo tenga regulador |
+| GND | GND | Tierra común |
+| SDA / SDI | GPIO 9 | Datos I2C |
+| SCL / SCK | GPIO 10 | Reloj I2C |
+| SDO | GND o 3V3 | Selecciona dirección 0x76 / 0x77 |
+| CS | 3V3 | Mantener alto para forzar modo I2C |
+
+> **Pull-ups:** si el bus no responde, agregar 4.7 kΩ de SDA→3V3 y SCL→3V3. Los breakouts
+> tipo GY-BME680 / Adafruit ya las incluyen; los chips "pelones" no.
+
+> **Firmware:** inicializar con `Wire.begin(9, 10);` y **auto-detectar la dirección**
+> probando `0x76` y luego `0x77` (`if (!bme.begin(0x76)) bme.begin(0x77);`). Para mostrar
+> Gas/IAQ se usa la librería **BSEC2** de Bosch (mayor consumo de Flash/RAM); para T/H/P
+> directos basta `Adafruit_BME680`.
 
 ## Consideraciones adicionales
 
@@ -255,7 +346,9 @@ El ESP32-S3 puede tardar más en compilar la primera vez debido a las biblioteca
 5. [ ] Colores correctos (no invertidos)
 6. [ ] WiFi conecta correctamente
 7. [ ] Interfaz web accesible
-8. [ ] LDR funciona (brillo automático)
+8. [ ] LDR funciona (brillo automático) — recordar mover `ldrPin` a GPIO 1 en S3
+9. [ ] BME680 detectado en el bus I2C (`bme.begin()` retorna true en 0x76/0x77)
+10. [ ] Lecturas de temperatura/humedad/presión coherentes
 
 ## Rollback
 

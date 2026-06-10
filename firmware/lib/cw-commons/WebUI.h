@@ -543,7 +543,8 @@ let settings={},storedClockfaces=[],thumbCache={},canvasChanged=false;
 // Native clockfaces (built into firmware)
 const nativeClockfaces=[
     {name:'_pacman',displayName:'Pac-Man',native:true,size:0},
-    {name:'_mario',displayName:'Mario Bros',native:true,size:0}
+    {name:'_mario',displayName:'Mario Bros',native:true,size:0},
+    {name:'_bme680',displayName:'BME680',native:true,size:0}
 ];
 
 // Native clockface thumbnails (base64 encoded 64x64 JPEGs)
