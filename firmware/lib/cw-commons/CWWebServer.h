@@ -80,6 +80,7 @@ struct ClockwiseWebServer
       doc["wifiHasPwd3"] = p->wifiPwd3.length() > 0 ? 1 : 0;
       doc["wifiConnected"] = WiFi.SSID();
       doc["wifiRssi"] = WiFi.RSSI();
+      doc["wifiIp"] = WiFi.localIP().toString();
       // Display
       doc["displayBright"] = p->displayBright;
       doc["displayRotation"] = p->displayRotation;

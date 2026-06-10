@@ -1210,7 +1210,7 @@ async function load(){
 
         $('current-ssid').textContent=settings.wifiConnected||'-';
         $('wifi-rssi').textContent=settings.wifiRssi?'('+settings.wifiRssi+' dBm)':'';
-        $('ip-address').textContent=location.hostname;
+        $('ip-address').textContent=settings.wifiIp||location.hostname;
         $('fw-version').textContent=settings.version||'1.0.0';
 
         $('wifiSsid').value=settings.wifiSsid||'';

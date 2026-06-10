@@ -326,7 +326,7 @@ setInterval(updUptime,1000);
 async function load(){
 try{
 const r=await fetch('/api/settings');cfg=await r.json();
-$('status').innerText='WiFi: '+(cfg.wifiConnected||'-')+' | IP: '+location.hostname;
+$('status').innerText='WiFi: '+(cfg.wifiConnected||'-')+' | IP: '+(cfg.wifiIp||location.hostname);
 $('ver').innerText='v'+(cfg.version||'1.0');
 $('wifiSsid').value=cfg.wifiSsid||'';
 $('wifiSsid2').value=cfg.wifiSsid2||'';
