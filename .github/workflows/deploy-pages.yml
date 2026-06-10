@@ -4,9 +4,12 @@ on:
   push:
     branches: [main]
     paths:
+      - 'index.html'
       - 'web-flasher/**'
       - 'clockface-editor/**'
       - 'docs/**'
+      - 'scripts/build-docs.mjs'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -18,9 +21,6 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,19 +29,31 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
-      - name: Create site structure
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install markdown renderer
+        run: npm install marked@12 --no-save
+
+      - name: Assemble site
         run: |
           mkdir -p _site
-          # Web Flasher as root (main page)
-          cp -r web-flasher/* _site/
-          # Editor in /editor subfolder
-          mkdir -p _site/editor
-          cp -r clockface-editor/* _site/editor/
-          # Docs in /docs subfolder
-          mkdir -p _site/docs
-          cp -r docs/* _site/docs/
+          # Landing page at the site root (its links already point to web-flasher/, clockface-editor/, docs/)
+          cp index.html _site/index.html
+          # Web flasher
+          cp -r web-flasher _site/web-flasher
+          # Clockface editor (folder name must match the landing page links)
+          cp -r clockface-editor _site/clockface-editor
+          # Documentation (manuals, images, guides)
+          cp -r docs _site/docs
+          # Render every markdown file in docs/ to styled HTML
+          node scripts/build-docs.mjs _site/docs
+          # Disable Jekyll so folders/files are served as-is
+          touch _site/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
