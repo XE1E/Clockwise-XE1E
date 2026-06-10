@@ -3,7 +3,30 @@
     "allow": [
       "Bash(git commit *)",
       "Bash(platformio run *)",
-      "Bash(python -m platformio run -e esp32dev -t upload)"
+      "Bash(python -m platformio run -e esp32dev -t upload)",
+      "PowerShell(git fetch *)",
+      "PowerShell(python firmware/tools/gzip_webui.py)",
+      "PowerShell($tool = \"$env:USERPROFILE\\\\.platformio\\\\packages\\\\toolchain-xtensa-esp32s3\\\\bin\\\\xtensa-esp32s3-elf-addr2line.exe\"; $elf = \"C:\\\\Documents\\\\GitHub\\\\Clockwise-XE1E\\\\firmware\\\\.pio\\\\build\\\\esp32s3\\\\firmware.elf\"; if \\(Test-Path $tool\\) { & $tool -pfiaC -e $elf 0x420b29a9 0x42081d5c 0x42081f8d 0x420861a6 0x420824eb 0x42072e26 0x42072ed5 0x420715a6 0x420b1cd9 } else { Write-Output \"addr2line no encontrado en $tool\" })",
+      "WebFetch(domain:xe1e.github.io)",
+      "Bash(grep -iE \"docs/|\\\\.html$|index\")",
+      "Bash(grep -iE \"\\\\.html$|\\\\.md$|index|docs/\")",
+      "Bash(git rm *)",
+      "Bash(npm install *)",
+      "Bash(mkdir -p /tmp/sitetest/docs)",
+      "Bash(cp docs/*.md /tmp/sitetest/docs/)",
+      "Bash(node scripts/build-docs.mjs /tmp/sitetest/docs)",
+      "Read(//tmp/sitetest/docs/**)",
+      "Read(//tmp/sitetest/**)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git push *)",
+      "Bash(gh run *)",
+      "Bash(git tag *)",
+      "Bash(git branch *)",
+      "Bash(grep -vE \"thumbs/|clockfaces/.*\\\\.\\(json\\)$\")",
+      "Bash(curl -s \"https://xe1e.github.io/Clockwise-XE1E/web-flasher/\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"https://xe1e.github.io/Clockwise-XE1E/web-flasher/gallery/clockfaces/Star%20Wars%20v2.json\")"
     ]
   }
 }
