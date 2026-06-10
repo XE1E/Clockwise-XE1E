@@ -75,6 +75,16 @@ jobs:
           echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
           echo "time=$(date +'%H%M')" >> $GITHUB_OUTPUT
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          # Extraer la version semantica de CW_FW_VERSION en platformio.ini
+          SEMVER=$(grep -m1 'CW_FW_VERSION' firmware/platformio.ini | grep -oE '[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?')
+          echo "semver=$SEMVER" >> $GITHUB_OUTPUT
+          # Marcar pre-release si la version contiene beta/rc/alpha
+          if echo "$SEMVER" | grep -qiE 'beta|rc|alpha'; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
+          echo "Firmware semver: $SEMVER (prerelease: $(echo "$SEMVER" | grep -qiE 'beta|rc|alpha' && echo true || echo false))"
 
       - name: Prepare firmware files
         run: |
@@ -101,10 +111,11 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.version.outputs.date }}.${{ steps.version.outputs.time }}
-          name: ${{ github.event.inputs.release_name || format('Firmware {0}', steps.version.outputs.date) }}
+          name: ${{ github.event.inputs.release_name || format('Firmware {0} ({1})', steps.version.outputs.semver, steps.version.outputs.date) }}
           body: |
             ## Firmware Build
 
+            - **Version**: ${{ steps.version.outputs.semver }}
             - **Commit**: ${{ github.sha }}
             - **Date**: ${{ steps.version.outputs.date }}
             - **Branch**: ${{ github.ref_name }}
@@ -122,6 +133,6 @@ jobs:
 
           files: release-files/firmware-*.bin
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.version.outputs.prerelease }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
