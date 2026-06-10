@@ -6,6 +6,13 @@
     #define CW_PREF_DB_NAME "clockwise"
 #endif
 
+// Pin LDR por defecto segun la placa (definido en platformio.ini).
+// ESP32 clasico: GPIO35 (ADC1_CH7). ESP32-S3: GPIO1 (ADC1_CH0), ya que
+// GPIO35 NO es un pin ADC valido en el S3.
+#ifndef CW_LDR_PIN_DEFAULT
+    #define CW_LDR_PIN_DEFAULT 35
+#endif
+
 
 struct ClockwiseParams
 {
@@ -130,7 +137,7 @@ struct ClockwiseParams
         displayBright = preferences.getUInt(PREF_DISPLAY_BRIGHT, 32);
         autoBrightMin = preferences.getUInt(PREF_DISPLAY_ABC_MIN, 0);
         autoBrightMax = preferences.getUInt(PREF_DISPLAY_ABC_MAX, 0);
-        ldrPin = preferences.getUInt(PREF_LDR_PIN, 35);
+        ldrPin = preferences.getUInt(PREF_LDR_PIN, CW_LDR_PIN_DEFAULT);
         timeZone = preferences.getString(PREF_TIME_ZONE, "America/Mexico_City");
         // WiFi multi-red
         wifiSsid = preferences.getString(PREF_WIFI_SSID, "");
@@ -139,8 +146,8 @@ struct ClockwiseParams
         wifiPwd2 = preferences.getString(PREF_WIFI_PASSWORD_2, "");
         wifiSsid3 = preferences.getString(PREF_WIFI_SSID_3, "");
         wifiPwd3 = preferences.getString(PREF_WIFI_PASSWORD_3, "");
-        ntpServer = preferences.getString(PREF_NTP_SERVER, "time.google.com");
-        canvasFile = preferences.getString(PREF_CANVAS_FILE, "");
+        ntpServer = preferences.getString(PREF_NTP_SERVER, "time.cloudflare.com");
+        canvasFile = preferences.getString(PREF_CANVAS_FILE, "_mario");
         manualPosix = preferences.getString(PREF_MANUAL_POSIX, "");
         displayRotation = preferences.getUInt(PREF_DISPLAY_ROTATION, 0);
         nightModeEnabled = preferences.getBool(PREF_NIGHT_MODE_ENABLED, false);
@@ -149,10 +156,10 @@ struct ClockwiseParams
         nightBrightness = preferences.getUInt(PREF_NIGHT_BRIGHTNESS, 8);
         nightColor = preferences.getUInt(PREF_NIGHT_COLOR, 63488);
         nightClockface = preferences.getString(PREF_NIGHT_CLOCKFACE, "_builtin");
-        rotationEnabled = preferences.getBool(PREF_ROTATION_ENABLED, false);
-        rotationList = preferences.getString(PREF_ROTATION_LIST, "");
+        rotationEnabled = preferences.getBool(PREF_ROTATION_ENABLED, true);
+        rotationList = preferences.getString(PREF_ROTATION_LIST, "_mario,_pacman");
         rotationIndex = preferences.getUInt(PREF_ROTATION_INDEX, 0);
-        rotationInterval = preferences.getUInt(PREF_ROTATION_INTERVAL, 1440);
+        rotationInterval = preferences.getUInt(PREF_ROTATION_INTERVAL, 5);
         localServerHost = preferences.getString(PREF_LOCAL_SERVER_HOST, "192.168.1.100");
         localServerPort = preferences.getUInt(PREF_LOCAL_SERVER_PORT, 8080);
     }
