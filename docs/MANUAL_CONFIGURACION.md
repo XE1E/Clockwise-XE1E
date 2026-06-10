@@ -430,12 +430,14 @@ El pinout depende de la placa. Usa la tabla que corresponda a tu microcontrolado
 ### Conexion LDR
 
 ```
-3.3V ──── LDR ────┬──── GPIO35
+3.3V ──── LDR ────┬──── GPIO (ADC)
                   │
                  10K
                   │
                  GND
 ```
+
+Pin ADC por defecto: **GPIO 35** en ESP32 DevKit v1, **GPIO 1** en ESP32-S3 (ADC1, compatible con WiFi). Configurable desde la web UI. Esquema detallado del S3 en **[Migracion a ESP32-S3](ESP32-S3-MIGRATION.html#esquema-de-conexion-divisor-de-tension)**.
 
 ---
 

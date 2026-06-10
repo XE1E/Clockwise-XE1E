@@ -212,9 +212,51 @@ Los siguientes pines están reservados y NO deben usarse:
 
 ### LDR (sensor de luz)
 
-El pin por defecto para LDR en el proyecto puede necesitar cambio. GPIOs recomendados para ADC en S3:
-- GPIO 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 (ADC1)
-- GPIO 11, 12, 13, 14 (ADC2 - no usar con WiFi activo)
+En el ESP32-S3 el pin por defecto del LDR es **GPIO 1** (`CW_LDR_PIN_DEFAULT=1` en `platformio.ini`), frente al GPIO 35 del ESP32 original.
+
+**Por que GPIO 1:** es **ADC1_CH0**. El bloque ADC1 sigue funcionando con WiFi activo; el ADC2 NO (lo usa la radio WiFi), por eso se evita. Ademas GPIO 1 queda libre tras asignar los pines de HUB75.
+
+GPIOs validos para reasignar el LDR (configurable desde la web UI, campo "Pin LDR"):
+- **ADC1 (recomendado):** GPIO 1, 2, 9, 10 (los demas de ADC1 estan ocupados por HUB75)
+- **ADC2 (evitar):** GPIO 11-14 — no leen bien con WiFi encendido
+
+> El valor se calibra desde la interfaz web (Brillo Automatico → min/max del LDR). Max = 0 desactiva el brillo automatico.
+
+#### Esquema de conexion (divisor de tension)
+
+El LDR forma un divisor de tension con una resistencia fija de 10K. El pin ADC lee el punto medio: a mas luz, baja la resistencia del LDR y sube el voltaje leido.
+
+```
+                3.3V
+                 │
+                 ┤
+                ┌┴┐
+                │ │  LDR (fotorresistencia)
+                │ │
+                └┬┘
+                 │
+                 ├───────────────►  GPIO 1  (ADC1_CH0)
+                 │
+                ┌┴┐
+                │ │  R1 = 10K  (resistencia fija / pull-down)
+                │ │
+                └┬┘
+                 │
+                GND
+```
+
+| Conexion | Desde | Hacia |
+|----------|-------|-------|
+| LDR pata 1 | **3.3V** | LDR pata 2 |
+| LDR pata 2 | nodo central | **GPIO 1** + R1 |
+| R1 (10K) pata 1 | nodo central | R1 pata 2 |
+| R1 (10K) pata 2 | **GND** | — |
+
+**Notas:**
+- Usar **3.3V**, nunca 5V: el ADC del S3 no tolera 5V en el pin.
+- Con poca luz el LDR sube su resistencia → el voltaje en el nodo baja (lectura ADC baja). Con mucha luz, sube.
+- Si las lecturas salen invertidas respecto a lo esperado, intercambiar LDR y R1 de posicion (LDR abajo, R1 arriba).
+- El rango util del ADC es 0-4095 (12 bits). Calibrar min/max segun tu ambiente desde la web UI.
 
 ## Consideraciones adicionales
 
