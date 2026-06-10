@@ -649,7 +649,7 @@ class ClockfaceEditor {
     }
 
     bindElementProperties() {
-        const inputs = ['el-x', 'el-y', 'el-content', 'el-font', 'el-width', 'el-height', 'el-x1', 'el-y1', 'el-radius', 'el-in-loop'];
+        const inputs = ['el-x', 'el-y', 'el-content', 'el-font', 'el-width', 'el-height', 'el-x1', 'el-y1', 'el-radius', 'el-in-loop', 'el-sensor-source', 'el-sensor-unit', 'el-sensor-decimals'];
 
         inputs.forEach(id => {
             const el = document.getElementById(id);
@@ -2347,6 +2347,9 @@ class ClockfaceEditor {
             case 'datetime':
                 element = new DateTimeElement(coords.x, coords.y);
                 break;
+            case 'sensor':
+                element = new SensorElement(coords.x, coords.y);
+                break;
             case 'text':
                 element = new TextElement(coords.x, coords.y);
                 break;
@@ -2413,6 +2416,15 @@ class ClockfaceEditor {
 
         if (element.type === 'datetime' || element.type === 'text') {
             element.content = document.getElementById('el-content').value;
+            element.font = document.getElementById('el-font').value;
+            element.fgColor = ColorUtils.hexToRgb565(document.getElementById('el-fgcolor').value);
+            element.bgColor = ColorUtils.hexToRgb565(document.getElementById('el-bgcolor').value);
+        }
+
+        if (element.type === 'sensor') {
+            element.source = document.getElementById('el-sensor-source').value;
+            element.showUnit = document.getElementById('el-sensor-unit').checked;
+            element.decimals = parseInt(document.getElementById('el-sensor-decimals').value) || 0;
             element.font = document.getElementById('el-font').value;
             element.fgColor = ColorUtils.hexToRgb565(document.getElementById('el-fgcolor').value);
             element.bgColor = ColorUtils.hexToRgb565(document.getElementById('el-bgcolor').value);
@@ -2488,8 +2500,9 @@ class ClockfaceEditor {
         const showFields = {
             'fg-content': ['datetime', 'text'],
             'fg-format-presets': ['datetime'],
-            'fg-font': ['datetime', 'text'],
-            'fg-colors-grid': ['datetime', 'text'],
+            'fg-sensor': ['sensor'],
+            'fg-font': ['datetime', 'text', 'sensor'],
+            'fg-colors-grid': ['datetime', 'text', 'sensor'],
             'fg-size': ['rect', 'fillrect'],
             'fg-radius': ['circle', 'fillcircle'],
             'fg-endpoint': ['line'],
@@ -2512,6 +2525,18 @@ class ClockfaceEditor {
 
         if (element.type === 'datetime' || element.type === 'text') {
             document.getElementById('el-content').value = element.content;
+            document.getElementById('el-font').value = element.font;
+            document.getElementById('el-fgcolor').value = ColorUtils.rgb565ToHex(element.fgColor);
+            document.getElementById('el-fgcolor-value').textContent = element.fgColor;
+            document.getElementById('el-bgcolor').value = ColorUtils.rgb565ToHex(element.bgColor);
+            document.getElementById('el-bgcolor-value').textContent = element.bgColor;
+            this.updateFontPreview();
+        }
+
+        if (element.type === 'sensor') {
+            document.getElementById('el-sensor-source').value = element.source;
+            document.getElementById('el-sensor-unit').checked = element.showUnit;
+            document.getElementById('el-sensor-decimals').value = element.decimals;
             document.getElementById('el-font').value = element.font;
             document.getElementById('el-fgcolor').value = ColorUtils.rgb565ToHex(element.fgColor);
             document.getElementById('el-fgcolor-value').textContent = element.fgColor;
@@ -2573,6 +2598,8 @@ class ClockfaceEditor {
             let label = el.type;
             if (el.content) {
                 label += ': ' + el.content.substring(0, 10);
+            } else if (el.type === 'sensor') {
+                label += ': ' + el.source;
             } else if (el.type === 'sprite') {
                 label += ` #${el.sprite}`;
             }

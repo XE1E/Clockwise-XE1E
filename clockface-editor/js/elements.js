@@ -30,6 +30,15 @@ class ClockfaceElement {
                 element.fgColor = data.fgColor || 65535;
                 element.bgColor = data.bgColor || 0;
                 break;
+            case 'sensor':
+                element = new SensorElement(data.x, data.y);
+                element.source = data.source || 'temp';
+                element.showUnit = data.showUnit !== undefined ? data.showUnit : true;
+                element.decimals = data.decimals !== undefined ? data.decimals : 1;
+                element.font = data.font || '';
+                element.fgColor = data.fgColor || 65535;
+                element.bgColor = data.bgColor || 0;
+                break;
             case 'text':
                 element = new TextElement(data.x, data.y);
                 element.content = data.content || 'Text';
@@ -187,6 +196,48 @@ class DateTimeElement extends ClockfaceElement {
             return 'veinti\n' + unidades[u];
         }
         return decenas[d] + '\ny ' + unidades[u];
+    }
+}
+
+class SensorElement extends ClockfaceElement {
+    constructor(x = 0, y = 0) {
+        super('sensor', x, y);
+        this.source = 'temp';   // temp | hum | pres | gas
+        this.showUnit = true;
+        this.decimals = 1;
+        this.font = 'picopixel';
+        this.fgColor = 65535;
+        this.bgColor = 0;
+        this.inLoop = true;
+    }
+
+    toJSON() {
+        return {
+            type: this.type,
+            x: this.x,
+            y: this.y,
+            source: this.source,
+            showUnit: this.showUnit,
+            decimals: this.decimals,
+            font: this.font,
+            fgColor: this.fgColor,
+            bgColor: this.bgColor,
+            id: this.id
+        };
+    }
+
+    getDisplayText() {
+        // Sample values shown in the editor (the device reads the real BME680)
+        const sample = { temp: 23.4, hum: 45, pres: 1013, gas: 120 };
+        const units = { temp: 'C', hum: '%', pres: 'hPa', gas: 'k' };
+        const v = sample[this.source];
+        if (v === undefined) return '--';
+        let dec = this.decimals;
+        if (dec < 0) dec = 0;
+        if (dec > 3) dec = 3;
+        let text = Number(v).toFixed(dec);
+        if (this.showUnit) text += units[this.source] || '';
+        return text;
     }
 }
 

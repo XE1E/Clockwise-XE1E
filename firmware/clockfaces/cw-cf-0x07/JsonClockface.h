@@ -28,6 +28,7 @@
 #include "PNGRender.h"
 #include "CustomSprite.h"
 #include "CWHttpClient.h"
+#include "BME680Sensor.h"
 
 #define CLOCKFACE_NAME "cw-cf-0x07"
 
@@ -67,10 +68,12 @@ private:
   String getTimeInWords(const char *content);
   String hourToWords(int h);
   String minuteToWords(int m);
+  String formatSensorValue(const char *source, int decimals, bool showUnit);
   void handleSpriteAnimation(std::shared_ptr<CustomSprite> &sprite);
   void handleSpriteMovement(std::shared_ptr<CustomSprite> &sprite);
 
   std::vector<std::shared_ptr<CustomSprite>> sprites;
+  BME680Sensor _sensor;
 
 public:
   JsonClockface(Adafruit_GFX *display);

@@ -33,6 +33,9 @@
                     <button class="tool-btn" data-tool="datetime" title="Fecha/Hora">
                         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>
                     </button>
+                    <button class="tool-btn" data-tool="sensor" title="Sensor BME680 (temp/hum/pres/gas)">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15,13V5A3,3 0 0,0 12,2A3,3 0 0,0 9,5V13A5,5 0 1,0 15,13M12,4A1,1 0 0,1 13,5V8H11V5A1,1 0 0,1 12,4Z"/></svg>
+                    </button>
                     <button class="tool-btn" data-tool="text" title="Texto">
                         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.5,4L19.66,8.35L18.7,8.61C18.25,7.74 17.79,6.87 17.26,6.43C16.73,6 16.11,6 15.5,6H13V16.5C13,17 13,17.5 13.33,17.75C13.67,18 14.33,18 15,18V19H9V18C9.67,18 10.33,18 10.67,17.75C11,17.5 11,17 11,16.5V6H8.5C7.89,6 7.27,6 6.74,6.43C6.21,6.87 5.75,7.74 5.3,8.61L4.34,8.35L5.5,4H18.5Z"/></svg>
                     </button>
@@ -186,6 +189,26 @@
                                 <button type="button" class="btn-preset" data-format="Hw">Hora (texto)</button>
                                 <button type="button" class="btn-preset" data-format="iw">Min (texto)</button>
                                 <button type="button" class="btn-preset" data-format="l">Dia semana</button>
+                            </div>
+                        </div>
+
+                        <div class="prop-row" id="fg-sensor" style="display:none;">
+                            <label>Dato del sensor</label>
+                            <select id="el-sensor-source" class="select-highlight">
+                                <option value="temp">Temperatura (C)</option>
+                                <option value="hum">Humedad (%)</option>
+                                <option value="pres">Presion (hPa)</option>
+                                <option value="gas">Gas (k)</option>
+                            </select>
+                            <div class="prop-row-half" style="margin-top:8px;">
+                                <div>
+                                    <label>Decimales</label>
+                                    <input type="number" id="el-sensor-decimals" min="0" max="3" value="1">
+                                </div>
+                                <div style="display:flex;align-items:center;gap:6px;margin-top:18px;">
+                                    <input type="checkbox" id="el-sensor-unit" checked>
+                                    <label for="el-sensor-unit" style="margin:0;">Mostrar unidad</label>
+                                </div>
                             </div>
                         </div>
 

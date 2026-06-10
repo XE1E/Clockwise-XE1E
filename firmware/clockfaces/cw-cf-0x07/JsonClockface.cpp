@@ -291,34 +291,68 @@ void JsonClockface::renderText(String text, JsonVariantConst value)
   Locator::getDisplay()->print(text);
 }
 
+String JsonClockface::formatSensorValue(const char *source, int decimals, bool showUnit)
+{
+  if (!source) return "--";
+
+  float v = NAN;
+  const char *unit = "";
+  if (strcmp(source, "temp") == 0)      { v = _sensor.temperature;    unit = "C"; }
+  else if (strcmp(source, "hum") == 0)  { v = _sensor.humidity;       unit = "%"; }
+  else if (strcmp(source, "pres") == 0) { v = _sensor.pressure;       unit = "hPa"; }
+  else if (strcmp(source, "gas") == 0)  { v = _sensor.gasResistance;  unit = "k"; }
+  else return "--";
+
+  if (isnan(v)) return "--";
+
+  if (decimals < 0) decimals = 0;
+  if (decimals > 3) decimals = 3;
+
+  String text = String(v, (unsigned int)decimals);
+  if (showUnit) text += unit;
+  return text;
+}
+
+// Resolve a dynamic element (datetime or sensor) to its display text.
+// Returns true if the element was dynamic and got rendered.
+static bool isDynamicType(const char *type)
+{
+  return type && (strcmp(type, "datetime") == 0 || strcmp(type, "sensor") == 0);
+}
+
 void JsonClockface::refreshDateTime()
 {
-  // Check both "setup" and "loop" arrays for datetime elements
-  JsonArrayConst setupElements = doc["setup"].as<JsonArrayConst>();
-  for (JsonVariantConst value : setupElements)
-  {
-    const char *type = value["type"].as<const char *>();
-    if (strcmp(type, "datetime") == 0)
-    {
-      const char *content = value["content"].as<const char *>();
-      String text = getTimeInWords(content);
-      if (text.length() == 0) {
-        text = _dateTime->getFormattedTime(content);
-      }
-      renderText(text, value);
-    }
-  }
+  // Read the environmental sensor (throttled + retried internally).
+  _sensor.update();
 
-  JsonArrayConst loopElements = doc["loop"].as<JsonArrayConst>();
-  for (JsonVariantConst value : loopElements)
+  // Check both "setup" and "loop" arrays for dynamic elements.
+  JsonArrayConst arrays[2] = {
+    doc["setup"].as<JsonArrayConst>(),
+    doc["loop"].as<JsonArrayConst>()
+  };
+
+  for (JsonArrayConst elements : arrays)
   {
-    const char *type = value["type"].as<const char *>();
-    if (strcmp(type, "datetime") == 0)
+    for (JsonVariantConst value : elements)
     {
-      const char *content = value["content"].as<const char *>();
-      String text = getTimeInWords(content);
-      if (text.length() == 0) {
-        text = _dateTime->getFormattedTime(content);
+      const char *type = value["type"].as<const char *>();
+      if (!isDynamicType(type)) continue;
+
+      String text;
+      if (strcmp(type, "sensor") == 0)
+      {
+        const char *source = value["source"].as<const char *>();
+        int decimals = value["decimals"] | 1;
+        bool showUnit = value["showUnit"] | true;
+        text = formatSensorValue(source, decimals, showUnit);
+      }
+      else  // datetime
+      {
+        const char *content = value["content"].as<const char *>();
+        text = getTimeInWords(content);
+        if (text.length() == 0) {
+          text = _dateTime->getFormattedTime(content);
+        }
       }
       renderText(text, value);
     }
