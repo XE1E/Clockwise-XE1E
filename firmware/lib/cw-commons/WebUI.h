@@ -496,6 +496,7 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                     <table style="width:100%;font-size:14px">
                         <tr><td style="padding:5px 0">Firmware:</td><td><strong id="sysName">ClockWise-XE1E</strong></td></tr>
                         <tr><td style="padding:5px 0">Version:</td><td><strong id="sysVersion">1.0.0</strong></td></tr>
+                        <tr><td style="padding:5px 0">Chip:</td><td><strong id="sysChip">--</strong></td></tr>
                         <tr><td style="padding:5px 0">MAC:</td><td><strong id="sysMac">--:--:--:--:--:--</strong></td></tr>
                     </table>
                 </div>
@@ -597,6 +598,7 @@ function restartDevice(){api('restart');toast('Reiniciando...');}
 
 // System info
 let uptimeStart=0;
+let apMode=false;
 async function loadSystemInfo(){
     try{
         const controller=new AbortController();
@@ -608,6 +610,7 @@ async function loadSystemInfo(){
         const pctRAM=Math.round(usedRAM/d.totalHeap*100);
         $('ram-info').textContent=pctRAM+'% ('+Math.round(usedRAM/1024)+'/'+Math.round(d.totalHeap/1024)+'KB)';
         if(d.mac&&$('sysMac'))$('sysMac').textContent=d.mac;
+        if(d.chipModel&&$('sysChip'))$('sysChip').textContent=d.chipModel+(d.chipCores?' ('+d.chipCores+' cores @ '+d.cpuFreqMHz+'MHz)':'');
         uptimeStart=Date.now()-d.uptimeMs;
         updateUptime();
     }catch(e){console.error('loadSystemInfo:',e);}
@@ -1072,7 +1075,14 @@ async function saveWifi(){
     if($('wifiPwd2').value)await saveField('wifiPwd2',$('wifiPwd2').value);
     await saveField('wifiSsid3',$('wifiSsid3').value);
     if($('wifiPwd3').value)await saveField('wifiPwd3',$('wifiPwd3').value);
-    toast('WiFi guardado');
+    // En modo AP reiniciamos para conectar a la red recien configurada.
+    // En operacion normal solo guardamos (el reinicio queda manual).
+    if(apMode){
+        toast('WiFi guardado, reiniciando...');
+        setTimeout(()=>api('restart'),800);
+    }else{
+        toast('WiFi guardado');
+    }
 }
 
 let lastScanNetworks=[];
@@ -1211,6 +1221,7 @@ async function load(){
         $('current-ssid').textContent=settings.wifiConnected||'-';
         $('wifi-rssi').textContent=settings.wifiRssi?'('+settings.wifiRssi+' dBm)':'';
         $('ip-address').textContent=settings.wifiIp||location.hostname;
+        apMode=settings.apMode==1;
         $('fw-version').textContent=settings.version||'1.0.0';
 
         $('wifiSsid').value=settings.wifiSsid||'';

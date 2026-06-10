@@ -80,7 +80,10 @@ struct ClockwiseWebServer
       doc["wifiHasPwd3"] = p->wifiPwd3.length() > 0 ? 1 : 0;
       doc["wifiConnected"] = WiFi.SSID();
       doc["wifiRssi"] = WiFi.RSSI();
-      doc["wifiIp"] = WiFi.localIP().toString();
+      // IP real: en estacion la del router, en modo AP la del portal (192.168.4.1)
+      bool staConnected = (WiFi.status() == WL_CONNECTED);
+      doc["wifiIp"] = staConnected ? WiFi.localIP().toString() : WiFi.softAPIP().toString();
+      doc["apMode"] = (WiFi.getMode() == WIFI_AP) ? 1 : 0;
       // Display
       doc["displayBright"] = p->displayBright;
       doc["displayRotation"] = p->displayRotation;
