@@ -23,7 +23,8 @@
   <a href="#-herramientas-web">Herramientas</a> •
   <a href="#-funcionalidades">Funcionalidades</a> •
   <a href="#-hardware">Hardware</a> •
-  <a href="#-documentacion">Docs</a>
+  <a href="#-documentacion">Docs</a> •
+  <a href="#contribuir">Contribuir</a>
 </p>
 
 ---
@@ -181,6 +182,27 @@ Clockwise-XE1E/
 ├── web-flasher/        # Instalador web
 └── docs/               # Documentacion
 ```
+
+---
+
+## Contribuir
+
+Las contribuciones son bienvenidas. Si quieres aportar al proyecto:
+
+1. Haz un **fork** del repositorio.
+2. Crea una rama para tu cambio: `git checkout -b feature/mi-aporte`.
+3. Realiza tus cambios y haz commit con mensajes descriptivos.
+4. Asegurate de que el firmware compila (`pio run`) y de que las herramientas web funcionan localmente.
+5. Sube tu rama y abre un **Pull Request** hacia `main` describiendo que cambiaste y por que.
+
+### Formas de aportar
+
+- **Caratulas** - Disena nuevas caratulas con el [Editor](https://xe1e.github.io/Clockwise-XE1E/editor/) y compartelas.
+- **Codigo** - Mejoras al firmware, al editor o al web flasher.
+- **Documentacion** - Correcciones o ampliaciones de los manuales.
+- **Reportes** - Abre un [Issue](https://github.com/XE1E/Clockwise-XE1E/issues) con bugs o ideas.
+
+Para cambios grandes, abre primero un Issue para discutir la propuesta.
 
 ---
 
