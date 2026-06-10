@@ -14,3 +14,6 @@ dependencies.lock
 
 # Firmware library dependencies
 components/
+
+# Claude Code local settings (machine-specific permissions)
+.claude/settings.local.json
