@@ -9,10 +9,7 @@ on:
       tags:
         description: 'Reason for manual run'
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-jobs: 
+jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -28,7 +25,7 @@ jobs:
           - cw-cf-0x07
     steps:
     - name: Checkout clockwise
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         path: clockwise
     - name: Update submodules
@@ -36,25 +33,25 @@ jobs:
         cd $GITHUB_WORKSPACE/clockwise 
         git submodule update --init firmware/clockfaces/
     - name: Checkout GitHub Pages
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: jnthas/clockwise
         ref: gh-pages
         path: github-pages
     - name: Cache pip
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Cache PlatformIO
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.platformio
         key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
     - name: Install PlatformIO
       run: |
         python -m pip install --upgrade pip

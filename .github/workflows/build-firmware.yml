@@ -16,19 +16,16 @@ on:
 permissions:
   contents: write
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Cache PlatformIO
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cache/pip
@@ -38,7 +35,7 @@ jobs:
             ${{ runner.os }}-pio-
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -48,7 +45,7 @@ jobs:
           pip install --upgrade platformio
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
 
@@ -93,14 +90,14 @@ jobs:
           cp firmware/.pio/build/esp32s3/firmware.bin release-files/firmware-esp32s3-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}.bin
 
       - name: Upload firmware artifact (ESP32)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: firmware-esp32-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}
           path: release-files/firmware-esp32-*.bin
           retention-days: 30
 
       - name: Upload firmware artifact (ESP32-S3)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: firmware-esp32s3-${{ steps.version.outputs.date }}-${{ steps.version.outputs.sha_short }}
           path: release-files/firmware-esp32s3-*.bin
@@ -108,7 +105,7 @@ jobs:
 
       - name: Create Release
         if: github.event_name == 'push' || github.event.inputs.release_name != ''
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.version.outputs.date }}.${{ steps.version.outputs.time }}
           name: ${{ github.event.inputs.release_name || format('Firmware {0} ({1})', steps.version.outputs.semver, steps.version.outputs.date) }}
