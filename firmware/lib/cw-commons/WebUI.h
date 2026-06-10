@@ -256,11 +256,11 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
             <div class="card">
                 <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.92 6-4.72 7.28L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.94 2.55 2 6.81 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.28 2.28C5.92 18 4 15.21 4 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg><h3>Pin LDR</h3></div>
                 <div class="card-body">
-                    <p class="card-description">Puerto GPIO donde esta conectado el sensor de luz</p>
+                    <p class="card-description">Puerto GPIO donde esta conectado el sensor de luz. <span id="ldrPinHint" style="color:var(--text-secondary)"></span></p>
                     <div class="form-group">
                         <label class="form-label">GPIO Pin</label>
                         <div class="input-row">
-                            <input type="number" class="form-input" id="ldrPin" min="0" max="39" value="35">
+                            <input type="number" class="form-input" id="ldrPin" min="0" max="48">
                             <button class="btn btn-primary" onclick="readLdrPin()">Leer</button>
                         </div>
                         <div style="margin-top:8px;font-size:13px">Valor actual: <strong id="ldrValue">--</strong></div>
@@ -1234,7 +1234,9 @@ async function load(){
         $('swapBlueGreen').checked=settings.swapBlueGreen==1;
         $('autoBrightMin').value=settings.autoBrightMin||0;
         $('autoBrightMax').value=settings.autoBrightMax||0;
-        $('ldrPin').value=settings.ldrPin||35;
+        var ldrDef=(settings.ldrPinDefault!=null?settings.ldrPinDefault:35);
+        $('ldrPin').value=(settings.ldrPin!=null?settings.ldrPin:ldrDef);
+        if($('ldrPinHint'))$('ldrPinHint').textContent='Default de esta placa: GPIO '+ldrDef;
 
         $('timeZone').value=settings.timeZone||'CST6';
         $('ntpServer').value=settings.ntpServer||'time.cloudflare.com';

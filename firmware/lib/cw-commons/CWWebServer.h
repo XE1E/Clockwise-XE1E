@@ -91,6 +91,7 @@ struct ClockwiseWebServer
       doc["autoBrightMin"] = p->autoBrightMin;
       doc["autoBrightMax"] = p->autoBrightMax;
       doc["ldrPin"] = p->ldrPin;
+      doc["ldrPinDefault"] = CW_LDR_PIN_DEFAULT;  // default segun la placa (35 ESP32dev, 1 ESP32-S3)
       // Time
       doc["timeZone"] = p->timeZone;
       doc["ntpServer"] = p->ntpServer;
