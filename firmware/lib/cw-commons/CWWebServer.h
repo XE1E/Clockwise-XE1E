@@ -7,7 +7,6 @@
 #include <CWPreview.h>
 #include "StatusController.h"
 #include "WebUI_gz.h"
-#include "WebUI_minimal.h"
 
 #ifndef CLOCKFACE_NAME
   #define CLOCKFACE_NAME "UNKNOWN"
