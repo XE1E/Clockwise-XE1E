@@ -63,11 +63,29 @@ git pull origin main
 
 ## Compilar y Subir Firmware
 
+### Seleccionar Placa (Environment)
+
+El proyecto soporta dos placas mediante *environments* de PlatformIO. Ambas pueden coexistir sin cambios de codigo.
+
+| Placa | Environment | Comando |
+|-------|-------------|---------|
+| **ESP32 DevKit v1** (original, default) | `esp32dev` | `pio run` |
+| **ESP32-S3-DevKitC-1** (N16R8) | `esp32s3` | `pio run -e esp32s3` |
+
+`pio run` sin `-e` usa el ESP32 original (`default_envs = esp32dev`). Para el S3 hay que indicar `-e esp32s3` en cada comando.
+
+Para el detalle completo del S3 (pinout, PSRAM, USB nativo, LED RGB, diagramas de cableado) ver **[Migracion a ESP32-S3](ESP32-S3-MIGRATION.html)**.
+
 ### Compilar
 
 ```powershell
 cd D:\Documents\GitHub\Clockwise-XE1E\firmware
+
+# ESP32 original (default)
 python -m platformio run
+
+# ESP32-S3
+python -m platformio run -e esp32s3
 ```
 
 Primera compilacion toma varios minutos (descarga dependencias).
@@ -78,7 +96,17 @@ Primera compilacion toma varios minutos (descarga dependencias).
 2. Ejecutar:
 
 ```powershell
+# ESP32 original
 python -m platformio run --target upload
+
+# ESP32-S3
+python -m platformio run -e esp32s3 --target upload
+```
+
+**Nota S3:** el ESP32-S3 tiene USB nativo (no requiere driver CP2102/CH340). El monitor serial se selecciona con `-e esp32s3`:
+
+```powershell
+python -m platformio device monitor -e esp32s3 --baud 115200
 ```
 
 ### Subir a puerto especifico
@@ -350,12 +378,14 @@ Convierte fuentes BDF a formato JavaScript para pixel-fonts.js.
 
 | Componente | Descripcion |
 |------------|-------------|
-| ESP32 DevKit v1 | Microcontrolador (o ESP32-S3 N16R8) |
+| ESP32 DevKit v1 **o** ESP32-S3-DevKitC-1 (N16R8) | Microcontrolador |
 | Panel LED HUB75 | Matriz 64x64 pixels |
 | Fuente 5V 4A | Alimentacion panel LED |
 | LDR + 10K (opcional) | Sensor brillo automatico |
 
-### Pines HUB75 → ESP32
+El pinout depende de la placa. Usa la tabla que corresponda a tu microcontrolador.
+
+### Pines HUB75 → ESP32 DevKit v1
 
 | Pin Panel | GPIO | Notas |
 |-----------|------|-------|
@@ -374,6 +404,28 @@ Convierte fuentes BDF a formato JavaScript para pixel-fonts.js.
 | LAT | 4 | |
 | OE | 15 | |
 | GND | GND | |
+
+### Pines HUB75 → ESP32-S3-DevKitC-1
+
+| Pin Panel | GPIO | Notas |
+|-----------|------|-------|
+| R1 | 4 | |
+| G1 | 5 | (6 si swap) |
+| B1 | 6 | (5 si swap) |
+| R2 | 7 | |
+| G2 | 15 | (16 si swap) |
+| B2 | 16 | (15 si swap) |
+| A | 18 | |
+| B | 8 | |
+| C | 3 | |
+| D | 42 | |
+| E | 38 | Solo paneles 64x64 |
+| CLK | 41 | |
+| LAT | 40 | |
+| OE | 2 | |
+| GND | GND | |
+
+**Pines a evitar en S3:** 26-32 (flash/PSRAM), 19/20 (USB), 43/44 (UART0), 0 (boot). Diagrama de cableado e imagenes del conector en **[Migracion a ESP32-S3](ESP32-S3-MIGRATION.html)**.
 
 ### Conexion LDR
 
@@ -458,5 +510,6 @@ Clockwise-XE1E/
 
 - **Repositorio:** https://github.com/XE1E/Clockwise-XE1E
 - **Editor Online:** https://xe1e.github.io/Clockwise-XE1E/clockface-editor/
+- **Migracion a ESP32-S3:** [ESP32-S3-MIGRATION.html](ESP32-S3-MIGRATION.html)
 - **Libreria HUB75:** https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-DMA
 - **PlatformIO:** https://platformio.org/
