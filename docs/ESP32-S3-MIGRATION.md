@@ -28,6 +28,9 @@ Este documento describe los cambios necesarios para soportar la tarjeta ESP32-S3
 
 Agregar nuevo environment (no reemplazar el existente):
 
+> ⚠️ **NO usar `board_build.arduino.memory_type = qio_opi`.** Provocó boot loop en este
+> proyecto (dos veces). El environment real NO lleva esa línea. Ver changelog 2026-06-11.
+
 ```ini
 [env:esp32s3]
 platform = espressif32
@@ -35,12 +38,11 @@ board = esp32-s3-devkitc-1
 framework = arduino
 test_ignore = test_native
 monitor_speed = 115200
-board_build.arduino.memory_type = qio_opi
 build_flags =
-    -D CW_FW_VERSION="\"1.0.0\""
+    -D CW_FW_VERSION="\"2.0.0-beta.1\""
     -D CW_FW_NAME="\"ClockWise-XE1E-S3\""
     -D CLOCKFACE_NAME="\"cw-cf-0x07\""
-    -D BOARD_HAS_PSRAM
+    -D CW_LDR_PIN_DEFAULT=1
     -DARDUINO_USB_CDC_ON_BOOT=1
 lib_deps =
     https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-I2S-DMA.git
@@ -54,17 +56,20 @@ lib_deps =
     bitbank2/PNGdec@^1.0.1
     https://github.com/me-no-dev/ESPAsyncWebServer.git
     https://github.com/me-no-dev/AsyncTCP.git
+    # adafruit/Adafruit BME280 Library   ← se añadirá al integrar el sensor ambiental (ver PLAN-SENSOR-AMBIENTAL.md)
 lib_extra_dirs =
     clockfaces
 lib_ignore =
-    cw-cf-0x01
     cw-cf-0x02
     cw-cf-0x03
     cw-cf-0x04
-    cw-cf-0x05
     cw-cf-0x06
 build_src_filter = +<*> -<.git/> -<.svn/> -<example/> -<examples/> -<test/> -<tests/>
 ```
+
+> Nota: este environment es **idéntico** al de `esp32dev` salvo `board`, `CW_FW_NAME`,
+> `CW_LDR_PIN_DEFAULT` y `ARDUINO_USB_CDC_ON_BOOT`. El objetivo del proyecto es **un solo
+> código fuente para ambas placas**: las diferencias se reducen a defaults de pines.
 
 ### 2. main.cpp - LED integrado
 
@@ -205,10 +210,15 @@ Los siguientes pines están reservados y NO deben usarse:
 
 | GPIOs | Razón |
 |-------|-------|
-| 26, 27, 28, 29, 30, 31, 32 | Reservados para flash/PSRAM (QSPI) |
+| 26, 27, 28, 29, 30, 31, 32 | Reservados para flash (QSPI) |
+| 33, 34, 35, 36, 37 | Reservados para PSRAM **octal** (si el módulo la tiene, p.ej. N16R8) |
 | 19, 20 | USB D-/D+ |
 | 43, 44 | UART0 (consola) |
 | 0 | Boot mode |
+| 2, 3, 4, 5, 6, 7, 8, 15, 16, 18, 38, 40, 41, 42 | Ocupados por el panel HUB75 (ver tabla de pinout) |
+
+> Para el **I²C del BME280 en S3** se usan **SDA=10 / SCL=9** (libres). Notar que **GPIO 8
+> NO sirve para I²C**: lo usa el display como línea de dirección **B** del HUB75.
 
 ### LDR (sensor de luz)
 
@@ -258,6 +268,27 @@ El LDR forma un divisor de tension con una resistencia fija de 10K. El pin ADC l
 - Si las lecturas salen invertidas respecto a lo esperado, intercambiar LDR y R1 de posicion (LDR abajo, R1 arriba).
 - El rango util del ADC es 0-4095 (12 bits). Calibrar min/max segun tu ambiente desde la web UI.
 
+### BME280 (sensor ambiental: temperatura / humedad / presión) — opcional
+
+Sensor I²C opcional para mostrar temperatura, humedad y presión en las carátulas.
+**Mismo código y mismo sensor en ambas placas**; solo cambian los pines I²C por defecto.
+Plan completo en [`PLAN-SENSOR-AMBIENTAL.md`](PLAN-SENSOR-AMBIENTAL.md).
+
+| Señal BME280 | ESP32 clásico | ESP32-S3 | Nota |
+|--------------|---------------|----------|------|
+| SDA | GPIO 21 | **GPIO 10** | Configurable desde la web UI |
+| SCL | GPIO 22 | **GPIO 9** | Configurable desde la web UI |
+| VCC | 3V3 | 3V3 | Nunca 5V |
+| GND | GND | GND | — |
+| Dirección I²C | `0x76` / `0x77` | `0x76` / `0x77` | Autodetección en el firmware |
+
+**Notas:**
+- El BME280 es digital (I²C): **no** necesita divisor de tensión como el LDR.
+- En S3, los pines I²C **no pueden** ser 8 (línea B del display) ni 35–37 (PSRAM octal). Por eso 10/9.
+- En el ESP32 clásico, 21/22 son el I²C "clásico" y quedan libres tras asignar el HUB75.
+- Si más adelante se quiere **calidad de aire (IAQ)**, se sustituye por un **BME680 + BSEC2**
+  reutilizando la misma infraestructura (ver el plan). Ojo entonces con flash/RAM.
+
 ## Consideraciones adicionales
 
 ### PSRAM
@@ -274,6 +305,9 @@ Beneficios:
 - Buffers DMA más grandes
 - Mejor rendimiento con animaciones complejas
 - Posibilidad de doble buffer
+
+> ⚠️ **No** configurar `board_build.arduino.memory_type = qio_opi`: provocó boot loop en
+> este proyecto (dos veces). Habilitar PSRAM solo con los flags de arriba si realmente se necesita.
 
 ### USB nativo
 
@@ -390,3 +424,32 @@ pio run -e esp32s3 -t upload
 # Monitor serial ESP32-S3
 pio device monitor -e esp32s3
 ```
+
+---
+
+## Actualización (2026-06-11)
+
+### Modelo de distribución: dos firmwares, mismo código
+
+Se consolida el objetivo de **un solo código fuente para ambas placas**. En el web-flasher
+habrá **dos firmwares** (ESP32 clásico y ESP32-S3). El usuario solo elige el de su placa,
+lo graba, cablea según la tabla de su versión y queda funcionando — el pinout del display
+ya viene compilado en el firmware, no hay que configurar nada.
+
+### Correcciones a este documento
+
+| Tema | Antes (incorrecto) | Ahora |
+|------|--------------------|-------|
+| `memory_type=qio_opi` | Aparecía en el ejemplo de `platformio.ini` | **Eliminado** (causaba boot loop) |
+| `CW_FW_VERSION` | `1.0.0` | `2.0.0-beta.1` |
+| `lib_ignore` | ignoraba `0x01` y `0x05` | alineado al real (no se ignoran) |
+| Pines a evitar (S3) | faltaban HUB75 y PSRAM octal | añadidos GPIO del panel y 33–37 |
+
+### Sensor ambiental BME280 (planificado)
+
+- Sensor I²C opcional para **temp/humedad/presión** en carátulas, igual en ambas placas.
+- Pines I²C por defecto: clásico **SDA 21 / SCL 22**; S3 **SDA 10 / SCL 9** (el GPIO 8 lo usa el display).
+- Dirección autodetectada (`0x76`/`0x77`); pines y unidad °C/°F configurables por web UI.
+- Se expondrá en las carátulas con un nuevo elemento `type:"sensor"` y se añadirá el glifo `°` a las fuentes.
+- IAQ/calidad de aire queda fuera por ahora (requeriría BME680 + BSEC2).
+- Detalle completo: [`PLAN-SENSOR-AMBIENTAL.md`](PLAN-SENSOR-AMBIENTAL.md).
