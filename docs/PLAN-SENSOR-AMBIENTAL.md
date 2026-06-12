@@ -225,4 +225,9 @@ Si más adelante se quiere calidad de aire: cambiar a **BME680 + BSEC2 de Bosch*
    Compila en los dos entornos. **Pendientes (casos especiales):** `picopixel` (formato Adafruit
    fontconvert), `tomthumb` (bloques `#if` en los arrays), `square`/atari (editor solo a `0x3A`),
    `8x13`/`haxor-12` (no existen en `pixel-fonts.js`). `%` vacío en `nocturno`/`ledDisplay` queda opcional.
-5. Fase 5 (Web UI + docs, incl. tabla de pinout §8 en el manual de usuario).
+5. ✅ **Fase 5 (Web UI + docs) — HECHA (2026-06-11).** Web UI (`WebUI.h`): tarjeta "Sensor Ambiental
+   (BME280)" en la pestaña Pantalla (habilitar, SDA/SCL con hint de default, dirección 0=auto,
+   unidad °C/°F, botón "Leer sensor" que consume `/api/sensor`); `saveDisplay()` guarda los campos,
+   `readSensor()` y carga de settings añadidos; `WebUI_gz.h` regenerado (`gzip_webui.py`). Compila.
+   Manual (`MANUAL_USUARIO.md`): subsección "Sensor Ambiental (BME280)" + sección "Conexiones de
+   Hardware (Pinout)" con tablas HUB75/LDR/BME280 por placa.

@@ -136,6 +136,23 @@ Si tu reloj tiene sensor de luz (LDR):
 
 **Para desactivar:** Pon ambos valores en 0.
 
+### Sensor Ambiental (BME280)
+Sensor I2C **opcional** para mostrar **temperatura, humedad y presion** en las caratulas.
+Funciona igual en ambas versiones (ESP32 y ESP32-S3); solo cambian los pines I2C por defecto.
+
+En la tarjeta **"Sensor Ambiental (BME280)"** (pestana Pantalla):
+1. Activa **"Habilitar sensor"**.
+2. Revisa **SDA** y **SCL** (vienen con el default de tu placa — ver [Conexiones de Hardware](#conexiones-de-hardware-pinout)).
+3. **Direccion I2C:** deja **0** para autodeteccion (`0x76`/`0x77`).
+4. Elige la **unidad** de temperatura (Celsius o Fahrenheit).
+5. Haz clic en **"Guardar Pantalla"** y **reinicia** el reloj (los cambios del sensor se aplican al reiniciar).
+6. Tras reiniciar, usa **"Leer sensor"** para verificar la lectura.
+
+Para usarlo en una caratula, en el editor agrega un elemento **Sensor** y elige la magnitud
+(temperatura / humedad / presion).
+
+> El simbolo de grado (°) esta disponible en las fuentes **medium, big y tiny5**.
+
 ---
 
 ## Hora y Fecha
@@ -367,6 +384,39 @@ La actualizacion por aire (Over-The-Air) permitira actualizar el firmware sin co
 | Alimentacion | 5V / 4A minimo |
 | Sincronizacion | NTP (automatica por internet) |
 | Almacenamiento | SPIFFS para caratulas |
+
+---
+
+## Conexiones de Hardware (Pinout)
+
+Hay **dos firmwares** (ESP32 clasico y ESP32-S3). Graba el de tu placa, cablea segun **tu** tabla y
+listo: el pinout del display ya viene compilado, no hay que configurar nada de la pantalla.
+
+### Pantalla 64x64 HUB75
+
+| Senal HUB75 | ESP32 clasico (GPIO) | ESP32-S3 (GPIO) |
+|-------------|----------------------|-----------------|
+| R1 / G1 / B1 | 25 / 26 / 27 | 4 / 5 / 6 |
+| R2 / G2 / B2 | 14 / 12 / 13 | 7 / 15 / 16 |
+| A / B / C / D | 23 / 19 / 5 / 17 | 18 / 8 / 3 / 42 |
+| E (64x64) | 18 | 38 |
+| LAT / OE / CLK | 4 / 15 / 16 | 40 / 2 / 41 |
+| GND | GND | GND |
+
+> Si los colores se ven mal (panel RBG), activa **"Intercambiar Azul/Verde"** en la pestana Pantalla;
+> no hay que recablear.
+
+### Perifericos (LDR y BME280)
+
+| Periferico | Senal | ESP32 clasico | ESP32-S3 |
+|------------|-------|---------------|----------|
+| LDR (sensor de luz) | ADC | GPIO 35 | GPIO 1 |
+| BME280 (ambiental) | SDA | GPIO 21 | GPIO 10 |
+| BME280 (ambiental) | SCL | GPIO 22 | GPIO 9 |
+| BME280 (ambiental) | VCC / GND | 3V3 / GND | 3V3 / GND |
+
+> El BME280 es I2C y usa **3V3** (nunca 5V). En el ESP32-S3 el GPIO 8 NO sirve para I2C
+> (lo usa el display). Los pines del sensor y del LDR son configurables desde la Web UI.
 
 ---
 

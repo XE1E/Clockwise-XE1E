@@ -267,6 +267,28 @@ const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
                     </div>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-header"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-secondary)"><path d="M15 13V5a3 3 0 0 0-6 0v8a5 5 0 1 0 6 0zm-3-9a1 1 0 0 1 1 1v3h-2V5a1 1 0 0 1 1-1z"/></svg><h3>Sensor Ambiental (BME280)</h3></div>
+                <div class="card-body">
+                    <p class="card-description">Sensor I2C opcional: temperatura, humedad y presion. Los cambios de pines/direccion/habilitacion requieren reiniciar. <span id="sensorPinHint" style="color:var(--text-secondary)"></span></p>
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="sensorEnabled">
+                        <label for="sensorEnabled">Habilitar sensor</label>
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group"><label class="form-label">SDA (GPIO)</label><input type="number" class="form-input" id="sensorSda" min="0" max="48"></div>
+                        <div class="form-group"><label class="form-label">SCL (GPIO)</label><input type="number" class="form-input" id="sensorScl" min="0" max="48"></div>
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group"><label class="form-label">Direccion I2C</label><input type="number" class="form-input" id="sensorAddr" min="0" max="127" placeholder="0 = auto"></div>
+                        <div class="form-group"><label class="form-label">Unidad temp.</label><select class="form-input" id="tempFahrenheit"><option value="0">Celsius (C)</option><option value="1">Fahrenheit (F)</option></select></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-row"><button class="btn btn-primary" onclick="readSensor()">Leer sensor</button></div>
+                        <div style="margin-top:8px;font-size:13px">Lectura: <strong id="sensorValue">--</strong></div>
+                    </div>
+                </div>
+            </div>
         </div>
         <button class="btn btn-save" onclick="saveDisplay()" style="width:100%;margin-top:20px">Guardar Pantalla</button>
     </div>
@@ -1141,7 +1163,12 @@ async function saveDisplay(){
     await saveField('autoBrightMin',$('autoBrightMin').value);
     await saveField('autoBrightMax',$('autoBrightMax').value);
     await saveField('ldrPin',$('ldrPin').value);
-    toast('Pantalla guardada');
+    await saveField('sensorEnabled',$('sensorEnabled').checked?'1':'0');
+    await saveField('sensorSda',$('sensorSda').value);
+    await saveField('sensorScl',$('sensorScl').value);
+    await saveField('sensorAddr',$('sensorAddr').value);
+    await saveField('tempFahrenheit',$('tempFahrenheit').value);
+    toast('Pantalla guardada (reinicia para aplicar el sensor)');
 }
 
 async function readLdrPin(){
@@ -1151,6 +1178,18 @@ async function readLdrPin(){
         var d=await r.json();
         $('ldrValue').textContent=d.value;
     }catch(e){$('ldrValue').textContent='Error';}
+}
+
+async function readSensor(){
+    try{
+        var r=await fetch('/api/sensor');
+        var d=await r.json();
+        if(d.ok){
+            $('sensorValue').textContent=d.temp.toFixed(1)+'°'+(d.unit||'C')+'  |  '+d.hum.toFixed(0)+'%  |  '+d.pres.toFixed(0)+' hPa  ('+(d.addr||'')+')';
+        }else{
+            $('sensorValue').textContent='No detectado';
+        }
+    }catch(e){$('sensorValue').textContent='Error';}
 }
 
 async function saveTime(){
@@ -1237,6 +1276,17 @@ async function load(){
         var ldrDef=(settings.ldrPinDefault!=null?settings.ldrPinDefault:35);
         $('ldrPin').value=(settings.ldrPin!=null?settings.ldrPin:ldrDef);
         if($('ldrPinHint'))$('ldrPinHint').textContent='Default de esta placa: GPIO '+ldrDef;
+
+        if($('sensorEnabled')){
+            $('sensorEnabled').checked=settings.sensorEnabled==1;
+            var sdaDef=(settings.sensorSdaDefault!=null?settings.sensorSdaDefault:21);
+            var sclDef=(settings.sensorSclDefault!=null?settings.sensorSclDefault:22);
+            $('sensorSda').value=(settings.sensorSda!=null?settings.sensorSda:sdaDef);
+            $('sensorScl').value=(settings.sensorScl!=null?settings.sensorScl:sclDef);
+            $('sensorAddr').value=(settings.sensorAddr!=null?settings.sensorAddr:0);
+            $('tempFahrenheit').value=(settings.tempFahrenheit==1?'1':'0');
+            if($('sensorPinHint'))$('sensorPinHint').textContent='Default de esta placa: SDA '+sdaDef+' / SCL '+sclDef+'.';
+        }
 
         $('timeZone').value=settings.timeZone||'CST6';
         $('ntpServer').value=settings.ntpServer||'time.cloudflare.com';
