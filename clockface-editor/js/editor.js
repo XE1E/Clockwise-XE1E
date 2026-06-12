@@ -622,6 +622,22 @@ class ClockfaceEditor {
             this.render();
         });
 
+        // Test sensor values (BME280 preview)
+        const btnSetSensor = document.getElementById('btn-set-sensor');
+        if (btnSetSensor) {
+            btnSetSensor.addEventListener('click', () => {
+                const t = document.getElementById('test-temp').value;
+                const h = document.getElementById('test-hum').value;
+                const p = document.getElementById('test-pres').value;
+                window.testSensor = {
+                    temp: t !== '' ? parseFloat(t) : undefined,
+                    hum: h !== '' ? parseFloat(h) : undefined,
+                    pres: p !== '' ? parseFloat(p) : undefined
+                };
+                this.render();
+            });
+        }
+
         document.getElementById('theme-name').addEventListener('input', (e) => {
             this.clockface.name = e.target.value;
         });
@@ -649,7 +665,8 @@ class ClockfaceEditor {
     }
 
     bindElementProperties() {
-        const inputs = ['el-x', 'el-y', 'el-content', 'el-font', 'el-width', 'el-height', 'el-x1', 'el-y1', 'el-radius', 'el-in-loop'];
+        const inputs = ['el-x', 'el-y', 'el-content', 'el-font', 'el-width', 'el-height', 'el-x1', 'el-y1', 'el-radius', 'el-in-loop',
+            'el-sensor-source', 'el-sensor-decimals', 'el-sensor-unit'];
 
         inputs.forEach(id => {
             const el = document.getElementById(id);
@@ -2347,6 +2364,9 @@ class ClockfaceEditor {
             case 'datetime':
                 element = new DateTimeElement(coords.x, coords.y);
                 break;
+            case 'sensor':
+                element = new SensorElement(coords.x, coords.y);
+                break;
             case 'text':
                 element = new TextElement(coords.x, coords.y);
                 break;
@@ -2413,6 +2433,16 @@ class ClockfaceEditor {
 
         if (element.type === 'datetime' || element.type === 'text') {
             element.content = document.getElementById('el-content').value;
+            element.font = document.getElementById('el-font').value;
+            element.fgColor = ColorUtils.hexToRgb565(document.getElementById('el-fgcolor').value);
+            element.bgColor = ColorUtils.hexToRgb565(document.getElementById('el-bgcolor').value);
+        }
+
+        if (element.type === 'sensor') {
+            element.source = document.getElementById('el-sensor-source').value;
+            let dec = parseInt(document.getElementById('el-sensor-decimals').value);
+            element.decimals = isNaN(dec) ? 1 : dec;
+            element.unit = document.getElementById('el-sensor-unit').checked;
             element.font = document.getElementById('el-font').value;
             element.fgColor = ColorUtils.hexToRgb565(document.getElementById('el-fgcolor').value);
             element.bgColor = ColorUtils.hexToRgb565(document.getElementById('el-bgcolor').value);
@@ -2488,8 +2518,10 @@ class ClockfaceEditor {
         const showFields = {
             'fg-content': ['datetime', 'text'],
             'fg-format-presets': ['datetime'],
-            'fg-font': ['datetime', 'text'],
-            'fg-colors-grid': ['datetime', 'text'],
+            'fg-sensor': ['sensor'],
+            'fg-sensor-opts': ['sensor'],
+            'fg-font': ['datetime', 'text', 'sensor'],
+            'fg-colors-grid': ['datetime', 'text', 'sensor'],
             'fg-size': ['rect', 'fillrect'],
             'fg-radius': ['circle', 'fillcircle'],
             'fg-endpoint': ['line'],
@@ -2512,6 +2544,18 @@ class ClockfaceEditor {
 
         if (element.type === 'datetime' || element.type === 'text') {
             document.getElementById('el-content').value = element.content;
+            document.getElementById('el-font').value = element.font;
+            document.getElementById('el-fgcolor').value = ColorUtils.rgb565ToHex(element.fgColor);
+            document.getElementById('el-fgcolor-value').textContent = element.fgColor;
+            document.getElementById('el-bgcolor').value = ColorUtils.rgb565ToHex(element.bgColor);
+            document.getElementById('el-bgcolor-value').textContent = element.bgColor;
+            this.updateFontPreview();
+        }
+
+        if (element.type === 'sensor') {
+            document.getElementById('el-sensor-source').value = element.source;
+            document.getElementById('el-sensor-decimals').value = element.decimals;
+            document.getElementById('el-sensor-unit').checked = element.unit;
             document.getElementById('el-font').value = element.font;
             document.getElementById('el-fgcolor').value = ColorUtils.rgb565ToHex(element.fgColor);
             document.getElementById('el-fgcolor-value').textContent = element.fgColor;

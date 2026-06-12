@@ -211,6 +211,11 @@ Si más adelante se quiere calidad de aire: cambiar a **BME680 + BSEC2 de Bosch*
    `"--"` si no hay sensor) y `refreshSensors()` (itera `setup`+`loop`, render cada 1 s). Llamado
    desde `clockfaceSetup()` y `update()`. `iaq` devuelve `"--"` (futuro). Compila en ambos entornos.
    **Nota:** el glifo `°` aún no existe en las fuentes hasta la Fase 4 (se verá hueco/caja).
-3. Fase 3 (editor: elemento + preview + valores de prueba).
+3. ✅ **Fase 3 (editor) — HECHA (2026-06-11).** `elements.js`: clase `SensorElement` (source/decimals/unit,
+   `getDisplayText()` con valores de `window.testSensor`) + caso en `fromJSON`. `canvas-renderer.js`:
+   `renderSensor()` + bounds. `editor.js`: creación, lectura/escritura de props, panel (grupos `fg-sensor`
+   / `fg-sensor-opts` + reuso de fuente/colores) y bindings. `index.html`: botón de toolbar "Sensor",
+   grupos de propiedades y campos de prueba en el footer (`test-temp/hum/pres` + botón Set). Sintaxis OK.
+   **Nota:** el `°` en preview sale hueco hasta la Fase 4 (igual que el firmware).
 4. Fase 4 (fuentes: glifo `°`).
 5. Fase 5 (Web UI + docs, incl. tabla de pinout §8 en el manual de usuario).

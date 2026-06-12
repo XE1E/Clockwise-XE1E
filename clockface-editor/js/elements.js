@@ -30,6 +30,15 @@ class ClockfaceElement {
                 element.fgColor = data.fgColor || 65535;
                 element.bgColor = data.bgColor || 0;
                 break;
+            case 'sensor':
+                element = new SensorElement(data.x, data.y);
+                element.source = data.source || 'temp';
+                element.decimals = (data.decimals !== undefined) ? data.decimals : 1;
+                element.unit = (data.unit !== undefined) ? data.unit : true;
+                element.font = data.font || '';
+                element.fgColor = data.fgColor || 65535;
+                element.bgColor = data.bgColor || 0;
+                break;
             case 'text':
                 element = new TextElement(data.x, data.y);
                 element.content = data.content || 'Text';
@@ -187,6 +196,67 @@ class DateTimeElement extends ClockfaceElement {
             return 'veinti\n' + unidades[u];
         }
         return decenas[d] + '\ny ' + unidades[u];
+    }
+}
+
+class SensorElement extends ClockfaceElement {
+    constructor(x = 0, y = 0) {
+        super('sensor', x, y);
+        this.source = 'temp';   // temp | hum | pres | iaq
+        this.decimals = 1;
+        this.unit = true;       // mostrar unidad (°C / % / hPa)
+        this.font = 'medium';
+        this.fgColor = 65535;
+        this.bgColor = 0;
+        this.inLoop = true;
+    }
+
+    toJSON() {
+        return {
+            type: this.type,
+            x: this.x,
+            y: this.y,
+            source: this.source,
+            decimals: this.decimals,
+            unit: this.unit,
+            font: this.font,
+            fgColor: this.fgColor,
+            bgColor: this.bgColor,
+            id: this.id
+        };
+    }
+
+    getDisplayText() {
+        // Valores de prueba (footer). Si no hay, usa valores demo.
+        const s = window.testSensor || {};
+        const dec = (this.decimals !== undefined && this.decimals !== null) ? this.decimals : 1;
+
+        switch (this.source) {
+            case 'temp': {
+                const t = (s.temp !== undefined) ? s.temp : 23.4;
+                let txt = Number(t).toFixed(dec);
+                if (this.unit) txt += '°C';   // grado: glifo se agrega en fase 4
+                return txt;
+            }
+            case 'hum': {
+                const h = (s.hum !== undefined) ? s.hum : 45;
+                let txt = Number(h).toFixed(dec);
+                if (this.unit) txt += '%';
+                return txt;
+            }
+            case 'pres': {
+                const p = (s.pres !== undefined) ? s.pres : 1013.2;
+                let txt = Number(p).toFixed(dec);
+                if (this.unit) txt += ' hPa';
+                return txt;
+            }
+            case 'iaq': {
+                const q = (s.iaq !== undefined) ? s.iaq : 50;
+                return Number(q).toFixed(dec);
+            }
+            default:
+                return '--';
+        }
     }
 }
 

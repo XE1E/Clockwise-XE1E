@@ -41,6 +41,9 @@ class CanvasRenderer {
             case 'datetime':
                 this.renderDateTime(element);
                 break;
+            case 'sensor':
+                this.renderSensor(element);
+                break;
             case 'text':
                 this.renderText(element);
                 break;
@@ -69,6 +72,11 @@ class CanvasRenderer {
     }
 
     renderDateTime(element) {
+        const text = element.getDisplayText();
+        this.drawText(text, element.x, element.y, element.font, element.fgColor, element.bgColor);
+    }
+
+    renderSensor(element) {
         const text = element.getDisplayText();
         this.drawText(text, element.x, element.y, element.font, element.fgColor, element.bgColor);
     }
@@ -237,8 +245,9 @@ class CanvasRenderer {
     getElementBounds(element) {
         switch (element.type) {
             case 'datetime':
+            case 'sensor':
             case 'text': {
-                const text = element.type === 'datetime' ? element.getDisplayText() : element.content;
+                const text = (element.type === 'text') ? element.content : element.getDisplayText();
                 const mappedFont = (element.font && PixelFonts[element.font]) ? element.font : 'picopixel';
                 const metrics = PixelFonts.measureText(mappedFont, text);
                 return {
