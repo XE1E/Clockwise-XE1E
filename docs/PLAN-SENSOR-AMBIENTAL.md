@@ -200,7 +200,12 @@ Si más adelante se quiere calidad de aire: cambiar a **BME680 + BSEC2 de Bosch*
 
 ## Orden de ejecución sugerido
 
-1. Fase 1 (firmware: lib + `CWSensor` + polling + prefs + `/api/sensor`).
+1. ✅ **Fase 1 (firmware base) — HECHA (2026-06-11).** Lib `Adafruit BME280` + defaults de pines
+   I²C por placa en `platformio.ini`; nuevo `CWSensor.h/.cpp` (singleton, autodetección 0x76/0x77,
+   modo forzado, polling 30 s); prefs (`sensorEnabled/Sda/Scl/Addr`, `tempFahrenheit`);
+   init en `setup()` + `update()` en `loop()`; endpoint `GET /api/sensor` + campos en
+   `/api/settings` y `/api/set`. Compila en ambos entornos (esp32dev Flash 84.8%, esp32s3 31.6%).
+   **Pendiente:** prueba en hardware real con el módulo.
 2. Fase 2 (render `type:"sensor"` en `JsonClockface`).
 3. Fase 3 (editor: elemento + preview + valores de prueba).
 4. Fase 4 (fuentes: glifo `°`).

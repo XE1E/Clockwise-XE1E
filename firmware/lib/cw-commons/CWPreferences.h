@@ -13,6 +13,16 @@
     #define CW_LDR_PIN_DEFAULT 35
 #endif
 
+// Pines I2C por defecto del sensor ambiental (BME280), segun la placa
+// (definidos en platformio.ini). ESP32 clasico: SDA=21/SCL=22 (I2C clasico).
+// ESP32-S3: SDA=10/SCL=9 (el GPIO8 lo usa el display HUB75 como linea B).
+#ifndef CW_SENSOR_SDA_DEFAULT
+    #define CW_SENSOR_SDA_DEFAULT 21
+#endif
+#ifndef CW_SENSOR_SCL_DEFAULT
+    #define CW_SENSOR_SCL_DEFAULT 22
+#endif
+
 
 struct ClockwiseParams
 {
@@ -49,6 +59,12 @@ struct ClockwiseParams
     const char* const PREF_ROTATION_INTERVAL = "rotInterval";
     const char* const PREF_LOCAL_SERVER_HOST = "localHost";
     const char* const PREF_LOCAL_SERVER_PORT = "localPort";
+    // Sensor ambiental (BME280)
+    const char* const PREF_SENSOR_ENABLED = "sensorEnabled";
+    const char* const PREF_SENSOR_SDA = "sensorSda";
+    const char* const PREF_SENSOR_SCL = "sensorScl";
+    const char* const PREF_SENSOR_ADDR = "sensorAddr";
+    const char* const PREF_TEMP_FAHRENHEIT = "tempFahrenheit";
 
     bool swapBlueGreen;
     bool use24hFormat;
@@ -81,6 +97,12 @@ struct ClockwiseParams
     uint16_t rotationInterval;
     String localServerHost;  // IP/hostname for local dev server
     uint16_t localServerPort; // Port for local dev server
+    // Sensor ambiental (BME280)
+    bool sensorEnabled;
+    uint8_t sensorSdaPin;
+    uint8_t sensorSclPin;
+    uint8_t sensorAddr;     // 0 = autodeteccion (0x76/0x77)
+    bool tempFahrenheit;    // false = grados C, true = grados F
 
 
     ClockwiseParams() {
@@ -127,6 +149,12 @@ struct ClockwiseParams
         preferences.putUInt(PREF_ROTATION_INTERVAL, rotationInterval);
         preferences.putString(PREF_LOCAL_SERVER_HOST, localServerHost);
         preferences.putUInt(PREF_LOCAL_SERVER_PORT, localServerPort);
+        // Sensor ambiental (BME280)
+        preferences.putBool(PREF_SENSOR_ENABLED, sensorEnabled);
+        preferences.putUInt(PREF_SENSOR_SDA, sensorSdaPin);
+        preferences.putUInt(PREF_SENSOR_SCL, sensorSclPin);
+        preferences.putUInt(PREF_SENSOR_ADDR, sensorAddr);
+        preferences.putBool(PREF_TEMP_FAHRENHEIT, tempFahrenheit);
     }
 
     void load()
@@ -162,6 +190,12 @@ struct ClockwiseParams
         rotationInterval = preferences.getUInt(PREF_ROTATION_INTERVAL, 5);
         localServerHost = preferences.getString(PREF_LOCAL_SERVER_HOST, "192.168.1.100");
         localServerPort = preferences.getUInt(PREF_LOCAL_SERVER_PORT, 8080);
+        // Sensor ambiental (BME280)
+        sensorEnabled = preferences.getBool(PREF_SENSOR_ENABLED, false);
+        sensorSdaPin = preferences.getUInt(PREF_SENSOR_SDA, CW_SENSOR_SDA_DEFAULT);
+        sensorSclPin = preferences.getUInt(PREF_SENSOR_SCL, CW_SENSOR_SCL_DEFAULT);
+        sensorAddr = preferences.getUInt(PREF_SENSOR_ADDR, 0);
+        tempFahrenheit = preferences.getBool(PREF_TEMP_FAHRENHEIT, false);
     }
 
 };

@@ -12,6 +12,7 @@
 #include <CWDateTime.h>
 #include <CWPreferences.h>
 #include <CWWebServer.h>
+#include <CWSensor.h>
 #include <StatusController.h>
 
 #define MIN_BRIGHT_DISPLAY_ON 4
@@ -283,6 +284,15 @@ void setup()
 
   pinMode(ClockwiseParams::getInstance()->ldrPin, INPUT);
 
+  // Sensor ambiental BME280 (opcional). Pines/direccion configurables por web UI;
+  // los cambios requieren reinicio. update() en el loop relee cada 30s.
+  if (ClockwiseParams::getInstance()->sensorEnabled) {
+    CWSensor::getInstance()->begin(
+        ClockwiseParams::getInstance()->sensorSdaPin,
+        ClockwiseParams::getInstance()->sensorSclPin,
+        ClockwiseParams::getInstance()->sensorAddr);
+  }
+
   displaySetup(ClockwiseParams::getInstance()->swapBlueGreen, ClockwiseParams::getInstance()->displayBright, ClockwiseParams::getInstance()->displayRotation);
 
   // Create all clockface instances
@@ -467,6 +477,8 @@ void loop()
   if (!nightModeActive) {
     automaticBrightControl();
   }
+
+  CWSensor::getInstance()->update();
 
   delay(1);  // Give time to WiFi/web server
 }

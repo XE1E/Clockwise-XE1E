@@ -5,6 +5,7 @@
 #include <SPIFFS.h>
 #include <CWPreferences.h>
 #include <CWPreview.h>
+#include "CWSensor.h"
 #include "StatusController.h"
 #include "WebUI_gz.h"
 
@@ -67,7 +68,7 @@ struct ClockwiseWebServer
 
     // API: obtener configuración (usando ArduinoJson para evitar fragmentación de heap)
     server.on("/api/settings", HTTP_GET, [](AsyncWebServerRequest *request) {
-      StaticJsonDocument<1024> doc;
+      StaticJsonDocument<1536> doc;
       ClockwiseParams* p = ClockwiseParams::getInstance();
 
       // WiFi
@@ -91,6 +92,14 @@ struct ClockwiseWebServer
       doc["autoBrightMax"] = p->autoBrightMax;
       doc["ldrPin"] = p->ldrPin;
       doc["ldrPinDefault"] = CW_LDR_PIN_DEFAULT;  // default segun la placa (35 ESP32dev, 1 ESP32-S3)
+      // Sensor ambiental (BME280)
+      doc["sensorEnabled"] = p->sensorEnabled ? 1 : 0;
+      doc["sensorSda"] = p->sensorSdaPin;
+      doc["sensorScl"] = p->sensorSclPin;
+      doc["sensorAddr"] = p->sensorAddr;
+      doc["sensorSdaDefault"] = CW_SENSOR_SDA_DEFAULT;
+      doc["sensorSclDefault"] = CW_SENSOR_SCL_DEFAULT;
+      doc["tempFahrenheit"] = p->tempFahrenheit ? 1 : 0;
       // Time
       doc["timeZone"] = p->timeZone;
       doc["ntpServer"] = p->ntpServer;
@@ -150,6 +159,12 @@ struct ClockwiseWebServer
         else if (key == "autoBrightMin") params->autoBrightMin = value.toInt();
         else if (key == "autoBrightMax") params->autoBrightMax = value.toInt();
         else if (key == "ldrPin") params->ldrPin = value.toInt();
+        // Sensor ambiental (BME280) - los cambios aplican tras reiniciar
+        else if (key == "sensorEnabled") params->sensorEnabled = (value == "1");
+        else if (key == "sensorSda") params->sensorSdaPin = value.toInt();
+        else if (key == "sensorScl") params->sensorSclPin = value.toInt();
+        else if (key == "sensorAddr") params->sensorAddr = value.toInt();
+        else if (key == "tempFahrenheit") params->tempFahrenheit = (value == "1");
         // Time
         else if (key == "timeZone") params->timeZone = value;
         else if (key == "ntpServer") params->ntpServer = value;
@@ -214,6 +229,28 @@ struct ClockwiseWebServer
       } else {
         request->send(400);
       }
+    });
+
+    // API: lectura del sensor ambiental (BME280)
+    server.on("/api/sensor", HTTP_GET, [](AsyncWebServerRequest *request) {
+      CWSensor* s = CWSensor::getInstance();
+      s->update();
+      StaticJsonDocument<192> doc;
+      doc["ok"] = s->available() ? 1 : 0;
+      if (s->available()) {
+        bool f = ClockwiseParams::getInstance()->tempFahrenheit;
+        float t = s->getTemperature();
+        doc["temp"] = f ? (t * 9.0f / 5.0f + 32.0f) : t;
+        doc["unit"] = f ? "F" : "C";
+        doc["hum"] = s->getHumidity();
+        doc["pres"] = s->getPressure();
+        char addrHex[6];
+        snprintf(addrHex, sizeof(addrHex), "0x%02X", s->getAddress());
+        doc["addr"] = addrHex;
+      }
+      String output;
+      serializeJson(doc, output);
+      request->send(200, "application/json", output);
     });
 
     // API: limpiar preview y volver a caratula normal
