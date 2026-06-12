@@ -1,6 +1,7 @@
 
 #include "JsonClockface.h"
 #include <CWPreview.h>
+#include <CWSensor.h>
 #include <SPIFFS.h>
 
 unsigned long lastMillisJson = 0;
@@ -112,6 +113,7 @@ void JsonClockface::update()
   if (millis() - lastMillisJson >= 1000)
   {
     refreshDateTime();
+    refreshSensors();
     lastMillisJson = millis();
   }
 }
@@ -325,6 +327,70 @@ void JsonClockface::refreshDateTime()
   }
 }
 
+// Formatea la lectura del sensor ambiental segun el elemento JSON.
+//   source:   "temp" | "hum" | "pres" | "iaq"
+//   decimals: nº de decimales (default 1)
+//   unit:     mostrar unidad (default true): °C/°F, %, hPa
+// El grado se emite como byte unico 0xB0 (el glifo se agrega en las fuentes,
+// fase 4). Si el sensor no esta disponible muestra "--".
+String JsonClockface::getSensorText(JsonVariantConst value)
+{
+  const char *source = value["source"].as<const char *>();
+  if (!source) return "";
+
+  CWSensor *sensor = CWSensor::getInstance();
+  if (!sensor->available()) return "--";
+
+  int decimals = value["decimals"].isNull() ? 1 : value["decimals"].as<int>();
+  bool showUnit = value["unit"].isNull() ? true : value["unit"].as<bool>();
+
+  if (strcmp(source, "temp") == 0) {
+    bool fahrenheit = ClockwiseParams::getInstance()->tempFahrenheit;
+    float t = sensor->getTemperature();
+    if (fahrenheit) t = t * 9.0f / 5.0f + 32.0f;
+    String s = String(t, decimals);
+    if (showUnit) {
+      s += (char)0xB0;                       // simbolo de grado
+      s += (fahrenheit ? "F" : "C");
+    }
+    return s;
+  }
+  if (strcmp(source, "hum") == 0) {
+    String s = String(sensor->getHumidity(), decimals);
+    if (showUnit) s += "%";
+    return s;
+  }
+  if (strcmp(source, "pres") == 0) {
+    String s = String(sensor->getPressure(), decimals);
+    if (showUnit) s += " hPa";
+    return s;
+  }
+  if (strcmp(source, "iaq") == 0) {
+    // Futuro: requiere BME680 + BSEC (ver PLAN-SENSOR-AMBIENTAL.md)
+    return "--";
+  }
+  return "";
+}
+
+void JsonClockface::refreshSensors()
+{
+  JsonArrayConst setupElements = doc["setup"].as<JsonArrayConst>();
+  for (JsonVariantConst value : setupElements)
+  {
+    if (strcmp(value["type"].as<const char *>(), "sensor") == 0) {
+      renderText(getSensorText(value), value);
+    }
+  }
+
+  JsonArrayConst loopElements = doc["loop"].as<JsonArrayConst>();
+  for (JsonVariantConst value : loopElements)
+  {
+    if (strcmp(value["type"].as<const char *>(), "sensor") == 0) {
+      renderText(getSensorText(value), value);
+    }
+  }
+}
+
 void JsonClockface::clockfaceSetup()
 {
 
@@ -338,6 +404,9 @@ void JsonClockface::clockfaceSetup()
 
   // Draw Date/Time
   refreshDateTime();
+
+  // Draw sensor values (BME280)
+  refreshSensors();
 
   // Create sprites
   createSprites();

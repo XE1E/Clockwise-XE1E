@@ -61,6 +61,8 @@ private:
   uint16_t resolveColor(int32_t color);
   void createSprites();
   void refreshDateTime();
+  void refreshSensors();
+  String getSensorText(JsonVariantConst value);
   void drawSplashScreen(uint16_t color, const char *msg);
   void drawFallbackClock();
   void drawNightClock();

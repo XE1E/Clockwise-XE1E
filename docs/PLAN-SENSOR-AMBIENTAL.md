@@ -206,7 +206,11 @@ Si más adelante se quiere calidad de aire: cambiar a **BME680 + BSEC2 de Bosch*
    init en `setup()` + `update()` en `loop()`; endpoint `GET /api/sensor` + campos en
    `/api/settings` y `/api/set`. Compila en ambos entornos (esp32dev Flash 84.8%, esp32s3 31.6%).
    **Pendiente:** prueba en hardware real con el módulo.
-2. Fase 2 (render `type:"sensor"` en `JsonClockface`).
+2. ✅ **Fase 2 (render en carátula) — HECHA (2026-06-11).** `JsonClockface`: nuevo `getSensorText()`
+   (formatea `source` temp/hum/pres con `decimals`/`unit`, conversión °C/°F, grado como byte `0xB0`,
+   `"--"` si no hay sensor) y `refreshSensors()` (itera `setup`+`loop`, render cada 1 s). Llamado
+   desde `clockfaceSetup()` y `update()`. `iaq` devuelve `"--"` (futuro). Compila en ambos entornos.
+   **Nota:** el glifo `°` aún no existe en las fuentes hasta la Fase 4 (se verá hueco/caja).
 3. Fase 3 (editor: elemento + preview + valores de prueba).
 4. Fase 4 (fuentes: glifo `°`).
 5. Fase 5 (Web UI + docs, incl. tabla de pinout §8 en el manual de usuario).
