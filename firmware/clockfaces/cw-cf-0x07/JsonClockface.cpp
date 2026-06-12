@@ -350,7 +350,7 @@ String JsonClockface::getSensorText(JsonVariantConst value)
     if (fahrenheit) t = t * 9.0f / 5.0f + 32.0f;
     String s = String(t, decimals);
     if (showUnit) {
-      s += (char)0xB0;                       // simbolo de grado
+      s += (char)0x7F;                       // simbolo de grado (glifo en 0x7F)
       s += (fahrenheit ? "F" : "C");
     }
     return s;

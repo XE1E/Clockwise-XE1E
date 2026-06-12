@@ -235,7 +235,7 @@ class SensorElement extends ClockfaceElement {
             case 'temp': {
                 const t = (s.temp !== undefined) ? s.temp : 23.4;
                 let txt = Number(t).toFixed(dec);
-                if (this.unit) txt += '°C';   // grado: glifo se agrega en fase 4
+                if (this.unit) txt += String.fromCharCode(0x7F) + 'C';   // grado en 0x7F
                 return txt;
             }
             case 'hum': {

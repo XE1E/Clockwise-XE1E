@@ -217,5 +217,12 @@ Si más adelante se quiere calidad de aire: cambiar a **BME680 + BSEC2 de Bosch*
    / `fg-sensor-opts` + reuso de fuente/colores) y bindings. `index.html`: botón de toolbar "Sensor",
    grupos de propiedades y campos de prueba en el footer (`test-temp/hum/pres` + botón Set). Sintaxis OK.
    **Nota:** el `°` en preview sale hueco hasta la Fase 4 (igual que el firmware).
-4. Fase 4 (fuentes: glifo `°`).
+4. ✅ **Fase 4 (fuentes: glifo `°`) — PARCIAL (2026-06-11).** Decisión refinada: en vez de `0xB0`
+   (que obliga a ~50 glifos de relleno por la contigüidad GFX), el grado va en **`0x7F`** (extender
+   el rango +1, un solo glifo). Firmware (`getSensorText`) y editor (`getDisplayText`) emiten el byte
+   `0x7F`. Script `scripts/add-degree-glyph.js` (append-only, auto-dimensiona el glifo desde el dígito
+   `0`, idempotente) aplicado a **medium, big, tiny5** en ambos lados (`.h` + `pixel-fonts.js`).
+   Compila en los dos entornos. **Pendientes (casos especiales):** `picopixel` (formato Adafruit
+   fontconvert), `tomthumb` (bloques `#if` en los arrays), `square`/atari (editor solo a `0x3A`),
+   `8x13`/`haxor-12` (no existen en `pixel-fonts.js`). `%` vacío en `nocturno`/`ledDisplay` queda opcional.
 5. Fase 5 (Web UI + docs, incl. tabla de pinout §8 en el manual de usuario).
