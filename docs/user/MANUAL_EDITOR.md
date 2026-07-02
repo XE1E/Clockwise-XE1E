@@ -329,8 +329,8 @@ Muestra valores del sensor ambiental BME280 (temperatura, humedad, presion).
 | X, Y | Posicion del texto |
 | Source | Tipo de dato: temp, hum, pres |
 | Decimals | Digitos decimales (0-2, default 1) |
-| Unit | Mostrar unidad (°C, %, hPa/mb) |
-| Pres Unit | Unidad de presion: hPa o mb |
+| Unit | Mostrar unidad (°C, %, mb) |
+| Usar hPa | Mostrar presion en hPa en vez de mb |
 | Font | Fuente del texto |
 | fgColor | Color del texto |
 | bgColor | Color de fondo |
@@ -342,8 +342,8 @@ Muestra valores del sensor ambiental BME280 (temperatura, humedad, presion).
 | temp, decimals=1, unit=true | 23.4°C |
 | temp, decimals=0, unit=true | 23°C |
 | hum, decimals=0, unit=true | 56% |
-| pres, decimals=0, unit=true | 1013 hPa |
-| pres, decimals=0, presUnit=mb | 1013 mb |
+| pres, decimals=0, unit=true | 1013 mb |
+| pres, decimals=0, presUnit=hPa | 1013 hPa |
 
 **Nota:** Si el sensor no esta conectado, muestra "--".
 

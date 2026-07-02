@@ -35,7 +35,7 @@ class ClockfaceElement {
                 element.source = data.source || 'temp';
                 element.decimals = (data.decimals !== undefined) ? data.decimals : 1;
                 element.unit = (data.unit !== undefined) ? data.unit : true;
-                element.presUnit = data.presUnit || 'hPa';
+                element.presUnit = data.presUnit || 'mb';
                 element.font = data.font || '';
                 element.fgColor = data.fgColor || 65535;
                 element.bgColor = data.bgColor || 0;
@@ -206,7 +206,7 @@ class SensorElement extends ClockfaceElement {
         this.source = 'temp';   // temp | hum | pres | iaq
         this.decimals = 1;
         this.unit = true;       // mostrar unidad (°C / % / hPa/mb)
-        this.presUnit = 'hPa';  // unidad de presion: hPa o mb
+        this.presUnit = 'mb';   // unidad de presion: mb (default) o hPa
         this.font = 'medium';
         this.fgColor = 65535;
         this.bgColor = 0;
@@ -253,7 +253,7 @@ class SensorElement extends ClockfaceElement {
             case 'pres': {
                 const p = (s.pres !== undefined) ? s.pres : 1013.2;
                 let txt = Number(p).toFixed(dec);
-                if (this.unit) txt += ' ' + (this.presUnit || 'hPa');
+                if (this.unit) txt += ' ' + (this.presUnit || 'mb');
                 return txt;
             }
             case 'iaq': {
