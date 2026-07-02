@@ -223,6 +223,7 @@ PNG 64x64 codificado en base64. Se genera automáticamente al exportar desde el 
 | `image` | Imagen PNG base64 | x, y, image |
 | `datetime` | Texto con fecha/hora | x, y, content, font, fgColor, bgColor |
 | `text` | Texto estático | x, y, text, font, fgColor, bgColor |
+| `sensor` | Valor sensor BME280 | x, y, source, decimals, unit, presUnit, font, fgColor, bgColor |
 | `line` | Línea | x, y, x2, y2, color |
 | `rect` | Rectángulo | x, y, w, h, color, fill |
 | `sprite` | Sprite animado | x, y, sprite, frameDelay |
@@ -237,6 +238,7 @@ PNG 64x64 codificado en base64. Se genera automáticamente al exportar desde el 
 | `s` | Segundos | 45 |
 | `A` | AM/PM | PM |
 | `d` | Día del mes | 15 |
+| `j` | Día sin cero | 5 |
 | `D` | Día abreviado | Dom |
 | `l` | Día completo | Domingo |
 | `M` | Mes abreviado | Ene |
@@ -250,6 +252,19 @@ PNG 64x64 codificado en base64. Se genera automáticamente al exportar desde el 
 **Hora en palabras (español):**
 - `Hw`: UNA, DOS, TRES... DOCE (mayúsculas)
 - `iw`: en punto, y cuarto, y media, treinta\ny uno, etc.
+
+### Propiedades del Sensor (BME280)
+
+| Propiedad | Descripción | Valores |
+|-----------|-------------|---------|
+| `source` | Tipo de dato | temp, hum, pres |
+| `decimals` | Decimales | 0-2 (default 1) |
+| `unit` | Mostrar unidad | true/false |
+| `presUnit` | Unidad presión | mb (default), hPa |
+
+**Ejemplos:**
+- `decimals: 0, unit: true` → 23°C, 56%, 1013 mb
+- `presUnit: "hPa"` → 1013 hPa
 
 ---
 
