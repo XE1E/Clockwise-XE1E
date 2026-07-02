@@ -2524,7 +2524,6 @@ class ClockfaceEditor {
             'fg-format-presets': ['datetime'],
             'fg-sensor': ['sensor'],
             'fg-sensor-opts': ['sensor'],
-            'fg-sensor-unit-opts': ['sensor'],
             'fg-font': ['datetime', 'text', 'sensor'],
             'fg-colors-grid': ['datetime', 'text', 'sensor'],
             'fg-size': ['rect', 'fillrect'],
