@@ -1,6 +1,6 @@
 # TODO - ClockWise-XE1E
 
-> Ver [PLAN-DE-TRABAJO.md](PLAN-DE-TRABAJO.md) para el plan completo.
+> Ver [docs/dev/PLAN-DE-TRABAJO.md](docs/dev/PLAN-DE-TRABAJO.md) para el plan completo.
 
 ## En Progreso
 
