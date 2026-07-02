@@ -14,6 +14,27 @@
 - [x] Tema claro/oscuro
 - [x] Integrar editores de clockface
 
+### Sensor Ambiental BME280
+> Plan: [docs/dev/PLAN-SENSOR-AMBIENTAL.md](docs/dev/PLAN-SENSOR-AMBIENTAL.md)
+- [x] Firmware: CWSensor.cpp/h, endpoints API, integración main.cpp
+- [x] Editor: SensorElement, panel de propiedades, valores de prueba
+- [x] Web UI: Tarjeta sensor con config de pines
+- [x] Render carátula: type:"sensor" con source temp/hum/pres
+- [ ] Fuentes: Glifo ° en casos especiales (picopixel, tomthumb, square, atari, 8x13, haxor-12)
+- [ ] Prueba en hardware real con módulo BME280
+
+### RTC DS3231 (Reloj de respaldo)
+> Plan: [docs/dev/PLAN-RTC-DS3231.md](docs/dev/PLAN-RTC-DS3231.md)
+- [ ] Firmware: Helper cwI2CEnsureBegun (bus I²C compartido)
+- [ ] Firmware: CWRtc.cpp/h (begin, available, getEpochUTC, setEpochUTC, lostPower)
+- [ ] Firmware: RTClib en platformio.ini
+- [ ] Firmware: Orquestación en main.cpp (sembrar hora desde RTC, sync a RTC tras NTP)
+- [ ] Firmware: CWDateTime setFromEpochUTC/getEpochUTC
+- [ ] Firmware: pref rtcEnabled en CWPreferences.h
+- [ ] Firmware: Endpoints /api/rtc, rtcEnabled en /api/settings y /api/set
+- [ ] Web UI: Tarjeta RTC en WebUI.h + regenerar WebUI_gz.h
+- [ ] Docs: Subsección RTC en MANUAL_USUARIO.md
+
 ### Pendientes
 - [ ] Actualizacion OTA (subir firmware desde web)
 - [ ] Subir carátulas al repo GitHub desde el editor (requiere token)
