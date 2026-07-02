@@ -224,8 +224,14 @@ npx serve .
 | s | Segundos | 45 |
 | A | AM/PM | PM |
 | d | Dia | 29 |
-| m | Mes | 04 |
-| Y | Año | 2026 |
+| j | Dia sin cero | 9 |
+| m | Mes numerico | 04 |
+| M | Mes abreviado | Abr |
+| F | Mes completo | Abril |
+| Y | Año completo | 2026 |
+| y | Año corto | 26 |
+| D | Dia semana corto | Lun |
+| l | Dia semana completo | Lunes |
 | Hw | Hora en palabras | DIEZ |
 | iw | Minutos en palabras | y media |
 
@@ -234,6 +240,8 @@ npx serve .
 - `H:i:s` = 14:30:45
 - `h:i A` = 02:30 PM
 - `d/m` = 29/04
+- `d M y` = 29 Abr 26
+- `D d` = Lun 29
 
 #### Hora en Palabras (Español)
 
@@ -311,6 +319,33 @@ Resultado a las 10:30: "DIEZ" + "y media"
 3. Agregar frames cargando imagenes PNG
 4. Preview la animacion con "Play"
 5. Eliminar frames con "X" en cada frame
+
+### Sensor (BME280)
+
+Muestra valores del sensor ambiental BME280 (temperatura, humedad, presion).
+
+| Propiedad | Descripcion |
+|-----------|-------------|
+| X, Y | Posicion del texto |
+| Source | Tipo de dato: temp, hum, pres |
+| Decimals | Digitos decimales (0-2, default 1) |
+| Unit | Mostrar unidad (°C, %, hPa/mb) |
+| Pres Unit | Unidad de presion: hPa o mb |
+| Font | Fuente del texto |
+| fgColor | Color del texto |
+| bgColor | Color de fondo |
+
+**Ejemplos de formato:**
+
+| Config | Resultado |
+|--------|-----------|
+| temp, decimals=1, unit=true | 23.4°C |
+| temp, decimals=0, unit=true | 23°C |
+| hum, decimals=0, unit=true | 56% |
+| pres, decimals=0, unit=true | 1013 hPa |
+| pres, decimals=0, presUnit=mb | 1013 mb |
+
+**Nota:** Si el sensor no esta conectado, muestra "--".
 
 ---
 

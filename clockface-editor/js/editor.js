@@ -666,7 +666,7 @@ class ClockfaceEditor {
 
     bindElementProperties() {
         const inputs = ['el-x', 'el-y', 'el-content', 'el-font', 'el-width', 'el-height', 'el-x1', 'el-y1', 'el-radius', 'el-in-loop',
-            'el-sensor-source', 'el-sensor-decimals', 'el-sensor-unit'];
+            'el-sensor-source', 'el-sensor-decimals', 'el-sensor-unit', 'el-sensor-pres-unit'];
 
         inputs.forEach(id => {
             const el = document.getElementById(id);
@@ -2443,9 +2443,13 @@ class ClockfaceEditor {
             let dec = parseInt(document.getElementById('el-sensor-decimals').value);
             element.decimals = isNaN(dec) ? 1 : dec;
             element.unit = document.getElementById('el-sensor-unit').checked;
+            element.presUnit = document.getElementById('el-sensor-pres-unit').value;
             element.font = document.getElementById('el-font').value;
             element.fgColor = ColorUtils.hexToRgb565(document.getElementById('el-fgcolor').value);
             element.bgColor = ColorUtils.hexToRgb565(document.getElementById('el-bgcolor').value);
+            // Mostrar/ocultar selector de unidad de presion
+            document.getElementById('fg-sensor-pres-unit').style.display =
+                element.source === 'pres' ? '' : 'none';
         }
 
         if (element.type === 'rect' || element.type === 'fillrect') {
@@ -2556,6 +2560,9 @@ class ClockfaceEditor {
             document.getElementById('el-sensor-source').value = element.source;
             document.getElementById('el-sensor-decimals').value = element.decimals;
             document.getElementById('el-sensor-unit').checked = element.unit;
+            document.getElementById('el-sensor-pres-unit').value = element.presUnit || 'hPa';
+            document.getElementById('fg-sensor-pres-unit').style.display =
+                element.source === 'pres' ? '' : 'none';
             document.getElementById('el-font').value = element.font;
             document.getElementById('el-fgcolor').value = ColorUtils.rgb565ToHex(element.fgColor);
             document.getElementById('el-fgcolor-value').textContent = element.fgColor;

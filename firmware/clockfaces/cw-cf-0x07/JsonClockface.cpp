@@ -362,7 +362,10 @@ String JsonClockface::getSensorText(JsonVariantConst value)
   }
   if (strcmp(source, "pres") == 0) {
     String s = String(sensor->getPressure(), decimals);
-    if (showUnit) s += " hPa";
+    if (showUnit) {
+      const char *presUnit = value["presUnit"].as<const char *>();
+      s += (presUnit && strcmp(presUnit, "mb") == 0) ? " mb" : " hPa";
+    }
     return s;
   }
   if (strcmp(source, "iaq") == 0) {
