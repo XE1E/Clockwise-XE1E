@@ -197,7 +197,7 @@
                             <select id="el-sensor-source" class="select-highlight">
                                 <option value="temp">Temperatura (&deg;C)</option>
                                 <option value="hum">Humedad (%)</option>
-                                <option value="pres">Presion (hPa)</option>
+                                <option value="pres">Presion (mb)</option>
                                 <option value="iaq">Calidad aire (IAQ)</option>
                             </select>
                         </div>
@@ -207,14 +207,14 @@
                                 <label>Decimales</label>
                                 <input type="number" id="el-sensor-decimals" min="0" max="2" value="1">
                             </div>
+                        </div>
+
+                        <div class="prop-row-half" id="fg-sensor-unit-opts" style="display:none;">
                             <div>
                                 <label>Unidad</label>
                                 <input type="checkbox" id="el-sensor-unit" checked>
                             </div>
-                        </div>
-
-                        <div class="prop-row-half" id="fg-sensor-pres-unit" style="display:none;">
-                            <div>
+                            <div id="fg-sensor-pres-unit" style="display:none;">
                                 <label>Usar hPa</label>
                                 <input type="checkbox" id="el-sensor-pres-hpa">
                             </div>
