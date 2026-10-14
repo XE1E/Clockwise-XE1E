@@ -84,8 +84,8 @@ Disponibles online, sin instalar nada:
 | Herramienta | Descripcion |
 |-------------|-------------|
 | **[Web Flasher](https://xe1e.github.io/Clockwise-XE1E/)** | Instala el firmware desde el navegador |
-| **[Editor de Caratulas](https://xe1e.github.io/Clockwise-XE1E/editor/)** | Disena caratulas con preview en tiempo real |
-| **[Galeria](https://xe1e.github.io/Clockwise-XE1E/gallery/)** | Descarga caratulas listas para usar |
+| **[Editor de Caratulas](https://xe1e.github.io/Clockwise-XE1E/clockface-editor/)** | Disena caratulas con preview en tiempo real |
+| **[Galeria](https://xe1e.github.io/Clockwise-XE1E/web-flasher/gallery/)** | Descarga caratulas listas para usar |
 
 ---
 
@@ -165,8 +165,8 @@ Disponibles online, sin instalar nada:
 
 | Documento | Contenido |
 |-----------|-----------|
-| [Manual de Usuario](docs/MANUAL_USUARIO.md) | Guia completa de uso |
-| [Manual de Configuracion](docs/MANUAL_CONFIGURACION.md) | Configuracion avanzada |
+| [Manual de Usuario](docs/user/MANUAL_USUARIO.md) | Guia completa de uso |
+| [Manual de Configuracion](docs/user/MANUAL_CONFIGURACION.md) | Configuracion avanzada |
 
 ---
 
@@ -197,7 +197,7 @@ Las contribuciones son bienvenidas. Si quieres aportar al proyecto:
 
 ### Formas de aportar
 
-- **Caratulas** - Disena nuevas caratulas con el [Editor](https://xe1e.github.io/Clockwise-XE1E/editor/) y compartelas.
+- **Caratulas** - Disena nuevas caratulas con el [Editor](https://xe1e.github.io/Clockwise-XE1E/clockface-editor/) y compartelas.
 - **Codigo** - Mejoras al firmware, al editor o al web flasher.
 - **Documentacion** - Correcciones o ampliaciones de los manuales.
 - **Reportes** - Abre un [Issue](https://github.com/XE1E/Clockwise-XE1E/issues) con bugs o ideas.

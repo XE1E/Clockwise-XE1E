@@ -74,7 +74,7 @@ El proyecto soporta dos placas mediante *environments* de PlatformIO. Ambas pued
 
 `pio run` sin `-e` usa el ESP32 original (`default_envs = esp32dev`). Para el S3 hay que indicar `-e esp32s3` en cada comando.
 
-Para el detalle completo del S3 (pinout, PSRAM, USB nativo, LED RGB, diagramas de cableado) ver **[Migracion a ESP32-S3](ESP32-S3-MIGRATION.html)**.
+Para el detalle completo del S3 (pinout, PSRAM, USB nativo, LED RGB, diagramas de cableado) ver **[Migracion a ESP32-S3](../dev/ESP32-S3-MIGRATION.md)**.
 
 ### Compilar
 
@@ -425,7 +425,7 @@ El pinout depende de la placa. Usa la tabla que corresponda a tu microcontrolado
 | OE | 2 | |
 | GND | GND | |
 
-**Pines a evitar en S3:** 26-32 (flash/PSRAM), 19/20 (USB), 43/44 (UART0), 0 (boot). Diagrama de cableado e imagenes del conector en **[Migracion a ESP32-S3](ESP32-S3-MIGRATION.html)**.
+**Pines a evitar en S3:** 26-32 (flash/PSRAM), 19/20 (USB), 43/44 (UART0), 0 (boot). Diagrama de cableado e imagenes del conector en **[Migracion a ESP32-S3](../dev/ESP32-S3-MIGRATION.md)**.
 
 ### Conexion LDR
 
@@ -437,7 +437,7 @@ El pinout depende de la placa. Usa la tabla que corresponda a tu microcontrolado
                  GND
 ```
 
-Pin ADC por defecto: **GPIO 35** en ESP32 DevKit v1, **GPIO 1** en ESP32-S3 (ADC1, compatible con WiFi). Configurable desde la web UI. Esquema detallado del S3 en **[Migracion a ESP32-S3](ESP32-S3-MIGRATION.html#esquema-de-conexion-divisor-de-tension)**.
+Pin ADC por defecto: **GPIO 35** en ESP32 DevKit v1, **GPIO 1** en ESP32-S3 (ADC1, compatible con WiFi). Configurable desde la web UI. Esquema detallado del S3 en **[Migracion a ESP32-S3](../dev/ESP32-S3-MIGRATION.md#esquema-de-conexion-divisor-de-tension)**.
 
 ---
 
@@ -512,6 +512,6 @@ Clockwise-XE1E/
 
 - **Repositorio:** https://github.com/XE1E/Clockwise-XE1E
 - **Editor Online:** https://xe1e.github.io/Clockwise-XE1E/clockface-editor/
-- **Migracion a ESP32-S3:** [ESP32-S3-MIGRATION.html](ESP32-S3-MIGRATION.html)
+- **Migracion a ESP32-S3:** [ESP32-S3-MIGRATION.html](../dev/ESP32-S3-MIGRATION.md)
 - **Libreria HUB75:** https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-DMA
 - **PlatformIO:** https://platformio.org/

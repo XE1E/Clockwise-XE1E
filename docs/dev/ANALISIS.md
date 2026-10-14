@@ -679,7 +679,7 @@ Se ha creado la carpeta `web-flasher/` con:
 
 Se ha desarrollado un editor web interactivo para diseñar clockfaces sin escribir JSON manualmente.
 
-**Documentacion completa:** [manual_editor.md](manual_editor.md)
+**Documentacion completa:** [MANUAL_EDITOR.md](../user/MANUAL_EDITOR.md)
 
 ### Resumen de Funcionalidades
 

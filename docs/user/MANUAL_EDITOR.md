@@ -76,7 +76,7 @@ npx serve .
 
 1. Ir a Settings > Pages en tu repositorio
 2. Seleccionar rama `main` y carpeta `/clockface-editor`
-3. URL: `https://xe1e.github.io/Clockwise/clockface-editor/`
+3. URL: `https://xe1e.github.io/Clockwise-XE1E/clockface-editor/`
 
 ### Opcion C - Abrir directamente
 

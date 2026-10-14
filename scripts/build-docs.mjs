@@ -4,7 +4,7 @@
 // Requiere: marked (npm install marked)
 
 import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { join, basename } from 'node:path';
+import { join, basename, relative, sep } from 'node:path';
 import { marked } from 'marked';
 
 const targetDir = process.argv[2] || '_site/docs';
@@ -26,7 +26,7 @@ function rewriteMdLinks(html) {
   return html.replace(/href="([^"#:]+)\.md(#[^"]*)?"/g, 'href="$1.html$2"');
 }
 
-function template(title, body) {
+function template(title, body, home) {
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -100,31 +100,36 @@ function template(title, body) {
 <body>
   <nav>
     <div class="inner">
-      <a class="home" href="../">← ClockWise XE1E</a>
+      <a class="home" href="${home}">← ClockWise XE1E</a>
       <span class="doc-title">${escapeHtml(title)}</span>
     </div>
   </nav>
   <main>
 ${body}
-    <a class="back" href="../">← Volver al inicio</a>
+    <a class="back" href="${home}">← Volver al inicio</a>
   </main>
 </body>
 </html>
 `;
 }
 
-const entries = await readdir(targetDir, { withFileTypes: true });
-const mdFiles = entries.filter(e => e.isFile() && e.name.endsWith('.md')).map(e => e.name);
+// Recorre docs/ y sus subcarpetas (user/, dev/, misc/...). El enlace de inicio sube los niveles que hagan falta.
+const mdFiles = (await readdir(targetDir, { recursive: true, withFileTypes: true }))
+  .filter(e => e.isFile() && e.name.endsWith('.md'))
+  .map(e => join(e.parentPath ?? e.path, e.name));
 
 let count = 0;
-for (const file of mdFiles) {
-  const md = await readFile(join(targetDir, file), 'utf8');
-  const title = extractTitle(md, basename(file, '.md'));
+for (const path of mdFiles) {
+  const rel = relative(targetDir, path);
+  const depth = rel.split(sep).length;            // docs/x.md -> 1, docs/user/x.md -> 2
+  const home = '../'.repeat(depth);
+  const md = await readFile(path, 'utf8');
+  const title = extractTitle(md, basename(path, '.md'));
   const body = rewriteMdLinks(marked.parse(md));
-  const outName = file.replace(/\.md$/, '.html');
-  await writeFile(join(targetDir, outName), template(title, body), 'utf8');
+  const outPath = path.replace(/\.md$/, '.html');
+  await writeFile(outPath, template(title, body, home), 'utf8');
   count++;
-  console.log(`  ✓ ${file} → ${outName}`);
+  console.log(`  ✓ ${rel} → ${relative(targetDir, outPath)}`);
 }
 
 console.log(`Renderizados ${count} documento(s) en ${targetDir}`);

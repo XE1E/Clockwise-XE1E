@@ -159,9 +159,9 @@ void displaySetup(bool swapBlueGreen, uint8_t displayBright, uint8_t displayRota
 | OE | 2 | Output Enable |
 | GND | GND | Tierra |
 
-![ESP32-S3-DevKitC-1 Pinout](ESP32-S3-DevKit-C.png)
+![ESP32-S3-DevKitC-1 Pinout](../images/ESP32-S3-DevKit-C.png)
 
-![ESP32-S3-DevKitC-1 IPEX N16R8](ESP32-S3-DevKit-C-Ipex.png)
+![ESP32-S3-DevKitC-1 IPEX N16R8](../images/ESP32-S3-DevKit-C-Ipex.png)
 
 ### Diagrama de conexión
 
@@ -198,7 +198,7 @@ ESP32-S3-DevKitC-1          Panel HUB75 64x64
 </td>
 <td>
 
-![Conector HUB75](HUB75.png)
+![Conector HUB75](../images/HUB75.png)
 
 </td>
 </tr>
