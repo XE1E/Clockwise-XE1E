@@ -16,4 +16,4 @@ dependencies.lock
 components/
 
 # Claude Code local settings (machine-specific permissions)
-.claude/settings.local.json
+.claude/settings.local.jsonnode_modules/
